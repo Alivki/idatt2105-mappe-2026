@@ -1,3 +1,43 @@
+<template>
+  <div class="page">
+    <div class="wrapper">
+      <p class="step">STEG 2: VELG ORGANISASJON</p>
+
+      <div class="card">
+        <h1>Velg virksomhet</h1>
+        <p class="subtitle">Du har tilgang til flere virksomheter</p>
+
+        <div
+          v-for="company in companies"
+          :key="company.id"
+          class="company-card"
+          :class="{ selected: selectedCompany === company.id }"
+          @click="selectedCompany = company.id"
+        >
+          <div class="company-left">
+            <div class="logo-box" :class="company.logoClass">
+              {{ company.initials }}
+            </div>
+
+            <div class="company-info">
+              <h2>{{ company.name }}</h2>
+              <p>Org: {{ company.org }}</p>
+            </div>
+          </div>
+
+          <span class="role-badge" :class="company.roleClass">
+            {{ company.role }}
+          </span>
+        </div>
+
+        <button class="continue-btn" :disabled="!selectedCompany">
+          Fortsett
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ref } from "vue";
 
@@ -24,44 +64,6 @@ const companies = [
   },
 ];
 </script>
-
-<template>
-  <div class="container">
-    <p class="step">Steg 2: Velg organisasjon</p>
-
-    <div class="card">
-      <h2>Velg virksomhet</h2>
-      <p class="subtitle">Du har tilgang til flere virksomheter</p>
-
-      <div
-        v-for="company in companies"
-        :key="company.id"
-        class="company-card"
-        :class="{selected: selectedCompany === company.id}"
-        @click="selectedCompany = company.id"
-      >
-        <div class="company-left">
-          <div class="logo-box" :class="company.logoClass">
-            {{ company.initials }}
-          </div>
-
-          <div class="company-info">
-            <h2>{{ company.name }}</h2>
-            <p>Org: {{ company.org }}</p>
-          </div>
-        </div>
-
-        <span class="role-badge" :class="company.roleClass">
-            {{ company.role }}
-          </span>
-      </div>
-
-      <button class="continue-btn" :disabled="!selectedCompany">
-        Fortsett
-      </button>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .page {
