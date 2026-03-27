@@ -1,10 +1,10 @@
-package com.iksystem.ik_mat
+package com.iksystem
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
-class IkMatApplicationTests {
+class IkSystemApplicationTests {
 
     @Test
     fun contextLoads() {
