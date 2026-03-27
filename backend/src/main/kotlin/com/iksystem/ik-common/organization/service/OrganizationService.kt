@@ -9,8 +9,24 @@ import com.iksystem.`ik-common`.organization.repository.OrganizationRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
+/**
+ * Service layer for organization management.
+ *
+ * Handles creation, lookup, and listing of organizations while
+ * enforcing uniqueness constraints on the organization name.
+ *
+ * @property organizationRepository JPA repository used for persistence operations.
+ */
 @Service
 class OrganizationService(private val organizationRepository: OrganizationRepository) {
+
+    /**
+     * Creates a new organization.
+     *
+     * @param request DTO containing the desired name and optional org number.
+     * @return An [OrganizationResponse] representing the newly created organization.
+     * @throws ConflictException if an organization with the same name already exists.
+     */
     @Transactional
     fun create(request: CreateOrganizationRequest): OrganizationResponse {
         if (organizationRepository.existsByName(request.name)) {
@@ -24,6 +40,13 @@ class OrganizationService(private val organizationRepository: OrganizationReposi
         return org.toResponse()
     }
 
+    /**
+     * Retrieves a single organization by its primary key.
+     *
+     * @param id The organization ID.
+     * @return An [OrganizationResponse] for the matching organization.
+     * @throws NotFoundException if no organization with the given [id] exists.
+     */
     @Transactional(readOnly = true)
     fun getById(id: Long): OrganizationResponse {
         val org = organizationRepository.findById(id)
@@ -32,11 +55,19 @@ class OrganizationService(private val organizationRepository: OrganizationReposi
         return org.toResponse()
     }
 
+    /**
+     * Lists all organizations in the system.
+     *
+     * @return A list of [OrganizationResponse] DTOs.
+     */
     @Transactional(readOnly = true)
     fun listAll(): List<OrganizationResponse> =
         organizationRepository.findAll().map { it.toResponse() }
 }
 
+/**
+ * Extension function that maps an [Organization] entity to an [OrganizationResponse] DTO.
+ */
 fun Organization.toResponse() = OrganizationResponse(
     id = id,
     name = name,

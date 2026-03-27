@@ -8,6 +8,17 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.time.Instant
 
+/**
+ * JPA entity representing an organization in the system.
+ *
+ * Each organization has a unique [name] and an optional [orgNumber]
+ * (e.g. a national business registry number).
+ *
+ * @property id Auto-generated primary key.
+ * @property name Unique display name of the organization.
+ * @property orgNumber Optional external organization/business number.
+ * @property createdAt Timestamp set automatically when the row is first inserted.
+ */
 @Entity
 @Table(name = "organizations")
 data class Organization (
