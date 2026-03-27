@@ -2,36 +2,30 @@ package com.iksystem.`ik-common`.user.model
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import com.iksystem.`ik-common`.organization.model.Organization
 import java.time.Instant
 
 /**
- * JPA entity representing a user in the system.
+ * JPA entity representing a user identity in the system.
  *
- * Every user belongs to exactly one [Organization] and is assigned a [Role]
- * that determines their access level. Users can be soft-disabled via [active].
+ * Users are pure identity — roles and organization membership are
+ * managed through the [Membership] entity. A user can belong to
+ * multiple organizations with different roles.
  *
  * @property id Auto-generated primary key.
  * @property email Unique login email address.
  * @property password BCrypt-hashed password.
  * @property fullName User's display name.
  * @property phoneNumber Contact phone number.
- * @property role The user's authorization role (defaults to [Role.EMPLOYEE]).
- * @property organization The organization this user belongs to.
  * @property active Whether the account is enabled; `false` prevents login.
  * @property createdAt Timestamp set automatically when the row is first inserted.
  */
 @Entity
 @Table(name = "users")
-data class User (
+data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
@@ -47,14 +41,6 @@ data class User (
 
     @Column(nullable = false)
     val phoneNumber: String,
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    val role: Role = Role.EMPLOYEE,
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "organization_id", nullable = false)
-    val organization: Organization,
 
     @Column(nullable = false)
     val active: Boolean = true,

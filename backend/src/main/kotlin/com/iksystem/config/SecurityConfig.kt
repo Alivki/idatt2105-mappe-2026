@@ -12,13 +12,31 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.http.HttpMethod
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.cors.CorsConfiguration
+import com.iksystem.`ik-common`.security.JwtAuthFilter
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
+/**
+ * Spring Security configuration for the IK System backend.
+ *
+ * Configures stateless JWT-based authentication, CORS, and the HTTP
+ * security filter chain. Auth endpoints (`/api/v1/auth/`) are publicly
+ * accessible; all other routes require a valid JWT.
+ *
+ * @property jwtAuthFilter Filter that extracts and validates JWTs from incoming requests.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-class SecurityConfig(private val jwtAuthFilter: RefreshTokenRepositoryJwtAuthFilter, ) {
+class SecurityConfig(private val jwtAuthFilter: JwtAuthFilter) {
+
+    /**
+     * Builds the main security filter chain.
+     *
+     * Disables CSRF (stateless API), enforces CORS, adds the [jwtAuthFilter]
+     * before Spring's default username/password filter, and permits auth
+     * endpoints without authentication.
+     */
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
         http
@@ -27,7 +45,9 @@ class SecurityConfig(private val jwtAuthFilter: RefreshTokenRepositoryJwtAuthFil
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/api/v1/auth/**").permitAll()
+                    .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
+                    .requestMatchers("/api/v1/auth/select-org", "/api/v1/auth/logout").authenticated()
+                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     .requestMatchers("/h2-console/**").permitAll()
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .anyRequest().authenticated()
@@ -36,9 +56,14 @@ class SecurityConfig(private val jwtAuthFilter: RefreshTokenRepositoryJwtAuthFil
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
             .build()
 
+    /** Provides a BCrypt password encoder with strength 12. */
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder(12)
 
+    /**
+     * Configures CORS to allow requests from local dev servers
+     * (`localhost:5173` and `localhost:3000`).
+     */
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val config = CorsConfiguration().apply {

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
+import org.springframework.stereotype.Repository
 
 /**
  * Spring Data JPA repository for [Session] entities.
@@ -12,6 +13,7 @@ import org.springframework.data.repository.query.Param
  * Provides finders for session lookup as well as bulk operations
  * for revoking and cleaning up sessions.
  */
+@Repository
 interface SessionRepository : JpaRepository<Session, Long> {
 
     /**
@@ -47,6 +49,11 @@ interface SessionRepository : JpaRepository<Session, Long> {
      *
      * Intended to be called by a scheduled cleanup job.
      */
+    /** Deactivates all sessions for a user within a specific organization. */
+    @Modifying
+    @Query("UPDATE Session s SET s.active = false WHERE s.user.id = :userId AND s.organizationId = :organizationId")
+    fun deactivateAllByUserIdAndOrganizationId(@Param("userId") userId: Long, @Param("organizationId") organizationId: Long)
+
     @Modifying
     @Query("DELETE FROM Session s WHERE s.expiresAt < CURRENT_TIMESTAMP")
     fun deleteExpired()

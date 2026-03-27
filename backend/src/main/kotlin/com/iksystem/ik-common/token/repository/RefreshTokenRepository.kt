@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
+import org.springframework.stereotype.Repository
 
 /**
  * Spring Data JPA repository for [RefreshToken] entities.
@@ -12,6 +13,7 @@ import org.springframework.data.repository.query.Param
  * Provides token lookup as well as bulk operations for revoking
  * and cleaning up refresh tokens.
  */
+@Repository
 interface RefreshTokenRepository : JpaRepository<RefreshToken, Long> {
 
     /**
@@ -39,6 +41,11 @@ interface RefreshTokenRepository : JpaRepository<RefreshToken, Long> {
      *
      * Intended to be called by a scheduled cleanup job.
      */
+    /** Revokes all refresh tokens for a user within a specific organization. */
+    @Modifying
+    @Query("UPDATE RefreshToken r SET r.revoked = true WHERE r.user.id = :userId AND r.organizationId = :organizationId")
+    fun revokeAllByUserIdAndOrganizationId(@Param("userId") userId: Long, @Param("organizationId") organizationId: Long)
+
     @Modifying
     @Query("DELETE FROM RefreshToken r WHERE r.expiresAt < CURRENT_TIMESTAMP")
     fun deleteExpired()

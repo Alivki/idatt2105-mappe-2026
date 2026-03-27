@@ -4,7 +4,9 @@ import com.ik.ikcommon.exception.BadRequestException
 import com.ik.ikcommon.exception.ConflictException
 import com.ik.ikcommon.exception.ForbiddenException
 import com.ik.ikcommon.exception.NotFoundException
-import com.iksystem.`ik-common`.organization.repository.OrganizationRepository
+import com.iksystem.`ik-common`.membership.dto.MembershipResponse
+import com.iksystem.`ik-common`.membership.model.Membership
+import com.iksystem.`ik-common`.membership.repository.MembershipRepository
 import com.iksystem.`ik-common`.security.AuthenticatedUser
 import com.iksystem.`ik-common`.session.repository.SessionRepository
 import com.iksystem.`ik-common`.token.repository.RefreshTokenRepository
@@ -14,6 +16,7 @@ import com.iksystem.`ik-common`.user.dto.UserResponse
 import com.iksystem.`ik-common`.user.model.Role
 import com.iksystem.`ik-common`.user.model.User
 import com.iksystem.`ik-common`.user.repository.UserRepository
+import com.iksystem.`ik-common`.organization.repository.OrganizationRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,119 +24,116 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * Service layer for user management.
  *
- * All operations are scoped to the caller's organization via [AuthenticatedUser],
- * ensuring tenant isolation. Passwords are hashed with [PasswordEncoder] before storage.
- *
- * @property userRepository JPA repository for user persistence.
- * @property organizationRepository JPA repository used to resolve the caller's organization.
- * @property passwordEncoder Encoder used for hashing passwords (BCrypt).
+ * Operations are scoped to the caller's organization via memberships.
+ * "List users" means list all memberships in the caller's org.
  */
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val refreshTokenRepository: RefreshTokenRepository,
+    private val membershipRepository: MembershipRepository,
     private val organizationRepository: OrganizationRepository,
+    private val refreshTokenRepository: RefreshTokenRepository,
     private val sessionRepository: SessionRepository,
     private val passwordEncoder: PasswordEncoder,
 ) {
 
     /**
-     * Lists all users in the caller's organization.
-     *
-     * @param auth The authenticated caller, used to determine organization scope.
-     * @return A list of [UserResponse] DTOs.
+     * Lists all members in the caller's organization.
      */
     @Transactional(readOnly = true)
-    fun listUsers(auth: AuthenticatedUser): List<UserResponse> =
-        userRepository.findAllByOrganizationId(auth.organizationId).map { it.toResponse() }
+    fun listUsers(auth: AuthenticatedUser): List<MembershipResponse> {
+        val orgId = auth.requireOrganizationId()
+        return membershipRepository.findAllByOrganizationId(orgId).map { it.toMembershipResponse() }
+    }
 
     /**
-     * Retrieves a single user by ID within the caller's organization.
-     *
-     * @param id The user's primary key.
-     * @param auth The authenticated caller.
-     * @return A [UserResponse] for the matching user.
-     * @throws NotFoundException if no user with the given [id] exists in the organization.
+     * Gets a specific user's membership in the caller's organization.
      */
     @Transactional(readOnly = true)
-    fun getUser(id: Long, auth: AuthenticatedUser): UserResponse {
-        val user = userRepository.findByIdAndOrganizationId(id, auth.organizationId)
-            ?: throw NotFoundException("User not found")
+    fun getUser(userId: Long, auth: AuthenticatedUser): MembershipResponse {
+        val orgId = auth.requireOrganizationId()
+        val membership = membershipRepository.findByUserIdAndOrganizationId(userId, orgId)
+            ?: throw NotFoundException("User not found in this organization")
+        return membership.toMembershipResponse()
+    }
+
+    /**
+     * Returns the caller's own profile.
+     */
+    @Transactional(readOnly = true)
+    fun getCurrentUser(auth: AuthenticatedUser): UserResponse {
+        val user = userRepository.findById(auth.userId)
+            .orElseThrow { NotFoundException("User not found") }
         return user.toResponse()
     }
 
     /**
-     * Creates a new user in the caller's organization.
-     *
-     * @param request DTO containing the new user's details.
-     * @param auth The authenticated caller, whose organization the new user will join.
-     * @return A [UserResponse] representing the newly created user.
-     * @throws ConflictException if a user with the same email already exists.
-     * @throws NotFoundException if the caller's organization cannot be found.
+     * Creates a new user and adds them to the caller's organization with the specified role.
+     * If a user with that email already exists, adds them to the org instead.
      */
     @Transactional
-    fun createUser(request: CreateUserRequest, auth: AuthenticatedUser): UserResponse {
-        if (userRepository.existsByEmail(request.email)) {
-            throw ConflictException("User already registered")
-        }
-
+    fun createUser(request: CreateUserRequest, auth: AuthenticatedUser): MembershipResponse {
+        val orgId = auth.requireOrganizationId()
         val role = parseRole(request.role)
-        val organization = organizationRepository.findById(auth.organizationId)
+
+        val organization = organizationRepository.findById(orgId)
             .orElseThrow { NotFoundException("Organization not found") }
 
-        val user = userRepository.save(
-            User(
-                email = request.email,
-                password = passwordEncoder.encode(request.password),
-                fullName = request.fullName,
-                phoneNumber = request.phoneNumber,
-                role = role,
-                organization = organization,
+        var user = userRepository.findByEmail(request.email)
+
+        if (user != null) {
+            // User exists — check they're not already in this org
+            if (membershipRepository.existsByUserIdAndOrganizationId(user.id, orgId)) {
+                throw ConflictException("User is already a member of this organization")
+            }
+        } else {
+            // Create new user identity
+            user = userRepository.save(
+                User(
+                    email = request.email,
+                    password = passwordEncoder.encode(request.password),
+                    fullName = request.fullName,
+                    phoneNumber = request.phoneNumber,
+                )
             )
+        }
+
+        val membership = membershipRepository.save(
+            Membership(user = user, organization = organization, role = role)
         )
 
-        return user.toResponse()
+        return membership.toMembershipResponse()
     }
 
     /**
-     * Updates the role of an existing user.
-     *
-     * @param id The target user's primary key.
-     * @param request DTO containing the new role string.
-     * @param auth The authenticated caller.
-     * @return A [UserResponse] reflecting the updated role.
-     * @throws NotFoundException if the user does not exist in the caller's organization.
-     * @throws BadRequestException if the role string is invalid.
+     * Updates a user's role within the caller's organization.
      */
     @Transactional
-    fun updateUserRole(id: Long, request: UpdateUserRoleRequest, auth: AuthenticatedUser): UserResponse {
-        val user = userRepository.findByIdAndOrganizationId(id, auth.organizationId)
-            ?: throw NotFoundException("User not found")
+    fun updateUserRole(userId: Long, request: UpdateUserRoleRequest, auth: AuthenticatedUser): MembershipResponse {
+        val orgId = auth.requireOrganizationId()
+        val membership = membershipRepository.findByUserIdAndOrganizationId(userId, orgId)
+            ?: throw NotFoundException("User not found in this organization")
 
         val newRole = parseRole(request.role)
-        val updated = userRepository.save(user.copy(role = newRole))
-        return user.toResponse()
+        val updated = membershipRepository.save(membership.copy(role = newRole))
+        return updated.toMembershipResponse()
     }
 
     /**
-     * Soft-disables a user account by setting [User.active] to `false`.
-     *
-     * A user cannot deactivate their own account.
-     *
-     * @param id The target user's primary key.
-     * @param auth The authenticated caller.
-     * @return A [UserResponse] with `active = false`.
-     * @throws NotFoundException if the user does not exist in the caller's organization.
-     * @throws ForbiddenException if the caller attempts to deactivate themselves.
+     * Deactivates a user account globally (across all orgs).
      */
     @Transactional
-    fun deactivateUser(id: Long, auth: AuthenticatedUser): UserResponse {
-        val user = userRepository.findByIdAndOrganizationId(id, auth.organizationId)
-            ?: throw NotFoundException("User not found")
+    fun deactivateUser(userId: Long, auth: AuthenticatedUser): UserResponse {
+        val orgId = auth.requireOrganizationId()
+        membershipRepository.findByUserIdAndOrganizationId(userId, orgId)
+            ?: throw NotFoundException("User not found in this organization")
 
-        if (user.id == auth.userId) {
+        if (userId == auth.userId) {
             throw ForbiddenException("Cannot deactivate your own account")
         }
+
+        val user = userRepository.findById(userId)
+            .orElseThrow { NotFoundException("User not found") }
 
         refreshTokenRepository.revokeAllByUserId(user.id)
         sessionRepository.deactivateAllByUserId(user.id)
@@ -143,52 +143,57 @@ class UserService(
     }
 
     /**
-     * Re-enables a previously deactivated user account.
-     *
-     * @param id The target user's primary key.
-     * @param auth The authenticated caller.
-     * @return A [UserResponse] with `active = true`.
-     * @throws NotFoundException if the user does not exist in the caller's organization.
+     * Re-activates a previously deactivated user account.
      */
     @Transactional
-    fun activateUser(id: Long, auth: AuthenticatedUser): UserResponse {
-        val user = userRepository.findByIdAndOrganizationId(id, auth.organizationId)
-            ?: throw NotFoundException("User not found")
+    fun activateUser(userId: Long, auth: AuthenticatedUser): UserResponse {
+        val orgId = auth.requireOrganizationId()
+        membershipRepository.findByUserIdAndOrganizationId(userId, orgId)
+            ?: throw NotFoundException("User not found in this organization")
+
+        val user = userRepository.findById(userId)
+            .orElseThrow { NotFoundException("User not found") }
 
         val updated = userRepository.save(user.copy(active = true))
         return updated.toResponse()
     }
 
     /**
-     * Kicks a user by revoking their active sessions and refresh tokens.
-     *
-     * The user record itself is not deleted or deactivated. A user cannot kick themselves.
-     *
-     * @param id The target user's primary key.
-     * @param auth The authenticated caller.
-     * @throws NotFoundException if the user does not exist in the caller's organization.
-     * @throws ForbiddenException if the caller attempts to kick themselves.
+     * Kicks a user by revoking their sessions and tokens.
      */
     @Transactional
-    fun kickUser(id: Long, auth: AuthenticatedUser) {
-        val user = userRepository.findByIdAndOrganizationId(id, auth.organizationId)
-            ?: throw NotFoundException("User not found")
+    fun kickUser(userId: Long, auth: AuthenticatedUser) {
+        val orgId = auth.requireOrganizationId()
+        membershipRepository.findByUserIdAndOrganizationId(userId, orgId)
+            ?: throw NotFoundException("User not found in this organization")
 
-        if (user.id == auth.userId) {
+        if (userId == auth.userId) {
             throw ForbiddenException("Cannot kick yourself")
         }
 
-        refreshTokenRepository.revokeAllByUserId(user.id)
-        sessionRepository.deactivateAllByUserId(user.id)
+        refreshTokenRepository.revokeAllByUserId(userId)
+        sessionRepository.deactivateAllByUserId(userId)
     }
 
     /**
-     * Parses a role string into a [Role] enum value (case-insensitive).
-     *
-     * @param role The role string to parse.
-     * @return The corresponding [Role].
-     * @throws BadRequestException if the string does not match any known role.
+     * Removes a user's membership from the caller's organization.
      */
+    @Transactional
+    fun removeMember(userId: Long, auth: AuthenticatedUser) {
+        val orgId = auth.requireOrganizationId()
+        val membership = membershipRepository.findByUserIdAndOrganizationId(userId, orgId)
+            ?: throw NotFoundException("User not found in this organization")
+
+        if (userId == auth.userId) {
+            throw ForbiddenException("Cannot remove yourself from the organization")
+        }
+
+        membershipRepository.delete(membership)
+        // Revoke org-scoped tokens
+        refreshTokenRepository.revokeAllByUserIdAndOrganizationId(userId, orgId)
+        sessionRepository.deactivateAllByUserIdAndOrganizationId(userId, orgId)
+    }
+
     private fun parseRole(role: String): Role =
         try {
             Role.valueOf(role.uppercase())
@@ -197,15 +202,21 @@ class UserService(
         }
 }
 
-/**
- * Extension function that maps a [User] entity to a [UserResponse] DTO.
- */
+/** Extension function that maps a [User] entity to a [UserResponse] DTO. */
 fun User.toResponse() = UserResponse(
     id = id,
     email = email,
     fullName = fullName,
     phoneNumber = phoneNumber,
-    role = role.name,
-    organizationId = organization.id,
     active = active,
+)
+
+/** Extension function that maps a [Membership] to a [MembershipResponse] DTO. */
+fun Membership.toMembershipResponse() = MembershipResponse(
+    id = id,
+    userId = user.id,
+    userEmail = user.email,
+    userFullName = user.fullName,
+    organizationId = organization.id,
+    role = role.name,
 )

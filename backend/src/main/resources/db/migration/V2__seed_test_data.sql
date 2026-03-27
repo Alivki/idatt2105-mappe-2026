@@ -1,20 +1,19 @@
-INSERT INTO roles (name, description)
+INSERT INTO organizations (name, org_number)
 VALUES
-    ('ROLE_ADMIN', 'System administrator with full access'),
-    ('ROLE_MANAGER', 'Can manage checklists, users and reports'),
-    ('ROLE_STAFF', 'Can complete daily routines and logs');
+    ('IK System', '123456789'),
+    ('Demo Organization', '987654321');
 
-INSERT INTO users (username, email, password_hash, enabled)
+-- Password is 'password' hashed with BCrypt (strength 12)
+INSERT INTO users (email, password, full_name, phone_number)
 VALUES
-    ('admin', 'admin@iksystem.local', '$2a$10$exampleAdminHashReplaceLater', TRUE),
-    ('manager', 'manager@iksystem.local', '$2a$10$exampleManagerHashReplaceLater', TRUE),
-    ('staff', 'staff@iksystem.local', '$2a$10$exampleStaffHashReplaceLater', TRUE);
+    ('admin@iksystem.local', '$2a$12$LJ3m4ys3Gzl0Ih2UjKLBYeFP3kNMbWR6V0VQ5xNdPBM5DqHO/nIVu', 'Admin User', '+4712345678'),
+    ('manager@iksystem.local', '$2a$12$LJ3m4ys3Gzl0Ih2UjKLBYeFP3kNMbWR6V0VQ5xNdPBM5DqHO/nIVu', 'Manager User', '+4712345679'),
+    ('employee@iksystem.local', '$2a$12$LJ3m4ys3Gzl0Ih2UjKLBYeFP3kNMbWR6V0VQ5xNdPBM5DqHO/nIVu', 'Employee User', '+4712345680');
 
-INSERT INTO user_roles (user_id, role_id)
-SELECT u.id, r.id
-FROM users u
-JOIN roles r ON (
-    (u.username = 'admin' AND r.name IN ('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_STAFF')) OR
-    (u.username = 'manager' AND r.name IN ('ROLE_MANAGER', 'ROLE_STAFF')) OR
-    (u.username = 'staff' AND r.name = 'ROLE_STAFF')
-);
+-- Memberships: admin + manager in IK System, employee in both orgs
+INSERT INTO memberships (user_id, organization_id, role)
+VALUES
+    (1, 1, 'ADMIN'),
+    (2, 1, 'MANAGER'),
+    (3, 1, 'EMPLOYEE'),
+    (3, 2, 'ADMIN');
