@@ -18,7 +18,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-class SecurityConfig(private val jwtAuthFilter: JwtAuthFilter, ) {
+class SecurityConfig(private val jwtAuthFilter: RefreshTokenRepositoryJwtAuthFilter, ) {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
         http

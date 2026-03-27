@@ -6,6 +6,8 @@ import com.ik.ikcommon.exception.ForbiddenException
 import com.ik.ikcommon.exception.NotFoundException
 import com.iksystem.`ik-common`.organization.repository.OrganizationRepository
 import com.iksystem.`ik-common`.security.AuthenticatedUser
+import com.iksystem.`ik-common`.session.repository.SessionRepository
+import com.iksystem.`ik-common`.token.repository.RefreshTokenRepository
 import com.iksystem.`ik-common`.user.dto.CreateUserRequest
 import com.iksystem.`ik-common`.user.dto.UpdateUserRoleRequest
 import com.iksystem.`ik-common`.user.dto.UserResponse
@@ -29,9 +31,9 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    //private val refreshTokenRepository: RefreshTokenRepository,
+    private val refreshTokenRepository: RefreshTokenRepository,
     private val organizationRepository: OrganizationRepository,
-    //private val sessionRepository: SessionRepository,
+    private val sessionRepository: SessionRepository,
     private val passwordEncoder: PasswordEncoder,
 ) {
 
@@ -133,8 +135,8 @@ class UserService(
             throw ForbiddenException("Cannot deactivate your own account")
         }
 
-        //refreshTokenRepository.revokeAllByUserId(user.id)
-        //sessionRepository.deactivateAllByUserId(user.id)
+        refreshTokenRepository.revokeAllByUserId(user.id)
+        sessionRepository.deactivateAllByUserId(user.id)
 
         val updated = userRepository.save(user.copy(active = false))
         return updated.toResponse()
@@ -176,8 +178,8 @@ class UserService(
             throw ForbiddenException("Cannot kick yourself")
         }
 
-        //refreshTokenRepository.revokeAllByUserId(user.id)
-        //sessionRepository.deactivateAllByUserId(user.id)
+        refreshTokenRepository.revokeAllByUserId(user.id)
+        sessionRepository.deactivateAllByUserId(user.id)
     }
 
     /**

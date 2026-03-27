@@ -1,0 +1,45 @@
+package com.iksystem.`ik-common`.token.repository
+
+import com.iksystem.`ik-common`.token.model.RefreshToken
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
+
+/**
+ * Spring Data JPA repository for [RefreshToken] entities.
+ *
+ * Provides token lookup as well as bulk operations for revoking
+ * and cleaning up refresh tokens.
+ */
+interface RefreshTokenRepository : JpaRepository<RefreshToken, Long> {
+
+    /**
+     * Finds a refresh token by its unique opaque [token] string.
+     *
+     * @param token The token value sent by the client.
+     * @return The matching [RefreshToken], or `null` if none exists.
+     */
+    fun findByToken(token: String): RefreshToken?
+
+    /**
+     * Revokes every refresh token belonging to the specified user.
+     *
+     * Uses a bulk JPQL UPDATE because Spring Data cannot derive
+     * modification queries from method names alone.
+     *
+     * @param userId The user whose tokens should be revoked.
+     */
+    @Modifying
+    @Query("UPDATE RefreshToken r SET r.revoked = true WHERE r.user.id = :userId")
+    fun revokeAllByUserId(@Param("userId") userId: Long)
+
+    /**
+     * Deletes all refresh tokens whose [RefreshToken.expiresAt] is in the past.
+     *
+     * Intended to be called by a scheduled cleanup job.
+     */
+    @Modifying
+    @Query("DELETE FROM RefreshToken r WHERE r.expiresAt < CURRENT_TIMESTAMP")
+    fun deleteExpired()
+}
