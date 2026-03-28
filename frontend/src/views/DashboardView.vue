@@ -74,7 +74,7 @@ const deviations = [
     id: 3,
     title: 'Renholdsplan ikke fullført tirsdag',
     meta: 'IK-Mat - Rapportert av Ansatt Ansattsen - 3 dager siden',
-    severity: 'Loest' as const,
+    severity: 'Løst' as const,
   },
 ]
 </script>
