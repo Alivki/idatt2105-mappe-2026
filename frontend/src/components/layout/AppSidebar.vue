@@ -17,9 +17,9 @@ const itemToRoute: Record<string, string | null> = {
   Dashboard: '/dashboard',
   Sjekklister: '/sjekklister',
   Temperatur: '/temperatur',
-  Opplaering: null,
-  Bevilling: null,
-  Avvik: null,
+  Opplæring: '/opplæring',
+  Bevilling: '/bevilling',
+  Avvik: '/avvik',
 }
 
 function navigateTo(item: string): void {

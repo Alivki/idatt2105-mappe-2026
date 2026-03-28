@@ -4,6 +4,8 @@ import LoginView from '@/views/loginView.vue'
 import BusinessView from '@/views/businessView.vue'
 import ChecklistView from '@/views/ChecklistView.vue'
 import TemperatureView from '@/views/TemperatureView.vue'
+import DeviationsView from '@/views/DeviationsView.vue'
+import TrainingView from '@/views/TrainingView.vue'
 
 const TEMP_AUTH_KEY = 'ik_temp_auth'
 
@@ -41,6 +43,24 @@ const router = createRouter({
       path: '/business',
       name: 'business',
       component: BusinessView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/opplæring',
+      name: 'opplæring',
+      component: TrainingView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/bevilling',
+      name: 'bevilling',
+      component: DeviationsView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/avvik',
+      name: 'avvik',
+      component: DeviationsView,
       meta: { requiresAuth: true },
     },
   ],
