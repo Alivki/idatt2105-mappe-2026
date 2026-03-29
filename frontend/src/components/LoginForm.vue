@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useForm } from '@tanstack/vue-form'
 import { z } from 'zod'
-import { useLogin } from '@/composables/useAuth'
+import { useLogin, useSelectOrg } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-vue-next'
+import { useAuthStore } from '@/stores/auth'
 import Button from '@/components/ui/button/Button.vue'
 import InputGroup from '@/components/ui/input-group/InputGroup.vue'
 import InputGroupAddon from '@/components/ui/input-group/InputGroupAddon.vue'
@@ -13,7 +14,9 @@ import InputGroupInput from '@/components/ui/input-group/InputGroupInput.vue'
 import InputGroupButton from '@/components/ui/input-group/InputGroupButton.vue'
 
 const router = useRouter()
+const auth = useAuthStore()
 const login = useLogin()
+const selectOrg = useSelectOrg()
 const showPassword = ref(false)
 
 const emailSchema = z.string().min(1, 'E-post er påkrevd').email('Ugyldig e-postadresse')
@@ -30,6 +33,15 @@ const form = useForm({
     } catch {
       toast.error('Feil e-post eller passord')
     }
+
+    const firstMembership = auth.memberships[0]
+    if (!firstMembership) {
+      router.push('/create-org')
+      return
+    }
+
+    await selectOrg.mutateAsync({ organizationId: firstMembership.organizationId })
+    router.push('/')
   },
 })
 
@@ -98,11 +110,20 @@ defineExpose({ loginError: login.error })
       </div>
     </div>
 
-    <Button type="submit" :disabled="login.isPending.value">
-      {{ login.isPending.value ? 'Logger inn...' : 'Logg inn' }}
-    </Button>
+    <div class="buttons">
+      <Button type="submit" :disabled="login.isPending.value">
+        {{ login.isPending.value ? 'Logger inn...' : 'Logg inn' }}
+      </Button>
 
-    <Button variant="link" type="button">Glemt passord?</Button>
+      <div class="signuplink">
+        <p class="subtitle">
+          Har du ikke en konto?
+        </p>
+        <RouterLink to="/signup" custom v-slot="{ navigate }">
+          <Button @click="navigate" role="link" variant="link" type="button">Registrer deg</Button>
+        </RouterLink>
+      </div>
+    </div>
   </form>
 </template>
 
@@ -143,5 +164,23 @@ form > :deep(.btn--link) {
 
 :deep(.input-group--error) {
   border-color: hsl(var(--destructive));
+}
+
+.buttons {
+  gap: 4px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.signuplink {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.subtitle {
+  font-size: 14px;
 }
 </style>
