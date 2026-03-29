@@ -22,7 +22,7 @@ watch(isOpen, async (open: boolean) => {
       // Set explicit height first for transition
       height.value = contentRef.value.scrollHeight + "px"
       // Force reflow
-      contentRef.value.offsetHeight
+      void contentRef.value.offsetHeight
       requestAnimationFrame(() => {
         height.value = "0px"
       })
