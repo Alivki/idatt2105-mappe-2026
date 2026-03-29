@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { inject } from "vue"
-import { Button } from '@/components/ui/button--------------------'
+import { Button } from '@/components/ui/button'
 
 const props = defineProps<{
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"

@@ -9,13 +9,13 @@ const props = defineProps<{
   class?: string
 }>()
 
-const { selectedValue, select, registerItem } = inject("select--------------------") as { selectedValue: Ref<string>; select: (value: string, label: string) => void; registerItem: (value: string, label: string) => void }
+const { selectedValue, select, registerItem } = inject("select") as { selectedValue: Ref<string>; select: (value: string, label?: string) => void; registerItem: (value: string, label: string) => void }
 const itemRef = ref<HTMLElement | null>(null)
 
 const isSelected = computed(() => selectedValue.value === props.value)
 
 onMounted(() => {
-  const text = itemRef.value?.querySelector(".select---------------------item__text")?.textContent?.trim() ?? props.value
+  const text = itemRef.value?.querySelector(".select-item__text")?.textContent?.trim() ?? props.value
   registerItem(props.value, text)
 })
 

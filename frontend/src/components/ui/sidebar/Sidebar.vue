@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Sheet, SheetContent } from "@/components/ui/sheet--------------------"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { SIDEBAR_WIDTH_MOBILE, useSidebar } from "./utils"
 
 defineOptions({

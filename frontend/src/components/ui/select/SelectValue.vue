@@ -6,7 +6,7 @@ defineProps<{
   placeholder?: string
 }>()
 
-const { selectedValue, selectedLabel } = inject("select--------------------") as { selectedValue: Ref<string>; selectedLabel: Ref<string> }
+const { selectedValue, selectedLabel } = inject("select") as { selectedValue: Ref<string>; selectedLabel: Ref<string> }
 
 const showPlaceholder = computed(() => !selectedValue.value)
 </script>

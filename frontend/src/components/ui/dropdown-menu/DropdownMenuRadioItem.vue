@@ -8,7 +8,7 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 
-const group = inject("dropdown-radio-group") as { modelValue: () => string }
+const group = inject("dropdown-radio-group") as { modelValue: () => string; select: (value: string) => void }
 const isChecked = computed(() => group.modelValue() === props.value)
 
 function handleClick() {

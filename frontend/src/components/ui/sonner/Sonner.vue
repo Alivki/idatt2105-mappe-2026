@@ -13,10 +13,10 @@ const delegatedProps = reactiveOmit(props, "toastOptions")
     class="toaster"
     :toast-options="{
       classes: {
-        toast: 'sonner---------------------toast',
-        description: 'sonner---------------------description',
-        actionButton: 'sonner---------------------action',
-        cancelButton: 'sonner---------------------cancel',
+        toast: 'sonner-toast',
+        description: 'sonner-description',
+        actionButton: 'sonner-action',
+        cancelButton: 'sonner-cancel',
       },
     }"
     v-bind="delegatedProps"
@@ -45,7 +45,7 @@ const delegatedProps = reactiveOmit(props, "toastOptions")
 </template>
 
 <style>
-/* These styles must be unscoped since vue-sonner-------------------- injects toast elements outside this component's scope */
+/* These styles must be unscoped since vue-sonner injects toast elements outside this component's scope */
 
 .sonner-toast {
   background-color: hsl(var(--background, 43 30% 96%)) !important;

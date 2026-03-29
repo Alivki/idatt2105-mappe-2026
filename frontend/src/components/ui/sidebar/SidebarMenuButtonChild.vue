@@ -6,7 +6,7 @@ export interface SidebarMenuButtonProps {
   variant?: "default" | "outline"
   size?: "default" | "sm" | "lg"
   isActive?: boolean
-  class?: string
+  class?: string | Record<string, unknown> | unknown[] | null | false
 }
 
 const props = withDefaults(defineProps<SidebarMenuButtonProps>(), {
