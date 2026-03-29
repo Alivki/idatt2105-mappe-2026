@@ -141,4 +141,69 @@
   box-shadow: 0 0 0 3px var(--accent-focus);
 }
 
+.select-wrap {
+  position: relative;
+}
+
+.select-wrap select {
+  width: 100%;
+  height: 44px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-input);
+  background: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  padding: 0 38px 0 14px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.select-wrap select:hover {
+  border-color: #c0c0d8;
+}
+
+.select-wrap select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-focus);
+}
+
+.select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.finishBtn {
+  display: block;
+  width: 100%;
+  height: 48px;
+  background: var(--accent);
+  color: #fff;
+  border: 2px solid transparent;
+  border-radius: var(--radius-btn);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1.15rem;
+  letter-spacing: 0.01em;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+}
+
+.finishBtn:hover {
+  background: var(--accent-hover);
+  border-color: #2a22a8;
+}
+
+.finishBtn:active {
+  transform: scale(0.985);
+}
+
 </style>
