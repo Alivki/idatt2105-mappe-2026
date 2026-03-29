@@ -4,7 +4,6 @@ import { computed, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/button/Button.vue'
-import StatusPill from '@/components/ui/StatusPill.vue'
 import ChecklistCard from '@/components/checklists/ChecklistCard.vue'
 import ChecklistFormDialog from '@/components/checklists/ChecklistFormDialog.vue'
 import ChecklistItemFormDialog from '@/components/checklists/ChecklistItemFormDialog.vue'
@@ -58,20 +57,67 @@ const canComplete = computed(() => !!auth.role)
 
 const checklists = computed(() => checklistQuery.data.value ?? [])
 
-const filteredChecklists = computed(() => {
-  if (activeFilter.value === 'ALL') {
-    return checklists.value
-  }
-  return checklists.value.filter((entry) => entry.frequency === activeFilter.value)
+const frequencyOrder: ChecklistFrequency[] = ['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']
+
+const filters: Array<{ label: string; value: FrequencyFilter }> = [
+  { label: 'Alle', value: 'ALL' },
+  { label: 'Daglig', value: 'DAILY' },
+  { label: 'Ukentlig', value: 'WEEKLY' },
+  { label: 'Månedlig', value: 'MONTHLY' },
+  { label: 'Årlig', value: 'YEARLY' },
+]
+
+const groupedChecklists = computed(() => {
+  const source =
+    activeFilter.value === 'ALL'
+      ? checklists.value
+      : checklists.value.filter((entry) => entry.frequency === activeFilter.value)
+
+  return frequencyOrder
+    .map((frequency) => {
+      const items = source.filter((entry) => entry.frequency === frequency)
+      return {
+        frequency,
+        label: sectionHeadingLabel(frequency),
+        items,
+      }
+    })
+    .filter((section) => section.items.length > 0)
 })
 
-const filters: Array<{ label: string; value: FrequencyFilter; tone: 'brand' | 'ok' | 'warning' | 'neutral' }> = [
-  { label: 'Alle', value: 'ALL', tone: 'brand' },
-  { label: 'Daglig', value: 'DAILY', tone: 'brand' },
-  { label: 'Ukentlig', value: 'WEEKLY', tone: 'ok' },
-  { label: 'Månedlig', value: 'MONTHLY', tone: 'warning' },
-  { label: 'Årlig', value: 'YEARLY', tone: 'neutral' },
-]
+function sectionHeadingLabel(frequency: ChecklistFrequency): string {
+  const now = new Date()
+  const dateLabel = new Intl.DateTimeFormat('nb-NO', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(now)
+  const monthLabel = new Intl.DateTimeFormat('nb-NO', {
+    month: 'long',
+    year: 'numeric',
+  }).format(now)
+
+  switch (frequency) {
+    case 'DAILY':
+      return `Daglige sjekklister - ${dateLabel}`
+    case 'WEEKLY':
+      return `Ukentlige sjekklister - uke ${getIsoWeek(now)}`
+    case 'MONTHLY':
+      return `Månedlige sjekklister - ${monthLabel}`
+    case 'YEARLY':
+      return `Årlige sjekklister - ${now.getFullYear()}`
+    default:
+      return 'Sjekklister'
+  }
+}
+
+function getIsoWeek(date: Date): number {
+  const target = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
+  const day = target.getUTCDay() || 7
+  target.setUTCDate(target.getUTCDate() + 4 - day)
+  const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1))
+  return Math.ceil((((target.getTime() - yearStart.getTime()) / 86400000) + 1) / 7)
+}
 
 function openCreateChecklistDialog() {
   checklistDialogMode.value = 'create'
@@ -228,7 +274,7 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
         type="button"
         @click="activeFilter = filter.value"
       >
-        <StatusPill :label="filter.label" :tone="filter.tone" />
+        {{ filter.label }}
       </button>
     </section>
 
@@ -237,25 +283,33 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
       <p v-else-if="checklistQuery.isError.value" class="state-line state-line--danger">
         Kunne ikke hente sjekklister.
       </p>
-      <p v-else-if="filteredChecklists.length === 0" class="state-line">
+      <p v-else-if="groupedChecklists.length === 0" class="state-line">
         Ingen sjekklister i valgt frekvens ennå.
       </p>
 
-      <div v-else class="checklist-grid">
-        <ChecklistCard
-          v-for="checklist in filteredChecklists"
-          :key="checklist.id"
-          :checklist="checklist"
-          :can-manage="canManage"
-          :can-complete="canComplete"
-          @edit-checklist="openEditChecklistDialog"
-          @delete-checklist="handleDeleteChecklist"
-          @new-item="openCreateItemDialog"
-          @edit-item="openEditItemDialog"
-          @delete-item="handleDeleteItem"
-          @toggle-item-completed="handleToggleItemCompleted"
-          @toggle-checklist-completed="handleToggleChecklistCompleted"
-        />
+      <div v-else class="sections-wrap">
+        <section v-for="section in groupedChecklists" :key="section.frequency" class="frequency-section">
+          <div class="section-divider">
+            <span>{{ section.label }}</span>
+          </div>
+
+          <div class="checklist-grid">
+            <ChecklistCard
+              v-for="checklist in section.items"
+              :key="checklist.id"
+              :checklist="checklist"
+              :can-manage="canManage"
+              :can-complete="canComplete"
+              @edit-checklist="openEditChecklistDialog"
+              @delete-checklist="handleDeleteChecklist"
+              @new-item="openCreateItemDialog"
+              @edit-item="openEditItemDialog"
+              @delete-item="handleDeleteItem"
+              @toggle-item-completed="handleToggleItemCompleted"
+              @toggle-checklist-completed="handleToggleChecklistCompleted"
+            />
+          </div>
+        </section>
       </div>
     </section>
 
@@ -307,16 +361,20 @@ h1 {
 }
 
 .filter-button {
-  border: 1px solid transparent;
+  border: 1px solid #cfcfc9;
   border-radius: var(--radius-pill);
-  background: transparent;
-  padding: 0;
+  background: #f3f3f2;
+  padding: 8px 16px;
   cursor: pointer;
+  font-size: 0.95rem;
+  color: #32363d;
 }
 
 .filter-button--active {
-  border-color: #cdccc8;
-  box-shadow: inset 0 0 0 1px #e0dfdb;
+  border-color: #4f4bcf;
+  background: #eeedff;
+  color: #403db1;
+  font-weight: 600;
 }
 
 .list-section {
@@ -339,6 +397,30 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.sections-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.frequency-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-divider {
+  padding-top: 2px;
+}
+
+.section-divider span {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.96rem;
+  color: #474c53;
+  font-weight: 700;
 }
 
 @media (max-width: 760px) {
