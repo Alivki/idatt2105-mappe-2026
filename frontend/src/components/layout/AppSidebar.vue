@@ -2,14 +2,9 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-const props = withDefaults(
-  defineProps<{
-    activeItem?: string
-  }>(),
-  {
-    activeItem: 'Dashboard',
-  },
-)
+const { activeItem = 'Dashboard' } = defineProps<{
+  activeItem?: string
+}>()
 
 const router = useRouter()
 
