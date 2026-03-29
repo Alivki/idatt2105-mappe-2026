@@ -1,11 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DashboardView from '@/views/DashboardView.vue'
-import LoginView from '@/views/loginView.vue'
-import BusinessView from '@/views/businessView.vue'
+import LoginView from '@/views/LoginView.vue'
+import BusinessView from '@/views/BusinessView.vue'
 import ChecklistView from '@/views/ChecklistView.vue'
 import TemperatureView from '@/views/TemperatureView.vue'
 import DeviationsView from '@/views/DeviationsView.vue'
 import TrainingView from '@/views/TrainingView.vue'
+import AllowanceView from '@/views/AllowanceView.vue'
 
 const TEMP_AUTH_KEY = 'ik_temp_auth'
 
@@ -54,7 +55,7 @@ const router = createRouter({
     {
       path: '/bevilling',
       name: 'bevilling',
-      component: DeviationsView,
+      component: AllowanceView,
       meta: { requiresAuth: true },
     },
     {
