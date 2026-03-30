@@ -21,3 +21,21 @@ export interface Deviation {
   createdAt: string
   updatedAt: string
 }
+
+export interface CreateDeviationRequest {
+  module: DeviationModule
+  title: string
+  description: string
+  immediateAction?: string
+  severity: DeviationSeverity
+  assignedToUserId?: number
+}
+
+export interface OrganizationMember {
+  id: number
+  userId: number
+  userEmail: string
+  userFullName: string
+  organizationId: number
+  role: string
+}

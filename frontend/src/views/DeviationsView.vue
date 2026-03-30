@@ -1,26 +1,56 @@
 <script setup lang="ts">
+import axios from 'axios'
 import { computed, ref } from 'vue'
 import { AlertTriangle } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/button/Button.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import DeviationListCard from '@/components/deviations/DeviationListCard.vue'
+import DeviationFormDialog from '@/components/deviations/DeviationFormDialog.vue'
 import { useAuthStore } from '@/stores/auth'
-import { useDeviationsQuery } from '@/composables/useDeviations'
-import type { Deviation, DeviationModule, DeviationStatus } from '@/types/deviation'
+import {
+  useCreateDeviationMutation,
+  useDeviationsQuery,
+  useOrganizationMembersQuery,
+} from '@/composables/useDeviations'
+import type { CreateDeviationRequest, Deviation, DeviationModule, DeviationStatus } from '@/types/deviation'
 
 type ModuleFilter = 'ALL' | DeviationModule
 type SortOrder = 'NEWEST_FIRST' | 'OLDEST_FIRST'
 
 const auth = useAuthStore()
 const deviationsQuery = useDeviationsQuery()
+const createDeviation = useCreateDeviationMutation()
 
 const activeModuleFilter = ref<ModuleFilter>('ALL')
 const sortOrder = ref<SortOrder>('NEWEST_FIRST')
+const createDialogOpen = ref(false)
 
 const deviations = computed(() => deviationsQuery.data.value ?? [])
 const canManage = computed(() => auth.role === 'ADMIN' || auth.role === 'MANAGER')
+const membersQuery = useOrganizationMembersQuery(canManage)
+
+const assigneeOptions = computed(() => {
+  if (canManage.value) {
+    return (membersQuery.data.value ?? []).map((member) => ({
+      userId: member.userId,
+      label: `${member.userFullName} (${member.role})`,
+    }))
+  }
+
+  if (!auth.user) {
+    return []
+  }
+
+  return [
+    {
+      userId: auth.user.id,
+      label: `${auth.user.fullName} (Deg)`,
+    },
+  ]
+})
 
 const statusCards = computed(() => [
   {
@@ -83,6 +113,32 @@ function handleEdit(deviation: Deviation) {
   // Commit 5 implements edit flow; button is exposed now from expanded view.
   console.info('Edit requested for deviation', deviation.id)
 }
+
+function openCreateDialog() {
+  createDialogOpen.value = true
+}
+
+async function handleCreate(payload: CreateDeviationRequest) {
+  try {
+    await createDeviation.mutateAsync(payload)
+    createDialogOpen.value = false
+    toast.success('Avvik registrert')
+  } catch (error) {
+    handleMutationError(error, 'Kunne ikke registrere avvik')
+  }
+}
+
+function handleMutationError(error: unknown, fallbackMessage: string) {
+  if (axios.isAxiosError(error)) {
+    const message = error.response?.data?.error?.message
+    if (typeof message === 'string' && message.trim().length > 0) {
+      toast.error(message)
+      return
+    }
+  }
+
+  toast.error(fallbackMessage)
+}
 </script>
 
 <template>
@@ -102,7 +158,7 @@ function handleEdit(deviation: Deviation) {
           <p>Alle registrerte avvik for IK-Mat og IK-Alkohol</p>
         </div>
 
-        <Button :disabled="!canManage">
+        <Button @click="openCreateDialog">
           + Rapporter avvik
         </Button>
       </section>
@@ -168,6 +224,13 @@ function handleEdit(deviation: Deviation) {
         </div>
       </section>
     </div>
+
+    <DeviationFormDialog
+      v-model:open="createDialogOpen"
+      :submitting="createDeviation.isPending.value"
+      :assignees="assigneeOptions"
+      @create="handleCreate"
+    />
   </AppLayout>
 </template>
 

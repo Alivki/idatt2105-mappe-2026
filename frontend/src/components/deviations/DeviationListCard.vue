@@ -152,24 +152,54 @@ function toRelativeTime(value: string): string {
 
 <style scoped>
 .deviation-card {
+  position: relative;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--card-bg);
-  padding: 14px 14px 12px;
-  border-left-width: 4px;
+  padding: 14px 14px 12px 18px;
+}
+
+.deviation-card::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  bottom: -1px;
+  width: 5px;
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  background: transparent;
 }
 
 .deviation-card--critical {
-  border-left-color: var(--red);
+  border-color: hsl(var(--destructive) / 0.25);
 }
 
-.deviation-card--high,
+.deviation-card--critical::before {
+  background: var(--red);
+}
+
 .deviation-card--medium {
-  border-left-color: var(--amber);
+  border-color: #ead8a6;
+}
+
+.deviation-card--medium::before {
+  background: #d0a11f;
+}
+
+.deviation-card--high {
+  border-color: #e7bf99;
+}
+
+.deviation-card--high::before {
+  background: #c9751a;
 }
 
 .deviation-card--low {
-  border-left-color: var(--green);
+  border-color: #b9d9be;
+}
+
+.deviation-card--low::before {
+  background: var(--green);
 }
 
 .deviation-card-header {
