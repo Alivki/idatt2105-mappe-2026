@@ -24,7 +24,6 @@ type OrganizationEmployees = {
   phone: string
   employees: Employee[]
 }
-
 const auth = useAuthStore()
 const search = ref('')
 const editingId = ref<number | null>(null)
