@@ -3,6 +3,18 @@ import { Users } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+
+type Role = 'Admin' | 'Leder' | 'Ansatt'
+
+type Employee = {
+  id: number
+  name: string
+  email: string
+  phone: string
+  role: Role
+  joinedAt: string
+  expanded: boolean
+}
 </script>
 
 <template>
