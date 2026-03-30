@@ -129,9 +129,27 @@ function saveEdit() {
         </article>
       </section>
     </div>
+
+    <div v-if="editingId" class="modal-backdrop" @click.self="editingId = null">
+      <div class="modal">
+        <h3>Rediger bruker</h3>
+        <input v-model="form.name" placeholder="Navn" />
+        <input v-model="form.email" placeholder="E-post" />
+        <input v-model="form.phone" placeholder="Telefon" />
+        <input v-model="form.joinedAt" placeholder="Ansatt siden" />
+        <select v-model="form.role">
+          <option value="Admin">Admin</option>
+          <option value="Leder">Leder</option>
+          <option value="Ansatt">Ansatt</option>
+        </select>
+        <div class="modal-actions">
+          <button class="cancel-btn" @click="editingId = null">Avbryt</button>
+          <button class="save-btn" @click="saveEdit">Lagre</button>
+        </div>
+      </div>
+    </div>
   </AppLayout>
 </template>
-
 
 <style scoped>
 .page-header { display: flex; height: 4rem; align-items: center; }
