@@ -5,16 +5,25 @@ defineProps<{
   deviations: Array<{
     id: number
     title: string
-    dateLabel: string
-    statusLabel: 'Åpen' | 'Under behandling' | 'Løst' | 'Lukket'
+    moduleLabel: string
+    reportedBy: string
+    relativeTime: string
+    severityLabel: 'Lav' | 'Middels' | 'Høy' | 'Kritisk'
   }>
 }>()
 
-const statusTone: Record<'Åpen' | 'Under behandling' | 'Løst' | 'Lukket', 'danger' | 'warning' | 'ok' | 'neutral'> = {
-  Åpen: 'danger',
-  'Under behandling': 'warning',
-  Løst: 'ok',
-  Lukket: 'neutral',
+const severityTone: Record<'Lav' | 'Middels' | 'Høy' | 'Kritisk', 'ok' | 'warning' | 'danger'> = {
+  Lav: 'ok',
+  Middels: 'warning',
+  Høy: 'warning',
+  Kritisk: 'danger',
+}
+
+const severityRailClass: Record<'Lav' | 'Middels' | 'Høy' | 'Kritisk', string> = {
+  Lav: 'entry--low',
+  Middels: 'entry--medium',
+  Høy: 'entry--high',
+  Kritisk: 'entry--critical',
 }
 </script>
 
@@ -22,12 +31,12 @@ const statusTone: Record<'Åpen' | 'Under behandling' | 'Løst' | 'Lukket', 'dan
   <section class="panel">
     <h2>Siste avvik</h2>
 
-    <article v-for="item in deviations" :key="item.id" class="entry">
+    <article v-for="item in deviations" :key="item.id" class="entry" :class="severityRailClass[item.severityLabel]">
       <div>
         <h3>{{ item.title }}</h3>
-        <p>{{ item.dateLabel }}</p>
+        <p>{{ item.moduleLabel }} · Rapportert av {{ item.reportedBy }} · {{ item.relativeTime }}</p>
       </div>
-      <StatusPill :label="item.statusLabel" :tone="statusTone[item.statusLabel]" />
+      <StatusPill :label="item.severityLabel" :tone="severityTone[item.severityLabel]" />
     </article>
 
     <p v-if="deviations.length === 0" class="empty-state">Ingen registrerte avvik ennå.</p>
@@ -72,6 +81,22 @@ h2 {
   margin: 5px 0 0;
   color: #4b5158;
   font-size: 1.14rem;
+}
+
+.entry--critical {
+  border-left-color: #ab3030;
+}
+
+.entry--high {
+  border-left-color: #c9751a;
+}
+
+.entry--medium {
+  border-left-color: #d0a11f;
+}
+
+.entry--low {
+  border-left-color: #158856;
 }
 
 .empty-state {

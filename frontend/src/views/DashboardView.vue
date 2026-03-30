@@ -7,12 +7,15 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 import StatusPill from '@/components/ui/StatusPill.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { useChecklistsQuery } from '@/composables/useChecklists'
 import { useDeviationsQuery } from '@/composables/useDeviations'
-import type { DeviationStatus } from '@/types/deviation'
+import type { Checklist } from '@/types/checklist'
+import type { DeviationSeverity } from '@/types/deviation'
 
 const deviationsQuery = useDeviationsQuery()
+const checklistsQuery = useChecklistsQuery()
 
-const kpis: Array<{
+const kpis = computed<Array<{
   title: string
   value: string
   subtitle?: string
@@ -21,25 +24,42 @@ const kpis: Array<{
     current: number
     total: number
   }
-}> = [
-  {
-    title: 'Temp.avvik',
-    value: '2',
-    subtitle: 'Krever tiltak',
-    highlight: 'danger' as const,
-  },
-  {
-    title: 'Apne avvik',
-    value: '4',
-    subtitle: '1 kritisk',
-  },
-  {
-    title: 'Opplæring',
-    value: '92%',
-    subtitle: '1 utløper snart',
-    highlight: 'success' as const,
-  },
-]
+}>>(() => {
+  const dailyStats = getDailyChecklistStats(checklistsQuery.data.value ?? [])
+  const allDeviations = deviationsQuery.data.value ?? []
+  const openCount = allDeviations.filter((item) => item.status === 'OPEN').length
+  const criticalOpenCount = allDeviations.filter(
+    (item) => item.status === 'OPEN' && item.severity === 'CRITICAL',
+  ).length
+
+  return [
+    {
+      title: 'Sjekklister i dag',
+      value: `${dailyStats.completed}/${dailyStats.total}`,
+      progress: {
+        current: dailyStats.completed,
+        total: Math.max(dailyStats.total, 1),
+      },
+    },
+    {
+      title: 'Temp.avvik',
+      value: '2',
+      subtitle: 'Krever tiltak',
+      highlight: 'danger' as const,
+    },
+    {
+      title: 'Åpne avvik',
+      value: String(openCount),
+      subtitle: `${criticalOpenCount} kritisk`,
+    },
+    {
+      title: 'Opplæring',
+      value: '92%',
+      subtitle: '1 utløper snart',
+      highlight: 'success' as const,
+    },
+  ]
+})
 
 const temperatures = [
   {
@@ -77,34 +97,56 @@ const latestDeviations = computed(() => {
     .map((item) => ({
       id: item.id,
       title: item.title,
-      dateLabel: toDashboardDate(item.reportedAt),
-      statusLabel: toStatusLabel(item.status),
+      moduleLabel: item.module === 'IK_MAT' ? 'IK-Mat' : 'IK-Alkohol',
+      reportedBy: item.reportedByUserName,
+      relativeTime: toRelativeTime(item.reportedAt),
+      severityLabel: toSeverityLabel(item.severity),
     }))
 })
 
-function toDashboardDate(value: string): string {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) {
+function toSeverityLabel(severity: DeviationSeverity): 'Lav' | 'Middels' | 'Høy' | 'Kritisk' {
+  switch (severity) {
+    case 'LOW':
+      return 'Lav'
+    case 'MEDIUM':
+      return 'Middels'
+    case 'HIGH':
+      return 'Høy'
+    default:
+      return 'Kritisk'
+  }
+}
+
+function toRelativeTime(value: string): string {
+  const timestamp = new Date(value).getTime()
+  if (Number.isNaN(timestamp)) {
     return '-'
   }
 
-  return date.toLocaleDateString('nb-NO', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
+  const diffMs = Date.now() - timestamp
+  const minute = 60 * 1000
+  const hour = 60 * minute
+  const day = 24 * hour
+
+  if (diffMs < hour) {
+    const minutes = Math.max(1, Math.floor(diffMs / minute))
+    return `${minutes} min siden`
+  }
+
+  if (diffMs < day) {
+    const hours = Math.floor(diffMs / hour)
+    return `${hours} time${hours > 1 ? 'r' : ''} siden`
+  }
+
+  const days = Math.floor(diffMs / day)
+  return `${days} dag${days > 1 ? 'er' : ''} siden`
 }
 
-function toStatusLabel(status: DeviationStatus): 'Åpen' | 'Under behandling' | 'Løst' | 'Lukket' {
-  switch (status) {
-    case 'OPEN':
-      return 'Åpen'
-    case 'IN_PROGRESS':
-      return 'Under behandling'
-    case 'RESOLVED':
-      return 'Løst'
-    default:
-      return 'Lukket'
+function getDailyChecklistStats(checklists: Checklist[]): { total: number; completed: number } {
+  const daily = checklists.filter((item) => item.frequency === 'DAILY' && item.active)
+  return {
+    total: daily.length,
+    completed: daily.filter((item) => item.status === 'COMPLETED').length,
   }
 }
 </script>

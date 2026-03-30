@@ -59,7 +59,7 @@ VALUES
         (SELECT id FROM organizations WHERE name = 'IK System'),
         'IK_MAT',
         'Renholdsplan ikke fullført tirsdag',
-        'Ukentlig dyprengjøring av kjokken ble utsatt grunnet sykdom.',
+        'Ukentlig dyprengjøring av kjøkken ble utsatt grunnet sykdom.',
         'Gjennomført onsdag som kompensasjon. Rutine oppdatert.',
         'LOW',
         'RESOLVED',
