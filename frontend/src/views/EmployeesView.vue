@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Users } from 'lucide-vue-next'
+import { computed, ref } from 'vue'
+import { Users, ChevronDown, ChevronUp } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
@@ -133,16 +134,47 @@ function saveEdit() {
 
 
 <style scoped>
-.page-header { display: flex; height: 4rem; flex-shrink: 0; align-items: center; }
+.page-header { display: flex; height: 4rem; align-items: center; }
 .page-header-inner { display: flex; align-items: center; gap: 0.5rem; padding: 0 1rem; }
 .header-separator { height: 1rem !important; width: 1px !important; margin-right: 0.5rem; }
 .page-title { font-weight: 500; color: hsl(var(--sidebar-primary, 245 43% 52%)); }
-.page-content { display: flex; flex: 1; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; }
-.empty-state { position: relative; display: flex; min-height: 320px; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; border-radius: 1rem; border: 2px dashed hsl(var(--muted-foreground) / 0.2); background: linear-gradient(to bottom right, hsl(var(--muted) / 0.4), hsl(var(--muted) / 0.2), hsl(var(--background))); padding: 2rem; }
-.empty-state-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at center, hsl(var(--muted)) 0%, transparent 70%); opacity: 0.5; }
-.empty-state-inner { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
-.empty-state-icon { display: flex; height: 5rem; width: 5rem; align-items: center; justify-content: center; border-radius: 1rem; background-color: hsl(var(--primary) / 0.1); box-shadow: 0 0 0 4px hsl(var(--primary) / 0.05); }
-.empty-state-icon :deep(svg) { width: 2.5rem; height: 2.5rem; color: hsl(var(--primary) / 0.7); }
-.empty-state-text h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; }
-.empty-state-text p { max-width: 24rem; font-size: 0.875rem; color: hsl(var(--muted-foreground)); margin-top: 0.25rem; }
+.page-content { display: flex; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; background: #f6f4ef; min-height: calc(100vh - 4rem); }
+.hero-card, .list-card { border: 1px solid #e4ddd3; border-radius: 1rem; background: #fff; }
+.hero-card { padding: 1.5rem; }
+.hero-card h1 { margin: 0; font-size: 2.4rem; font-weight: 800; }
+.hero-card p { margin: 0.35rem 0 1.25rem; color: #6f6a63; }
+.org-card { display: flex; gap: 1rem; align-items: center; padding: 1.25rem; border: 1px solid #e4ddd3; border-radius: 1rem; margin-bottom: 1rem; }
+.org-avatar { width: 4.5rem; height: 4.5rem; border-radius: 1rem; display: flex; align-items: center; justify-content: center; background: #d9d0ff; color: #5a4fd6; font-size: 1.7rem; font-weight: 700; }
+.org-card h2 { margin: 0; font-size: 1.8rem; }
+.org-meta { color: #6f6a63; }
+.stats-row { display: flex; gap: 2rem; margin-top: 1rem; flex-wrap: wrap; }
+.stats-row div { display: flex; flex-direction: column; }
+.stats-row strong { font-size: 1.8rem; line-height: 1; }
+.stats-row span { font-size: 0.8rem; color: #6f6a63; letter-spacing: 0.05em; }
+.search-input, .modal input, .modal select { width: 100%; border: 1px solid #ddd5ca; border-radius: 0.85rem; padding: 0.85rem 1rem; font: inherit; background: #fff; }
+.list-card { overflow: hidden; }
+.employee-row + .employee-row { border-top: 1px solid #ece5db; }
+.row-top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 1.25rem; }
+.row-top h3 { margin: 0; font-size: 1.1rem; }
+.row-top p { margin: 0.15rem 0 0; color: #6f6a63; }
+.row-actions { display: flex; align-items: center; gap: 0.75rem; }
+.badge { padding: 0.45rem 0.9rem; border-radius: 999px; font-size: 0.9rem; font-weight: 600; }
+.badge-admin { background: #eee9ff; color: #5a4fd6; }
+.badge-leader { background: #f7ecd2; color: #9a7322; }
+.badge-employee { background: #e5efd9; color: #5d7f31; }
+.icon-btn { border: 0; background: transparent; color: #6f6a63; cursor: pointer; display: flex; }
+.details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; padding: 0 1.25rem 1.25rem; border-top: 1px solid #ece5db; }
+.details div { display: flex; flex-direction: column; gap: 0.35rem; padding-top: 1rem; }
+.details span { font-size: 0.8rem; color: #6f6a63; letter-spacing: 0.05em; }
+.details strong { font-size: 1rem; }
+.details-last { display: flex !important; flex-direction: row !important; justify-content: space-between; align-items: end; gap: 1rem; }
+.edit-btn, .save-btn, .cancel-btn { border: 0; border-radius: 0.8rem; padding: 0.75rem 1rem; font-weight: 600; cursor: pointer; }
+.edit-btn { background: #eee9ff; color: #5a4fd6; }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.modal { width: 100%; max-width: 26rem; background: white; border-radius: 1rem; padding: 1rem; display: grid; gap: 0.75rem; }
+.modal h3 { margin: 0 0 0.25rem; }
+.modal-actions { display: flex; justify-content: end; gap: 0.75rem; }
+.cancel-btn { background: #efebe4; color: #3b3732; }
+.save-btn { background: #5a4fd6; color: white; }
+@media (max-width: 700px) { .details { grid-template-columns: 1fr; } .details-last { flex-direction: column !important; align-items: flex-start; } .row-top { flex-direction: column; align-items: flex-start; } }
 </style>
