@@ -17,9 +17,11 @@ const open = ref(false)
 const statuses = ['Gyldig', 'Utløper snart', 'Mangler'] as const
 
 function toggle(field: 'type' | 'status', val: string): void {
-  const key   = field === 'type' ? 'update:modelType' : 'update:modelStatus'
-  const cur   = field === 'type' ? props.modelType : props.modelStatus
-  emit(key, cur === val ? '' : val)
+  if (field === 'type') {
+    emit('update:modelType', props.modelType === val ? '' : val)
+  } else {
+    emit('update:modelStatus', props.modelStatus === val ? '' : val)
+  }
 }
 
 const hasFilters = (): boolean => !!(props.modelType || props.modelStatus)
