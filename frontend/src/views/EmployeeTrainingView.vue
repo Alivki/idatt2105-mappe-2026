@@ -2,10 +2,10 @@
 import { computed } from 'vue'
 import { Award, Clock, AlertTriangle } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
-import { useTrainingStore } from '@/stores/training.ts'
+import { useTrainingStore } from '@/stores/training'
 import EmployeeAvatar from '@/components/training/EmployeeAvatar.vue'
-import StatusBadge from '@/components/training/Statusbadge.vue'
-import StatCard from '@/components/training/Statcard.vue'
+import StatusBadge from '@/components/training/StatusBadge.vue'
+import StatCard from '@/components/training/StatCard.vue'
 
 const auth  = useAuthStore()
 const store = useTrainingStore()

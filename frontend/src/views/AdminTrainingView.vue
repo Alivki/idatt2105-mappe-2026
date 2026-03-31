@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { Plus } from 'lucide-vue-next'
-import type { TrainingRow } from '@/stores/training.ts'
-import { useTrainingStore } from '@/stores/training.ts'
+import type { TrainingRow } from '@/stores/training'
+import { useTrainingStore } from '@/stores/training'
 import StatCard from '@/components/training/StatCard.vue'
 import FilterPanel from '@/components/training/FilterPanel.vue'
 import TrainingTable from '@/components/training/TrainingTable.vue'
