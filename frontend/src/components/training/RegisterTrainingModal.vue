@@ -13,7 +13,7 @@ const form = ref({
   type: '',
   completed: '',
   expires: '',
-  status: 'Gyldig' as 'Gyldig' | 'Utløper snart' | 'Mangler',
+  status: 'Fullført' as 'Fullført' | 'Ikke-fullført',
 })
 
 const errors = ref<Record<string, string>>({})
@@ -36,7 +36,7 @@ function close(): void {
 }
 
 function reset(): void {
-  form.value = { employeeId: null, type: '', completed: '', expires: '', status: 'Gyldig' }
+  form.value = { employeeId: null, type: '', completed: '', expires: '', status: 'Fullført' }
   errors.value = {}
 }
 
@@ -46,7 +46,7 @@ function save(): void {
     type: form.value.type.trim(),
     completed: form.value.completed || null,
     expires: form.value.expires || null,
-    status: form.value.status,
+    status: form.value.status === 'Ikke-fullført' ? 'Mangler' : 'Gyldig',
   })
   close()
 }
@@ -115,7 +115,7 @@ function save(): void {
                   v-for="s in ['Fullført', 'Ikke-fullført']"
                   :key="s"
                   type="button"
-                  :class="['status-pill', `pill-${s.replace(' ', '-').toLowerCase()}`, { active: form.status === s }]"
+                  :class="['status-pill', `pill-${s === 'Ikke-fullført' ? 'ikke-fullfort' : 'fullfort'}`, { active: form.status === s }]"
                   @click="form.status = s as typeof form.status"
                 >
                   <span class="pill-dot" />
@@ -319,20 +319,15 @@ function save(): void {
   transition: opacity 0.14s;
 }
 
-.pill-gyldig { color: #059669; }
-.pill-gyldig:hover { background: #ecfdf5; border-color: #a7f3d0; }
-.pill-gyldig.active { background: #ecfdf5; border-color: #6ee7b7; color: #059669; }
-.pill-gyldig.active .pill-dot { opacity: 1; }
+.pill-fullfort { color: #059669; }
+.pill-fullfort:hover { background: #ecfdf5; border-color: #a7f3d0; }
+.pill-fullfort.active { background: #ecfdf5; border-color: #6ee7b7; color: #059669; }
+.pill-fullfort.active .pill-dot { opacity: 1; }
 
-.pill-utløper-snart { color: #d97706; }
-.pill-utløper-snart:hover { background: #fffbeb; border-color: #fcd34d; }
-.pill-utløper-snart.active { background: #fffbeb; border-color: #fcd34d; color: #d97706; }
-.pill-utløper-snart.active .pill-dot { opacity: 1; }
-
-.pill-mangler { color: #dc2626; }
-.pill-mangler:hover { background: #fff5f5; border-color: #fca5a5; }
-.pill-mangler.active { background: #fff5f5; border-color: #fca5a5; color: #dc2626; }
-.pill-mangler.active .pill-dot { opacity: 1; }
+.pill-ikke-fullfort { color: #dc2626; }
+.pill-ikke-fullfort:hover { background: #fff5f5; border-color: #fca5a5; }
+.pill-ikke-fullfort.active { background: #fff5f5; border-color: #fca5a5; color: #dc2626; }
+.pill-ikke-fullfort.active .pill-dot { opacity: 1; }
 
 .modal-footer {
   display: flex;
