@@ -56,7 +56,6 @@ function deleteSelected(): void {
   editMode.value = false
 }
 
-// ── Single-row edit / delete ─────────────────────────────────────────────────
 const showRegister     = ref(false)
 const editModal        = ref(false)
 const editRow          = ref<TrainingRow | null>(null)
@@ -77,7 +76,6 @@ function confirmDelete(): void {
 <template>
   <div class="page">
 
-    <!-- Header -->
     <div class="header">
       <div>
         <h1 class="page-title">Opplæring og sertifiseringer</h1>
@@ -101,7 +99,6 @@ function confirmDelete(): void {
       </div>
     </div>
 
-    <!-- Stat cards -->
     <div class="stat-grid">
       <StatCard label="Totalt ansatte" :value="store.totalEmployees" />
       <StatCard
@@ -124,14 +121,12 @@ function confirmDelete(): void {
       />
     </div>
 
-    <!-- Filter -->
     <FilterPanel
       :types="store.trainingTypes"
       v-model:modelType="filterType"
       v-model:modelStatus="filterStatus"
     />
 
-    <!-- Table -->
     <div class="table-card">
       <div v-if="!filtered.length" class="empty-state">
         Ingen resultater matcher filteret.
@@ -202,7 +197,6 @@ function confirmDelete(): void {
       </div>
     </div>
 
-    <!-- Modals -->
     <EditTrainingModal
       v-model="editModal"
       :training="editRow"
@@ -210,7 +204,6 @@ function confirmDelete(): void {
     />
     <RegisterTrainingModal v-model="showRegister" />
 
-    <!-- Delete confirm -->
     <Teleport to="body">
       <div v-if="deleteConfirmRow" class="overlay" @click.self="deleteConfirmRow = null">
         <div class="dialog">
@@ -233,7 +226,6 @@ function confirmDelete(): void {
 </template>
 
 <style scoped>
-/* ── Layout ─────────────────────────────────────────────────────────────── */
 .page {
   max-width: 960px;
   margin: 0 auto;
@@ -241,7 +233,6 @@ function confirmDelete(): void {
   font-family: inherit;
 }
 
-/* ── Header ─────────────────────────────────────────────────────────────── */
 .header {
   display: flex;
   align-items: flex-start;
@@ -272,7 +263,6 @@ function confirmDelete(): void {
   flex-wrap: wrap;
 }
 
-/* ── Buttons ────────────────────────────────────────────────────────────── */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -307,7 +297,6 @@ function confirmDelete(): void {
 }
 .btn-danger:hover { background: #b91c1c; }
 
-/* ── Stat grid ──────────────────────────────────────────────────────────── */
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -319,7 +308,6 @@ function confirmDelete(): void {
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* Progress bar (inside StatCard slot) */
 .progress-track {
   margin-top: 10px;
   height: 6px;
@@ -334,7 +322,6 @@ function confirmDelete(): void {
   transition: width 0.5s ease;
 }
 
-/* ── Table card ─────────────────────────────────────────────────────────── */
 .table-card {
   background: #fff;
   border: 1px solid #e7e5e4;
@@ -351,7 +338,6 @@ function confirmDelete(): void {
   color: #9ca3af;
 }
 
-/* ── Table ──────────────────────────────────────────────────────────────── */
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -382,7 +368,6 @@ function confirmDelete(): void {
   vertical-align: middle;
 }
 
-/* Checkbox column */
 .col-check {
   width: 44px;
   padding-left: 16px;
@@ -395,18 +380,14 @@ function confirmDelete(): void {
   accent-color: #059669;
 }
 
-/* Action column */
 .col-action { width: 40px; padding: 0 12px; }
 
-/* Selected row */
 .row-selected { background: #fff1f2 !important; }
 .row-clickable { cursor: pointer; }
 
-/* Cell helpers */
 .cell-text { font-size: 0.875rem; color: #4b5563; }
 .expires-soon { color: #d97706; font-weight: 600; }
 
-/* Employee cell */
 .employee-cell {
   display: flex;
   align-items: center;
@@ -424,7 +405,6 @@ function confirmDelete(): void {
   margin: 0;
 }
 
-/* Icon button */
 .icon-btn {
   width: 28px;
   height: 28px;
@@ -440,12 +420,10 @@ function confirmDelete(): void {
 }
 .icon-btn:hover { background: #f5f5f4; color: #374151; }
 
-/* Hide on mobile */
 @media (max-width: 768px) {
   .hide-mobile { display: none; }
 }
 
-/* ── Overlay / Dialog ───────────────────────────────────────────────────── */
 .overlay {
   position: fixed;
   inset: 0;

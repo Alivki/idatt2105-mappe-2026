@@ -19,14 +19,11 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
 
 <template>
   <div class="page">
-
-    <!-- Header -->
     <div class="header">
       <h1 class="page-title">Min opplæring</h1>
       <p class="page-sub">Oversikt over din opplæringsstatus</p>
     </div>
 
-    <!-- Employee profile card -->
     <div v-if="me" class="profile-card">
       <EmployeeAvatar :initials="me.initials" :color="me.color" size="lg" />
       <div>
@@ -35,7 +32,6 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
       </div>
     </div>
 
-    <!-- Stat cards -->
     <div class="stat-grid">
       <StatCard label="Gyldige" :value="valid.length" value-class="val-green">
         <Award class="stat-icon icon-green" :size="18" />
@@ -48,7 +44,6 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
       </StatCard>
     </div>
 
-    <!-- Trainings table -->
     <div class="table-card">
       <div v-if="!trainings.length" class="empty-state">
         Ingen opplæring registrert.
@@ -82,7 +77,6 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
 </template>
 
 <style scoped>
-/* ── Layout ─────────────────────────────────────────────────────────────── */
 .page {
   max-width: 720px;
   margin: 0 auto;
@@ -90,7 +84,6 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
   font-family: inherit;
 }
 
-/* ── Header ─────────────────────────────────────────────────────────────── */
 .header { margin-bottom: 28px; }
 
 .page-title {
@@ -107,7 +100,6 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
   margin: 2px 0 0;
 }
 
-/* ── Profile card ───────────────────────────────────────────────────────── */
 .profile-card {
   display: flex;
   align-items: center;
@@ -132,7 +124,6 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
   margin: 2px 0 0;
 }
 
-/* ── Stat grid ──────────────────────────────────────────────────────────── */
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -145,7 +136,6 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
 .icon-amber { color: #f59e0b; }
 .icon-red   { color: #f87171; }
 
-/* ── Table card ─────────────────────────────────────────────────────────── */
 .table-card {
   background: #fff;
   border: 1px solid #e7e5e4;
@@ -162,7 +152,6 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
   color: #9ca3af;
 }
 
-/* ── Table ──────────────────────────────────────────────────────────────── */
 .data-table {
   width: 100%;
   border-collapse: collapse;

@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { useAuthStore } from '@/stores/auth'
 
 export interface Training {
   id: number
@@ -11,6 +12,7 @@ export interface Training {
 
 export interface Employee {
   id: number
+  organizationId: number
   name: string
   initials: string
   role: string
@@ -23,32 +25,65 @@ export interface TrainingRow extends Training {
 }
 
 export const useTrainingStore = defineStore('training', () => {
-  const employees = ref<Employee[]>([
+  const auth = useAuthStore()
+
+  // All employees across all organisations.
+  // In a real app these would come from an API that already filters by org.
+  // Here we store everything client-side and scope by organizationId.
+  const _allEmployees = ref<Employee[]>([
+    // ── Org 1 ────────────────────────────────────────────────────────────────
     {
-      id: 1, name: 'Leder Ledersen', initials: 'LL', role: 'Styrer', color: '#7c6fcd',
+      id: 1, organizationId: 1,
+      name: 'Leder Ledersen', initials: 'LL', role: 'Styrer', color: '#7c6fcd',
       trainings: [{ id: 101, type: 'Kunnskapsprøve alkohol', completed: '12.01.2025', expires: '12.01.2027', status: 'Gyldig' }]
     },
     {
-      id: 2, name: 'Kari Hansen', initials: 'KH', role: 'Stedfortreder', color: '#4fad89',
+      id: 2, organizationId: 1,
+      name: 'Kari Hansen', initials: 'KH', role: 'Stedfortreder', color: '#4fad89',
       trainings: [{ id: 102, type: 'Kunnskapsprøve alkohol', completed: '05.03.2024', expires: '05.04.2026', status: 'Utløper snart' }]
     },
     {
-      id: 3, name: 'Ole Johansen', initials: 'OJ', role: 'Servitør', color: '#e07b6a',
+      id: 3, organizationId: 1,
+      name: 'Ole Johansen', initials: 'OJ', role: 'Servitør', color: '#e07b6a',
       trainings: [{ id: 103, type: 'Alderskontroll-opplæring', completed: '15.02.2026', expires: '15.02.2027', status: 'Gyldig' }]
     },
     {
-      id: 4, name: 'Per Nilsen', initials: 'PN', role: 'Bartender', color: '#5b9bd5',
+      id: 4, organizationId: 1,
+      name: 'Per Nilsen', initials: 'PN', role: 'Bartender', color: '#5b9bd5',
       trainings: [{ id: 104, type: 'Ansvarlig vertskap', completed: '20.01.2026', expires: '20.04.2026', status: 'Utløper snart' }]
     },
     {
-      id: 5, name: 'Ny Bansen', initials: 'NB', role: 'Servitør', color: '#e0a04f',
+      id: 5, organizationId: 1,
+      name: 'Ny Bansen', initials: 'NB', role: 'Servitør', color: '#e0a04f',
       trainings: [{ id: 105, type: 'Alderskontroll-opplæring', completed: null, expires: null, status: 'Mangler' }]
     },
     {
-      id: 6, name: 'Anna Sørensen', initials: 'AS', role: 'Servitør', color: '#a07cc5',
+      id: 6, organizationId: 1,
+      name: 'Anna Sørensen', initials: 'AS', role: 'Servitør', color: '#a07cc5',
       trainings: [{ id: 106, type: 'Ansvarlig vertskap', completed: '10.11.2024', expires: '10.11.2026', status: 'Gyldig' }]
-    }
+    },
+
+    // ── Org 2 (example second organisation) ──────────────────────────────────
+    {
+      id: 7, organizationId: 2,
+      name: 'Bjørn Berg', initials: 'BB', role: 'Styrer', color: '#3b82f6',
+      trainings: [{ id: 201, type: 'Kunnskapsprøve alkohol', completed: '01.06.2024', expires: '01.06.2026', status: 'Utløper snart' }]
+    },
+    {
+      id: 8, organizationId: 2,
+      name: 'Silje Strand', initials: 'SS', role: 'Servitør', color: '#ec4899',
+      trainings: [{ id: 202, type: 'Alderskontroll-opplæring', completed: '10.01.2026', expires: '10.01.2027', status: 'Gyldig' }]
+    },
   ])
+
+  // ── Everything below is scoped to the current user's organisation ──────────
+
+  /** Employees belonging to the logged-in user's organisation only. */
+  const employees = computed<Employee[]>(() => {
+    const orgId = auth.organizationId
+    if (!orgId) return []
+    return _allEmployees.value.filter(e => e.organizationId === orgId)
+  })
 
   const allTrainings = computed<TrainingRow[]>(() =>
     employees.value.flatMap(emp =>
@@ -60,9 +95,11 @@ export const useTrainingStore = defineStore('training', () => {
     [...new Set(allTrainings.value.map(t => t.type))]
   )
 
-  const totalEmployees  = computed(() => employees.value.length)
-  const completedCount  = computed(() => employees.value.filter(e => e.trainings.some(t => t.status !== 'Mangler')).length)
+  const totalEmployees    = computed(() => employees.value.length)
+  const completedCount    = computed(() => employees.value.filter(e => e.trainings.some(t => t.status !== 'Mangler')).length)
   const expiringSoonCount = computed(() => allTrainings.value.filter(t => t.status === 'Utløper snart').length)
+
+  // ── Mutations — each checks the employee belongs to the current org ────────
 
   function updateTraining(employeeId: number, trainingId: number, data: Omit<Training, 'id'>): void {
     const emp = employees.value.find(e => e.id === employeeId)
@@ -82,8 +119,14 @@ export const useTrainingStore = defineStore('training', () => {
   }
 
   return {
-    employees, allTrainings, trainingTypes,
-    totalEmployees, completedCount, expiringSoonCount,
-    updateTraining, deleteTraining, addTraining
+    employees,
+    allTrainings,
+    trainingTypes,
+    totalEmployees,
+    completedCount,
+    expiringSoonCount,
+    updateTraining,
+    deleteTraining,
+    addTraining,
   }
 })
