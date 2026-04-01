@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { X, Check, Trash2 } from 'lucide-vue-next'
 import type { Training } from '@/stores/training'
 import { useTrainingStore } from '@/stores/training'
+import Button from '@/components/ui/button/Button.vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -56,9 +57,9 @@ function remove(): void {
               </div>
               <h2 class="modal-title">Rediger opplæring</h2>
             </div>
-            <button class="close-btn" @click="close" aria-label="Lukk">
+            <Button variant="ghost" size="icon-sm" class="close-btn" @click="close" aria-label="Lukk">
               <X :size="16" />
-            </button>
+            </Button>
           </div>
 
           <div class="modal-body">
@@ -86,7 +87,6 @@ function remove(): void {
             </div>
           </div>
 
-          <!-- Footer -->
           <div class="modal-footer">
             <div class="footer-left">
               <button
@@ -103,10 +103,10 @@ function remove(): void {
               </div>
             </div>
             <div class="footer-right">
-              <button class="btn-cancel" @click="close">Avbryt</button>
-              <button class="btn-save" @click="save">
-                <Check :size="14" /> Lagre
-              </button>
+              <Button variant="destructive" size="sm" @click="close">Avbryt</Button>
+              <Button variant="default" size="sm" @click="save">
+                <Check :size="14" /> Registrer
+              </Button>
             </div>
           </div>
 
@@ -173,24 +173,6 @@ function remove(): void {
   color: #111827;
   margin: 0;
   letter-spacing: -0.01em;
-}
-
-.close-btn {
-  width: 30px;
-  height: 30px;
-  border: none;
-  background: transparent;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #9ca3af;
-  cursor: pointer;
-  transition: background 0.12s, color 0.12s;
-}
-.close-btn:hover {
-  background: #f5f5f4;
-  color: #374151;
 }
 
 .modal-body {
@@ -319,47 +301,6 @@ function remove(): void {
   transition: background 0.12s;
 }
 .confirm-no:hover { background: #f9fafb; }
-
-.btn-cancel {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 16px;
-  border-radius: 10px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
-  background: #fff5f5;
-  border: 1.5px solid #fecaca;
-  color: #ef4444;
-  font-family: inherit;
-}
-.btn-cancel:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
-}
-
-.btn-save {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 18px;
-  border-radius: 10px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, box-shadow 0.15s;
-  background: #7c3aed;
-  border: none;
-  color: #fff;
-  font-family: inherit;
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.30);
-}
-.btn-save:hover {
-  background: #6d28d9;
-  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.38);
-}
 
 .modal-enter-active,
 .modal-leave-active {

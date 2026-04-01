@@ -38,12 +38,10 @@ withDefaults(defineProps<{
   margin: 0;
 }
 
-/* value colour helpers – passed via :class from parent */
 :deep(.val-green), .val-green { color: #059669; }
 :deep(.val-amber), .val-amber { color: #d97706; }
 :deep(.val-red),   .val-red   { color: #dc2626; }
 
-/* these match the old Tailwind value-class names too */
 :deep(.text-emerald-700) { color: #059669; }
 :deep(.text-amber-600)   { color: #d97706; }
 :deep(.text-red-600)     { color: #dc2626; }

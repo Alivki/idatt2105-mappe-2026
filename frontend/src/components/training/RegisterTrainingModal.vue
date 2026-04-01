@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { X, Check, ChevronDown } from 'lucide-vue-next'
 import { useTrainingStore } from '@/stores/training'
+import Button from '@/components/ui/button/Button.vue'
 
 defineProps<{ modelValue: boolean }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
@@ -68,9 +69,9 @@ function save(): void {
                 <p class="modal-sub">Legg til ny opplæring for en ansatt</p>
               </div>
             </div>
-            <button class="close-btn" @click="close" aria-label="Lukk">
+            <Button variant="ghost" size="icon-sm" class="close-btn" @click="close" aria-label="Lukk">
               <X :size="16" />
-            </button>
+            </Button>
           </div>
 
           <div class="modal-body">
@@ -111,7 +112,7 @@ function save(): void {
               <label class="field-label">Status</label>
               <div class="status-pills">
                 <button
-                  v-for="s in ['Gyldig', 'Utløper snart', 'Mangler']"
+                  v-for="s in ['Fullført', 'Ikke-fullført']"
                   :key="s"
                   type="button"
                   :class="['status-pill', `pill-${s.replace(' ', '-').toLowerCase()}`, { active: form.status === s }]"
@@ -128,10 +129,10 @@ function save(): void {
           <div class="modal-footer">
             <p class="required-note"><span class="required">*</span> Påkrevde felt</p>
             <div class="footer-right">
-              <button class="btn-cancel" @click="close">Avbryt</button>
-              <button class="btn-save" @click="save">
+              <Button variant="destructive" size="sm" @click="close">Avbryt</Button>
+              <Button variant="default" size="sm" @click="save">
                 <Check :size="14" /> Registrer
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -205,21 +206,6 @@ function save(): void {
   color: #9ca3af;
   margin: 1px 0 0;
 }
-
-.close-btn {
-  width: 30px;
-  height: 30px;
-  border: none;
-  background: transparent;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #9ca3af;
-  cursor: pointer;
-  transition: background 0.12s, color 0.12s;
-}
-.close-btn:hover { background: #f5f5f4; color: #374151; }
 
 .modal-body {
   padding: 20px 24px;
@@ -368,42 +354,6 @@ function save(): void {
   gap: 8px;
 }
 
-.btn-cancel {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 16px;
-  border-radius: 10px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
-  background: #fff5f5;
-  border: 1.5px solid #fecaca;
-  color: #ef4444;
-  font-family: inherit;
-}
-.btn-cancel:hover { background: #fee2e2; border-color: #fca5a5; }
-
-.btn-save {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 18px;
-  border-radius: 10px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, box-shadow 0.15s;
-  background: #7c3aed;
-  border: none;
-  color: #fff;
-  font-family: inherit;
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.30);
-}
-.btn-save:hover { background: #6d28d9; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.38); }
-
-/* Transition */
 .modal-enter-active,
 .modal-leave-active { transition: opacity 0.2s ease; }
 .modal-enter-active .modal,
