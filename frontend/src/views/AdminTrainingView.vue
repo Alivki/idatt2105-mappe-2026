@@ -15,14 +15,27 @@ const store = useTrainingStore()
 const filterType   = ref('')
 const filterStatus = ref('')
 
-const filtered = computed(() =>
-  store.allTrainings.filter(t =>
+type SortDir = 'none' | 'asc' | 'desc'
+const nameSortDir = ref<SortDir>('none')
+
+function cycleNameSort(): void {
+  if (nameSortDir.value === 'none') { nameSortDir.value = 'asc' }
+  else if (nameSortDir.value === 'asc') { nameSortDir.value = 'desc' }
+  else { nameSortDir.value = 'none' }
+}
+
+const filtered = computed(() => {
+  const rows = store.allTrainings.filter(t =>
     (!filterType.value   || t.type   === filterType.value) &&
     (!filterStatus.value || t.status === filterStatus.value)
   )
-)
+  if (nameSortDir.value === 'none') return rows
+  return [...rows].sort((a, b) => {
+    const cmp = a.employee.name.localeCompare(b.employee.name, 'nb')
+    return nameSortDir.value === 'asc' ? cmp : -cmp
+  })
+})
 
-// ── Edit / bulk-delete mode ──────────────────────────────────────────────────
 const editMode = ref(false)
 const selected = ref<Set<number>>(new Set())
 
@@ -33,7 +46,7 @@ function toggleEditMode(): void {
 
 function toggleSelect(id: number): void {
   const s = new Set(selected.value)
-  s.has(id) ? s.delete(id) : s.add(id)
+  if (s.has(id)) { s.delete(id) } else { s.add(id) }
   selected.value = s
 }
 
@@ -75,7 +88,6 @@ function confirmDelete(): void {
 
 <template>
   <div class="page">
-
     <div class="header">
       <div>
         <h1 class="page-title">Opplæring og sertifiseringer</h1>
@@ -98,7 +110,6 @@ function confirmDelete(): void {
         </button>
       </div>
     </div>
-
     <div class="stat-grid">
       <StatCard label="Totalt ansatte" :value="store.totalEmployees" />
       <StatCard
@@ -120,13 +131,11 @@ function confirmDelete(): void {
         sub-label="Innen 30 dager"
       />
     </div>
-
     <FilterPanel
       :types="store.trainingTypes"
       v-model:modelType="filterType"
       v-model:modelStatus="filterStatus"
     />
-
     <div class="table-card">
       <div v-if="!filtered.length" class="empty-state">
         Ingen resultater matcher filteret.
@@ -143,7 +152,13 @@ function confirmDelete(): void {
                 @change="toggleSelectAll"
               />
             </th>
-            <th>Ansatt</th>
+            <th class="th-sortable" @click="cycleNameSort">
+              Ansatt
+              <span class="sort-icon">
+                  <span :class="['arrow', nameSortDir === 'asc' ? 'arrow-active' : '']">▲</span>
+                  <span :class="['arrow', nameSortDir === 'desc' ? 'arrow-active' : '']">▼</span>
+                </span>
+            </th>
             <th class="hide-mobile">Opplæringstype</th>
             <th class="hide-mobile">Fullført</th>
             <th>Utløper</th>
@@ -197,6 +212,7 @@ function confirmDelete(): void {
       </div>
     </div>
 
+    <!-- Modals -->
     <EditTrainingModal
       v-model="editModal"
       :training="editRow"
@@ -355,6 +371,28 @@ function confirmDelete(): void {
   padding: 12px 20px;
   white-space: nowrap;
 }
+
+.th-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+.th-sortable:hover { color: #374151; }
+
+.sort-icon {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-left: 5px;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.arrow {
+  font-size: 0.5rem;
+  color: #d1d5db;
+  line-height: 1;
+}
+.arrow-active { color: #059669; }
 
 .data-table tbody tr {
   border-bottom: 1px solid #fafaf9;

@@ -1,81 +1,196 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Filter, ChevronDown, ChevronUp, X } from 'lucide-vue-next'
-import { Separator } from '@/components/ui/separator'
+import { X } from 'lucide-vue-next'
 
 const props = defineProps<{
   types: string[]
   modelType: string
   modelStatus: string
 }>()
+
 const emit = defineEmits<{
   'update:modelType':   [value: string]
   'update:modelStatus': [value: string]
 }>()
 
-const open = ref(false)
 const statuses = ['Gyldig', 'Utløper snart', 'Mangler'] as const
 
-function toggle(field: 'type' | 'status', val: string): void {
-  if (field === 'type') {
-    emit('update:modelType', props.modelType === val ? '' : val)
-  } else {
-    emit('update:modelStatus', props.modelStatus === val ? '' : val)
-  }
+function toggleType(val: string): void {
+  emit('update:modelType', props.modelType === val ? '' : val)
 }
 
-const hasFilters = (): boolean => !!(props.modelType || props.modelStatus)
+function clearAll(): void {
+  emit('update:modelType', '')
+  emit('update:modelStatus', '')
+}
 </script>
 
 <template>
-  <div class="mb-3">
-    <!-- Bar -->
-    <div class="flex items-center gap-2 flex-wrap">
+  <div class="filter-bar">
+    <div class="filter-group">
+      <span class="filter-label">Type</span>
       <button
-        class="flex items-center gap-1.5 border border-stone-200 bg-white rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-stone-50 transition-colors"
-        @click="open = !open"
+        v-for="t in types"
+        :key="t"
+        class="pill"
+        :class="{ 'pill-active': modelType === t }"
+        @click="toggleType(t)"
       >
-        <Filter :size="14" /> Filtrer
-        <component :is="open ? ChevronUp : ChevronDown" :size="13" />
+        {{ t }}
       </button>
-
-      <!-- Active chips -->
-      <template v-if="hasFilters()">
-        <span v-if="modelType" class="flex items-center gap-1 text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-2.5 py-0.5">
-          {{ modelType }}
-          <button @click="emit('update:modelType', '')"><X :size="11" /></button>
-        </span>
-        <span v-if="modelStatus" class="flex items-center gap-1 text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-2.5 py-0.5">
-          {{ modelStatus }}
-          <button @click="emit('update:modelStatus', '')"><X :size="11" /></button>
-        </span>
-        <button class="text-xs text-gray-400 underline" @click="emit('update:modelType', ''); emit('update:modelStatus', '')">Fjern alle</button>
-      </template>
     </div>
 
-    <!-- Panel -->
-    <div v-if="open" class="mt-2 bg-white border border-stone-200 rounded-xl p-4 flex flex-col gap-3">
-      <div>
-        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Opplæringstype</p>
-        <div class="flex flex-wrap gap-2">
-          <button
-            v-for="t in types" :key="t"
-            :class="['text-sm px-3 py-1 rounded-full border transition-colors', modelType === t ? 'bg-emerald-700 text-white border-emerald-700' : 'border-stone-200 text-gray-600 hover:bg-stone-50']"
-            @click="toggle('type', t)"
-          >{{ t }}</button>
-        </div>
-      </div>
-      <Separator />
-      <div>
-        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Status</p>
-        <div class="flex flex-wrap gap-2">
-          <button
-            v-for="s in statuses" :key="s"
-            :class="['text-sm px-3 py-1 rounded-full border transition-colors', modelStatus === s ? 'bg-emerald-700 text-white border-emerald-700' : 'border-stone-200 text-gray-600 hover:bg-stone-50']"
-            @click="toggle('status', s)"
-          >{{ s }}</button>
-        </div>
-      </div>
+    <div class="divider" />
+    <div class="filter-group">
+      <span class="filter-label">Status</span>
+      <button
+        v-for="s in statuses"
+        :key="s"
+        class="pill"
+        :class="{
+          'pill-active':         modelStatus === s,
+          'pill-green':          s === 'Gyldig'        && modelStatus === s,
+          'pill-amber':          s === 'Utløper snart' && modelStatus === s,
+          'pill-red':            s === 'Mangler'       && modelStatus === s,
+          'pill-outline-green':  s === 'Gyldig'        && modelStatus !== s,
+          'pill-outline-amber':  s === 'Utløper snart' && modelStatus !== s,
+          'pill-outline-red':    s === 'Mangler'       && modelStatus !== s,
+        }"
+      >
+        <span class="pill-dot"
+              :class="{
+            'dot-green': s === 'Gyldig',
+            'dot-amber': s === 'Utløper snart',
+            'dot-red':   s === 'Mangler',
+          }"
+        />
+        {{ s }}
+      </button>
     </div>
+
+    <button
+      v-if="modelType || modelStatus"
+      class="clear-btn"
+      @click="clearAll"
+    >
+      <X :size="13" /> Fjern filter
+    </button>
+
   </div>
 </template>
+
+<style scoped>
+.filter-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid #e7e5e4;
+  border-radius: 14px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-right: 2px;
+  white-space: nowrap;
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  background: #e7e5e4;
+  margin: 0 4px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1.5px solid #e7e5e4;
+  background: #fafaf9;
+  color: #6b7280;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.pill:hover {
+  background: #f0fdf4;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.pill-active {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+  color: #065f46;
+  font-weight: 600;
+}
+
+.pill-outline-green { color: #059669; border-color: #d1fae5; background: #f0fdf4; }
+.pill-outline-amber { color: #d97706; border-color: #fde68a; background: #fffbeb; }
+.pill-outline-red   { color: #dc2626; border-color: #fecdd3; background: #fff1f2; }
+
+.pill-outline-green:hover { background: #d1fae5; border-color: #6ee7b7; }
+.pill-outline-amber:hover { background: #fde68a; border-color: #fcd34d; }
+.pill-outline-red:hover   { background: #fecdd3; border-color: #fca5a5; }
+
+.pill-green { background: #059669; border-color: #059669; color: #fff; font-weight: 600; }
+.pill-amber { background: #d97706; border-color: #d97706; color: #fff; font-weight: 600; }
+.pill-red   { background: #dc2626; border-color: #dc2626; color: #fff; font-weight: 600; }
+
+.pill-green:hover { background: #047857; }
+.pill-amber:hover { background: #b45309; }
+.pill-red:hover   { background: #b91c1c; }
+
+.pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-green { background: #059669; }
+.dot-amber { background: #d97706; }
+.dot-red   { background: #dc2626; }
+
+.pill-green .pill-dot,
+.pill-amber .pill-dot,
+.pill-red   .pill-dot { background: rgba(255,255,255,0.7); }
+
+.clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #9ca3af;
+  background: transparent;
+  border: 1.5px solid #e7e5e4;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.clear-btn:hover {
+  color: #dc2626;
+  border-color: #fca5a5;
+  background: #fff1f2;
+}
+</style>
