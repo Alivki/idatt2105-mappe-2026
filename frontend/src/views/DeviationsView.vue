@@ -2,7 +2,7 @@
 import axios from 'axios'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { AlertTriangle, Trash2 } from 'lucide-vue-next'
+import {AlertTriangle, Plus, Trash2} from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -296,7 +296,10 @@ function handleError(error: unknown, fallback: string) {
           <p>Alle registrerte avvik for IK-Mat og IK-Alkohol</p>
         </div>
 
-        <Button @click="openCreateDialog">+ Register avvik</Button>
+        <Button @click="openCreateDialog">
+          <Plus :size="16" />
+          Registrer avvik
+        </Button>
       </section>
 
       <!-- Info cards -->
