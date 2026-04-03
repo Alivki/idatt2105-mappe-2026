@@ -8,7 +8,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/button/Button.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import StatusPill from '@/components/ui/StatusPill.vue'
+import Badge from '@/components/ui/badge/Badge.vue'
 import AlertDialog from '@/components/ui/alert-dialog/AlertDialog.vue'
 import AlertDialogAction from '@/components/ui/alert-dialog/AlertDialogAction.vue'
 import AlertDialogCancel from '@/components/ui/alert-dialog/AlertDialogCancel.vue'
@@ -194,9 +194,9 @@ function handleError(error: unknown, fallback: string) {
     </header>
 
     <div class="page-content">
-      <button class="back-button" @click="router.push('/avvik')">
+      <Button variant="ghost" class="back-button" @click="router.push('/avvik')">
         <ArrowLeft :size="18" /><span>Tilbake til oversikt</span>
-      </button>
+      </Button>
 
       <div v-if="isLoading" class="state-line">Laster...</div>
 
@@ -217,10 +217,14 @@ function handleError(error: unknown, fallback: string) {
         <div class="detail-layout">
           <div class="detail-main">
             <div class="tag-row">
-              <StatusPill :label="foodTypeLabel[foodDeviation.deviationType]" tone="neutral" />
-              <StatusPill :label="severityLabel[foodDeviation.severity]" :tone="foodDeviation.severity === 'HIGH' || foodDeviation.severity === 'CRITICAL' ? 'danger' : foodDeviation.severity === 'MEDIUM' ? 'warning' : 'ok'" />
-              <StatusPill label="IK-Mat" tone="brand" />
-              <StatusPill :label="foodStatusLabel[foodDeviation.status]" :tone="foodDeviation.status === 'OPEN' ? 'danger' : foodDeviation.status === 'UNDER_TREATMENT' ? 'warning' : 'ok'" />
+              <Badge tone="neutral">{{ foodTypeLabel[foodDeviation.deviationType] }}</Badge>
+              <Badge :tone="foodDeviation.severity === 'HIGH' || foodDeviation.severity === 'CRITICAL' ? 'danger' : foodDeviation.severity === 'MEDIUM' ? 'warning' : 'ok'">
+                {{ severityLabel[foodDeviation.severity] }}
+              </Badge>
+              <Badge tone="brand">IK-Mat</Badge>
+              <Badge :tone="foodDeviation.status === 'OPEN' ? 'danger' : foodDeviation.status === 'UNDER_TREATMENT' ? 'warning' : 'ok'">
+                {{ foodStatusLabel[foodDeviation.status] }}
+              </Badge>
             </div>
 
             <section class="content-section">
@@ -280,10 +284,14 @@ function handleError(error: unknown, fallback: string) {
         <div class="detail-layout">
           <div class="detail-main">
             <div class="tag-row">
-              <StatusPill :label="sourceLabel[alcoholDeviation.reportSource]" :tone="alcoholDeviation.reportSource === 'EGENRAPPORT' ? 'neutral' : alcoholDeviation.reportSource === 'SJENKEKONTROLL' ? 'warning' : 'danger'" />
-              <StatusPill :label="alcoholTypeLabel[alcoholDeviation.deviationType]" tone="neutral" />
-              <StatusPill label="IK-Alkohol" tone="brand" />
-              <StatusPill :label="alcoholStatusLabel[alcoholDeviation.status]" :tone="alcoholDeviation.status === 'OPEN' ? 'danger' : alcoholDeviation.status === 'UNDER_TREATMENT' ? 'warning' : 'ok'" />
+              <Badge :tone="alcoholDeviation.reportSource === 'EGENRAPPORT' ? 'neutral' : alcoholDeviation.reportSource === 'SJENKEKONTROLL' ? 'warning' : 'danger'">
+                {{ sourceLabel[alcoholDeviation.reportSource] }}
+              </Badge>
+              <Badge tone="neutral">{{ alcoholTypeLabel[alcoholDeviation.deviationType] }}</Badge>
+              <Badge tone="brand">IK-Alkohol</Badge>
+              <Badge :tone="alcoholDeviation.status === 'OPEN' ? 'danger' : alcoholDeviation.status === 'UNDER_TREATMENT' ? 'warning' : 'ok'">
+                {{ alcoholStatusLabel[alcoholDeviation.status] }}
+              </Badge>
             </div>
 
             <section class="content-section">
@@ -298,7 +306,7 @@ function handleError(error: unknown, fallback: string) {
 
             <section v-if="alcoholDeviation.causalAnalysis" class="content-section">
               <h2>Årsaksanalyse</h2>
-              <StatusPill :label="causalLabel[alcoholDeviation.causalAnalysis]" tone="neutral" />
+              <Badge tone="neutral">{{ causalLabel[alcoholDeviation.causalAnalysis] }}</Badge>
               <p v-if="alcoholDeviation.causalExplanation" class="detail-body" style="margin-top: 8px;">{{ alcoholDeviation.causalExplanation }}</p>
             </section>
 

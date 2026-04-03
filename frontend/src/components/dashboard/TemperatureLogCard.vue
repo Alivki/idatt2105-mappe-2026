@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import StatusPill from '../ui/StatusPill.vue'
+import Badge from '@/components/ui/badge/Badge.vue'
 
 defineProps<{
   rows: Array<{
@@ -30,7 +30,7 @@ defineProps<{
           <td :class="{ 'danger-text': row.status === 'Avvik' }">{{ row.temperature }}</td>
           <td>{{ row.limit }}</td>
           <td class="status-col">
-            <StatusPill :label="row.status" :tone="row.status === 'OK' ? 'ok' : 'danger'" />
+            <Badge :tone="row.status === 'OK' ? 'ok' : 'danger'">{{ row.status }}</Badge>
           </td>
         </tr>
       </tbody>

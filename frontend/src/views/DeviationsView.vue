@@ -319,28 +319,28 @@ function handleError(error: unknown, fallback: string) {
       <section class="filters-row">
         <div class="filters-left">
           <div class="filter-group">
-            <button
+            <Button
               v-for="filter in statusFilters"
               :key="filter.value"
-              class="filter-button"
-              :class="{ 'filter-button--active': activeStatusFilter === filter.value }"
-              type="button"
+              :class="activeStatusFilter === filter.value ? 'filter-button filter-button--active' : 'filter-button'"
+              variant="outline"
+              size="sm"
               @click="activeStatusFilter = filter.value"
             >
               {{ filter.label }}
-            </button>
+            </Button>
           </div>
           <div class="filter-group">
-            <button
+            <Button
               v-for="filter in moduleFilters"
               :key="filter.value"
-              class="filter-button"
-              :class="{ 'filter-button--active': activeModuleFilter === filter.value }"
-              type="button"
+              :class="activeModuleFilter === filter.value ? 'filter-button filter-button--active' : 'filter-button'"
+              variant="outline"
+              size="sm"
               @click="activeModuleFilter = filter.value"
             >
               {{ filter.label }}
-            </button>
+            </Button>
           </div>
         </div>
 

@@ -272,34 +272,34 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
                 <Checkbox :checked="allSelected" @update:checked="toggleSelectAll" />
               </TableHead>
               <TableHead class="th-employee">
-                <button class="sort-btn" @click="toggleSort('employee')">
+                <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('employee')">
                   Ansatt
                   <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'employee' }" />
-                </button>
+                </Button>
               </TableHead>
               <TableHead class="th-title">
-                <button class="sort-btn" @click="toggleSort('title')">
+                <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('title')">
                   Opplæringstype
                   <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'title' }" />
-                </button>
+                </Button>
               </TableHead>
               <TableHead class="th-date hide-mobile">
-                <button class="sort-btn" @click="toggleSort('completed')">
+                <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('completed')">
                   Fullført
                   <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'completed' }" />
-                </button>
+                </Button>
               </TableHead>
               <TableHead class="th-date hide-mobile">
-                <button class="sort-btn" @click="toggleSort('expires')">
+                <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('expires')">
                   Utløper
                   <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'expires' }" />
-                </button>
+                </Button>
               </TableHead>
               <TableHead class="th-status">
-                <button class="sort-btn" @click="toggleSort('status')">
+                <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('status')">
                   Status
                   <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'status' }" />
-                </button>
+                </Button>
               </TableHead>
               <TableHead class="th-actions" />
             </TableRow>
@@ -333,9 +333,9 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
               <TableCell class="cell-actions">
                 <DropdownMenu>
                   <DropdownMenuTrigger as-child>
-                    <button type="button" class="actions-trigger">
+                    <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger">
                       <MoreVertical :size="18" />
-                    </button>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" :side-offset="4">
                     <DropdownMenuLabel>Handlinger</DropdownMenuLabel>

@@ -2,7 +2,8 @@
 import { computed, ref } from 'vue'
 import { MoreVertical, CheckCircle2, Pencil, Trash2 } from 'lucide-vue-next'
 import type { Checklist } from '@/types/checklist'
-import StatusPill from '@/components/ui/StatusPill.vue'
+import Badge from '@/components/ui/badge/Badge.vue'
+import Button from '@/components/ui/button/Button.vue'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -85,8 +86,8 @@ const checklistComplete = computed(() =>
     <div class="card-top">
       <button type="button" class="card-body" @click="emits('open', checklist)">
         <div class="tag-row">
-          <StatusPill :label="frequencyLabel" :tone="frequencyTone" />
-          <StatusPill :label="statusLabel" :tone="statusTone" />
+          <Badge :tone="frequencyTone">{{ frequencyLabel }}</Badge>
+          <Badge :tone="statusTone">{{ statusLabel }}</Badge>
         </div>
 
         <h3>{{ checklist.name }}</h3>
@@ -104,9 +105,9 @@ const checklistComplete = computed(() =>
       <div v-if="canManage || canComplete" class="card-actions" @click.stop>
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
-            <button type="button" class="actions-trigger">
+            <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger">
               <MoreVertical :size="18" />
-            </button>
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" :side-offset="4">
             <DropdownMenuItem

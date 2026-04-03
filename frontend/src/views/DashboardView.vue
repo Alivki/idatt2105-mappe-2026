@@ -4,7 +4,7 @@ import KpiCard from '@/components/dashboard/KpiCard.vue'
 import LatestDeviationCard from '@/components/dashboard/LatestDeviationCard.vue'
 import TemperatureLogCard from '@/components/dashboard/TemperatureLogCard.vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
-import StatusPill from '@/components/ui/StatusPill.vue'
+import Badge from '@/components/ui/badge/Badge.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { useChecklistsQuery } from '@/composables/useChecklists'
@@ -195,8 +195,8 @@ function getDailyChecklistStats(checklists: Checklist[]): { total: number; compl
         </div>
 
         <div class="module-toggle" aria-label="Velg modul">
-          <StatusPill label="IK-Mat" tone="brand" />
-          <StatusPill label="IK-Alkohol" tone="ok" />
+          <Badge tone="brand">IK-Mat</Badge>
+          <Badge tone="ok">IK-Alkohol</Badge>
         </div>
       </section>
 

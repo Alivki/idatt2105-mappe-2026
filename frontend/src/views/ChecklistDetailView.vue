@@ -7,7 +7,7 @@ import { toast } from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/button/Button.vue'
 import Checkbox from '@/components/ui/checkbox/Checkbox.vue'
-import StatusPill from '@/components/ui/StatusPill.vue'
+import Badge from '@/components/ui/badge/Badge.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import Tooltip from '@/components/ui/tooltip/Tooltip.vue'
@@ -248,10 +248,10 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
     </header>
 
     <div class="page-content">
-      <button class="back-button" @click="router.push('/sjekklister')">
+      <Button variant="ghost" class="back-button" @click="router.push('/sjekklister')">
         <ArrowLeft :size="18" />
         <span>Tilbake til sjekklister</span>
-      </button>
+      </Button>
 
       <p v-if="checklistsQuery.isLoading.value" class="state-line">Laster sjekkliste...</p>
 
@@ -273,11 +273,10 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
         <section class="detail-header">
           <div>
             <div class="tag-row">
-              <StatusPill :label="frequencyLabel[checklist.frequency]" :tone="frequencyTone[checklist.frequency]" />
-              <StatusPill
-                :label="checklist.status === 'COMPLETED' ? 'Fullført' : checklist.status === 'IN_PROGRESS' ? 'Pågår' : 'Ikke startet'"
-                :tone="statusTone"
-              />
+              <Badge :tone="frequencyTone[checklist.frequency]">{{ frequencyLabel[checklist.frequency] }}</Badge>
+              <Badge :tone="statusTone">
+                {{ checklist.status === 'COMPLETED' ? 'Fullført' : checklist.status === 'IN_PROGRESS' ? 'Pågår' : 'Ikke startet' }}
+              </Badge>
             </div>
             <h1>{{ checklist.name }}</h1>
             <p v-if="checklist.description" class="detail-description">{{ checklist.description }}</p>

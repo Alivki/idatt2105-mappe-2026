@@ -221,16 +221,16 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
       </section>
 
       <section class="filters-row" aria-label="Filtrer frekvens">
-        <button
+        <Button
           v-for="filter in filters"
           :key="filter.value"
-          class="filter-button"
-          :class="{ 'filter-button--active': activeFilter === filter.value }"
-          type="button"
+          :class="activeFilter === filter.value ? 'filter-button filter-button--active' : 'filter-button'"
+          variant="outline"
+          size="sm"
           @click="activeFilter = filter.value"
         >
           {{ filter.label }}
-        </button>
+        </Button>
       </section>
 
       <section class="list-section">

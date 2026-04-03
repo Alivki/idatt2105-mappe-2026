@@ -37,6 +37,7 @@ import AlertDialogDescription from '@/components/ui/alert-dialog/AlertDialogDesc
 import AlertDialogFooter from '@/components/ui/alert-dialog/AlertDialogFooter.vue'
 import AlertDialogHeader from '@/components/ui/alert-dialog/AlertDialogHeader.vue'
 import AlertDialogTitle from '@/components/ui/alert-dialog/AlertDialogTitle.vue'
+import Badge from '@/components/ui/badge/Badge.vue'
 import Select from '@/components/ui/select/Select.vue'
 import SelectContent from '@/components/ui/select/SelectContent.vue'
 import SelectItem from '@/components/ui/select/SelectItem.vue'
@@ -138,10 +139,10 @@ function initials(name: string) {
     .toUpperCase()
 }
 
-function badgeClass(role: string) {
-  if (role === 'ADMIN') return 'badge-admin'
-  if (role === 'MANAGER') return 'badge-leader'
-  return 'badge-employee'
+function badgeTone(role: string) {
+  if (role === 'ADMIN') return 'brand'
+  if (role === 'MANAGER') return 'warning'
+  return 'ok'
 }
 
 // ── Role editing ──
@@ -280,22 +281,22 @@ function handleInvite() {
               <TableHeader>
                 <TableRow>
                   <TableHead class="th-name">
-                    <button class="sort-btn" @click="toggleSort('name')">
+                    <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('name')">
                       Navn
                       <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'name' }" />
-                    </button>
+                    </Button>
                   </TableHead>
                   <TableHead class="th-email">
-                    <button class="sort-btn" @click="toggleSort('email')">
+                    <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('email')">
                       E-post
                       <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'email' }" />
-                    </button>
+                    </Button>
                   </TableHead>
                   <TableHead class="th-role">
-                    <button class="sort-btn" @click="toggleSort('role')">
+                    <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('role')">
                       Rolle
                       <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'role' }" />
-                    </button>
+                    </Button>
                   </TableHead>
                   <TableHead class="th-actions" />
                 </TableRow>
@@ -320,17 +321,17 @@ function handleInvite() {
                   </TableCell>
                   <TableCell class="cell-email">{{ member.userEmail }}</TableCell>
                   <TableCell>
-                    <span class="badge" :class="badgeClass(member.role)">
+                    <Badge :tone="badgeTone(member.role)">
                       {{ roleLabel[member.role] ?? member.role }}
-                    </span>
+                    </Badge>
                   </TableCell>
                   <TableCell class="cell-actions">
                     <div v-if="!isSelf(member)" class="actions-wrapper">
                       <DropdownMenu>
                         <DropdownMenuTrigger as-child>
-                          <button type="button" class="actions-trigger">
+                          <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger">
                             <MoreVertical :size="18" />
-                          </button>
+                          </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" :side-offset="4">
                           <DropdownMenuLabel>Handlinger</DropdownMenuLabel>
@@ -658,12 +659,6 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 .you-label { color: hsl(var(--muted-foreground, 24 5% 46%)); font-size: 0.8rem; margin-left: 0.25rem; }
 
 .cell-email { color: hsl(var(--muted-foreground, 24 5% 46%)); }
-
-/* Badges */
-.badge { padding: 0.3rem 0.7rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
-.badge-admin { background: #eee9ff; color: #5a4fd6; }
-.badge-leader { background: #f7ecd2; color: #9a7322; }
-.badge-employee { background: #e5efd9; color: #5d7f31; }
 
 /* Actions cell */
 .cell-actions {
