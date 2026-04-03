@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
@@ -15,11 +17,40 @@ import AlertDialogFooter from '@/components/ui/alert-dialog/AlertDialogFooter.vu
 import AlertDialogCancel from '@/components/ui/alert-dialog/AlertDialogCancel.vue'
 import AlertDialogAction from '@/components/ui/alert-dialog/AlertDialogAction.vue'
 
+const auth = useAuthStore()
+const router = useRouter()
+
+const isAdmin = auth.role === 'ADMIN'
+
 const unreadBadge = ref(true)
 const commEmails = ref(false)
 const socialEmails = ref(false)
 const announcementEmails = ref(false)
 const tipsEmails = ref(false)
+
+async function handleDeleteAccount() {
+  auth.clearAuth()
+  router.push('/login')
+}
+
+async function handleDeactivateAccount() {
+  auth.clearAuth()
+  router.push('/login')
+}
+
+async function handleDeleteOrganization() {
+  if (!auth.organizationId) return
+  try {
+    await fetch(`/api/v1/organizations/${auth.organizationId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${auth.accessToken}` },
+    })
+    auth.clearAuth()
+    router.push('/login')
+  } catch (e) {
+    console.error('Failed to delete organization', e)
+  }
+}
 </script>
 
 <template>
@@ -86,74 +117,6 @@ const tipsEmails = ref(false)
       <Separator />
 
       <section class="settings-section">
-        <h2 class="section-title">Autentiseringsapp</h2>
-        <p class="section-desc">
-          Det å konfigurere en autentiseringsapp er en fin måte å sikre Discord-kontoen på, slik at det bare er du som kan logge på.
-        </p>
-        <div class="button-row">
-          <Button variant="default">Vis sikkerhetskoder</Button>
-
-          <AlertDialog>
-            <AlertDialogTrigger>
-              <Button variant="outline" class="btn--danger-outline">Fjern autentiseringsapp</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Fjern autentiseringsapp?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Er du sikker på at du vil fjerne autentiseringsappen? Kontoen din vil bli mindre sikker.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Avbryt</AlertDialogCancel>
-                <AlertDialogAction variant="destructive">Ja, fjern</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      </section>
-
-      <section class="settings-section">
-        <h2 class="section-title">SMS som reserveløsning for autentisering</h2>
-        <p class="section-desc">
-          Bruk telefonen som backupløsning for flerfaktorautentisering i tilfelle du mister tilgang til autentiseringsappen eller sikkerhetskopikodene.
-        </p>
-        <p class="section-desc">
-          Det nåværende telefonnummeret ditt er: *******5853.
-          <Button variant="link" class="inline-link">Vis</Button>
-        </p>
-        <div class="button-row">
-          <AlertDialog>
-            <AlertDialogTrigger>
-              <Button variant="outline" class="btn--danger-outline">Fjern SMS-autentisering</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Fjern SMS-autentisering?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Er du sikker på at du vil fjerne SMS-autentiseringen? Du mister reserveløsningen for innlogging.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Avbryt</AlertDialogCancel>
-                <AlertDialogAction variant="destructive">Ja, fjern</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      </section>
-
-      <section class="settings-section">
-        <h2 class="section-title">Sikkerhetsnøkler</h2>
-        <p class="section-desc">Gi kontoen din ekstra beskyttelse med en sikkerhetsnøkkel.</p>
-        <div class="button-row">
-          <Button variant="default">Registrer en sikkerhetsnøkkel</Button>
-        </div>
-      </section>
-
-      <Separator />
-
-      <section class="settings-section">
         <h2 class="section-title">Fjerning av konto</h2>
         <p class="section-desc">Hvis du deaktiverer kontoen din, kan du når som helst hente den frem igjen.</p>
         <div class="button-row">
@@ -171,7 +134,9 @@ const tipsEmails = ref(false)
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Avbryt</AlertDialogCancel>
-                <AlertDialogAction variant="destructive">Ja, deaktiver</AlertDialogAction>
+                <AlertDialogAction variant="destructive" @click="handleDeactivateAccount">
+                  Ja, deaktiver
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -184,18 +149,54 @@ const tipsEmails = ref(false)
               <AlertDialogHeader>
                 <AlertDialogTitle>Slett kontoen?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Er du sikker på at du vil slette kontoen din? Dette kan ikke angres og all data vil gå tapt.
+                  Er du sikker på at du vil slette kontoen din? Dette kan ikke angres og all data vil gå tapt permanent.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Avbryt</AlertDialogCancel>
-                <AlertDialogAction variant="destructive">Ja, slett</AlertDialogAction>
+                <AlertDialogAction variant="destructive" @click="handleDeleteAccount">
+                  Ja, slett
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
 
         </div>
       </section>
+
+      <template v-if="isAdmin">
+        <Separator />
+
+        <section class="settings-section">
+          <h2 class="section-title">Organisasjon</h2>
+          <p class="section-desc">
+            Hvis du sletter organisasjonen, vil alle medlemmer og tilhørende data bli permanent fjernet.
+            Dette kan ikke angres.
+          </p>
+          <div class="button-row">
+            <AlertDialog>
+              <AlertDialogTrigger>
+                <Button variant="destructive">Slett organisasjon</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Slett organisasjon?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Er du sikker på at du vil slette organisasjonen? Alle medlemmer og all tilhørende data vil bli
+                    permanent slettet. Dette kan ikke angres.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                  <AlertDialogAction variant="destructive" @click="handleDeleteOrganization">
+                    Ja, slett organisasjon
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </section>
+      </template>
 
     </div>
   </AppLayout>
@@ -284,12 +285,5 @@ const tipsEmails = ref(false)
 :deep(.btn--danger-outline:hover) {
   color: hsl(var(--destructive, 0 55% 42%));
   background-color: hsl(var(--destructive, 0 55% 48%) / 0.05);
-}
-
-:deep(.inline-link) {
-  height: auto;
-  padding: 0;
-  font-size: inherit;
-  vertical-align: baseline;
 }
 </style>
