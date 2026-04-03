@@ -33,6 +33,7 @@ import AlertDialogFooter from '@/components/ui/alert-dialog/AlertDialogFooter.vu
 import AlertDialogHeader from '@/components/ui/alert-dialog/AlertDialogHeader.vue'
 import AlertDialogTitle from '@/components/ui/alert-dialog/AlertDialogTitle.vue'
 import StatusBadge from '@/components/training/StatusBadge.vue'
+import OverviewCard from '@/components/common/OverviewCard.vue'
 import RegisterTrainingModal from '@/components/training/RegisterTrainingModal.vue'
 import EditTrainingModal from '@/components/training/EditTrainingModal.vue'
 import {
@@ -234,26 +235,11 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 
     <!-- Stats cards -->
     <section class="cards-group">
-      <article class="status-card">
-        <span>Totalt opplærte</span>
-        <strong>{{ stats.total }}</strong>
-      </article>
-      <article class="status-card status-card--completed">
-        <span>Fullført</span>
-        <strong>{{ stats.completed }}</strong>
-      </article>
-      <article class="status-card status-card--expiring">
-        <span>Utløper snart</span>
-        <strong>{{ stats.expiringSoon }}</strong>
-      </article>
-      <article class="status-card status-card--expired">
-        <span>Utgått</span>
-        <strong>{{ stats.expired }}</strong>
-      </article>
-      <article class="status-card status-card--missing">
-        <span>Mangler</span>
-        <strong>{{ stats.notCompleted }}</strong>
-      </article>
+      <OverviewCard label="Totalt opplærte" :value="stats.total" />
+      <OverviewCard label="Fullført" :value="stats.completed" variant="resolved" />
+      <OverviewCard label="Utløper snart" :value="stats.expiringSoon" variant="in-progress" />
+      <OverviewCard label="Utgått" :value="stats.expired" variant="open" />
+      <OverviewCard label="Mangler" :value="stats.notCompleted" variant="open" />
     </section>
 
     <!-- Table -->
@@ -286,34 +272,34 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
                 <Checkbox :checked="allSelected" @update:checked="toggleSelectAll" />
               </TableHead>
               <TableHead class="th-employee">
-                <button class="sort-btn" @click="toggleSort('employee')">
+                <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('employee')">
                   Ansatt
                   <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'employee' }" />
-                </button>
+                </Button>
               </TableHead>
               <TableHead class="th-title">
-                <button class="sort-btn" @click="toggleSort('title')">
+                <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('title')">
                   Opplæringstype
                   <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'title' }" />
-                </button>
+                </Button>
               </TableHead>
               <TableHead class="th-date hide-mobile">
-                <button class="sort-btn" @click="toggleSort('completed')">
+                <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('completed')">
                   Fullført
                   <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'completed' }" />
-                </button>
+                </Button>
               </TableHead>
               <TableHead class="th-date hide-mobile">
-                <button class="sort-btn" @click="toggleSort('expires')">
+                <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('expires')">
                   Utløper
                   <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'expires' }" />
-                </button>
+                </Button>
               </TableHead>
               <TableHead class="th-status">
-                <button class="sort-btn" @click="toggleSort('status')">
+                <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('status')">
                   Status
                   <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'status' }" />
-                </button>
+                </Button>
               </TableHead>
               <TableHead class="th-actions" />
             </TableRow>
@@ -347,9 +333,9 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
               <TableCell class="cell-actions">
                 <DropdownMenu>
                   <DropdownMenuTrigger as-child>
-                    <button type="button" class="actions-trigger">
+                    <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger">
                       <MoreVertical :size="18" />
-                    </button>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" :side-offset="4">
                     <DropdownMenuLabel>Handlinger</DropdownMenuLabel>
@@ -434,43 +420,6 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
 }
-
-.status-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: var(--card-bg);
-}
-
-.status-card span { font-size: 1rem; }
-.status-card strong { font-size: 2rem; letter-spacing: -0.02em; }
-
-.status-card--completed {
-  background: #f3faf2;
-  border-color: #c8e4c2;
-}
-.status-card--completed strong { color: #3c8f2c; }
-
-.status-card--expiring {
-  background: #fdf9f0;
-  border-color: #f0ddb0;
-}
-.status-card--expiring strong { color: #946013; }
-
-.status-card--expired {
-  background: #fdf5f5;
-  border-color: #f0d0d0;
-}
-.status-card--expired strong { color: #a62929; }
-
-.status-card--missing {
-  background: #fdf5f5;
-  border-color: #f0d0d0;
-}
-.status-card--missing strong { color: #a62929; }
 
 /* Search */
 .search-wrapper {

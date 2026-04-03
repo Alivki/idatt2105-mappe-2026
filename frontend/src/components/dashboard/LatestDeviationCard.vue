@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import StatusPill from '../ui/StatusPill.vue'
+import Badge from '@/components/ui/badge/Badge.vue'
 
 defineProps<{
   deviations: Array<{
@@ -36,7 +36,7 @@ const severityRailClass: Record<'Lav' | 'Middels' | 'Høy' | 'Kritisk', string> 
         <h3>{{ item.title }}</h3>
         <p>{{ item.moduleLabel }} · Rapportert av {{ item.reportedBy }} · {{ item.relativeTime }}</p>
       </div>
-      <StatusPill :label="item.severityLabel" :tone="severityTone[item.severityLabel]" />
+      <Badge :tone="severityTone[item.severityLabel]">{{ item.severityLabel }}</Badge>
     </article>
 
     <p v-if="deviations.length === 0" class="empty-state">Ingen registrerte avvik ennå.</p>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { MoreVertical, Trash2, Pencil, CircleDot, Clock, CheckCircle2 } from 'lucide-vue-next'
-import StatusPill from '@/components/ui/StatusPill.vue'
+import Badge from '@/components/ui/badge/Badge.vue'
+import Button from '@/components/ui/button/Button.vue'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -77,9 +78,9 @@ const relativeTime = computed(() => {
     <div class="card-top">
       <div class="card-body">
         <div class="tag-row">
-          <StatusPill :label="deviationTypeLabel[deviation.deviationType]" tone="neutral" />
-          <StatusPill label="IK-Alkohol" tone="brand" />
-          <StatusPill :label="statusLabel[deviation.status]" :tone="statusTone[deviation.status]" />
+          <Badge tone="neutral">{{ deviationTypeLabel[deviation.deviationType] }}</Badge>
+          <Badge tone="brand">IK-Alkohol</Badge>
+          <Badge :tone="statusTone[deviation.status]">{{ statusLabel[deviation.status] }}</Badge>
         </div>
         <p class="description">{{ deviation.description }}</p>
         <span class="time-label">{{ relativeTime }}</span>
@@ -88,7 +89,7 @@ const relativeTime = computed(() => {
       <div v-if="canManage" class="card-actions" @click.stop>
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
-            <button type="button" class="actions-trigger"><MoreVertical :size="18" /></button>
+            <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger"><MoreVertical :size="18" /></Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" :side-offset="4">
             <DropdownMenuItem @click="emits('edit', deviation)">

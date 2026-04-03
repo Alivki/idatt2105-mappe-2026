@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useTrainingStore } from '@/stores/training'
 import EmployeeAvatar from '@/components/training/EmployeeAvatar.vue'
 import StatusBadge from '@/components/training/StatusBadge.vue'
-import StatCard from '@/components/training/StatCard.vue'
+import OverviewCard from '@/components/common/OverviewCard.vue'
 
 const auth  = useAuthStore()
 const store = useTrainingStore()
@@ -33,15 +33,15 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
     </div>
 
     <div class="stat-grid">
-      <StatCard label="Gyldige" :value="valid.length" value-class="val-green">
+      <OverviewCard label="Gyldige" :value="valid.length" value-class="val-green">
         <Award class="stat-icon icon-green" :size="18" />
-      </StatCard>
-      <StatCard label="Utløper snart" :value="expiring.length" value-class="val-amber">
+      </OverviewCard>
+      <OverviewCard label="Utløper snart" :value="expiring.length" value-class="val-amber">
         <Clock class="stat-icon icon-amber" :size="18" />
-      </StatCard>
-      <StatCard label="Mangler" :value="missing.length" value-class="val-red">
+      </OverviewCard>
+      <OverviewCard label="Mangler" :value="missing.length" value-class="val-red">
         <AlertTriangle class="stat-icon icon-red" :size="18" />
-      </StatCard>
+      </OverviewCard>
     </div>
 
     <div class="table-card">

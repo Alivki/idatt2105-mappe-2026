@@ -1,43 +1,17 @@
 <script setup lang="ts">
-defineProps<{ status: string }>()
+import { computed } from 'vue'
+import Badge from '@/components/ui/badge/Badge.vue'
+
+const props = defineProps<{ status: string }>()
+
+const tone = computed(() => {
+  if (props.status === 'Gyldig') return 'ok'
+  if (props.status === 'Utløper snart') return 'warning'
+  if (props.status === 'Mangler' || props.status === 'Utgått') return 'danger'
+  return 'neutral'
+})
 </script>
 
 <template>
-  <span class="badge" :class="{
-    'badge-green':  status === 'Gyldig',
-    'badge-amber':  status === 'Utløper snart',
-    'badge-red':    status === 'Mangler' || status === 'Utgått',
-  }">
-    {{ status }}
-  </span>
+  <Badge :tone="tone">{{ status }}</Badge>
 </template>
-
-<style scoped>
-.badge {
-  display: inline-block;
-  padding: 3px 12px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  white-space: nowrap;
-  border: 1px solid transparent;
-}
-
-.badge-green {
-  background: #f0fdf4;
-  color: #065f46;
-  border-color: #a7f3d0;
-}
-
-.badge-amber {
-  background: #fffbeb;
-  color: #92400e;
-  border-color: #fde68a;
-}
-
-.badge-red {
-  background: #fff1f2;
-  color: #9f1239;
-  border-color: #fecdd3;
-}
-</style>

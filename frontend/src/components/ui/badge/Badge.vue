@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed } from 'vue'
 
-type BadgeVariant = "default" | "secondary" | "destructive" | "outline"
+type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline'
+type BadgeTone = 'neutral' | 'ok' | 'warning' | 'danger' | 'brand'
 
 const props = defineProps<{
   variant?: BadgeVariant
+  tone?: BadgeTone
   class?: string
 }>()
 
 const classes = computed(() => {
-  const parts = ["badge"]
-  parts.push(`badge--${props.variant ?? "default"}`)
+  const parts = ['badge']
+  if (props.tone) {
+    parts.push(`badge--tone-${props.tone}`)
+  } else {
+    parts.push(`badge--${props.variant ?? 'default'}`)
+  }
   if (props.class) parts.push(props.class)
-  return parts.join(" ")
+  return parts.join(' ')
 })
 </script>
 
@@ -27,11 +33,11 @@ const classes = computed(() => {
   display: inline-flex;
   gap: 0.25rem;
   align-items: center;
-  border-radius: 0.375rem;
+  border-radius: 999px;
   border: 1px solid transparent;
-  padding: 0.125rem 0.625rem;
-  font-size: 0.75rem;
-  line-height: 1rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1;
   font-weight: 600;
   transition: colors 150ms ease;
   outline: none;
@@ -77,5 +83,35 @@ const classes = computed(() => {
   border-color: currentColor;
   color: hsl(var(--foreground, 24 10% 10%));
   background-color: transparent;
+}
+
+:where(.badge--tone-neutral) {
+  background-color: #e9e9e8;
+  border-color: #d6d6d3;
+  color: #464b52;
+}
+
+:where(.badge--tone-ok) {
+  background-color: var(--green-soft);
+  border-color: color-mix(in srgb, var(--green-soft) 68%, #2f6f34 32%);
+  color: #2f6f34;
+}
+
+:where(.badge--tone-warning) {
+  background-color: var(--amber-soft);
+  border-color: color-mix(in srgb, var(--amber-soft) 68%, #8e5713 32%);
+  color: #8e5713;
+}
+
+:where(.badge--tone-danger) {
+  background-color: var(--red-soft);
+  border-color: color-mix(in srgb, var(--red-soft) 68%, #902324 32%);
+  color: #902324;
+}
+
+:where(.badge--tone-brand) {
+  background-color: var(--brand-soft);
+  border-color: color-mix(in srgb, var(--brand-soft) 68%, #413da9 32%);
+  color: #413da9;
 }
 </style>
