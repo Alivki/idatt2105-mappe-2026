@@ -28,6 +28,7 @@ import FoodDeviationFormDialog from '@/components/deviations/FoodDeviationFormDi
 import AlcoholDeviationFormDialog from '@/components/deviations/AlcoholDeviationFormDialog.vue'
 import PenaltyPointsStatus from '@/components/deviations/PenaltyPointsStatus.vue'
 import PenaltyPointsGuide from '@/components/deviations/PenaltyPointsGuide.vue'
+import OverviewCard from '@/components/common/OverviewCard.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useMembersQuery } from '@/composables/useMembers'
 import {
@@ -144,14 +145,14 @@ const underTreatmentCount = computed(() => combinedDeviations.value.filter((i) =
 const closedCount = computed(() => combinedDeviations.value.filter((i) => i.data.status === 'CLOSED').length)
 
 const moduleCards = computed(() => [
-  { key: 'IK_MAT', label: 'IK-Mat', count: foodCount.value, className: 'status-card--neutral' },
-  { key: 'IK_ALKOHOL', label: 'IK-Alkohol', count: alcoholCount.value, className: 'status-card--neutral' },
+  { key: 'IK_MAT', label: 'IK-Mat', count: foodCount.value, variant: 'neutral' as const },
+  { key: 'IK_ALKOHOL', label: 'IK-Alkohol', count: alcoholCount.value, variant: 'neutral' as const },
 ])
 
 const statusCards = computed(() => [
-  { key: 'OPEN', label: 'Åpne', count: openCount.value, className: 'status-card--open' },
-  { key: 'UNDER_TREATMENT', label: 'Under behandling', count: underTreatmentCount.value, className: 'status-card--in-progress' },
-  { key: 'CLOSED', label: 'Lukket', count: closedCount.value, className: 'status-card--resolved' },
+  { key: 'OPEN', label: 'Åpne', count: openCount.value, variant: 'open' as const },
+  { key: 'UNDER_TREATMENT', label: 'Under behandling', count: underTreatmentCount.value, variant: 'in-progress' as const },
+  { key: 'CLOSED', label: 'Lukket', count: closedCount.value, variant: 'resolved' as const },
 ])
 
 const statusFilters: Array<{ label: string; value: StatusFilter }> = [
@@ -304,14 +305,8 @@ function handleError(error: unknown, fallback: string) {
 
       <!-- Info cards -->
       <section class="cards-section" aria-label="Statusoversikt">
-        <article v-for="card in moduleCards" :key="card.key" :class="['status-card', card.className]">
-          <span>{{ card.label }}</span>
-          <strong>{{ card.count }}</strong>
-        </article>
-        <article v-for="card in statusCards" :key="card.key" :class="['status-card', card.className]">
-          <span>{{ card.label }}</span>
-          <strong>{{ card.count }}</strong>
-        </article>
+        <OverviewCard v-for="card in moduleCards" :key="card.key" :label="card.label" :value="card.count" :variant="card.variant" />
+        <OverviewCard v-for="card in statusCards" :key="card.key" :label="card.label" :value="card.count" :variant="card.variant" />
       </section>
 
       <!-- Penalty points cards -->
@@ -578,28 +573,6 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
 }
-
-.status-card {
-  border: 2px solid #d1d5db;
-  border-radius: var(--radius-md);
-  padding: 12px;
-  min-height: 6.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: var(--card-bg);
-}
-.status-card span { font-size: 1rem; }
-.status-card strong { font-size: 2rem; letter-spacing: -0.02em; }
-
-.status-card--open { background: #f5e8ea; border-color: #e0aeb5; }
-.status-card--open strong { color: #a62929; }
-.status-card--in-progress { background: #f1e7d6; border-color: #e0bf81; }
-.status-card--in-progress strong { color: #946013; }
-.status-card--resolved { background: #e4eddc; border-color: #b7d18e; }
-.status-card--resolved strong { color: #3c8f2c; }
-.status-card--neutral { background: #ffffff; border-color: #d1d5db; }
-.status-card--neutral strong { color: #111827; }
 
 .penalty-section {
   display: grid;
