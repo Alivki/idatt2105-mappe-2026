@@ -328,9 +328,9 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
                     <div v-if="canManage" class="item-actions" @click.stop>
                       <DropdownMenu>
                         <DropdownMenuTrigger as-child>
-                          <button type="button" class="item-action-btn">
+                          <Button type="button" variant="ghost" size="icon-sm" class="item-action-btn">
                             <MoreVertical :size="16" />
-                          </button>
+                          </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" :side-offset="4">
                           <DropdownMenuItem @click="openEditItemDialog(item)">

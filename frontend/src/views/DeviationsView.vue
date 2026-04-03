@@ -436,22 +436,24 @@ function handleError(error: unknown, fallback: string) {
       <DialogContent class="create-dialog">
         <h2 class="create-dialog-title">Registrer avvik</h2>
         <div class="create-tabs">
-          <button
+          <Button
             type="button"
-            class="create-tab"
-            :class="{ 'create-tab--active': createTab === 'IK_MAT' }"
+            :class="createTab === 'IK_MAT' ? 'create-tab create-tab--active' : 'create-tab'"
+            variant="outline"
+            size="sm"
             @click="createTab = 'IK_MAT'"
           >
             IK-Mat
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            class="create-tab"
-            :class="{ 'create-tab--active': createTab === 'IK_ALKOHOL' }"
+            :class="createTab === 'IK_ALKOHOL' ? 'create-tab create-tab--active' : 'create-tab'"
+            variant="outline"
+            size="sm"
             @click="createTab = 'IK_ALKOHOL'"
           >
             IK-Alkohol
-          </button>
+          </Button>
         </div>
         <div class="create-form-scroll">
           <FoodDeviationFormDialog
