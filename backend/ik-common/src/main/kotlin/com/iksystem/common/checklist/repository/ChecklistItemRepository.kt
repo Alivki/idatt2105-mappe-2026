@@ -23,6 +23,8 @@ interface ChecklistItemRepository : JpaRepository<ChecklistItem, Long> {
     )
     fun countAllByOrganizationId(@Param("organizationId") organizationId: Long): Long
 
+    fun countByChecklistIdAndCompletedFalse(checklistId: Long): Long
+
     @Modifying
     @Query(
         """

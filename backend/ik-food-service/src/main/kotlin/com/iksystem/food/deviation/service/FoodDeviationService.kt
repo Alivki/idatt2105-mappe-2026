@@ -9,6 +9,9 @@ import com.iksystem.food.deviation.repository.FoodDeviationRepository
 import com.iksystem.common.exception.BadRequestException
 import com.iksystem.common.exception.NotFoundException
 import com.iksystem.common.membership.repository.MembershipRepository
+import com.iksystem.common.notifications.model.NotificationType
+import com.iksystem.common.notifications.model.ReferenceType
+import com.iksystem.common.notifications.service.NotificationsService
 import com.iksystem.common.security.AuthenticatedUser
 import com.iksystem.common.user.model.User
 import com.iksystem.common.user.repository.UserRepository
@@ -21,6 +24,7 @@ class FoodDeviationService(
     private val repository: FoodDeviationRepository,
     private val userRepository: UserRepository,
     private val membershipRepository: MembershipRepository,
+    private val notificationsService: NotificationsService,
 ) {
 
     @Transactional(readOnly = true)
@@ -59,6 +63,8 @@ class FoodDeviationService(
                 preventiveDeadline = request.preventiveDeadline?.let { Instant.parse(it) },
             )
         )
+        notifyDeviationCreated(deviation)
+
         return deviation.toResponse()
     }
 
@@ -97,6 +103,32 @@ class FoodDeviationService(
         val orgId = auth.requireOrganizationId()
         val deviation = requireDeviation(id, orgId)
         repository.delete(deviation)
+    }
+
+    private fun notifyDeviationCreated(deviation: FoodDeviation) {
+        val message = "Food deviation '${deviation.deviationType}' (${deviation.severity}) reported by ${deviation.reportedByUser.fullName}: ${deviation.description.take(100)}"
+
+        notificationsService.sendToOrgAdminsAndManagers(
+            organizationId = deviation.organizationId,
+            type = NotificationType.DEVIATION_CREATED,
+            title = "New Food Deviation: ${deviation.deviationType}",
+            message = message,
+            referenceType = ReferenceType.DEVIATION,
+            referenceId = deviation.id
+        )
+
+        val responsibleUser = deviation.preventiveResponsibleUser
+        if (responsibleUser != null) {
+            notificationsService.send(
+                organizationId = deviation.organizationId,
+                recipientUserId = responsibleUser.id,
+                type = NotificationType.DEVIATION_ASSIGNED,
+                title = "You have been assigned a deviation",
+                message = message,
+                referenceType = ReferenceType.DEVIATION,
+                referenceId = deviation.id
+            )
+        }
     }
 
     private fun requireDeviation(id: Long, organizationId: Long): FoodDeviation {

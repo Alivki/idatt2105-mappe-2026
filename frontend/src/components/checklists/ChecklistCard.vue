@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { MoreVertical, CheckCircle2, Pencil, Trash2 } from 'lucide-vue-next'
+import { MoreVertical, CheckCircle2, Pencil, Trash2, Check } from 'lucide-vue-next'
 import type { Checklist } from '@/types/checklist'
 import Badge from '@/components/ui/badge/Badge.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -39,8 +39,8 @@ const frequencyLabel = computed(() => {
   switch (props.checklist.frequency) {
     case 'DAILY': return 'Daglig'
     case 'WEEKLY': return 'Ukentlig'
-    case 'MONTHLY': return 'Månedlig'
-    case 'YEARLY': return 'Årlig'
+    case 'MONTHLY': return 'M\u00E5nedlig'
+    case 'YEARLY': return '\u00C5rlig'
     default: return props.checklist.frequency
   }
 })
@@ -62,8 +62,8 @@ const completionPercent = computed(() => {
 
 const statusLabel = computed(() => {
   switch (props.checklist.status) {
-    case 'COMPLETED': return 'Fullført'
-    case 'IN_PROGRESS': return 'Pågår'
+    case 'COMPLETED': return 'Fullf\u00F8rt'
+    case 'IN_PROGRESS': return 'P\u00E5g\u00E5r'
     default: return 'Ikke startet'
   }
 })
@@ -76,76 +76,124 @@ const statusTone = computed(() => {
   }
 })
 
-const checklistComplete = computed(() =>
+const isComplete = computed(() =>
   props.checklist.itemCount > 0 && props.checklist.completedItemCount === props.checklist.itemCount,
 )
+
+const progressColor = computed(() => {
+  switch (props.checklist.status) {
+    case 'COMPLETED': return 'var(--green, #3c8f2c)'
+    case 'IN_PROGRESS': return 'var(--amber, #c08a2c)'
+    default: return '#9a9a96'
+  }
+})
+
+const metaLine = computed(() => {
+  const { checklist } = props
+  const parts: string[] = []
+
+  const countLabel = `${checklist.completedItemCount}/${checklist.itemCount} punkter`
+  if (checklist.status === 'COMPLETED') {
+    parts.push(`${countLabel} fullf\u00F8rt`)
+  } else {
+    parts.push(countLabel)
+  }
+
+  if (checklist.description) {
+    parts.push(checklist.description)
+  } else {
+    parts.push(statusLabel.value)
+  }
+
+  if (checklist.status === 'COMPLETED') {
+    const lastCompleted = checklist.items
+      ?.filter(i => i.completedAt)
+      .map(i => new Date(i.completedAt!).getTime())
+      .sort((a, b) => b - a)[0]
+
+    if (lastCompleted) {
+      const d = new Date(lastCompleted)
+      parts.push(d.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' }))
+    }
+  }
+
+  return parts.join(' \u00B7 ')
+})
 </script>
 
 <template>
   <div class="checklist-card">
-    <div class="card-top">
-      <button type="button" class="card-body" @click="emits('open', checklist)">
-        <div class="tag-row">
-          <Badge :tone="frequencyTone">{{ frequencyLabel }}</Badge>
-          <Badge :tone="statusTone">{{ statusLabel }}</Badge>
-        </div>
-
-        <h3>{{ checklist.name }}</h3>
-
-        <div class="detail-row">
-          <p v-if="checklist.description" class="description">{{ checklist.description }}</p>
-          <span class="completion-label">{{ checklist.completedItemCount }}/{{ checklist.itemCount }} fullført</span>
-        </div>
-
-        <div class="progress-track" role="progressbar" :aria-valuenow="completionPercent" aria-valuemin="0" aria-valuemax="100">
-          <div class="progress-fill" :class="`progress-fill--${statusTone}`" :style="{ width: `${completionPercent}%` }" />
-        </div>
-      </button>
-
-      <div v-if="canManage || canComplete" class="card-actions" @click.stop>
-        <DropdownMenu>
-          <DropdownMenuTrigger as-child>
-            <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger">
-              <MoreVertical :size="18" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" :side-offset="4">
-            <DropdownMenuItem
-              v-if="canComplete && checklist.itemCount > 0"
-              @click="emits('toggle-checklist-completed', { checklistId: checklist.id, completed: !checklistComplete })"
-            >
-              <CheckCircle2 :size="16" class="menu-icon--green" />
-              {{ checklistComplete ? 'Angre fullføring' : 'Fullfør hele' }}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator v-if="canComplete && canManage && checklist.itemCount > 0" />
-            <DropdownMenuItem v-if="canManage" @click="emits('edit-checklist', checklist)">
-              <Pencil :size="16" />
-              Rediger
-            </DropdownMenuItem>
-            <DropdownMenuItem v-if="canManage" class="menu-item--danger" @click="deleteDialogOpen = true">
-              <Trash2 :size="16" />
-              Slett sjekkliste
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <AlertDialog v-model:open="deleteDialogOpen">
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Slett sjekkliste?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Dette fjerner sjekklisten og alle oppgaver permanent.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Avbryt</AlertDialogCancel>
-              <AlertDialogAction variant="destructive" @click="emits('delete-checklist', checklist.id)">
-                Slett
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+    <button type="button" class="card-body" @click="emits('open', checklist)">
+      <!-- Circle indicator -->
+      <div class="circle" :class="{ 'circle--done': isComplete, 'circle--progress': !isComplete && checklist.status === 'IN_PROGRESS', 'circle--idle': checklist.status === 'NOT_STARTED' }">
+        <Check v-if="isComplete" class="circle-check" />
+        <span v-else class="circle-count">{{ checklist.completedItemCount }}/{{ checklist.itemCount }}</span>
       </div>
+
+      <!-- Content -->
+      <div class="card-content">
+        <div class="title-row">
+          <h3>{{ checklist.name }}</h3>
+          <Badge :tone="frequencyTone" class="type-badge">{{ frequencyLabel }}</Badge>
+        </div>
+
+        <p class="meta">
+          {{ metaLine }}
+        </p>
+
+        <div class="progress-track">
+          <div
+            class="progress-fill"
+            :style="{ width: `${completionPercent}%`, backgroundColor: progressColor }"
+          />
+        </div>
+      </div>
+
+    </button>
+
+    <div v-if="canManage || canComplete" class="card-actions" @click.stop>
+      <DropdownMenu>
+        <DropdownMenuTrigger as-child>
+          <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger">
+            <MoreVertical :size="18" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" :side-offset="4">
+          <DropdownMenuItem
+            v-if="canComplete && checklist.itemCount > 0"
+            @click="emits('toggle-checklist-completed', { checklistId: checklist.id, completed: !isComplete })"
+          >
+            <CheckCircle2 :size="16" class="menu-icon--green" />
+            {{ isComplete ? 'Angre fullf\u00F8ring' : 'Fullf\u00F8r hele' }}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator v-if="canComplete && canManage && checklist.itemCount > 0" />
+          <DropdownMenuItem v-if="canManage" @click="emits('edit-checklist', checklist)">
+            <Pencil :size="16" />
+            Rediger
+          </DropdownMenuItem>
+          <DropdownMenuItem v-if="canManage" class="menu-item--danger" @click="deleteDialogOpen = true">
+            <Trash2 :size="16" />
+            Slett sjekkliste
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog v-model:open="deleteDialogOpen">
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Slett sjekkliste?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Dette fjerner sjekklisten og alle oppgaver permanent.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Avbryt</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" @click="emits('delete-checklist', checklist.id)">
+              Slett
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   </div>
 </template>
@@ -158,7 +206,7 @@ const checklistComplete = computed(() =>
   border-radius: var(--radius-lg);
   background: var(--card-bg);
   display: flex;
-  flex-direction: column;
+  align-items: flex-start;
   transition: box-shadow 150ms ease;
 }
 
@@ -166,15 +214,10 @@ const checklistComplete = computed(() =>
   box-shadow: 0 6px 14px rgb(0 0 0 / 0.08);
 }
 
-.card-top {
-  display: flex;
-  align-items: flex-start;
-}
-
 .card-body {
   flex: 1;
   min-width: 0;
-  padding: 14px 16px 14px 22px;
+  padding: 16px 16px 16px 20px;
   text-align: left;
   cursor: pointer;
   background: none;
@@ -182,8 +225,8 @@ const checklistComplete = computed(() =>
   font: inherit;
   color: inherit;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 16px;
 }
 
 .card-body:focus-visible {
@@ -192,47 +235,91 @@ const checklistComplete = computed(() =>
   border-radius: var(--radius-lg);
 }
 
-.tag-row {
+/* Circle indicator */
+.circle {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.circle--done {
+  background-color: var(--green-soft, #e6f4e6);
+  color: #2f6f34;
+}
+
+.circle-check {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #2f6f34;
+  stroke-width: 3;
+}
+
+.circle--progress {
+  background-color: var(--amber-soft, #fdf3e0);
+  color: #8e5713;
+}
+
+.circle--idle {
+  background-color: #e9e9e8;
+  color: #464b52;
+}
+
+.circle-count {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Content area */
+.card-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   flex-wrap: wrap;
-  gap: 6px;
 }
 
 h3 {
-  margin: 2px 0 0;
-  font-size: 1.5rem;
-  letter-spacing: -0.02em;
-}
-
-.detail-row {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  margin-top: 2px;
-}
-
-.description {
-  color: var(--text-primary);
   margin: 0;
-  font-size: 1.05rem;
-  line-height: 1.35;
-  flex: 1;
-  min-width: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.completion-label {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
+.type-badge {
   flex-shrink: 0;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.6rem;
+}
+
+.meta {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #6b7280);
+  line-height: 1.4;
   white-space: nowrap;
-  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .progress-track {
-  margin-top: 4px;
+  margin-top: 6px;
   height: 5px;
   border-radius: var(--radius-pill);
   background: #d8d8d5;
@@ -243,12 +330,10 @@ h3 {
 .progress-fill {
   height: 100%;
   border-radius: var(--radius-pill);
+  transition: width 300ms ease;
 }
 
-.progress-fill--ok { background: var(--green); }
-.progress-fill--warning { background: var(--amber); }
-.progress-fill--neutral { background: #9a9a96; }
-
+/* Actions */
 .card-actions {
   display: flex;
   align-items: flex-start;
