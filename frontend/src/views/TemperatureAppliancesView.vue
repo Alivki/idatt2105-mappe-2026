@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { Pencil, Plus, Refrigerator, Snowflake, Trash2 } from 'lucide-vue-next'
-import { useRouter } from 'vue-router'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import OverviewCard from '@/components/common/OverviewCard.vue'
 import Badge from '@/components/ui/badge/Badge.vue'
 import Button from '@/components/ui/button/Button.vue'
+import AlertDialog from '@/components/ui/alert-dialog/AlertDialog.vue'
+import AlertDialogAction from '@/components/ui/alert-dialog/AlertDialogAction.vue'
+import AlertDialogCancel from '@/components/ui/alert-dialog/AlertDialogCancel.vue'
+import AlertDialogContent from '@/components/ui/alert-dialog/AlertDialogContent.vue'
+import AlertDialogDescription from '@/components/ui/alert-dialog/AlertDialogDescription.vue'
+import AlertDialogFooter from '@/components/ui/alert-dialog/AlertDialogFooter.vue'
+import AlertDialogHeader from '@/components/ui/alert-dialog/AlertDialogHeader.vue'
+import AlertDialogTitle from '@/components/ui/alert-dialog/AlertDialogTitle.vue'
+import AlertDialogTrigger from '@/components/ui/alert-dialog/AlertDialogTrigger.vue'
 import Dialog from '@/components/ui/dialog/Dialog.vue'
 import DialogContent from '@/components/ui/dialog/DialogContent.vue'
 import DialogDescription from '@/components/ui/dialog/DialogDescription.vue'
@@ -31,7 +39,6 @@ import type {
   TemperatureThreshold,
 } from '@/types/temperature'
 
-const router = useRouter()
 const {
   appliancesWithLastEntry,
   createAppliance,
@@ -53,6 +60,20 @@ const editType = ref<TemperatureApplianceType>('FRIDGE')
 const editMin = ref(0)
 const editMax = ref(4)
 
+type SortOption =
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'CREATED_NEWEST'
+  | 'CREATED_OLDEST'
+  | 'LAST_MEASURED_NEWEST'
+  | 'LAST_MEASURED_OLDEST'
+  | 'DEVIATION_FIRST'
+
+type GroupOption = 'NONE' | 'TYPE' | 'STATUS'
+
+const sortOption = ref<SortOption>('NAME_ASC')
+const groupOption = ref<GroupOption>('TYPE')
+
 watch(createType, (nextType) => {
   const defaults = getDefaultThreshold(nextType)
   createMin.value = defaults.min
@@ -69,6 +90,71 @@ const inactiveCount = computed(() => {
 
 const withDeviationCount = computed(() => {
   return appliancesWithLastEntry.value.filter((item) => item.lastEntry?.status === 'DEVIATION').length
+})
+
+const sortedAppliances = computed(() => {
+  const list = [...appliancesWithLastEntry.value]
+
+  return list.sort((a, b) => {
+    if (sortOption.value === 'NAME_ASC') {
+      return a.name.localeCompare(b.name, 'nb-NO')
+    }
+
+    if (sortOption.value === 'NAME_DESC') {
+      return b.name.localeCompare(a.name, 'nb-NO')
+    }
+
+    if (sortOption.value === 'CREATED_NEWEST') {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    }
+
+    if (sortOption.value === 'CREATED_OLDEST') {
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    }
+
+    if (sortOption.value === 'LAST_MEASURED_NEWEST') {
+      const aTime = new Date(a.lastEntry?.measuredAt ?? 0).getTime()
+      const bTime = new Date(b.lastEntry?.measuredAt ?? 0).getTime()
+      return bTime - aTime
+    }
+
+    if (sortOption.value === 'LAST_MEASURED_OLDEST') {
+      const aTime = new Date(a.lastEntry?.measuredAt ?? 0).getTime()
+      const bTime = new Date(b.lastEntry?.measuredAt ?? 0).getTime()
+      return aTime - bTime
+    }
+
+    const aDeviation = a.lastEntry?.status === 'DEVIATION' ? 1 : 0
+    const bDeviation = b.lastEntry?.status === 'DEVIATION' ? 1 : 0
+    if (bDeviation !== aDeviation) {
+      return bDeviation - aDeviation
+    }
+
+    return a.name.localeCompare(b.name, 'nb-NO')
+  })
+})
+
+const groupedAppliances = computed(() => {
+  if (groupOption.value === 'NONE') {
+    return [{ key: 'all', label: '', items: sortedAppliances.value }]
+  }
+
+  if (groupOption.value === 'TYPE') {
+    const fridges = sortedAppliances.value.filter((item) => item.type === 'FRIDGE')
+    const freezers = sortedAppliances.value.filter((item) => item.type === 'FREEZER')
+    return [
+      { key: 'fridge', label: 'Kjøleskap', items: fridges },
+      { key: 'freezer', label: 'Frysere', items: freezers },
+    ].filter((group) => group.items.length > 0)
+  }
+
+  const active = sortedAppliances.value.filter((item) => item.isActive)
+  const inactive = sortedAppliances.value.filter((item) => !item.isActive)
+
+  return [
+    { key: 'active', label: 'Aktive enheter', items: active },
+    { key: 'inactive', label: 'Inaktive enheter', items: inactive },
+  ].filter((group) => group.items.length > 0)
 })
 
 const lastRegisteredLabel = computed(() => {
@@ -184,8 +270,8 @@ function removeAppliance(appliance: TemperatureAppliance): void {
   deleteAppliance(appliance.id)
 }
 
-function navigateToManualRegistration(): void {
-  router.push('/temperatur')
+function removeApplianceById(applianceId: string): void {
+  deleteAppliance(applianceId)
 }
 </script>
 
@@ -200,17 +286,14 @@ function navigateToManualRegistration(): void {
     </header>
 
     <div class="page-content">
-      <section class="page-top">
+      <section class="page-intro">
         <div>
           <Badge tone="brand">IK-Mat</Badge>
-          <h1>Registrer og behandle hvitevarer</h1>
-          <p>
-            Legg til kjøleskap og frysere med standard grenser, og tilpass min/maks ved behov.
-          </p>
+          <h1>Hvitevarer</h1>
+          <p>Legg til, rediger og vedlikehold kjøleskap og frysere for temperaturmåling.</p>
         </div>
 
-        <div class="top-actions">
-          <Button variant="outline" @click="navigateToManualRegistration">Gå til temperaturmåling</Button>
+        <div>
           <Button @click="openCreateDialog">
             <Plus />
             Ny enhet
@@ -224,66 +307,124 @@ function navigateToManualRegistration(): void {
         <OverviewCard label="Avvik sist målt" :value="withDeviationCount" variant="open" :sub-label="lastRegisteredLabel" />
       </section>
 
-      <section class="device-grid">
-        <article
-          v-for="item in appliancesWithLastEntry"
-          :key="item.id"
-          :class="['device-card', { 'device-card--inactive': !item.isActive }]"
-        >
-          <div class="device-card-head">
-            <div class="device-icon-wrap">
-              <Refrigerator v-if="item.type === 'FRIDGE'" />
-              <Snowflake v-else />
-            </div>
-            <div>
-              <h3>{{ item.name }}</h3>
-              <p>{{ toTypeLabel(item.type) }}</p>
-            </div>
-            <Badge :tone="item.isActive ? 'ok' : 'neutral'">
-              {{ item.isActive ? 'Aktiv' : 'Inaktiv' }}
-            </Badge>
-          </div>
+      <section class="controls-row">
+        <label class="control-field">
+          <span>Sortering</span>
+          <Select :model-value="sortOption" @update:model-value="(v) => (sortOption = v as SortOption)">
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="NAME_ASC">Navn (A-Å)</SelectItem>
+              <SelectItem value="NAME_DESC">Navn (Å-A)</SelectItem>
+              <SelectItem value="CREATED_NEWEST">Nyeste opprettet</SelectItem>
+              <SelectItem value="CREATED_OLDEST">Eldst opprettet</SelectItem>
+              <SelectItem value="LAST_MEASURED_NEWEST">Sist målt (nyest)</SelectItem>
+              <SelectItem value="LAST_MEASURED_OLDEST">Sist målt (eldst)</SelectItem>
+              <SelectItem value="DEVIATION_FIRST">Avvik først</SelectItem>
+            </SelectContent>
+          </Select>
+        </label>
 
-          <dl class="device-facts">
-            <div>
-              <dt>Grense</dt>
-              <dd>{{ formatThreshold(item.threshold) }}</dd>
-            </div>
-            <div>
-              <dt>Siste temp</dt>
-              <dd v-if="item.lastEntry">{{ item.lastEntry.temperature.toFixed(1) }}°C</dd>
-              <dd v-else>-</dd>
-            </div>
-            <div>
-              <dt>Sist registrert</dt>
-              <dd v-if="item.lastEntry">{{ toShortDateTime(item.lastEntry.measuredAt) }}</dd>
-              <dd v-else>Ingen måling</dd>
-            </div>
-            <div>
-              <dt>Status</dt>
-              <dd>
-                <Badge v-if="item.lastEntry" :tone="item.lastEntry.status === 'OK' ? 'ok' : 'danger'">
-                  {{ item.lastEntry.status === 'OK' ? 'OK' : 'Avvik' }}
+        <label class="control-field">
+          <span>Gruppering</span>
+          <Select :model-value="groupOption" @update:model-value="(v) => (groupOption = v as GroupOption)">
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="NONE">Ingen gruppering</SelectItem>
+              <SelectItem value="TYPE">Grupper etter type</SelectItem>
+              <SelectItem value="STATUS">Grupper etter aktiv/inaktiv</SelectItem>
+            </SelectContent>
+          </Select>
+        </label>
+      </section>
+
+      <section class="groups-wrap">
+        <section v-for="group in groupedAppliances" :key="group.key" class="group-section">
+          <h2 v-if="group.label" class="group-title">{{ group.label }}</h2>
+
+          <div class="device-grid">
+            <article
+              v-for="item in group.items"
+              :key="item.id"
+              :class="['device-card', { 'device-card--inactive': !item.isActive }]"
+            >
+              <div class="device-card-head">
+                <div class="device-icon-wrap">
+                  <Refrigerator v-if="item.type === 'FRIDGE'" />
+                  <Snowflake v-else />
+                </div>
+                <div>
+                  <h3>{{ item.name }}</h3>
+                  <p>{{ toTypeLabel(item.type) }}</p>
+                </div>
+                <Badge :tone="item.isActive ? 'ok' : 'neutral'">
+                  {{ item.isActive ? 'Aktiv' : 'Inaktiv' }}
                 </Badge>
-                <span v-else class="muted">Ingen data</span>
-              </dd>
-            </div>
-          </dl>
+              </div>
 
-          <div class="device-actions">
-            <Button variant="outline" size="sm" @click="openEditDialog(item)">
-              <Pencil />
-              Rediger
-            </Button>
-            <Button variant="outline" size="sm" @click="toggleActive(item)">
-              {{ item.isActive ? 'Sett inaktiv' : 'Aktiver' }}
-            </Button>
-            <Button variant="destructive" size="sm" @click="removeAppliance(item)">
-              <Trash2 />
-              Slett
-            </Button>
+              <dl class="device-facts">
+                <div>
+                  <dt>Grense</dt>
+                  <dd>{{ formatThreshold(item.threshold) }}</dd>
+                </div>
+                <div>
+                  <dt>Siste temp</dt>
+                  <dd v-if="item.lastEntry">{{ item.lastEntry.temperature.toFixed(1) }}°C</dd>
+                  <dd v-else>-</dd>
+                </div>
+                <div>
+                  <dt>Sist registrert</dt>
+                  <dd v-if="item.lastEntry">{{ toShortDateTime(item.lastEntry.measuredAt) }}</dd>
+                  <dd v-else>Ingen måling</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>
+                    <Badge v-if="item.lastEntry" :tone="item.lastEntry.status === 'OK' ? 'ok' : 'danger'">
+                      {{ item.lastEntry.status === 'OK' ? 'OK' : 'Avvik' }}
+                    </Badge>
+                    <span v-else class="muted">Ingen data</span>
+                  </dd>
+                </div>
+              </dl>
+
+              <div class="device-actions">
+                <Button variant="outline" size="sm" @click="openEditDialog(item)">
+                  <Pencil />
+                  Rediger
+                </Button>
+                <Button variant="outline" size="sm" @click="toggleActive(item)">
+                  {{ item.isActive ? 'Sett inaktiv' : 'Aktiver' }}
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger>
+                    <Button variant="destructive" size="sm">
+                      <Trash2 />
+                      Slett
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Slette enhet?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Er du sikker på at du vil slette {{ item.name }}? Alle tilhørende temperaturregistreringer for denne enheten blir også slettet.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                      <AlertDialogAction variant="destructive" @click="removeApplianceById(item.id)">
+                        Slett enhet
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </article>
           </div>
-        </article>
+        </section>
       </section>
     </div>
 
@@ -407,31 +548,22 @@ function navigateToManualRegistration(): void {
   padding: 0 1rem 1rem;
 }
 
-.page-top {
+.page-intro {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  border-radius: 14px;
-  border: 1px solid hsl(var(--border));
-  background: linear-gradient(145deg, #fefefe, #f6f5f1);
-  padding: 1rem;
 }
 
-.page-top h1 {
+.page-intro h1 {
   margin-top: 0.5rem;
-  font-size: 1.5rem;
+  font-size: 1.45rem;
   line-height: 1.2;
 }
 
-.page-top p {
+.page-intro p {
   margin-top: 0.375rem;
   color: hsl(var(--muted-foreground));
-}
-
-.top-actions {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
 }
 
 .overview-grid {
@@ -444,6 +576,42 @@ function navigateToManualRegistration(): void {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 0.75rem;
+}
+
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.control-field {
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.control-field span {
+  font-size: 0.85rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.groups-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.group-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.group-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
 }
 
 .device-card {
@@ -546,13 +714,12 @@ function navigateToManualRegistration(): void {
     grid-template-columns: 1fr;
   }
 
-  .page-top {
+  .page-intro {
     flex-direction: column;
   }
 
-  .top-actions {
-    width: 100%;
-    flex-wrap: wrap;
+  .controls-row {
+    flex-direction: column;
   }
 
   .form-grid {

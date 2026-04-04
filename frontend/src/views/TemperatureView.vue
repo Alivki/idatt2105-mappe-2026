@@ -1,8 +1,153 @@
 <script setup lang="ts">
-import { Thermometer } from 'lucide-vue-next'
+import { computed, ref, watch } from 'vue'
+import { Thermometer, TriangleAlert } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import OverviewCard from '@/components/common/OverviewCard.vue'
+import Badge from '@/components/ui/badge/Badge.vue'
+import Button from '@/components/ui/button/Button.vue'
+import Input from '@/components/ui/input/Input.vue'
 import { Separator } from '@/components/ui/separator'
+import Select from '@/components/ui/select/Select.vue'
+import SelectContent from '@/components/ui/select/SelectContent.vue'
+import SelectItem from '@/components/ui/select/SelectItem.vue'
+import SelectTrigger from '@/components/ui/select/SelectTrigger.vue'
+import SelectValue from '@/components/ui/select/SelectValue.vue'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import {
+  evaluateTemperatureStatus,
+  formatThreshold,
+  useTemperatureMonitoring,
+} from '@/composables/useTemperatureMonitoring'
+import { useCreateFoodDeviationMutation } from '@/composables/useFoodDeviations'
+import { useAuthStore } from '@/stores/auth'
+import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+
+const auth = useAuthStore()
+const { activeAppliances, appliances, entries, registerTemperature } = useTemperatureMonitoring()
+const createFoodDeviation = useCreateFoodDeviationMutation()
+
+const selectedApplianceId = ref('')
+const temperatureInput = ref('')
+const note = ref('')
+
+watch(
+  activeAppliances,
+  (list) => {
+    if (!selectedApplianceId.value && list[0]) {
+      selectedApplianceId.value = list[0].id
+    }
+
+    if (selectedApplianceId.value && !list.some((item) => item.id === selectedApplianceId.value)) {
+      selectedApplianceId.value = list[0]?.id ?? ''
+    }
+  },
+  { immediate: true },
+)
+
+const selectedAppliance = computed(() => {
+  return activeAppliances.value.find((item) => item.id === selectedApplianceId.value) ?? null
+})
+
+const recentEntries = computed(() => {
+  return entries.value.slice(0, 8).map((entry) => {
+    const appliance = appliances.value.find((item) => item.id === entry.applianceId)
+    return {
+      ...entry,
+      applianceName: appliance?.name ?? 'Ukjent enhet',
+      applianceType: appliance?.type ?? 'FRIDGE',
+      threshold: appliance ? formatThreshold(appliance.threshold) : '-',
+      statusTone: entry.status === 'OK' ? ('ok' as const) : ('danger' as const),
+    }
+  })
+})
+
+const activeCount = computed(() => activeAppliances.value.length)
+const totalCount = computed(() => appliances.value.length)
+const deviationCount = computed(() => entries.value.filter((item) => item.status === 'DEVIATION').length)
+const latestEntry = computed(() => entries.value[0] ?? null)
+
+const formStatus = computed(() => {
+  if (!selectedAppliance.value) {
+    return null
+  }
+
+  const value = Number(temperatureInput.value)
+  if (Number.isNaN(value)) {
+    return null
+  }
+
+  return evaluateTemperatureStatus(value, selectedAppliance.value.threshold)
+})
+
+function formatDateTime(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return '-'
+  }
+
+  return new Intl.DateTimeFormat('nb-NO', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+}
+
+function toDeviationSeverity(temperature: number, min: number, max: number): 'MEDIUM' | 'HIGH' | 'CRITICAL' {
+  const distance = temperature < min ? min - temperature : temperature - max
+
+  if (distance >= 5) {
+    return 'CRITICAL'
+  }
+
+  if (distance >= 2) {
+    return 'HIGH'
+  }
+
+  return 'MEDIUM'
+}
+
+async function submitTemperature(): Promise<void> {
+  if (!selectedAppliance.value) {
+    return
+  }
+
+  const temperature = Number(temperatureInput.value)
+  if (Number.isNaN(temperature)) {
+    return
+  }
+
+  const entry = registerTemperature({
+    applianceId: selectedAppliance.value.id,
+    temperature,
+    measuredBy: auth.user?.fullName ?? 'Innlogget bruker',
+    note: note.value,
+  })
+
+  if (!entry) {
+    return
+  }
+
+  if (entry.status === 'DEVIATION') {
+    const threshold = selectedAppliance.value.threshold
+    const severity = toDeviationSeverity(entry.temperature, threshold.min, threshold.max)
+
+    try {
+      await createFoodDeviation.mutateAsync({
+        reportedAt: entry.measuredAt,
+        deviationType: 'TEMPERATUR',
+        severity,
+        description: `Temperaturavvik registrert for ${selectedAppliance.value.name}. Målt ${entry.temperature.toFixed(1)}°C (grense ${threshold.min} til ${threshold.max}°C).`,
+        immediateAction: entry.note || undefined,
+      })
+    } catch {
+      // Temperature measurement is already stored locally.
+    }
+  }
+
+  temperatureInput.value = ''
+  note.value = ''
+}
 </script>
 
 <template>
@@ -11,38 +156,372 @@ import { SidebarTrigger } from '@/components/ui/sidebar'
       <div class="page-header-inner">
         <SidebarTrigger />
         <Separator orientation="vertical" class="header-separator" />
-        <span class="page-title">Temperaturlogg</span>
+        <span class="page-title">Temperaturmåling</span>
       </div>
     </header>
 
     <div class="page-content">
-      <div class="empty-state">
-        <div class="empty-state-bg" />
-        <div class="empty-state-inner">
-          <div class="empty-state-icon">
-            <Thermometer :stroke-width="1.5" />
+      <section class="page-intro">
+        <Badge tone="brand">IK-Mat</Badge>
+        <h1>Temperaturmåling</h1>
+        <p>Manuell registrering av temperaturer på kjøleskap og frysere.</p>
+      </section>
+
+      <section class="overview-grid">
+        <OverviewCard label="Aktive enheter" :value="activeCount" variant="resolved" />
+        <OverviewCard label="Totalt registrert" :value="totalCount" variant="neutral" />
+        <OverviewCard label="Avvik registrert" :value="deviationCount" variant="open" />
+        <OverviewCard
+          label="Siste måling"
+          :value="latestEntry ? `${latestEntry.temperature.toFixed(1)}°C` : '-'"
+          :sub-label="latestEntry ? `${formatDateTime(latestEntry.measuredAt)} • ${latestEntry.measuredBy}` : 'Ingen målinger ennå'"
+          :value-class="latestEntry?.status === 'DEVIATION' ? 'text-red-600' : 'text-emerald-700'"
+        />
+      </section>
+
+      <section class="workspace-grid">
+        <article class="form-panel">
+          <div class="panel-header">
+            <div>
+              <Badge tone="ok">Ny registrering</Badge>
+              <h2>Velg enhet og logg temp</h2>
+              <p>Bruk samme liste av registrerte enheter hver gang, så slipper du manuell tekstinnskriving.</p>
+            </div>
           </div>
-          <div class="empty-state-text">
-            <h3>Kommer snart</h3>
-            <p>Temperaturlogging er under utvikling. Her vil du snart kunne registrere og overvåke temperaturer.</p>
+
+          <div v-if="activeAppliances.length === 0" class="empty-warning">
+            <TriangleAlert />
+            <div>
+              <strong>Ingen aktive enheter</strong>
+              <p>Legg til eller aktiver kjøleskap og frysere før du registrerer målinger.</p>
+            </div>
           </div>
-        </div>
-      </div>
+
+          <div class="form-grid">
+            <label class="field field--full">
+              <span>Hvitevare</span>
+              <Select :model-value="selectedApplianceId" @update:model-value="(v) => (selectedApplianceId = v)">
+                <SelectTrigger :disabled="activeAppliances.length === 0">
+                  <SelectValue placeholder="Velg enhet" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="item in activeAppliances" :key="item.id" :value="item.id">
+                    {{ item.name }} · {{ item.type === 'FRIDGE' ? 'Kjøleskap' : 'Fryser' }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </label>
+
+            <label class="field">
+              <span>Temperatur (°C)</span>
+              <Input v-model="temperatureInput" type="number" step="0.1" placeholder="Skriv inn målt verdi" />
+            </label>
+
+            <label class="field">
+              <span>Registrert av</span>
+              <Input :model-value="auth.user?.fullName ?? 'Innlogget bruker'" disabled />
+            </label>
+
+            <label class="field field--full">
+              <span>Merknad</span>
+              <Input v-model="note" placeholder="Valgfri kommentar, for eksempel årsak til avvik" />
+            </label>
+          </div>
+
+          <div class="status-strip" v-if="selectedAppliance">
+            <div>
+              <span>Standardgrense</span>
+              <strong>{{ formatThreshold(selectedAppliance.threshold) }}</strong>
+            </div>
+            <div>
+              <span>Forventet status</span>
+              <Badge :tone="formStatus === 'DEVIATION' ? 'danger' : 'ok'">
+                {{ formStatus === 'DEVIATION' ? 'Avvik' : 'OK' }}
+              </Badge>
+            </div>
+          </div>
+
+          <Button class="submit-btn" :disabled="activeAppliances.length === 0 || !selectedAppliance || !temperatureInput" @click="submitTemperature">
+            <Thermometer />
+            Lagre temperatur
+          </Button>
+        </article>
+
+        <article class="log-panel">
+          <div class="panel-header">
+            <div>
+              <Badge tone="neutral">Logg</Badge>
+              <h2>Siste registreringer</h2>
+              <p>En oversikt som viser temp, grense, ansvarlig og om målingen ga avvik.</p>
+            </div>
+          </div>
+
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Tidspunkt</TableHead>
+                <TableHead>Enhet</TableHead>
+                <TableHead>Temp</TableHead>
+                <TableHead>Grense</TableHead>
+                <TableHead>Registrert av</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableEmpty v-if="recentEntries.length === 0" :colspan="6">
+                <div class="table-empty-content">
+                  <Thermometer />
+                  <div>
+                    <strong>Ingen temperaturregistreringer enda</strong>
+                    <p>Registrer den første målingen i panelet til venstre.</p>
+                  </div>
+                </div>
+              </TableEmpty>
+
+              <TableRow v-for="entry in recentEntries" :key="entry.id" :class="entry.status === 'DEVIATION' ? 'row--deviation' : ''">
+                <TableCell>
+                  <div class="cell-stack">
+                    <strong>{{ formatDateTime(entry.measuredAt) }}</strong>
+                    <span>{{ entry.note || 'Måling registrert' }}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div class="cell-stack">
+                    <strong>{{ entry.applianceName }}</strong>
+                    <span>{{ entry.applianceType === 'FRIDGE' ? 'Kjøleskap' : 'Fryser' }}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <strong :class="entry.status === 'DEVIATION' ? 'danger-text' : 'ok-text'">{{ entry.temperature.toFixed(1) }}°C</strong>
+                </TableCell>
+                <TableCell>{{ entry.threshold }}</TableCell>
+                <TableCell>{{ entry.measuredBy }}</TableCell>
+                <TableCell>
+                  <Badge :tone="entry.statusTone">{{ entry.status === 'OK' ? 'OK' : 'Avvik' }}</Badge>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </article>
+      </section>
     </div>
   </AppLayout>
 </template>
 
 <style scoped>
-.page-header { display: flex; height: 4rem; flex-shrink: 0; align-items: center; }
-.page-header-inner { display: flex; align-items: center; gap: 0.5rem; padding: 0 1rem; }
-.header-separator { height: 1rem !important; width: 1px !important; margin-right: 0.5rem; }
-.page-title { font-weight: 500; color: hsl(var(--sidebar-primary, 245 43% 52%)); }
-.page-content { display: flex; flex: 1; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; }
-.empty-state { position: relative; display: flex; min-height: 320px; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; border-radius: 1rem; border: 2px dashed hsl(var(--muted-foreground) / 0.2); background: linear-gradient(to bottom right, hsl(var(--muted) / 0.4), hsl(var(--muted) / 0.2), hsl(var(--background))); padding: 2rem; }
-.empty-state-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at center, hsl(var(--muted)) 0%, transparent 70%); opacity: 0.5; }
-.empty-state-inner { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
-.empty-state-icon { display: flex; height: 5rem; width: 5rem; align-items: center; justify-content: center; border-radius: 1rem; background-color: hsl(var(--primary) / 0.1); box-shadow: 0 0 0 4px hsl(var(--primary) / 0.05); }
-.empty-state-icon :deep(svg) { width: 2.5rem; height: 2.5rem; color: hsl(var(--primary) / 0.7); }
-.empty-state-text h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; }
-.empty-state-text p { max-width: 24rem; font-size: 0.875rem; color: hsl(var(--muted-foreground)); margin-top: 0.25rem; }
+.page-header {
+  display: flex;
+  height: 4rem;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.page-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.header-separator {
+  height: 1rem !important;
+  width: 1px !important;
+  margin-right: 0.5rem;
+}
+
+.page-title {
+  font-weight: 500;
+  color: hsl(var(--sidebar-primary, 245 43% 52%));
+}
+
+.page-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1rem 1rem;
+}
+
+.form-panel,
+.log-panel {
+  border-radius: 14px;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+}
+
+.page-intro h1 {
+  margin-top: 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+.page-intro p {
+  margin-top: 0.25rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.form-panel,
+.log-panel {
+  padding: 1rem;
+}
+
+.panel-header h2 {
+  margin-top: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.panel-header p {
+  margin-top: 0.25rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.empty-warning {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--amber-soft) 65%, #8e5713 35%);
+  background: #f8edd6;
+  padding: 0.75rem;
+}
+
+.empty-warning :deep(svg) {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: #8e5713;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.empty-warning strong {
+  display: block;
+  color: #7a4a0d;
+}
+
+.empty-warning p {
+  margin-top: 0.15rem;
+  color: #7a4a0d;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field--full {
+  grid-column: 1 / -1;
+}
+
+.field span {
+  font-size: 0.85rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.status-strip {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+  border-radius: 12px;
+  background: hsl(var(--muted) / 0.4);
+  padding: 0.8rem 0.9rem;
+}
+
+.status-strip span {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: hsl(var(--muted-foreground));
+}
+
+.status-strip strong {
+  margin-top: 0.2rem;
+  display: block;
+}
+
+.submit-btn {
+  margin-top: 0.9rem;
+}
+
+.submit-btn :deep(svg) {
+  width: 1rem;
+  height: 1rem;
+}
+
+.table-empty-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 0;
+}
+
+.table-empty-content :deep(svg) {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: hsl(var(--primary));
+}
+
+.table-empty-content p {
+  color: hsl(var(--muted-foreground));
+  margin-top: 0.15rem;
+}
+
+.cell-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.cell-stack span {
+  font-size: 0.8rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.row--deviation {
+  background: #fdf0f0;
+}
+
+.danger-text {
+  color: #ae2c2d;
+}
+
+.ok-text {
+  color: #1a7a4f;
+}
+
+@media (max-width: 1080px) {
+  .overview-grid,
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
