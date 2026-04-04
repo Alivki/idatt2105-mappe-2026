@@ -40,6 +40,10 @@ export function evaluateTemperatureStatus(value: number, threshold: TemperatureT
   return 'OK'
 }
 
+export function isValidThreshold(threshold: TemperatureThreshold): boolean {
+  return Number.isFinite(threshold.min) && Number.isFinite(threshold.max) && threshold.min < threshold.max
+}
+
 export function formatThreshold(threshold: TemperatureThreshold): string {
   return `${threshold.min} til ${threshold.max}°C`
 }
@@ -101,13 +105,20 @@ export function useTemperatureMonitoring() {
     })
   })
 
-  function createAppliance(payload: CreateAppliancePayload): TemperatureAppliance {
+  function createAppliance(payload: CreateAppliancePayload): TemperatureAppliance | null {
+    const normalizedName = payload.name.trim()
+    const threshold = payload.threshold ?? getDefaultThreshold(payload.type)
+
+    if (!normalizedName || !isValidThreshold(threshold)) {
+      return null
+    }
+
     const timestamp = nowIso()
     const appliance: TemperatureAppliance = {
       id: createId('appliance'),
-      name: payload.name.trim(),
+      name: normalizedName,
       type: payload.type,
-      threshold: payload.threshold ?? getDefaultThreshold(payload.type),
+      threshold,
       isActive: true,
       createdAt: timestamp,
       updatedAt: timestamp,
@@ -123,10 +134,15 @@ export function useTemperatureMonitoring() {
       return null
     }
 
+    const nextThreshold = payload.threshold ?? existing.threshold
+    if (!isValidThreshold(nextThreshold)) {
+      return null
+    }
+
     const updated: TemperatureAppliance = {
       ...existing,
       name: payload.name?.trim() || existing.name,
-      threshold: payload.threshold ?? existing.threshold,
+      threshold: nextThreshold,
       isActive: payload.isActive ?? existing.isActive,
       updatedAt: nowIso(),
     }
@@ -156,7 +172,7 @@ export function useTemperatureMonitoring() {
       id: createId('entry'),
       applianceId: appliance.id,
       measuredAt,
-      measuredBy: payload.measuredBy.trim() || DEFAULT_MEASURED_BY,
+      measuredBy: payload.measuredBy?.trim() || DEFAULT_MEASURED_BY,
       temperature: payload.temperature,
       note: payload.note?.trim() ?? '',
       status,

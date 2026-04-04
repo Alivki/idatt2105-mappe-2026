@@ -33,6 +33,11 @@ import {
   getDefaultThreshold,
   useTemperatureMonitoring,
 } from '@/composables/useTemperatureMonitoring'
+import {
+  useApplianceSorting,
+  type ApplianceGroupOption,
+  type ApplianceSortOption,
+} from '@/composables/useApplianceSorting'
 import type {
   TemperatureAppliance,
   TemperatureApplianceType,
@@ -59,20 +64,11 @@ const editName = ref('')
 const editType = ref<TemperatureApplianceType>('FRIDGE')
 const editMin = ref(0)
 const editMax = ref(4)
-
-type SortOption =
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'CREATED_NEWEST'
-  | 'CREATED_OLDEST'
-  | 'LAST_MEASURED_NEWEST'
-  | 'LAST_MEASURED_OLDEST'
-  | 'DEVIATION_FIRST'
-
-type GroupOption = 'NONE' | 'TYPE' | 'STATUS'
-
-const sortOption = ref<SortOption>('NAME_ASC')
-const groupOption = ref<GroupOption>('TYPE')
+const {
+  sortOption,
+  groupOption,
+  groupedAppliances,
+} = useApplianceSorting(appliancesWithLastEntry)
 
 watch(createType, (nextType) => {
   const defaults = getDefaultThreshold(nextType)
@@ -90,71 +86,6 @@ const inactiveCount = computed(() => {
 
 const withDeviationCount = computed(() => {
   return appliancesWithLastEntry.value.filter((item) => item.lastEntry?.status === 'DEVIATION').length
-})
-
-const sortedAppliances = computed(() => {
-  const list = [...appliancesWithLastEntry.value]
-
-  return list.sort((a, b) => {
-    if (sortOption.value === 'NAME_ASC') {
-      return a.name.localeCompare(b.name, 'nb-NO')
-    }
-
-    if (sortOption.value === 'NAME_DESC') {
-      return b.name.localeCompare(a.name, 'nb-NO')
-    }
-
-    if (sortOption.value === 'CREATED_NEWEST') {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    }
-
-    if (sortOption.value === 'CREATED_OLDEST') {
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    }
-
-    if (sortOption.value === 'LAST_MEASURED_NEWEST') {
-      const aTime = new Date(a.lastEntry?.measuredAt ?? 0).getTime()
-      const bTime = new Date(b.lastEntry?.measuredAt ?? 0).getTime()
-      return bTime - aTime
-    }
-
-    if (sortOption.value === 'LAST_MEASURED_OLDEST') {
-      const aTime = new Date(a.lastEntry?.measuredAt ?? 0).getTime()
-      const bTime = new Date(b.lastEntry?.measuredAt ?? 0).getTime()
-      return aTime - bTime
-    }
-
-    const aDeviation = a.lastEntry?.status === 'DEVIATION' ? 1 : 0
-    const bDeviation = b.lastEntry?.status === 'DEVIATION' ? 1 : 0
-    if (bDeviation !== aDeviation) {
-      return bDeviation - aDeviation
-    }
-
-    return a.name.localeCompare(b.name, 'nb-NO')
-  })
-})
-
-const groupedAppliances = computed(() => {
-  if (groupOption.value === 'NONE') {
-    return [{ key: 'all', label: '', items: sortedAppliances.value }]
-  }
-
-  if (groupOption.value === 'TYPE') {
-    const fridges = sortedAppliances.value.filter((item) => item.type === 'FRIDGE')
-    const freezers = sortedAppliances.value.filter((item) => item.type === 'FREEZER')
-    return [
-      { key: 'fridge', label: 'Kjøleskap', items: fridges },
-      { key: 'freezer', label: 'Frysere', items: freezers },
-    ].filter((group) => group.items.length > 0)
-  }
-
-  const active = sortedAppliances.value.filter((item) => item.isActive)
-  const inactive = sortedAppliances.value.filter((item) => !item.isActive)
-
-  return [
-    { key: 'active', label: 'Aktive enheter', items: active },
-    { key: 'inactive', label: 'Inaktive enheter', items: inactive },
-  ].filter((group) => group.items.length > 0)
 })
 
 const lastRegisteredLabel = computed(() => {
@@ -214,11 +145,15 @@ function submitCreate(): void {
     return
   }
 
-  createAppliance({
+  const created = createAppliance({
     name,
     type: createType.value,
     threshold,
   })
+
+  if (!created) {
+    return
+  }
 
   isCreateDialogOpen.value = false
 }
@@ -266,10 +201,6 @@ function toggleActive(appliance: TemperatureAppliance): void {
   })
 }
 
-function removeAppliance(appliance: TemperatureAppliance): void {
-  deleteAppliance(appliance.id)
-}
-
 function removeApplianceById(applianceId: string): void {
   deleteAppliance(applianceId)
 }
@@ -310,7 +241,7 @@ function removeApplianceById(applianceId: string): void {
       <section class="controls-row">
         <label class="control-field">
           <span>Sortering</span>
-          <Select :model-value="sortOption" @update:model-value="(v) => (sortOption = v as SortOption)">
+          <Select :model-value="sortOption" @update:model-value="(v) => (sortOption = v as ApplianceSortOption)">
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -328,7 +259,7 @@ function removeApplianceById(applianceId: string): void {
 
         <label class="control-field">
           <span>Gruppering</span>
-          <Select :model-value="groupOption" @update:model-value="(v) => (groupOption = v as GroupOption)">
+          <Select :model-value="groupOption" @update:model-value="(v) => (groupOption = v as ApplianceGroupOption)">
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>

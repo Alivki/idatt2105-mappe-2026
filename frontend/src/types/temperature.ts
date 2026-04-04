@@ -31,7 +31,7 @@ export interface TemperatureEntry {
 export interface RegisterTemperaturePayload {
   applianceId: string
   temperature: number
-  measuredBy: string
+  measuredBy?: string
   measuredAt?: string
   note?: string
 }

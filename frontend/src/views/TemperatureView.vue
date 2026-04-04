@@ -18,13 +18,14 @@ import {
   formatThreshold,
   useTemperatureMonitoring,
 } from '@/composables/useTemperatureMonitoring'
-import { useCreateFoodDeviationMutation } from '@/composables/useFoodDeviations'
+import { useTemperatureRegistration } from '@/composables/useTemperatureRegistration'
 import { useAuthStore } from '@/stores/auth'
 import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { toast } from 'vue-sonner'
 
 const auth = useAuthStore()
-const { activeAppliances, appliances, entries, registerTemperature } = useTemperatureMonitoring()
-const createFoodDeviation = useCreateFoodDeviationMutation()
+const { activeAppliances, appliances, entries } = useTemperatureMonitoring()
+const { registerTemperatureWithDeviation } = useTemperatureRegistration()
 
 const selectedApplianceId = ref('')
 const temperatureInput = ref('')
@@ -93,20 +94,6 @@ function formatDateTime(value: string): string {
   }).format(date)
 }
 
-function toDeviationSeverity(temperature: number, min: number, max: number): 'MEDIUM' | 'HIGH' | 'CRITICAL' {
-  const distance = temperature < min ? min - temperature : temperature - max
-
-  if (distance >= 5) {
-    return 'CRITICAL'
-  }
-
-  if (distance >= 2) {
-    return 'HIGH'
-  }
-
-  return 'MEDIUM'
-}
-
 async function submitTemperature(): Promise<void> {
   if (!selectedAppliance.value) {
     return
@@ -117,32 +104,18 @@ async function submitTemperature(): Promise<void> {
     return
   }
 
-  const entry = registerTemperature({
+  const result = await registerTemperatureWithDeviation({
     applianceId: selectedAppliance.value.id,
     temperature,
-    measuredBy: auth.user?.fullName ?? 'Innlogget bruker',
     note: note.value,
   })
 
-  if (!entry) {
+  if (!result.entry) {
     return
   }
 
-  if (entry.status === 'DEVIATION') {
-    const threshold = selectedAppliance.value.threshold
-    const severity = toDeviationSeverity(entry.temperature, threshold.min, threshold.max)
-
-    try {
-      await createFoodDeviation.mutateAsync({
-        reportedAt: entry.measuredAt,
-        deviationType: 'TEMPERATUR',
-        severity,
-        description: `Temperaturavvik registrert for ${selectedAppliance.value.name}. Målt ${entry.temperature.toFixed(1)}°C (grense ${threshold.min} til ${threshold.max}°C).`,
-        immediateAction: entry.note || undefined,
-      })
-    } catch {
-      // Temperature measurement is already stored locally.
-    }
+  if (result.deviationFailed) {
+    toast.warning('Temperatur ble lagret, men avvik kunne ikke opprettes automatisk.')
   }
 
   temperatureInput.value = ''
