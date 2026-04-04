@@ -6,8 +6,8 @@ import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 @SpringBootApplication(scanBasePackages = ["com.iksystem.common", "com.iksystem.food"])
-@EntityScan(basePackages = ["com.iksystem.common"])
-@EnableJpaRepositories(basePackages = ["com.iksystem.common"])
+@EntityScan(basePackages = ["com.iksystem.common", "com.iksystem.food"])
+@EnableJpaRepositories(basePackages = ["com.iksystem.common", "com.iksystem.food"])
 class IkFoodApplication
 
 fun main(args: Array<String>) {
