@@ -39,6 +39,8 @@ const note = ref('')
 const selectedEntryIds = ref<number[]>([])
 const deviationDialogOpen = ref(false)
 const deviationFormPrefill = ref<Partial<CreateFoodDeviationRequest> | null>(null)
+const currentPage = ref(1)
+const entriesPerPage = 10
 
 watch(
   activeAppliances,
@@ -75,8 +77,28 @@ const recentEntries = computed(() => {
   })
 })
 
+const totalPages = computed(() => {
+  return Math.max(1, Math.ceil(recentEntries.value.length / entriesPerPage))
+})
+
+const pagedEntries = computed(() => {
+  const start = (currentPage.value - 1) * entriesPerPage
+  const end = start + entriesPerPage
+  return recentEntries.value.slice(start, end)
+})
+
 const allRowsSelected = computed(() => {
-  return recentEntries.value.length > 0 && recentEntries.value.every((entry) => selectedEntryIds.value.includes(entry.id))
+  return pagedEntries.value.length > 0 && pagedEntries.value.every((entry) => selectedEntryIds.value.includes(entry.id))
+})
+
+const paginationSummary = computed(() => {
+  if (recentEntries.value.length === 0) {
+    return 'Viser 0 av 0'
+  }
+
+  const start = (currentPage.value - 1) * entriesPerPage + 1
+  const end = Math.min(currentPage.value * entriesPerPage, recentEntries.value.length)
+  return `Viser ${start}-${end} av ${recentEntries.value.length}`
 })
 
 const expectedMeasurementsToday = computed(() => activeAppliances.value.length * 2)
@@ -154,6 +176,10 @@ const memberOptions = computed(() => {
 watch(recentEntries, (rows) => {
   const validIds = new Set(rows.map((row) => row.id))
   selectedEntryIds.value = selectedEntryIds.value.filter((id) => validIds.has(id))
+
+  if (currentPage.value > totalPages.value) {
+    currentPage.value = totalPages.value
+  }
 })
 
 const deviationCount = computed(() => entries.value.filter((item) => item.status === 'DEVIATION').length)
@@ -250,11 +276,14 @@ function toggleEntrySelection(entryId: number, checked: boolean): void {
 
 function toggleSelectAll(checked: boolean): void {
   if (!checked) {
-    selectedEntryIds.value = []
+    const pageIds = new Set(pagedEntries.value.map((entry) => entry.id))
+    selectedEntryIds.value = selectedEntryIds.value.filter((id) => !pageIds.has(id))
     return
   }
 
-  selectedEntryIds.value = recentEntries.value.map((entry) => entry.id)
+  const nextSelected = new Set(selectedEntryIds.value)
+  pagedEntries.value.forEach((entry) => nextSelected.add(entry.id))
+  selectedEntryIds.value = [...nextSelected]
 }
 
 async function deleteSelectedMeasurements(): Promise<void> {
@@ -274,6 +303,18 @@ async function handleCreateDeviation(payload: CreateFoodDeviationRequest): Promi
     deviationFormPrefill.value = null
   } catch {
     toast.error('Kunne ikke registrere matavvik')
+  }
+}
+
+function goToPreviousPage(): void {
+  if (currentPage.value > 1) {
+    currentPage.value -= 1
+  }
+}
+
+function goToNextPage(): void {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value += 1
   }
 }
 </script>
@@ -422,7 +463,7 @@ async function handleCreateDeviation(payload: CreateFoodDeviationRequest): Promi
                   </div>
                 </TableEmpty>
 
-                <TableRow v-for="entry in recentEntries" :key="entry.id" :class="entry.status === 'DEVIATION' ? 'row--deviation' : ''">
+                <TableRow v-for="entry in pagedEntries" :key="entry.id" :class="entry.status === 'DEVIATION' ? 'row--deviation' : ''">
                   <TableCell>
                     <Checkbox
                       :checked="selectedEntryIds.includes(entry.id)"
@@ -452,6 +493,19 @@ async function handleCreateDeviation(payload: CreateFoodDeviationRequest): Promi
                 </TableRow>
               </TableBody>
             </Table>
+          </div>
+
+          <div class="pagination-row">
+            <span>{{ paginationSummary }}</span>
+            <div class="pagination-actions">
+              <Button variant="outline" size="sm" :disabled="currentPage <= 1" @click="goToPreviousPage">
+                Forrige
+              </Button>
+              <span>Side {{ currentPage }} av {{ totalPages }}</span>
+              <Button variant="outline" size="sm" :disabled="currentPage >= totalPages" @click="goToNextPage">
+                Neste
+              </Button>
+            </div>
           </div>
         </article>
       </section>
@@ -568,6 +622,22 @@ async function handleCreateDeviation(payload: CreateFoodDeviationRequest): Promi
   overflow: auto;
   flex: 1;
   min-height: 0;
+}
+
+.pagination-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.85rem;
+}
+
+.pagination-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
 }
 
 .empty-warning {
@@ -707,6 +777,11 @@ async function handleCreateDeviation(payload: CreateFoodDeviationRequest): Promi
 @media (max-width: 720px) {
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .pagination-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>
