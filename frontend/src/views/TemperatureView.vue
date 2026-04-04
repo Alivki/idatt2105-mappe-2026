@@ -5,6 +5,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 import OverviewCard from '@/components/common/OverviewCard.vue'
 import Badge from '@/components/ui/badge/Badge.vue'
 import Button from '@/components/ui/button/Button.vue'
+import Checkbox from '@/components/ui/checkbox/Checkbox.vue'
 import Input from '@/components/ui/input/Input.vue'
 import { Separator } from '@/components/ui/separator'
 import Select from '@/components/ui/select/Select.vue'
@@ -24,12 +25,13 @@ import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableR
 import { toast } from 'vue-sonner'
 
 const auth = useAuthStore()
-const { activeAppliances, appliances, entries } = useTemperatureMonitoring()
+const { activeAppliances, appliances, entries, deleteEntries } = useTemperatureMonitoring()
 const { registerTemperatureWithDeviation } = useTemperatureRegistration()
 
 const selectedApplianceId = ref('')
 const temperatureInput = ref('')
 const note = ref('')
+const selectedEntryIds = ref<string[]>([])
 
 watch(
   activeAppliances,
@@ -50,7 +52,7 @@ const selectedAppliance = computed(() => {
 })
 
 const recentEntries = computed(() => {
-  return entries.value.slice(0, 8).map((entry) => {
+  return entries.value.map((entry) => {
     const appliance = appliances.value.find((item) => item.id === entry.applianceId)
     return {
       ...entry,
@@ -62,8 +64,70 @@ const recentEntries = computed(() => {
   })
 })
 
-const activeCount = computed(() => activeAppliances.value.length)
-const totalCount = computed(() => appliances.value.length)
+const allRowsSelected = computed(() => {
+  return recentEntries.value.length > 0 && recentEntries.value.every((entry) => selectedEntryIds.value.includes(entry.id))
+})
+
+const expectedMeasurementsToday = computed(() => activeAppliances.value.length * 2)
+
+const measurementsToday = computed(() => {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = today.getMonth()
+  const day = today.getDate()
+
+  return entries.value.filter((entry) => {
+    const measured = new Date(entry.measuredAt)
+    return measured.getFullYear() === year
+      && measured.getMonth() === month
+      && measured.getDate() === day
+  })
+})
+
+const measurementsTodayCount = computed(() => measurementsToday.value.length)
+
+const completedUnitsToday = computed(() => {
+  const countsByAppliance = measurementsToday.value.reduce<Record<string, number>>((acc, entry) => {
+    acc[entry.applianceId] = (acc[entry.applianceId] ?? 0) + 1
+    return acc
+  }, {})
+
+  return activeAppliances.value.filter((appliance) => {
+    return (countsByAppliance[appliance.id] ?? 0) >= 2
+  }).length
+})
+
+const completedUnitsTarget = computed(() => activeAppliances.value.length)
+
+function progressVariant(done: number, total: number): 'open' | 'in-progress' | 'resolved' | 'neutral' {
+  if (total <= 0) {
+    return 'neutral'
+  }
+
+  if (done <= 0) {
+    return 'open'
+  }
+
+  if (done >= total) {
+    return 'resolved'
+  }
+
+  return 'in-progress'
+}
+
+const measurementsTodayVariant = computed(() => {
+  return progressVariant(measurementsTodayCount.value, expectedMeasurementsToday.value)
+})
+
+const completedUnitsVariant = computed(() => {
+  return progressVariant(completedUnitsToday.value, completedUnitsTarget.value)
+})
+
+watch(recentEntries, (rows) => {
+  const validIds = new Set(rows.map((row) => row.id))
+  selectedEntryIds.value = selectedEntryIds.value.filter((id) => validIds.has(id))
+})
+
 const deviationCount = computed(() => entries.value.filter((item) => item.status === 'DEVIATION').length)
 const latestEntry = computed(() => entries.value[0] ?? null)
 
@@ -121,6 +185,35 @@ async function submitTemperature(): Promise<void> {
   temperatureInput.value = ''
   note.value = ''
 }
+
+function toggleEntrySelection(entryId: string, checked: boolean): void {
+  if (checked) {
+    if (!selectedEntryIds.value.includes(entryId)) {
+      selectedEntryIds.value = [...selectedEntryIds.value, entryId]
+    }
+    return
+  }
+
+  selectedEntryIds.value = selectedEntryIds.value.filter((id) => id !== entryId)
+}
+
+function toggleSelectAll(checked: boolean): void {
+  if (!checked) {
+    selectedEntryIds.value = []
+    return
+  }
+
+  selectedEntryIds.value = recentEntries.value.map((entry) => entry.id)
+}
+
+function deleteSelectedMeasurements(): void {
+  const deletedCount = deleteEntries(selectedEntryIds.value)
+  selectedEntryIds.value = []
+
+  if (deletedCount > 0) {
+    toast.success(`${deletedCount} måling${deletedCount > 1 ? 'er' : ''} slettet`)
+  }
+}
 </script>
 
 <template>
@@ -141,8 +234,18 @@ async function submitTemperature(): Promise<void> {
       </section>
 
       <section class="overview-grid">
-        <OverviewCard label="Aktive enheter" :value="activeCount" variant="resolved" />
-        <OverviewCard label="Totalt registrert" :value="totalCount" variant="neutral" />
+        <OverviewCard
+          label="Målinger i dag"
+          :value="`${measurementsTodayCount}/${expectedMeasurementsToday}`"
+          :variant="measurementsTodayVariant"
+          sub-label="Mål: 2 målinger per aktiv enhet"
+        />
+        <OverviewCard
+          label="Ferdigmålte enheter"
+          :value="`${completedUnitsToday}/${completedUnitsTarget}`"
+          :variant="completedUnitsVariant"
+          sub-label="En enhet er ferdig når den har 2 målinger i dag"
+        />
         <OverviewCard label="Avvik registrert" :value="deviationCount" variant="open" />
         <OverviewCard
           label="Siste måling"
@@ -227,54 +330,68 @@ async function submitTemperature(): Promise<void> {
               <h2>Siste registreringer</h2>
               <p>En oversikt som viser temp, grense, ansvarlig og om målingen ga avvik.</p>
             </div>
+            <Button variant="outline" size="sm" :disabled="selectedEntryIds.length === 0" @click="deleteSelectedMeasurements">
+              Slett valgte ({{ selectedEntryIds.length }})
+            </Button>
           </div>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tidspunkt</TableHead>
-                <TableHead>Enhet</TableHead>
-                <TableHead>Temp</TableHead>
-                <TableHead>Grense</TableHead>
-                <TableHead>Registrert av</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableEmpty v-if="recentEntries.length === 0" :colspan="6">
-                <div class="table-empty-content">
-                  <Thermometer />
-                  <div>
-                    <strong>Ingen temperaturregistreringer enda</strong>
-                    <p>Registrer den første målingen i panelet til venstre.</p>
+          <div class="log-table-scroll">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>
+                    <Checkbox :checked="allRowsSelected" @update:checked="toggleSelectAll" />
+                  </TableHead>
+                  <TableHead>Tidspunkt</TableHead>
+                  <TableHead>Enhet</TableHead>
+                  <TableHead>Temp</TableHead>
+                  <TableHead>Grense</TableHead>
+                  <TableHead>Registrert av</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableEmpty v-if="recentEntries.length === 0" :colspan="7">
+                  <div class="table-empty-content">
+                    <Thermometer />
+                    <div>
+                      <strong>Ingen temperaturregistreringer enda</strong>
+                      <p>Registrer den første målingen i panelet til venstre.</p>
+                    </div>
                   </div>
-                </div>
-              </TableEmpty>
+                </TableEmpty>
 
-              <TableRow v-for="entry in recentEntries" :key="entry.id" :class="entry.status === 'DEVIATION' ? 'row--deviation' : ''">
-                <TableCell>
-                  <div class="cell-stack">
-                    <strong>{{ formatDateTime(entry.measuredAt) }}</strong>
-                    <span>{{ entry.note || 'Måling registrert' }}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div class="cell-stack">
-                    <strong>{{ entry.applianceName }}</strong>
-                    <span>{{ entry.applianceType === 'FRIDGE' ? 'Kjøleskap' : 'Fryser' }}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <strong :class="entry.status === 'DEVIATION' ? 'danger-text' : 'ok-text'">{{ entry.temperature.toFixed(1) }}°C</strong>
-                </TableCell>
-                <TableCell>{{ entry.threshold }}</TableCell>
-                <TableCell>{{ entry.measuredBy }}</TableCell>
-                <TableCell>
-                  <Badge :tone="entry.statusTone">{{ entry.status === 'OK' ? 'OK' : 'Avvik' }}</Badge>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+                <TableRow v-for="entry in recentEntries" :key="entry.id" :class="entry.status === 'DEVIATION' ? 'row--deviation' : ''">
+                  <TableCell>
+                    <Checkbox
+                      :checked="selectedEntryIds.includes(entry.id)"
+                      @update:checked="(checked) => toggleEntrySelection(entry.id, checked)"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <div class="cell-stack">
+                      <strong>{{ formatDateTime(entry.measuredAt) }}</strong>
+                      <span>{{ entry.note || 'Måling registrert' }}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div class="cell-stack">
+                      <strong>{{ entry.applianceName }}</strong>
+                      <span>{{ entry.applianceType === 'FRIDGE' ? 'Kjøleskap' : 'Fryser' }}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <strong :class="entry.status === 'DEVIATION' ? 'danger-text' : 'ok-text'">{{ entry.temperature.toFixed(1) }}°C</strong>
+                  </TableCell>
+                  <TableCell>{{ entry.threshold }}</TableCell>
+                  <TableCell>{{ entry.measuredBy }}</TableCell>
+                  <TableCell>
+                    <Badge :tone="entry.statusTone">{{ entry.status === 'OK' ? 'OK' : 'Avvik' }}</Badge>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
         </article>
       </section>
     </div>
@@ -352,6 +469,12 @@ async function submitTemperature(): Promise<void> {
   padding: 1rem;
 }
 
+.log-panel {
+  height: 680px;
+  display: flex;
+  flex-direction: column;
+}
+
 .panel-header h2 {
   margin-top: 0.5rem;
   font-size: 1.25rem;
@@ -360,6 +483,21 @@ async function submitTemperature(): Promise<void> {
 .panel-header p {
   margin-top: 0.25rem;
   color: hsl(var(--muted-foreground));
+}
+
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.log-table-scroll {
+  margin-top: 0.75rem;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .empty-warning {
@@ -489,6 +627,10 @@ async function submitTemperature(): Promise<void> {
   .overview-grid,
   .workspace-grid {
     grid-template-columns: 1fr;
+  }
+
+  .log-panel {
+    height: 560px;
   }
 }
 

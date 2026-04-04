@@ -183,6 +183,17 @@ export function useTemperatureMonitoring() {
     return entry
   }
 
+  function deleteEntries(entryIds: string[]): number {
+    if (entryIds.length === 0) {
+      return 0
+    }
+
+    const idSet = new Set(entryIds)
+    const before = entriesState.value.length
+    entriesState.value = entriesState.value.filter((item) => !idSet.has(item.id))
+    return before - entriesState.value.length
+  }
+
   return {
     appliances,
     activeAppliances,
@@ -192,5 +203,6 @@ export function useTemperatureMonitoring() {
     updateAppliance,
     deleteAppliance,
     registerTemperature,
+    deleteEntries,
   }
 }
