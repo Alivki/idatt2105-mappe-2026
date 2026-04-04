@@ -1,6 +1,7 @@
 package com.iksystem.common.checklist.repository
 
 import com.iksystem.common.checklist.model.Checklist
+import com.iksystem.common.checklist.model.ChecklistFrequency
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -34,4 +35,18 @@ interface ChecklistRepository : JpaRepository<Checklist, Long> {
         """
     )
     fun countActiveOpenByOrganizationId(@Param("organizationId") organizationId: Long): Long
+
+    @Query(
+        """
+        SELECT c FROM Checklist c
+        WHERE c.frequency = :frequency
+          AND c.active = true
+          AND EXISTS (
+              SELECT ci.id FROM ChecklistItem ci
+              WHERE ci.checklist.id = c.id
+                AND ci.completed = false
+          )
+        """
+    )
+    fun findIncompleteByFrequency(@Param("frequency") frequency: ChecklistFrequency): List<Checklist>
 }

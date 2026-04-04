@@ -11,6 +11,7 @@ import {
 } from 'lucide-vue-next'
 
 import NavMain from '@/components/NavMain.vue'
+import NavNotifications from '@/components/NavNotifications.vue'
 import NavSecondary from '@/components/NavSecondary.vue'
 import NavUser from '@/components/NavUser.vue'
 import {
@@ -92,7 +93,9 @@ const navSecondary = [
     </SidebarHeader>
     <SidebarContent>
       <NavMain :sections="navMain" />
-      <NavSecondary :items="navSecondary" />
+      <NavSecondary :items="navSecondary">
+        <NavNotifications />
+      </NavSecondary>
     </SidebarContent>
     <SidebarSeparator />
     <SidebarFooter>

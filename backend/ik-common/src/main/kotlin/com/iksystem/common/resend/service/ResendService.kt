@@ -13,9 +13,10 @@ class ResendService(
 ) {
     fun sendRegistrationEmail(email: String, fullName: String) {
         val html = tempBuilder.registrationEmail(
-            title = "Welcom to Ik-system",
-            description = "Hi, ${fullName} \n Thank you for joining!",
+            title = "Welcome to IK-system",
+            description = "Hi, ${fullName}\nThank you for joining!",
         )
+        resendClient.sendEmail(email, "Welcome to IK-system", html)
     }
 
     fun sendVerificationEmail(email: String, token: String) {
@@ -29,6 +30,16 @@ class ResendService(
         )
 
         resendClient.sendEmail(email, "Verify your account", html)
+    }
+
+    fun sendNotificationEmail(email: String, title: String, message: String) {
+        val html = tempBuilder.actionEmail(
+            title = title,
+            description = message,
+            buttonText = "View in App",
+            buttonUrl = "https://your-app-url.com"
+        )
+        resendClient.sendEmail(email, title, html)
     }
 
     fun sendChecklistAlert(
@@ -65,6 +76,46 @@ class ResendService(
         )
 
         resendClient.sendEmail(email, "Training Missing", html)
+    }
+
+    fun sendDeviationEmail(
+        email: String,
+        deviationType: String,
+        severity: String,
+        reportedBy: String,
+        description: String
+    ) {
+        val html = tempBuilder.statusCard(
+            title = "New Deviation Reported",
+            rows = listOf(
+                "Type" to deviationType,
+                "Severity" to severity,
+                "Reported by" to reportedBy,
+                "Description" to description.take(100)
+            ),
+            statusLabel = "Action Required",
+            statusColor = "#C53030"
+        )
+        resendClient.sendEmail(email, "New Deviation: $deviationType", html)
+    }
+
+    fun sendChecklistOverdueEmail(
+        email: String,
+        checklistName: String,
+        frequency: String,
+        incompleteItems: Int
+    ) {
+        val html = tempBuilder.statusCard(
+            title = "Checklist Overdue",
+            rows = listOf(
+                "Checklist" to checklistName,
+                "Frequency" to frequency,
+                "Incomplete items" to incompleteItems.toString()
+            ),
+            statusLabel = "Overdue",
+            statusColor = "#C53030"
+        )
+        resendClient.sendEmail(email, "Checklist Overdue: $checklistName", html)
     }
 
     fun sendTrainingMissing(

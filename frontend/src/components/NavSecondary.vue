@@ -29,6 +29,7 @@ defineProps<{
             <span>{{ item.title }}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
+        <slot />
       </SidebarMenu>
     </SidebarGroupContent>
   </SidebarGroup>
