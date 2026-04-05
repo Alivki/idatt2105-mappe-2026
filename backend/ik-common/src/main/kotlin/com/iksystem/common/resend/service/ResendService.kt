@@ -42,6 +42,18 @@ class ResendService(
         resendClient.sendEmail(email, title, html)
     }
 
+    fun sendInviteEmail(email: String, orgName: String, token: String) {
+        val inviteUrl = "http://localhost:80/invite?token=$token"
+
+        val html = tempBuilder.actionEmail(
+            title = "Du er invitert til $orgName",
+            description = "Du har blitt invitert til å bli med i IK-systemet for $orgName. Klikk på knappen under for å fullføre din profil.",
+            buttonText = "Godta invitasjon",
+            buttonUrl = inviteUrl
+        )
+        resendClient.sendEmail(email, "Invitasjon til $orgName", html)
+    }
+
     fun sendChecklistAlert(
         email: String,
         checklistName: String,

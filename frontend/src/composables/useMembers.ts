@@ -45,3 +45,10 @@ export function useRemoveMemberMutation() {
     },
   })
 }
+
+export function useInviteMutation() {
+  return useMutation({
+    mutationFn: (payload: { email: string; role: string }) =>
+      api.post('/invitations', payload),
+  })
+}
