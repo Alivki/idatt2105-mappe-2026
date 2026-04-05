@@ -2,6 +2,7 @@
 import { computed, ref, toRef } from 'vue'
 import { MoreVertical, Shield, ShieldCheck, User, UserMinus, ArrowUpDown, Search, Plus, Mail } from 'lucide-vue-next'
 import { z } from 'zod/v4'
+import { toast } from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/button/Button.vue'
 import { Separator } from '@/components/ui/separator'
@@ -49,8 +50,12 @@ import {
   useOrganizationQuery,
   useUpdateMemberRoleMutation,
   useRemoveMemberMutation,
+  useInviteMutation,
 } from '@/composables/useMembers'
 import type { OrganizationMember } from '@/types/member'
+import type { AxiosError } from 'axios'
+
+type ApiError = AxiosError<{ error: { message: string } }>
 
 const auth = useAuthStore()
 const search = ref('')
@@ -61,6 +66,7 @@ const { data: org } = useOrganizationQuery(orgId)
 
 const updateRoleMutation = useUpdateMemberRoleMutation()
 const removeMemberMutation = useRemoveMemberMutation()
+const inviteMutation = useInviteMutation()
 
 const roleLabel: Record<string, string> = {
   ADMIN: 'Admin',
@@ -214,8 +220,20 @@ function handleInvite() {
     return
   }
   inviteError.value = ''
-  // TODO: wire up to backend createUser endpoint
-  addDialogOpen.value = false
+  inviteMutation.mutate(
+    { email: inviteEmail.value.trim(), role: inviteRole.value },
+    {
+      onSuccess: () => {
+        addDialogOpen.value = false
+        toast.success('Invitasjon sendt til ' + inviteEmail.value.trim())
+      },
+      onError: (error: Error) => {
+        const msg = (error as ApiError)?.response?.data?.error?.message ?? 'Kunne ikke sende invitasjon'
+        inviteError.value = msg
+        toast.error(msg)
+      },
+    },
+  )
 }
 </script>
 
@@ -463,7 +481,9 @@ function handleInvite() {
 
           <DialogFooter>
             <Button variant="outline" type="button" @click="addDialogOpen = false">Avbryt</Button>
-            <Button type="submit">Send invitasjon</Button>
+            <Button type="submit" :disabled="inviteMutation.isPending.value">
+              {{ inviteMutation.isPending.value ? 'Sender...' : 'Send invitasjon' }}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

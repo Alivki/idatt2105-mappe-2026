@@ -20,6 +20,12 @@ const router = createRouter({
       meta: { public: true },
     },
     {
+      path: '/invite',
+      name: 'invite',
+      component: () => import('@/views/InviteView.vue'),
+      meta: { public: true },
+    },
+    {
       path: '/login',
       name: 'login',
       component: LoginView,

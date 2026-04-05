@@ -48,6 +48,7 @@ class SecurityConfig(private val jwtAuthFilter: JwtAuthFilter) {
             .authorizeHttpRequests { auth ->
                 auth
                     .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
+                    .requestMatchers("/api/v1/invitations/{token}", "/api/v1/invitations/{token}/accept").permitAll()
                     .requestMatchers("/api/v1/auth/select-org", "/api/v1/auth/logout").authenticated()
                     .requestMatchers("/error").permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
