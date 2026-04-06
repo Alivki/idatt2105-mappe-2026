@@ -93,9 +93,7 @@ Backend bruker **Flyway** for databasemigrasjoner og oppretter/migrerer schema a
 
 ## Dokumentasjon
 
-- **API referanse**: Se Swagger UI på `http://localhost/swagger.html`
-- **Systemdokumentasjon**: Se `/docs/` for arkitektur, klassediagrammer og setup-guide
-- **Wiki**: Full teknisk dokumentasjon og arkitektur-notater
+- Kommer
 
 ## Nyttige kommandoer
 
