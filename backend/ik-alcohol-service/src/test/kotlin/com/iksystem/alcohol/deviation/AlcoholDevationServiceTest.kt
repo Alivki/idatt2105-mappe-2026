@@ -41,15 +41,10 @@ class AlcoholDeviationServiceTest {
     private val orgId = 1L
     private val userId = 10L
 
-    private val auth = mockk<AuthenticatedUser> {
-        every { requireOrganizationId() } returns orgId
-        every { this@mockk.userId } returns userId
-    }
+    // Create the mock first, then stub in @BeforeEach to avoid eager evaluation issues
+    private val auth = mockk<AuthenticatedUser>()
 
-    private val reporter = mockk<User> {
-        every { id } returns userId
-        every { fullName } returns "Test User"
-    }
+    private val reporter = mockk<User>()
 
     private fun makeDeviation(
         id: Long = 1L,
@@ -71,10 +66,14 @@ class AlcoholDeviationServiceTest {
 
     @BeforeEach
     fun setUp() {
+        every { auth.requireOrganizationId() } returns orgId
+        every { auth.userId } returns userId
+        every { reporter.id } returns userId
+        every { reporter.fullName } returns "Test User"
         every { userRepository.findById(userId) } returns Optional.of(reporter)
     }
 
-    // List mapping
+    // ── list ──────────────────────────────────────────────────────────────────
 
     @Test
     fun `list returns mapped responses ordered by reportedAt desc`() {
@@ -94,7 +93,7 @@ class AlcoholDeviationServiceTest {
         assertThat(service.list(auth)).isEmpty()
     }
 
-    // getById
+    // ── getById ───────────────────────────────────────────────────────────────
 
     @Test
     fun `getById returns response when found`() {
@@ -115,7 +114,7 @@ class AlcoholDeviationServiceTest {
             .isInstanceOf(NotFoundException::class.java)
     }
 
-    // Different create functions
+    // ── create ────────────────────────────────────────────────────────────────
 
     @Test
     fun `create saves deviation and returns response`() {
@@ -204,7 +203,9 @@ class AlcoholDeviationServiceTest {
 
     @Test
     fun `create sends assignment notification when responsible user is set`() {
-        val responsibleUser = mockk<User> { every { id } returns 20L; every { fullName } returns "Bob" }
+        val responsibleUser = mockk<User>()
+        every { responsibleUser.id } returns 20L
+        every { responsibleUser.fullName } returns "Bob"
         every { userRepository.findById(20L) } returns Optional.of(responsibleUser)
         every { membershipRepository.existsByUserIdAndOrganizationId(20L, orgId) } returns true
 
@@ -268,7 +269,9 @@ class AlcoholDeviationServiceTest {
 
     @Test
     fun `create throws BadRequestException when responsible user is not org member`() {
-        val outsider = mockk<User> { every { id } returns 99L; every { fullName } returns "Outsider" }
+        val outsider = mockk<User>()
+        every { outsider.id } returns 99L
+        every { outsider.fullName } returns "Outsider"
         every { userRepository.findById(99L) } returns Optional.of(outsider)
         every { membershipRepository.existsByUserIdAndOrganizationId(99L, orgId) } returns false
 
@@ -283,7 +286,7 @@ class AlcoholDeviationServiceTest {
             .isInstanceOf(BadRequestException::class.java)
     }
 
-    // Update function
+    // ── update ────────────────────────────────────────────────────────────────
 
     @Test
     fun `update patches only provided fields`() {
@@ -292,8 +295,7 @@ class AlcoholDeviationServiceTest {
         val savedSlot = slot<AlcoholDeviation>()
         every { repository.save(capture(savedSlot)) } answers { savedSlot.captured }
 
-        val request = UpdateAlcoholDeviationRequest(status = AlcoholDeviationStatus.CLOSED)
-        service.update(1L, request, auth)
+        service.update(1L, UpdateAlcoholDeviationRequest(status = AlcoholDeviationStatus.CLOSED), auth)
 
         assertThat(savedSlot.captured.status).isEqualTo(AlcoholDeviationStatus.CLOSED)
         assertThat(savedSlot.captured.description).isEqualTo(existing.description)
@@ -301,7 +303,9 @@ class AlcoholDeviationServiceTest {
 
     @Test
     fun `update preserves existing responsibleUser when not provided`() {
-        val existingUser = mockk<User> { every { id } returns 20L; every { fullName } returns "Alice" }
+        val existingUser = mockk<User>()
+        every { existingUser.id } returns 20L
+        every { existingUser.fullName } returns "Alice"
         val existing = makeDeviation(responsibleUser = existingUser)
         every { repository.findByIdAndOrganizationId(1L, orgId) } returns existing
         val savedSlot = slot<AlcoholDeviation>()
@@ -333,7 +337,7 @@ class AlcoholDeviationServiceTest {
         assertThat(savedSlot.captured.updatedAt).isAfterOrEqualTo(before)
     }
 
-    // Deletion function
+    // ── delete ────────────────────────────────────────────────────────────────
 
     @Test
     fun `delete removes deviation`() {
