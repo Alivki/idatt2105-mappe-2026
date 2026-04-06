@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/sidebar'
 import { useAuthStore } from '@/stores/auth'
 import { computed } from 'vue'
+import veraIcon from '@/assets/vera-icon.png'
 
 const auth = useAuthStore()
 
@@ -83,7 +84,7 @@ const navSecondary = [
         <SidebarMenuItem>
           <SidebarMenuButton size="lg" as="div">
             <div class="sidebar-brand-icon">
-              {{ orgName.substring(0, 2).toUpperCase() }}
+              <img :src="veraIcon" alt="Vera ikon" class="sidebar-brand-icon-image">
             </div>
             <div class="sidebar-brand-text">
               <span class="sidebar-brand-name">{{ orgName }}</span>
@@ -120,6 +121,14 @@ const navSecondary = [
   font-weight: 700;
   font-size: 0.75rem;
   flex-shrink: 0;
+}
+
+.sidebar-brand-icon-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 0.4rem;
+  background-color: white;
 }
 
 .sidebar-brand-text {
