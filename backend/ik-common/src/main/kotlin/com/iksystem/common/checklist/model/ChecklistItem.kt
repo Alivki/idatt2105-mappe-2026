@@ -30,6 +30,9 @@ data class ChecklistItem(
     @Column(columnDefinition = "TEXT")
     val description: String? = null,
 
+    @Column(name = "sort_order", nullable = false)
+    val sortOrder: Int = 0,
+
     @Column(nullable = false)
     val completed: Boolean = false,
 

@@ -7,6 +7,7 @@ import {
   GraduationCap,
   ScrollText,
   ShieldCheck,
+  ListChecks,
   AlertTriangle,
   Users,
   Settings,
@@ -56,6 +57,9 @@ const navMain = computed(() => [
   {
     label: 'IK-MAT',
     items: [
+      ...(isManagerOrAdmin.value
+        ? [{ title: 'HACCP-oppsett', url: '/haccp-oppsett', icon: ListChecks }]
+        : []),
       { title: 'Sjekklister', url: '/sjekklister', icon: ClipboardCheck },
       { title: 'Temperaturlogg', url: '/temperatur', icon: Thermometer },
       ...(isManagerOrAdmin.value

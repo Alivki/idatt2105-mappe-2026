@@ -55,6 +55,11 @@ const router = createRouter({
       meta: { public: true },
     },
     {
+      path: '/haccp-oppsett',
+      name: 'haccp-oppsett',
+      component: () => import('@/views/HaccpSetupView.vue'),
+    },
+    {
       path: '/sjekklister',
       name: 'sjekklister',
       component: ChecklistView,

@@ -191,6 +191,7 @@ private fun Checklist.toResponse(items: List<ChecklistItem>): ChecklistResponse 
     description = description,
     frequency = frequency,
     active = active,
+    source = source,
     itemCount = items.size,
     completedItemCount = items.count { it.completed },
     status = items.toChecklistStatus(),
