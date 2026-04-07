@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick, ref } from 'vue'
+import { defineComponent, nextTick } from 'vue'
 
 import Collapsible from '../Collapsible.vue'
 import CollapsibleTrigger from '../CollapsibleTrigger.vue'
