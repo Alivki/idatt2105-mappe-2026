@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { ClipboardCheck } from 'lucide-vue-next'
+import { ClipboardCheck, ListChecks } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
@@ -248,6 +248,27 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
           </div>
         </div>
 
+        <div v-else-if="checklists.length === 0" class="empty-state">
+          <div class="empty-state-bg" />
+          <div class="empty-state-inner">
+            <div class="empty-state-icon empty-state-icon--green">
+              <ListChecks :stroke-width="1.5" />
+            </div>
+            <div class="empty-state-text">
+              <h3>Ingen sjekklister ennå</h3>
+              <p>Vi anbefaler å bruke HACCP-veiviseren for å sette opp sjekklistene dine. Veiviseren stiller noen spørsmål om virksomheten og genererer skreddersydde sjekklister basert på Mattilsynets krav.</p>
+            </div>
+            <div class="empty-state-actions">
+              <Button v-if="canManage" @click="router.push('/haccp-oppsett')">
+                Gå til HACCP-oppsett
+              </Button>
+              <Button v-if="canManage" variant="outline" @click="openCreateChecklistDialog">
+                + Opprett manuelt
+              </Button>
+            </div>
+          </div>
+        </div>
+
         <div v-else-if="groupedChecklists.length === 0" class="empty-state">
           <div class="empty-state-bg" />
           <div class="empty-state-inner">
@@ -255,12 +276,9 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
               <ClipboardCheck :stroke-width="1.5" />
             </div>
             <div class="empty-state-text">
-              <h3>Ingen sjekklister ennå</h3>
-              <p>Det finnes ingen sjekklister i valgt frekvens. Opprett en ny sjekkliste for å komme i gang.</p>
+              <h3>Ingen sjekklister i valgt frekvens</h3>
+              <p>Prøv å endre filteret for å se sjekklister med en annen frekvens.</p>
             </div>
-            <Button v-if="canManage" @click="openCreateChecklistDialog">
-              + Ny sjekkliste
-            </Button>
           </div>
         </div>
 
@@ -420,10 +438,24 @@ h1 {
 }
 
 .empty-state-text p {
-  max-width: 24rem;
+  max-width: 28rem;
   font-size: 0.875rem;
   color: hsl(var(--muted-foreground));
   margin-top: 0.25rem;
+}
+
+.empty-state-icon--green {
+  background-color: #f0fdf4;
+  box-shadow: 0 0 0 4px #dcfce7;
+}
+
+.empty-state-icon--green :deep(svg) {
+  color: #16a34a;
+}
+
+.empty-state-actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .checklist-grid {

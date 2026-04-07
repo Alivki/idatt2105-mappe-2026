@@ -36,6 +36,9 @@ data class Checklist(
     @Column(nullable = false)
     val active: Boolean = true,
 
+    @Column(nullable = false)
+    val source: String = "MANUAL",
+
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),
 
