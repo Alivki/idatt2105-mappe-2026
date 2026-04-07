@@ -151,7 +151,6 @@ function badgeTone(role: string) {
   return 'ok'
 }
 
-// ── Role editing ──
 const roleDialogOpen = ref(false)
 const editingMember = ref<OrganizationMember | null>(null)
 const selectedRole = ref('')
@@ -176,7 +175,6 @@ function cancelRoleEdit() {
   editingMember.value = null
 }
 
-// ── Remove member ──
 const removeDialogOpen = ref(false)
 const removingMember = ref<OrganizationMember | null>(null)
 
@@ -198,7 +196,6 @@ function cancelRemove() {
   removingMember.value = null
 }
 
-// ── Add employee dialog ──
 const addDialogOpen = ref(false)
 const inviteEmail = ref('')
 const inviteRole = ref('EMPLOYEE')
@@ -390,7 +387,6 @@ function handleInvite() {
       </section>
     </div>
 
-    <!-- Edit role dialog -->
     <AlertDialog :open="roleDialogOpen" @update:open="(v: boolean) => { roleDialogOpen = v }">
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -422,7 +418,6 @@ function handleInvite() {
       </AlertDialogContent>
     </AlertDialog>
 
-    <!-- Remove member dialog -->
     <AlertDialog :open="removeDialogOpen" @update:open="(v: boolean) => { removeDialogOpen = v }">
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -438,7 +433,6 @@ function handleInvite() {
       </AlertDialogContent>
     </AlertDialog>
 
-    <!-- Add employee dialog -->
     <Dialog :open="addDialogOpen" @update:open="(v: boolean) => { addDialogOpen = v }">
       <DialogContent>
         <DialogHeader>
@@ -451,7 +445,7 @@ function handleInvite() {
         <form class="invite-form" @submit.prevent="handleInvite">
           <div class="form-field">
             <label class="form-label" for="invite-email">E-post</label>
-            <div class="email-input-wrapper">
+            <div :class="['email-input-wrapper', { 'email-input-wrapper--error': inviteError }]">
               <Mail :size="16" class="email-input-icon" />
               <input
                 id="invite-email"
@@ -471,7 +465,7 @@ function handleInvite() {
               <SelectTrigger>
                 <SelectValue placeholder="Velg rolle" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent open-upward>
                 <SelectItem value="ADMIN">Admin</SelectItem>
                 <SelectItem value="MANAGER">Leder</SelectItem>
                 <SelectItem value="EMPLOYEE">Ansatt</SelectItem>
@@ -498,7 +492,6 @@ function handleInvite() {
 .page-title { font-weight: 500; color: hsl(var(--sidebar-primary, 245 43% 52%)); }
 .page-content { display: flex; flex: 1; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; }
 
-/* Header */
 .header-row {
   display: flex;
   justify-content: space-between;
@@ -511,7 +504,6 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 
 .loading-state { padding: 3rem; text-align: center; color: hsl(var(--muted-foreground, 24 5% 46%)); }
 
-/* Org card */
 .org-card {
   display: flex;
   justify-content: space-between;
@@ -575,7 +567,6 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   color: hsl(var(--foreground, 24 10% 15%));
 }
 
-/* Search */
 .search-wrapper {
   position: relative;
   width: 16rem;
@@ -606,7 +597,6 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   box-shadow: 0 0 0 2px hsl(var(--ring, 245 43% 52%) / 0.15);
 }
 
-/* Table */
 .table-section { display: flex; flex-direction: column; gap: 0.75rem; }
 
 .table-card {
@@ -615,7 +605,6 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   background: hsl(var(--card, 40 25% 98%));
 }
 
-/* Sort buttons — same hover as three-dot trigger */
 .sort-btn {
   display: inline-flex;
   align-items: center;
@@ -640,7 +629,6 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 .sort-icon { opacity: 0.4; transition: opacity 150ms; }
 .sort-icon--active { opacity: 1; }
 
-/* Self row */
 .row-self {
   background-color: hsl(var(--muted, 40 18% 93%) / 0.6) !important;
 }
@@ -649,7 +637,6 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   background-color: hsl(var(--muted, 40 18% 93%) / 0.75) !important;
 }
 
-/* User avatar in table */
 .cell-user {
   display: flex;
   align-items: center;
@@ -680,7 +667,6 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 
 .cell-email { color: hsl(var(--muted-foreground, 24 5% 46%)); }
 
-/* Actions cell */
 .cell-actions {
   width: 3rem;
   text-align: right;
@@ -712,13 +698,11 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 
 .menu-item--danger { color: #dc2626; }
 
-/* Responsive columns */
 .th-name { min-width: 10rem; }
 .th-email { min-width: 10rem; }
 .th-role { min-width: 6rem; }
 .th-actions { width: 3rem; }
 
-/* Landing / empty */
 .landing-card {
   padding: 1.5rem;
   border: 1px solid hsl(var(--border, 35 18% 88%));
@@ -740,7 +724,6 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 .landing-box h3 { margin: 0; font-size: 1.1rem; }
 .landing-box span { color: hsl(var(--muted-foreground, 24 5% 46%)); }
 
-/* Role edit dialog */
 .role-options { display: flex; flex-direction: column; gap: 0.5rem; }
 .role-option {
   display: flex;
@@ -756,7 +739,6 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 .role-option--selected { border-color: #5a4fd6; background: #f3f0ff; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
-/* Invite form */
 .invite-form {
   display: flex;
   flex-direction: column;
@@ -816,7 +798,11 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 
 .form-error {
   font-size: 0.8rem;
-  color: #dc2626;
+  color: hsl(var(--destructive));
+}
+
+.email-input-wrapper--error .email-input {
+  border-color: hsl(var(--destructive));
 }
 
 @media (max-width: 700px) {

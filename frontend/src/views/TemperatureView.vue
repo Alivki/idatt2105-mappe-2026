@@ -376,7 +376,7 @@ function goToNextPage(): void {
           </div>
 
           <div class="form-grid">
-            <label class="field field--full">
+            <div class="field field--full">
               <span>Hvitevare</span>
               <Select :model-value="selectedApplianceId == null ? '' : String(selectedApplianceId)" @update:model-value="(v) => (selectedApplianceId = Number(v))">
                 <SelectTrigger :disabled="activeAppliances.length === 0">
@@ -388,7 +388,7 @@ function goToNextPage(): void {
                   </SelectItem>
                 </SelectContent>
               </Select>
-            </label>
+            </div>
 
             <label class="field">
               <span>Temperatur (°C)</span>
@@ -454,10 +454,12 @@ function goToNextPage(): void {
               </TableHeader>
               <TableBody>
                 <TableEmpty v-if="recentEntries.length === 0" :colspan="7">
-                  <div class="table-empty-content">
-                    <Thermometer />
-                    <div>
-                      <strong>Ingen temperaturregistreringer enda</strong>
+                  <div class="table-empty-state">
+                    <div class="table-empty-icon">
+                      <Thermometer :stroke-width="1.5" />
+                    </div>
+                    <div class="table-empty-text">
+                      <h3>Ingen temperaturregistreringer enda</h3>
                       <p>Registrer den første målingen i panelet til venstre.</p>
                     </div>
                   </div>
@@ -722,21 +724,42 @@ function goToNextPage(): void {
   height: 1rem;
 }
 
-.table-empty-content {
+.table-empty-state {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem 0;
+  padding: 2rem 1rem;
+  text-align: center;
+  white-space: normal;
+  max-width: 20rem;
+  margin: 0 auto;
 }
 
-.table-empty-content :deep(svg) {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: hsl(var(--primary));
+.table-empty-icon {
+  display: flex;
+  height: 3.5rem;
+  width: 3.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  background-color: hsl(var(--primary) / 0.1);
 }
 
-.table-empty-content p {
+.table-empty-icon :deep(svg) {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: hsl(var(--primary) / 0.7);
+}
+
+.table-empty-text h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.table-empty-text p {
   color: hsl(var(--muted-foreground));
+  font-size: 0.85rem;
   margin-top: 0.15rem;
 }
 

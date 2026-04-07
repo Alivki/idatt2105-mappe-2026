@@ -4,6 +4,8 @@ import type { Ref } from "vue"
 
 const props = defineProps<{
   class?: string
+  openUpward?: boolean
+  alignEnd?: boolean
 }>()
 
 const { isOpen, close } = inject("select") as { isOpen: Ref<boolean>; close: () => void }
@@ -40,7 +42,8 @@ onBeforeUnmount(() => {
     <div
       v-show="isOpen"
       ref="contentRef"
-      :class="['select-content', props.class]"
+      :class="['select-content', props.openUpward && 'select-content--up', props.alignEnd && 'select-content--align-end', props.class]"
+      @click.stop
     >
       <div class="select-viewport">
         <slot />
@@ -100,5 +103,15 @@ onBeforeUnmount(() => {
     opacity: 0;
     transform: scale(0.95) translateY(-4px);
   }
+}
+
+.select-content--up {
+  top: auto;
+  bottom: calc(100% + 4px);
+}
+
+.select-content--align-end {
+  left: auto;
+  right: 0;
 }
 </style>

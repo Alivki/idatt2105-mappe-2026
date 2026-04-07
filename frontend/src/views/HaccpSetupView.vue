@@ -215,8 +215,12 @@ const nextStepLabels = [
   align-items: center;
   text-align: center;
   width: 100%;
-  max-width: 480px;
-  padding-top: 3rem;
+  max-width: 820px;
+  padding: 2.5rem 2rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 1rem;
+  background: hsl(var(--card));
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04);
 }
 
 .intro-icon,

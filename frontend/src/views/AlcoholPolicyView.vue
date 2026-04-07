@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { z } from 'zod'
 import axios from 'axios'
 import {
   ScrollText,
@@ -21,6 +22,11 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import Button from '@/components/ui/button/Button.vue'
+import Input from '@/components/ui/input/Input.vue'
+import Textarea from '@/components/ui/textarea/Textarea.vue'
+import DatePicker from '@/components/ui/date-picker/DatePicker.vue'
+import { CalendarDate } from '@internationalized/date'
+import type { DateValue } from '@internationalized/date'
 import {
   useAlcoholPolicyExistsQuery,
   useAlcoholPolicyQuery,
@@ -52,6 +58,37 @@ const showCard = computed(() => policyExists.value && !editing.value && !!policy
 
 const form = ref<CreateAlcoholPolicyRequest>({})
 const submitting = ref(false)
+const errors = ref<Record<string, string>>({})
+const bevillingNumberSchema = z.string().min(1, 'Bevillingsnummer er påkrevd')
+const styrerNameSchema = z.string().min(1, 'Styrer er påkrevd')
+const stedfortrederNameSchema = z.string().min(1, 'Stedfortreder er påkrevd')
+const candidateNameSchema = z.string().min(1, 'Kandidatens navn er påkrevd')
+const municipalitySchema = z.string().min(1, 'Kommune er påkrevd')
+const doubtRoutineSchema = z.string().min(1, 'Rutine ved tvil er påkrevd')
+const intoxicationSignsSchema = z.string().min(1, 'Beskriv tegn på beruselse')
+const refusalProcedureSchema = z.string().min(1, 'Beskriv prosedyre for nekt')
+const bevillingValidUntilSchema = z.custom<DateValue>((v) => !!v, 'Gyldig til-dato er påkrevd')
+const kunnskapsproveBirthDateSchema = z.custom<DateValue>((v) => !!v, 'Fødselsdato er påkrevd')
+const kunnskapsprovePassedDateSchema = z.custom<DateValue>((v) => !!v, 'Bestått dato er påkrevd')
+const kunnskapsproveTypeSchema = z.string().min(1, 'Velg type kunnskapsprøve')
+const bevillingValidUntilDate = ref<DateValue | undefined>()
+const kunnskapsproveBirthDateVal = ref<DateValue | undefined>()
+const kunnskapsprovePassedDateVal = ref<DateValue | undefined>()
+
+function stringToCalendarDate(str: string | null | undefined): CalendarDate | undefined {
+  if (!str) return undefined
+  const [y, m, d] = str.split('-').map(Number)
+  return new CalendarDate(y!, m!, d!)
+}
+
+function dateValueToString(dv: DateValue | undefined): string | undefined {
+  if (!dv) return undefined
+  return `${dv.year}-${String(dv.month).padStart(2, '0')}-${String(dv.day).padStart(2, '0')}`
+}
+
+watch(bevillingValidUntilDate, (v) => { form.value.bevillingValidUntil = dateValueToString(v) ?? null })
+watch(kunnskapsproveBirthDateVal, (v) => { form.value.kunnskapsproveBirthDate = dateValueToString(v) ?? null })
+watch(kunnskapsprovePassedDateVal, (v) => { form.value.kunnskapsprovePassedDate = dateValueToString(v) ?? null })
 
 const bevillingFileName = ref<string | null>(null)
 const kunnskapsproveFileName = ref<string | null>(null)
@@ -84,6 +121,9 @@ watch(
       }
       bevillingFileName.value = null
       kunnskapsproveFileName.value = null
+      bevillingValidUntilDate.value = stringToCalendarDate(policy.value.bevillingValidUntil)
+      kunnskapsproveBirthDateVal.value = stringToCalendarDate(policy.value.kunnskapsproveBirthDate)
+      kunnskapsprovePassedDateVal.value = stringToCalendarDate(policy.value.kunnskapsprovePassedDate)
     }
   },
 )
@@ -92,6 +132,10 @@ function resetForm() {
   form.value = {}
   bevillingFileName.value = null
   kunnskapsproveFileName.value = null
+  bevillingValidUntilDate.value = undefined
+  kunnskapsproveBirthDateVal.value = undefined
+  kunnskapsprovePassedDateVal.value = undefined
+  errors.value = {}
   editing.value = false
 }
 
@@ -194,6 +238,50 @@ function triggerFileInput(ref: HTMLInputElement | null) {
 }
 
 async function handleSubmit() {
+  const newErrors: Record<string, string> = {}
+
+  const bnResult = bevillingNumberSchema.safeParse((form.value.bevillingNumber ?? '').trim())
+  if (!bnResult.success) newErrors.bevillingNumber = bnResult.error.issues[0]?.message ?? ''
+
+  const bvResult = bevillingValidUntilSchema.safeParse(bevillingValidUntilDate.value)
+  if (!bvResult.success) newErrors.bevillingValidUntil = bvResult.error.issues[0]?.message ?? ''
+
+  const snResult = styrerNameSchema.safeParse((form.value.styrerName ?? '').trim())
+  if (!snResult.success) newErrors.styrerName = snResult.error.issues[0]?.message ?? ''
+
+  const sdResult = stedfortrederNameSchema.safeParse((form.value.stedfortrederName ?? '').trim())
+  if (!sdResult.success) newErrors.stedfortrederName = sdResult.error.issues[0]?.message ?? ''
+
+  const cnResult = candidateNameSchema.safeParse((form.value.kunnskapsproveCandidateName ?? '').trim())
+  if (!cnResult.success) newErrors.candidateName = cnResult.error.issues[0]?.message ?? ''
+
+  const kbResult = kunnskapsproveBirthDateSchema.safeParse(kunnskapsproveBirthDateVal.value)
+  if (!kbResult.success) newErrors.kunnskapsproveBirthDate = kbResult.error.issues[0]?.message ?? ''
+
+  const kpResult = kunnskapsprovePassedDateSchema.safeParse(kunnskapsprovePassedDateVal.value)
+  if (!kpResult.success) newErrors.kunnskapsprovePassedDate = kpResult.error.issues[0]?.message ?? ''
+
+  const ktResult = kunnskapsproveTypeSchema.safeParse(form.value.kunnskapsproveType ?? '')
+  if (!ktResult.success) newErrors.kunnskapsproveType = ktResult.error.issues[0]?.message ?? ''
+
+  const muResult = municipalitySchema.safeParse((form.value.kunnskapsproveMunicipality ?? '').trim())
+  if (!muResult.success) newErrors.municipality = muResult.error.issues[0]?.message ?? ''
+
+  const drResult = doubtRoutineSchema.safeParse((form.value.doubtRoutine ?? '').trim())
+  if (!drResult.success) newErrors.doubtRoutine = drResult.error.issues[0]?.message ?? ''
+
+  const isResult = intoxicationSignsSchema.safeParse((form.value.intoxicationSigns ?? '').trim())
+  if (!isResult.success) newErrors.intoxicationSigns = isResult.error.issues[0]?.message ?? ''
+
+  const rpResult = refusalProcedureSchema.safeParse((form.value.refusalProcedure ?? '').trim())
+  if (!rpResult.success) newErrors.refusalProcedure = rpResult.error.issues[0]?.message ?? ''
+
+  if (Object.keys(newErrors).length > 0) {
+    errors.value = newErrors
+    return
+  }
+  errors.value = {}
+
   submitting.value = true
   try {
     await upsertMutation.mutateAsync(form.value)
@@ -275,7 +363,7 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
       <p v-if="existsQuery.isLoading.value" class="state-line">Laster...</p>
 
       <template v-else-if="showForm">
-        <section class="form-wrapper"><section class="form-container">
+        <section class="form-wrapper"><section class="form-container form-card">
           <div class="form-header">
             <h1>Skjenkepolicy</h1>
             <p class="form-subtitle">
@@ -290,24 +378,28 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
               <legend class="section-title">Bevillingsinformasjon</legend>
 
               <div class="field-row two-col">
-                <div class="field">
-                  <label class="field-label">Bevillingsnummer</label>
-                  <input v-model="form.bevillingNumber" type="text" class="field-input" placeholder="F.eks. 2024/12345" />
+                <div :class="['field', { 'field--error': errors.bevillingNumber }]">
+                  <label class="field-label">Bevillingsnummer *</label>
+                  <Input :model-value="form.bevillingNumber ?? ''" @update:model-value="form.bevillingNumber = $event as string" placeholder="F.eks. 2024/12345" />
+                  <p v-if="errors.bevillingNumber" class="error-message">{{ errors.bevillingNumber }}</p>
                 </div>
-                <div class="field">
-                  <label class="field-label">Gyldig til</label>
-                  <input v-model="form.bevillingValidUntil" type="date" class="field-input" />
+                <div :class="['field', { 'field--error': errors.bevillingValidUntil }]">
+                  <label class="field-label">Gyldig til *</label>
+                  <DatePicker v-model="bevillingValidUntilDate" placeholder="Velg dato" />
+                  <p v-if="errors.bevillingValidUntil" class="error-message">{{ errors.bevillingValidUntil }}</p>
                 </div>
               </div>
 
               <div class="field-row two-col">
-                <div class="field">
-                  <label class="field-label">Styrer (navn)</label>
-                  <input v-model="form.styrerName" type="text" class="field-input" placeholder="Fullt navn" />
+                <div :class="['field', { 'field--error': errors.styrerName }]">
+                  <label class="field-label">Styrer (navn) *</label>
+                  <Input :model-value="form.styrerName ?? ''" @update:model-value="form.styrerName = $event as string" placeholder="Fullt navn" />
+                  <p v-if="errors.styrerName" class="error-message">{{ errors.styrerName }}</p>
                 </div>
-                <div class="field">
-                  <label class="field-label">Stedfortreder (navn)</label>
-                  <input v-model="form.stedfortrederName" type="text" class="field-input" placeholder="Fullt navn" />
+                <div :class="['field', { 'field--error': errors.stedfortrederName }]">
+                  <label class="field-label">Stedfortreder (navn) *</label>
+                  <Input :model-value="form.stedfortrederName ?? ''" @update:model-value="form.stedfortrederName = $event as string" placeholder="Fullt navn" />
+                  <p v-if="errors.stedfortrederName" class="error-message">{{ errors.stedfortrederName }}</p>
                 </div>
               </div>
 
@@ -342,29 +434,33 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
               <legend class="section-title">Kunnskapsprøve</legend>
 
               <div class="field-row two-col">
-                <div class="field">
-                  <label class="field-label">Kandidatens navn</label>
-                  <input v-model="form.kunnskapsproveCandidateName" type="text" class="field-input" placeholder="Fullt navn" />
+                <div :class="['field', { 'field--error': errors.candidateName }]">
+                  <label class="field-label">Kandidatens navn *</label>
+                  <Input :model-value="form.kunnskapsproveCandidateName ?? ''" @update:model-value="form.kunnskapsproveCandidateName = $event as string" placeholder="Fullt navn" />
+                  <p v-if="errors.candidateName" class="error-message">{{ errors.candidateName }}</p>
                 </div>
-                <div class="field">
-                  <label class="field-label">Fødselsdato</label>
-                  <input v-model="form.kunnskapsproveBirthDate" type="date" class="field-input" />
+                <div :class="['field', { 'field--error': errors.kunnskapsproveBirthDate }]">
+                  <label class="field-label">Fødselsdato *</label>
+                  <DatePicker v-model="kunnskapsproveBirthDateVal" placeholder="Velg dato" />
+                  <p v-if="errors.kunnskapsproveBirthDate" class="error-message">{{ errors.kunnskapsproveBirthDate }}</p>
                 </div>
               </div>
 
               <div class="field-row two-col">
-                <div class="field">
-                  <label class="field-label">Bestått dato</label>
-                  <input v-model="form.kunnskapsprovePassedDate" type="date" class="field-input" />
+                <div :class="['field', { 'field--error': errors.kunnskapsprovePassedDate }]">
+                  <label class="field-label">Bestått dato *</label>
+                  <DatePicker v-model="kunnskapsprovePassedDateVal" placeholder="Velg dato" />
+                  <p v-if="errors.kunnskapsprovePassedDate" class="error-message">{{ errors.kunnskapsprovePassedDate }}</p>
                 </div>
-                <div class="field">
-                  <label class="field-label">Kommune</label>
-                  <input v-model="form.kunnskapsproveMunicipality" type="text" class="field-input" placeholder="F.eks. Oslo" />
+                <div :class="['field', { 'field--error': errors.municipality }]">
+                  <label class="field-label">Kommune *</label>
+                  <Input :model-value="form.kunnskapsproveMunicipality ?? ''" @update:model-value="form.kunnskapsproveMunicipality = $event as string" placeholder="F.eks. Oslo" />
+                  <p v-if="errors.municipality" class="error-message">{{ errors.municipality }}</p>
                 </div>
               </div>
 
-              <div class="field">
-                <label class="field-label">Type kunnskapsprøve</label>
+              <div :class="['field', { 'field--error': errors.kunnskapsproveType }]">
+                <label class="field-label">Type kunnskapsprøve *</label>
                 <div class="chip-group">
                   <button
                     v-for="t in knowledgeTestTypes"
@@ -377,6 +473,7 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
                     {{ t.label }}
                   </button>
                 </div>
+                <p v-if="errors.kunnskapsproveType" class="error-message">{{ errors.kunnskapsproveType }}</p>
               </div>
 
               <div class="field">
@@ -439,9 +536,10 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
                 </div>
               </div>
 
-              <div class="field">
-                <label class="field-label">Rutine ved tvil om alder</label>
-                <textarea v-model="form.doubtRoutine" class="field-textarea" placeholder="Beskriv steg-for-steg: Hva gjør bartender/servitør når det er tvil?" rows="3" />
+              <div :class="['field', { 'field--error': errors.doubtRoutine }]">
+                <label class="field-label">Rutine ved tvil om alder *</label>
+                <Textarea :model-value="form.doubtRoutine ?? ''" @update:model-value="form.doubtRoutine = $event as string" placeholder="Beskriv steg-for-steg: Hva gjør bartender/servitør når det er tvil?" rows="3" />
+                <p v-if="errors.doubtRoutine" class="error-message">{{ errors.doubtRoutine }}</p>
               </div>
             </fieldset>
 
@@ -449,14 +547,16 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
               <legend class="section-title">Ansvarlig servering</legend>
               <p class="section-subtitle">Rutiner for å hindre overskjenking og sikre forsvarlig drift.</p>
 
-              <div class="field">
-                <label class="field-label">Hvordan identifiserer ansatte åpenbart berusede gjester?</label>
-                <textarea v-model="form.intoxicationSigns" class="field-textarea" placeholder="Tegn å se etter, prosedyre for servingsnekt..." rows="3" />
+              <div :class="['field', { 'field--error': errors.intoxicationSigns }]">
+                <label class="field-label">Hvordan identifiserer ansatte åpenbart berusede gjester? *</label>
+                <Textarea :model-value="form.intoxicationSigns ?? ''" @update:model-value="form.intoxicationSigns = $event as string" placeholder="Tegn å se etter, prosedyre for servingsnekt..." rows="3" />
+                <p v-if="errors.intoxicationSigns" class="error-message">{{ errors.intoxicationSigns }}</p>
               </div>
 
-              <div class="field">
-                <label class="field-label">Prosedyre ved nekt av servering</label>
-                <textarea v-model="form.refusalProcedure" class="field-textarea" placeholder="Hvem tar avgjørelsen, hvordan kommuniseres det, eskaleringsrutine..." rows="3" />
+              <div :class="['field', { 'field--error': errors.refusalProcedure }]">
+                <label class="field-label">Prosedyre ved nekt av servering *</label>
+                <Textarea :model-value="form.refusalProcedure ?? ''" @update:model-value="form.refusalProcedure = $event as string" placeholder="Hvem tar avgjørelsen, hvordan kommuniseres det, eskaleringsrutine..." rows="3" />
+                <p v-if="errors.refusalProcedure" class="error-message">{{ errors.refusalProcedure }}</p>
               </div>
             </fieldset>
 
@@ -618,7 +718,26 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
 .header-row p { margin-top: 6px; color: var(--text-secondary); font-size: 1.08rem; }
 
 .form-wrapper { display: flex; justify-content: center; width: 100%; }
-.form-container { width: 100%; max-width: 48rem; }
+.form-container { width: 100%; max-width: 820px; }
+.form-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+}
+.error-message {
+  color: hsl(var(--destructive));
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+.field--error :deep(.input),
+.field--error :deep(.textarea),
+.field--error :deep(.date-picker__trigger) {
+  border-color: hsl(var(--destructive));
+}
+.field--error .chip-btn:not(.chip-btn--active) {
+  border-color: hsl(var(--destructive));
+}
 .form-header h1 { margin: 0; font-size: 2rem; letter-spacing: -0.02em; }
 .form-subtitle { margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; }
 .form-section { border: none; padding: 0; margin: 2rem 0 0; }
@@ -630,30 +749,7 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
 .field { display: flex; flex-direction: column; gap: 0.375rem; margin-top: 0.75rem; }
 .field-label { font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); }
 
-.field-input {
-  width: 100%;
-  border: 1px solid hsl(var(--border));
-  border-radius: 0.5rem;
-  padding: 0.6rem 0.75rem;
-  font: inherit;
-  font-size: 0.9rem;
-  background: hsl(var(--card));
-  color: hsl(var(--foreground));
-}
-.field-input:focus { outline: none; border-color: hsl(var(--ring)); box-shadow: 0 0 0 2px hsl(var(--ring) / 0.15); }
 
-.field-textarea {
-  width: 100%;
-  border: 1px solid hsl(var(--border));
-  border-radius: 0.5rem;
-  padding: 0.6rem 0.75rem;
-  font: inherit;
-  font-size: 0.9rem;
-  background: hsl(var(--card));
-  color: hsl(var(--foreground));
-  resize: vertical;
-}
-.field-textarea:focus { outline: none; border-color: hsl(var(--ring)); box-shadow: 0 0 0 2px hsl(var(--ring) / 0.15); }
 
 .drop-zone {
   border: 2px dashed hsl(var(--border));
