@@ -10,7 +10,7 @@ import SelectContent from '@/components/ui/select/SelectContent.vue'
 import SelectItem from '@/components/ui/select/SelectItem.vue'
 import Textarea from '@/components/ui/textarea/Textarea.vue'
 
-const { wizard } = defineProps<{ wizard: WizardState }>()
+const wizard = defineModel<WizardState>('wizard', { required: true })
 
 function getRiskLevel(likelihood: number, severity: number) {
   const risk = likelihood * severity
@@ -24,16 +24,16 @@ function isKKP(likelihood: number, severity: number): boolean {
 }
 
 const kkpCount = computed(() =>
-  wizard.hazardEntries.filter((e) => isKKP(e.likelihood, e.severity)).length,
+  wizard.value!.hazardEntries.filter((e) => isKKP(e.likelihood, e.severity)).length,
 )
 
 function updateLikelihood(entryId: string, val: string) {
-  const entry = wizard.hazardEntries.find((e) => e.id === entryId)
+  const entry = wizard.value!.hazardEntries.find((e) => e.id === entryId)
   if (entry) entry.likelihood = Number(val) as 1 | 2 | 3
 }
 
 function updateSeverity(entryId: string, val: string) {
-  const entry = wizard.hazardEntries.find((e) => e.id === entryId)
+  const entry = wizard.value!.hazardEntries.find((e) => e.id === entryId)
   if (entry) entry.severity = Number(val) as 1 | 2 | 3
 }
 </script>

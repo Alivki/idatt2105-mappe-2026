@@ -149,10 +149,10 @@ const nextStepLabels = [
           <div class="step-title">{{ stepTitles[currentStep - 1] }}</div>
 
           <div class="wizard-body">
-            <Step1BusinessType v-if="currentStep === 1" :wizard="wizardData" :haccp-trinn="haccpTrinn" />
-            <Step2FoodHandling v-if="currentStep === 2" :wizard="wizardData" />
-            <Step3Premises v-if="currentStep === 3" :wizard="wizardData" />
-            <Step4RiskAssessment v-if="currentStep === 4" :wizard="wizardData" />
+            <Step1BusinessType v-if="currentStep === 1" v-model:wizard="wizardData" :haccp-trinn="haccpTrinn" />
+            <Step2FoodHandling v-if="currentStep === 2" v-model:wizard="wizardData" />
+            <Step3Premises v-if="currentStep === 3" v-model:wizard="wizardData" />
+            <Step4RiskAssessment v-if="currentStep === 4" v-model:wizard="wizardData" />
             <Step5Summary
               v-if="currentStep === 5"
               :wizard="wizardData"

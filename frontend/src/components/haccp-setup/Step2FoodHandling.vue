@@ -4,7 +4,7 @@ import { prerequisiteStatusLabels } from '@/types/haccp-setup'
 import { CircleCheck, AlertTriangle, CircleX, Info, ClipboardCheck } from 'lucide-vue-next'
 import { computed } from 'vue'
 
-const { wizard } = defineProps<{ wizard: WizardState }>()
+const wizard = defineModel<WizardState>('wizard', { required: true })
 
 const statusOptions: { value: PrerequisiteStatus; label: string; icon: typeof CircleCheck }[] = [
   { value: 'OK', label: prerequisiteStatusLabels.OK, icon: CircleCheck },
@@ -13,15 +13,15 @@ const statusOptions: { value: PrerequisiteStatus; label: string; icon: typeof Ci
 ]
 
 function setStatus(prereqId: string, status: PrerequisiteStatus) {
-  const prereq = wizard.prerequisites.find((p) => p.id === prereqId)
+  const prereq = wizard.value!.prerequisites.find((p) => p.id === prereqId)
   if (prereq) prereq.status = status
 }
 
 const summary = computed(() => {
-  const ok = wizard.prerequisites.filter((p) => p.status === 'OK').length
-  const work = wizard.prerequisites.filter((p) => p.status === 'NEEDS_WORK').length
-  const missing = wizard.prerequisites.filter((p) => p.status === 'MISSING').length
-  return { ok, work, missing, total: wizard.prerequisites.length }
+  const ok = wizard.value!.prerequisites.filter((p) => p.status === 'OK').length
+  const work = wizard.value!.prerequisites.filter((p) => p.status === 'NEEDS_WORK').length
+  const missing = wizard.value!.prerequisites.filter((p) => p.status === 'MISSING').length
+  return { ok, work, missing, total: wizard.value!.prerequisites.length }
 })
 </script>
 

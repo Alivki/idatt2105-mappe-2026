@@ -26,10 +26,8 @@ import {
 } from 'lucide-vue-next'
 import type { Component } from 'vue'
 
-const { wizard, haccpTrinn } = defineProps<{
-  wizard: WizardState
-  haccpTrinn: HaccpTrinn
-}>()
+const wizard = defineModel<WizardState>('wizard', { required: true })
+const { haccpTrinn } = defineProps<{ haccpTrinn: HaccpTrinn }>()
 
 const businessTypeOptions: { value: BusinessType; label: string; icon: Component }[] = [
   { value: 'RESTAURANT', label: businessTypeLabels.RESTAURANT, icon: UtensilsCrossed },
@@ -69,33 +67,33 @@ const goodsReceivingOptions: { value: GoodsReceiving; label: string }[] = (
 ).map(([value, label]) => ({ value, label }))
 
 function toggleFoodType(type: FoodType) {
-  const idx = wizard.foodTypes.indexOf(type)
-  if (idx >= 0) wizard.foodTypes.splice(idx, 1)
-  else wizard.foodTypes.push(type)
+  const idx = wizard.value!.foodTypes.indexOf(type)
+  if (idx >= 0) wizard.value!.foodTypes.splice(idx, 1)
+  else wizard.value!.foodTypes.push(type)
 }
 
 function toggleProcess(process: FoodProcess) {
-  const idx = wizard.processes.indexOf(process)
-  if (idx >= 0) wizard.processes.splice(idx, 1)
-  else wizard.processes.push(process)
+  const idx = wizard.value!.processes.indexOf(process)
+  if (idx >= 0) wizard.value!.processes.splice(idx, 1)
+  else wizard.value!.processes.push(process)
 }
 
 function toggleFacility(facility: Facility) {
-  const idx = wizard.facilities.indexOf(facility)
-  if (idx >= 0) wizard.facilities.splice(idx, 1)
-  else wizard.facilities.push(facility)
+  const idx = wizard.value!.facilities.indexOf(facility)
+  if (idx >= 0) wizard.value!.facilities.splice(idx, 1)
+  else wizard.value!.facilities.push(facility)
 }
 
 function toggleTempEquipment(equipment: TempEquipment) {
   if (equipment === 'NONE') {
-    wizard.temperatureEquipment = wizard.temperatureEquipment.includes('NONE') ? [] : ['NONE']
+    wizard.value!.temperatureEquipment = wizard.value!.temperatureEquipment.includes('NONE') ? [] : ['NONE']
     return
   }
-  const noneIdx = wizard.temperatureEquipment.indexOf('NONE')
-  if (noneIdx >= 0) wizard.temperatureEquipment.splice(noneIdx, 1)
-  const idx = wizard.temperatureEquipment.indexOf(equipment)
-  if (idx >= 0) wizard.temperatureEquipment.splice(idx, 1)
-  else wizard.temperatureEquipment.push(equipment)
+  const noneIdx = wizard.value!.temperatureEquipment.indexOf('NONE')
+  if (noneIdx >= 0) wizard.value!.temperatureEquipment.splice(noneIdx, 1)
+  const idx = wizard.value!.temperatureEquipment.indexOf(equipment)
+  if (idx >= 0) wizard.value!.temperatureEquipment.splice(idx, 1)
+  else wizard.value!.temperatureEquipment.push(equipment)
 }
 </script>
 

@@ -3,7 +3,7 @@ import type { HazardType, WizardState } from '@/types/haccp-setup'
 import { hazardTypeLabels } from '@/types/haccp-setup'
 import { ArrowDown, Plus, X, Info } from 'lucide-vue-next'
 
-const { wizard } = defineProps<{ wizard: WizardState }>()
+const wizard = defineModel<WizardState>('wizard', { required: true })
 
 const allHazardTypes: HazardType[] = ['BIOLOGICAL', 'CHEMICAL', 'PHYSICAL', 'ALLERGEN']
 
@@ -15,7 +15,7 @@ const hazardColors: Record<HazardType, string> = {
 }
 
 function toggleHazard(stepId: string, hazard: HazardType) {
-  const step = wizard.processSteps.find((s) => s.id === stepId)
+  const step = wizard.value!.processSteps.find((s) => s.id === stepId)
   if (!step) return
   const idx = step.hazards.indexOf(hazard)
   if (idx >= 0) step.hazards.splice(idx, 1)
@@ -23,13 +23,13 @@ function toggleHazard(stepId: string, hazard: HazardType) {
 }
 
 function toggleKKP(stepId: string) {
-  const step = wizard.processSteps.find((s) => s.id === stepId)
+  const step = wizard.value!.processSteps.find((s) => s.id === stepId)
   if (step) step.isKKP = !step.isKKP
 }
 
 function addStep(afterIndex: number) {
   const newId = String(Date.now())
-  wizard.processSteps.splice(afterIndex + 1, 0, {
+  wizard.value!.processSteps.splice(afterIndex + 1, 0, {
     id: newId,
     name: '',
     hazards: [],
@@ -38,8 +38,8 @@ function addStep(afterIndex: number) {
 }
 
 function removeStep(stepId: string) {
-  const idx = wizard.processSteps.findIndex((s) => s.id === stepId)
-  if (idx >= 0) wizard.processSteps.splice(idx, 1)
+  const idx = wizard.value!.processSteps.findIndex((s) => s.id === stepId)
+  if (idx >= 0) wizard.value!.processSteps.splice(idx, 1)
 }
 </script>
 
