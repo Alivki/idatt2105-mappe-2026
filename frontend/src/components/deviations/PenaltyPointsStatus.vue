@@ -50,9 +50,9 @@ const lastEntryLabel = computed(() => {
 
 const progressColor = computed(() => {
   const pct = progressPercent.value
-  if (pct >= 75) return '#ae2c2d'
-  if (pct >= 50) return '#c9751a'
-  return '#9f6511'
+  if (pct >= 75) return 'var(--red)'
+  if (pct >= 50) return 'var(--amber)'
+  return 'var(--amber)'
 })
 </script>
 
@@ -92,7 +92,7 @@ const progressColor = computed(() => {
 .status-card {
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius-lg);
-  background: #ffffff;
+  background: var(--card-bg);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -151,7 +151,7 @@ const progressColor = computed(() => {
 }
 
 .info-card {
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid hsl(var(--border));
   border-radius: var(--radius-md);
   padding: 12px;
   display: flex;
@@ -159,22 +159,22 @@ const progressColor = computed(() => {
   gap: 2px;
 }
 
-.info-card--last { background: #fde8e8; border-color: #e0aeb5; }
-.info-card--period { background: #dcebd8; border-color: #b7d18e; }
+.info-card--last { background: var(--red-soft); border-color: hsl(var(--border)); }
+.info-card--period { background: var(--green-soft); border-color: hsl(var(--border)); }
 
 .info-label {
   font-size: 0.78rem;
   font-weight: 600;
 }
 
-.info-card--last .info-label { color: #991b1b; }
-.info-card--period .info-label { color: #166534; }
+.info-card--last .info-label { color: var(--red); }
+.info-card--period .info-label { color: var(--green); }
 
 .info-value { font-size: 1.05rem; font-weight: 700; }
-.info-card--last .info-value { color: #7f1d1d; }
-.info-card--period .info-value { color: #14532d; }
+.info-card--last .info-value { color: var(--red); }
+.info-card--period .info-value { color: var(--green); }
 
 .info-sub { font-size: 0.78rem; }
-.info-card--last .info-sub { color: #991b1b; }
-.info-card--period .info-sub { color: #166534; }
+.info-card--last .info-sub { color: var(--red); }
+.info-card--period .info-sub { color: var(--green); }
 </style>

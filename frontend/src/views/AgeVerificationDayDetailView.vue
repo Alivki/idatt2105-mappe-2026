@@ -46,15 +46,6 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
 
 <template>
   <AppLayout>
-    <template #header>
-      <div class="flex items-center gap-3 px-4 py-3 border-b border-stone-200 bg-stone-50">
-        <SidebarTrigger />
-        <span class="text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-3 py-1">
-          IK-Alkohol
-        </span>
-      </div>
-    </template>
-
     <header class="page-header">
       <div class="page-header-inner">
         <SidebarTrigger />
@@ -65,11 +56,16 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
 
     <div class="page-content">
       <Button variant="ghost" size="sm" class="back-btn" @click="router.push({ name: 'bevilling' })">
-        <ArrowLeft :size="16" />
+        <ArrowLeft :size="16" aria-hidden="true" />
         Tilbake til oversikt
       </Button>
 
-      <p v-if="dayDetailQuery.isLoading.value" class="state-line">Laster...</p>
+      <div v-if="dayDetailQuery.isLoading.value" class="skeleton-list">
+        <div v-for="n in 4" :key="n" class="skeleton-card">
+          <div class="skeleton-line skeleton-line--title"></div>
+          <div class="skeleton-line skeleton-line--short"></div>
+        </div>
+      </div>
 
       <template v-else-if="detail">
         <section class="header-row">
@@ -115,11 +111,11 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
               </div>
               <div class="shift-stats-inline">
                 <span class="stat-chip stat-chip--ids">
-                  <IdCard :size="14" />
+                  <IdCard :size="14" aria-hidden="true" />
                   {{ s.shift.idsCheckedCount }}
                 </span>
                 <span v-if="s.deviations.length > 0" class="stat-chip stat-chip--dev">
-                  <AlertTriangle :size="14" />
+                  <AlertTriangle :size="14" aria-hidden="true" />
                   {{ s.deviations.length }}
                 </span>
               </div>
@@ -171,7 +167,7 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
   align-items: flex-start;
 }
 
-h1 { margin: 0; font-size: 1.8rem; letter-spacing: -0.02em; }
+h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 h1::first-letter { text-transform: uppercase; }
 .header-row p { margin-top: 6px; color: var(--text-secondary); font-size: 1rem; }
 
@@ -213,7 +209,7 @@ h2 {
 }
 
 .breakdown-label { color: hsl(var(--muted-foreground)); }
-.breakdown-value { font-weight: 700; color: #dc2626; }
+.breakdown-value { font-weight: 700; color: var(--red); }
 
 .shifts-section {
   display: flex;
@@ -267,8 +263,8 @@ h2 {
 .active-badge {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #059669;
-  background: #ecfdf5;
+  color: var(--green);
+  background: var(--green-soft);
   padding: 1px 6px;
   border-radius: 4px;
 }
@@ -288,8 +284,8 @@ h2 {
   border-radius: 8px;
 }
 
-.stat-chip--ids { background: #ecfdf5; color: #059669; }
-.stat-chip--dev { background: #fef2f2; color: #dc2626; }
+.stat-chip--ids { background: var(--green-soft); color: var(--green); }
+.stat-chip--dev { background: var(--red-soft); color: var(--red); }
 
 .shift-deviations {
   border-top: 1px solid hsl(var(--border));
@@ -315,12 +311,15 @@ h2 {
   background: hsl(var(--card));
 }
 
-.state-line {
-  border-radius: var(--radius-md); border: 1px solid hsl(var(--border));
-  background: hsl(var(--card)); padding: 12px; color: var(--text-secondary);
-}
+.skeleton-list { display: flex; flex-direction: column; gap: 12px; }
+.skeleton-card { padding: 16px; border-radius: var(--radius-lg); border: 1px solid hsl(var(--border)); background: var(--card-bg); }
+.skeleton-line { height: 14px; border-radius: 6px; background: hsl(var(--muted)); animation: shimmer 1.4s ease-in-out infinite; }
+.skeleton-line--title { width: 55%; margin-bottom: 10px; }
+.skeleton-line--short { width: 35%; }
+@keyframes shimmer { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 
 @media (max-width: 768px) {
+  h1 { font-size: 1.5rem; }
   .cards-group { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .shift-card-header { flex-direction: column; align-items: flex-start; }
 }

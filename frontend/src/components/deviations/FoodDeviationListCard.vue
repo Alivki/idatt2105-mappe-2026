@@ -77,25 +77,25 @@ const relativeTime = computed(() => {
       <div v-if="canManage" class="card-actions" @click.stop>
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
-            <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger"><MoreVertical :size="18" /></Button>
+            <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger" aria-label="Handlinger"><MoreVertical :size="18" aria-hidden="true" /></Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" :side-offset="4">
             <DropdownMenuItem @click="emits('edit', deviation)">
-              <Pencil :size="16" /> Rediger
+              <Pencil :size="16" aria-hidden="true" /> Rediger
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem v-if="deviation.status !== 'OPEN'" class="menu-item--status-open" @click="emits('update-status', deviation.id, 'OPEN')">
-              <CircleDot :size="16" /> Åpen
+              <CircleDot :size="16" aria-hidden="true" /> Åpen
             </DropdownMenuItem>
             <DropdownMenuItem v-if="deviation.status !== 'UNDER_TREATMENT'" class="menu-item--status-progress" @click="emits('update-status', deviation.id, 'UNDER_TREATMENT')">
-              <Clock :size="16" /> Under behandling
+              <Clock :size="16" aria-hidden="true" /> Under behandling
             </DropdownMenuItem>
             <DropdownMenuItem v-if="deviation.status !== 'CLOSED'" class="menu-item--status-closed" @click="emits('update-status', deviation.id, 'CLOSED')">
-              <CheckCircle2 :size="16" /> Lukket
+              <CheckCircle2 :size="16" aria-hidden="true" /> Lukket
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem class="menu-item--danger" @click="deleteDialogOpen = true">
-              <Trash2 :size="16" /> Slett
+              <Trash2 :size="16" aria-hidden="true" /> Slett
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -138,15 +138,15 @@ const relativeTime = computed(() => {
 .card-actions { display: flex; align-items: flex-start; padding: 12px 12px 0 0; flex-shrink: 0; }
 .actions-trigger {
   display: flex; align-items: center; justify-content: center;
-  width: 2rem; height: 2rem; border-radius: var(--radius-md);
+  width: 2.25rem; height: 2.25rem; border-radius: var(--radius-md);
   border: none; background: none; color: var(--text-secondary); cursor: pointer;
   transition: background 150ms ease;
 }
 .actions-trigger:hover { background: hsl(var(--accent)); color: hsl(var(--foreground)); }
 
-.menu-item--status-open { color: #a62929; }
-.menu-item--status-progress { color: #946013; }
-.menu-item--status-closed { color: #2f6f34; }
-.menu-item--danger { color: #c62828; }
-.menu-item--danger:hover { background-color: #fde8e8 !important; color: #c62828 !important; }
+.menu-item--status-open { color: var(--red); }
+.menu-item--status-progress { color: var(--amber); }
+.menu-item--status-closed { color: var(--green); }
+.menu-item--danger { color: var(--red); }
+.menu-item--danger:hover { background-color: var(--red-soft) !important; color: var(--red) !important; }
 </style>

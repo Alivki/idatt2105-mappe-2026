@@ -14,9 +14,9 @@ const wizard = defineModel<WizardState>('wizard', { required: true })
 
 function getRiskLevel(likelihood: number, severity: number) {
   const risk = likelihood * severity
-  if (risk >= 6) return { label: 'Høy', color: '#dc2626', bg: '#fef2f2' }
-  if (risk >= 3) return { label: 'Middels', color: '#d97706', bg: '#fffbeb' }
-  return { label: 'Lav', color: '#16a34a', bg: '#f0fdf4' }
+  if (risk >= 6) return { label: 'Høy', color: 'var(--red)', bg: 'var(--red-soft)' }
+  if (risk >= 3) return { label: 'Middels', color: 'var(--amber)', bg: 'var(--amber-soft)' }
+  return { label: 'Lav', color: 'var(--green)', bg: 'var(--green-soft)' }
 }
 
 function isKKP(likelihood: number, severity: number): boolean {
@@ -41,7 +41,7 @@ function updateSeverity(entryId: string, val: string) {
 <template>
   <div class="step-content">
     <div class="info-banner">
-      <Info :size="16" :stroke-width="1.5" />
+      <Info :size="16" :stroke-width="1.5" aria-hidden="true" />
       <p>
         Vurder sannsynlighet og alvorlighet for hver fare. Farer med risiko 6–9 foreslås som KKP.
         Legg til forebyggende tiltak.
@@ -49,7 +49,7 @@ function updateSeverity(entryId: string, val: string) {
     </div>
 
     <div v-if="kkpCount > 0" class="kkp-summary">
-      <ShieldAlert :size="16" :stroke-width="1.5" />
+      <ShieldAlert :size="16" :stroke-width="1.5" aria-hidden="true" />
       <span><strong>{{ kkpCount }}</strong> fare{{ kkpCount !== 1 ? 'r' : '' }} identifisert som KKP</span>
     </div>
 
@@ -134,9 +134,9 @@ function updateSeverity(entryId: string, val: string) {
 
     <div class="risk-legend">
       <span class="legend-title">Risikoskala (sannsynlighet x alvorlighet):</span>
-      <span class="legend-item" style="color: #16a34a;">1–2 Lav</span>
-      <span class="legend-item" style="color: #d97706;">3–4 Middels</span>
-      <span class="legend-item" style="color: #dc2626;">6–9 Høy (KKP)</span>
+      <span class="legend-item" style="color: var(--green);">1–2 Lav</span>
+      <span class="legend-item" style="color: var(--amber);">3–4 Middels</span>
+      <span class="legend-item" style="color: var(--red);">6–9 Høy (KKP)</span>
     </div>
   </div>
 </template>
@@ -173,11 +173,11 @@ function updateSeverity(entryId: string, val: string) {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.875rem;
-  background: #fffbeb;
-  border: 1px solid #fde68a;
+  background: var(--amber-soft);
+  border: 1px solid color-mix(in srgb, var(--amber-soft) 50%, var(--amber) 30%);
   border-radius: 0.5rem;
   font-size: 0.8125rem;
-  color: #92400e;
+  color: var(--amber);
 }
 
 .entries {
@@ -189,12 +189,12 @@ function updateSeverity(entryId: string, val: string) {
 .entry-card {
   border: 1px solid hsl(var(--border));
   border-radius: 0.625rem;
-  background: white;
+  background: hsl(var(--card));
   overflow: hidden;
 }
 
 .entry-card--kkp {
-  border-color: #fde68a;
+  border-color: var(--amber);
 }
 
 .entry-header {
@@ -207,7 +207,7 @@ function updateSeverity(entryId: string, val: string) {
 }
 
 .entry-card--kkp .entry-header {
-  background: #fffdf5;
+  background: var(--amber-soft);
 }
 
 .entry-step {
@@ -244,12 +244,12 @@ function updateSeverity(entryId: string, val: string) {
 
 .kkp-badge {
   padding: 0.0625rem 0.375rem;
-  background: #fef3c7;
-  border: 1px solid #fde68a;
+  background: var(--amber-soft);
+  border: 1px solid color-mix(in srgb, var(--amber-soft) 50%, var(--amber) 30%);
   border-radius: 999px;
   font-size: 0.625rem;
   font-weight: 700;
-  color: #d97706;
+  color: var(--amber);
 }
 
 .entry-body {

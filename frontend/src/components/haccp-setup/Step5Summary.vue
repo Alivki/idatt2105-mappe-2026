@@ -77,7 +77,7 @@ const previewChecklists = computed(() => {
     <!-- HACCP Level summary -->
     <div class="haccp-summary-card">
       <div class="haccp-summary-header">
-        <ShieldCheck :size="20" :stroke-width="1.5" />
+        <ShieldCheck :size="20" :stroke-width="1.5" aria-hidden="true" />
         <span>{{ haccpTrinn.label }}</span>
       </div>
       <div class="haccp-summary-details">
@@ -104,7 +104,7 @@ const previewChecklists = computed(() => {
     </div>
 
     <div v-if="prereqSummary.ok < prereqSummary.total" class="prereq-warning">
-      <AlertTriangle :size="16" :stroke-width="1.5" />
+      <AlertTriangle :size="16" :stroke-width="1.5" aria-hidden="true" />
       <p>
         <strong>{{ prereqSummary.total - prereqSummary.ok }} grunnforutsetning{{ prereqSummary.total - prereqSummary.ok !== 1 ? 'er' : '' }}</strong>
         er ikke markert som «på plass». Vi anbefaler å få disse på plass. Sjekklistene genereres uansett.
@@ -113,7 +113,7 @@ const previewChecklists = computed(() => {
 
     <div class="preview-section">
       <h3>
-        <ClipboardCheck :size="18" :stroke-width="1.5" />
+        <ClipboardCheck :size="18" :stroke-width="1.5" aria-hidden="true" />
         {{ previewChecklists.length }} sjekklister vil bli generert
       </h3>
       <div class="checklist-grid">
@@ -132,7 +132,7 @@ const previewChecklists = computed(() => {
     </div>
 
     <div class="info-banner">
-      <Info :size="16" :stroke-width="1.5" />
+      <Info :size="16" :stroke-width="1.5" aria-hidden="true" />
       <p>
         Sjekklistene blir lagt inn i din sjekkliste-modul og vil dukke opp som oppgaver for kjøkkenpersonalet
         basert på frekvens (daglig, ukentlig, månedlig, årlig). Du kan tilpasse dem når som helst.
@@ -194,11 +194,11 @@ const previewChecklists = computed(() => {
   display: flex;
   gap: 0.625rem;
   padding: 0.75rem 1rem;
-  background: #fffbeb;
-  border: 1px solid #fde68a;
+  background: var(--amber-soft);
+  border: 1px solid color-mix(in srgb, var(--amber-soft) 50%, var(--amber) 30%);
   border-radius: 0.5rem;
   font-size: 0.8125rem;
-  color: #92400e;
+  color: var(--amber);
   line-height: 1.5;
 }
 
@@ -229,7 +229,7 @@ const previewChecklists = computed(() => {
   padding: 0.625rem 0.875rem;
   border: 1px solid hsl(var(--border));
   border-radius: 0.5rem;
-  background: white;
+  background: hsl(var(--card));
 }
 
 .checklist-preview-header {

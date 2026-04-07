@@ -91,7 +91,7 @@ const nextStepLabels = [
 
       <div v-else-if="showIntro" class="intro-wrapper">
         <div class="intro-icon">
-          <ListChecks :size="40" :stroke-width="1.5" />
+          <ListChecks :size="40" :stroke-width="1.5" aria-hidden="true" />
         </div>
         <h2 class="intro-heading">Sett opp HACCP-sjekklister</h2>
         <p class="intro-desc">
@@ -114,13 +114,13 @@ const nextStepLabels = [
         </div>
         <Button class="intro-btn" @click="startWizard">
           Start HACCP-oppsett
-          <ArrowRight :size="16" />
+          <ArrowRight :size="16" aria-hidden="true" />
         </Button>
       </div>
 
       <div v-else-if="showCompleted" class="intro-wrapper">
         <div class="completed-icon">
-          <CircleCheck :size="40" :stroke-width="1.5" />
+          <CircleCheck :size="40" :stroke-width="1.5" aria-hidden="true" />
         </div>
         <h2 class="intro-heading">HACCP-oppsett er fullført</h2>
         <p class="intro-desc">
@@ -136,7 +136,7 @@ const nextStepLabels = [
             Gå til sjekklister
           </Button>
           <Button @click="startWizard">
-            <RotateCcw :size="16" />
+            <RotateCcw :size="16" aria-hidden="true" />
             Kjør veiviseren på nytt
           </Button>
         </div>
@@ -203,8 +203,8 @@ const nextStepLabels = [
 .state-line {
   padding: 14px;
   border-radius: 0.5rem;
-  background: #ececea;
-  color: #4b5056;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
   width: 100%;
   max-width: 640px;
 }
@@ -220,7 +220,7 @@ const nextStepLabels = [
   border: 1px solid hsl(var(--border));
   border-radius: 1rem;
   background: hsl(var(--card));
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04);
+  box-shadow: 0 1px 3px 0 hsl(var(--foreground) / 0.04);
 }
 
 .intro-icon,
@@ -231,8 +231,8 @@ const nextStepLabels = [
   width: 5rem;
   height: 5rem;
   border-radius: 1rem;
-  background: hsl(var(--primary) / 0.08);
-  color: hsl(var(--primary));
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
   margin-bottom: 1.25rem;
 }
 
@@ -276,8 +276,8 @@ const nextStepLabels = [
   width: 1.75rem;
   height: 1.75rem;
   border-radius: 50%;
-  background: hsl(var(--primary) / 0.08);
-  color: hsl(var(--primary));
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
   font-weight: 600;
   font-size: 0.8125rem;
   flex-shrink: 0;
@@ -293,8 +293,8 @@ const nextStepLabels = [
   font-size: 0.8125rem;
   color: hsl(var(--muted-foreground));
   line-height: 1.6;
-  background: hsl(var(--primary) / 0.05);
-  border: 1px solid hsl(var(--primary) / 0.15);
+  background: hsl(var(--muted) / 0.5);
+  border: 1px solid hsl(var(--border));
   border-radius: 0.5rem;
   padding: 0.75rem 1rem;
   margin-bottom: 1.5rem;
@@ -303,7 +303,7 @@ const nextStepLabels = [
 }
 
 .completed-tip strong {
-  color: hsl(var(--primary));
+  color: hsl(var(--foreground));
 }
 
 .completed-actions {
@@ -326,8 +326,8 @@ const nextStepLabels = [
   padding: 1.75rem 2rem;
   border: 1px solid hsl(var(--border));
   border-radius: 1rem;
-  background: white;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04);
+  background: hsl(var(--card));
+  box-shadow: 0 1px 3px 0 hsl(var(--foreground) / 0.04);
 }
 
 .step-title {

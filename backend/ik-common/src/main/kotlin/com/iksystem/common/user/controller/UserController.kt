@@ -1,5 +1,6 @@
 package com.iksystem.common.user.controller
 
+import com.iksystem.common.membership.dto.MemberNameResponse
 import com.iksystem.common.membership.dto.MembershipResponse
 import com.iksystem.common.security.AuthenticatedUser
 import com.iksystem.common.user.dto.CreateUserRequest
@@ -51,6 +52,12 @@ class UserController(private val userService: UserService) {
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     fun listUsers(@AuthenticationPrincipal auth: AuthenticatedUser): ResponseEntity<List<MembershipResponse>> =
         ResponseEntity.ok(userService.listUsers(auth))
+
+    @Operation(summary = "List member names", description = "Returns lightweight member names for select inputs. Available to all authenticated users.")
+    @ApiResponse(responseCode = "200", description = "Member names returned")
+    @GetMapping("/names")
+    fun listMemberNames(@AuthenticationPrincipal auth: AuthenticatedUser): ResponseEntity<List<MemberNameResponse>> =
+        ResponseEntity.ok(userService.listMemberNames(auth))
 
     /**
      * Retrieves a single member's details within the caller's organization.

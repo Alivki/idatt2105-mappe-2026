@@ -36,6 +36,12 @@ interface ChecklistRepository : JpaRepository<Checklist, Long> {
     )
     fun countActiveOpenByOrganizationId(@Param("organizationId") organizationId: Long): Long
 
+    fun countByOrganizationIdAndActive(organizationId: Long, active: Boolean): Long
+
+    fun countByOrganizationIdAndFrequencyAndActive(organizationId: Long, frequency: ChecklistFrequency, active: Boolean): Long
+
+    fun findAllByOrganizationIdAndFrequencyAndActive(organizationId: Long, frequency: ChecklistFrequency, active: Boolean): List<Checklist>
+
     fun deleteAllByOrganizationIdAndSource(organizationId: Long, source: String)
 
     @Query(

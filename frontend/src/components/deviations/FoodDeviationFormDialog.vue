@@ -315,12 +315,12 @@ function handleSubmit() {
           <label :class="['field', { 'field--error': errors.reportedDate }]">
             <span>Dato *</span>
             <DatePicker v-model="reportedDate" placeholder="Velg dato" />
-            <p v-if="errors.reportedDate" class="error-message">{{ errors.reportedDate }}</p>
+            <p v-if="errors.reportedDate" class="error-message" role="alert">{{ errors.reportedDate }}</p>
           </label>
           <label :class="['field', { 'field--error': errors.reportedTime }]">
             <span>Tidspunkt *</span>
             <TimePicker :hours="reportedHours" :minutes="reportedMinutes" @update:hours="reportedHours = $event" @update:minutes="reportedMinutes = $event" placeholder="Velg tid" />
-            <p v-if="errors.reportedTime" class="error-message">{{ errors.reportedTime }}</p>
+            <p v-if="errors.reportedTime" class="error-message" role="alert">{{ errors.reportedTime }}</p>
           </label>
         </div>
 
@@ -335,7 +335,7 @@ function handleSubmit() {
               <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">{{ m.label }}</SelectItem>
             </SelectContent>
           </Select>
-          <p v-if="errors.reporter" class="error-message">{{ errors.reporter }}</p>
+          <p v-if="errors.reporter" class="error-message" role="alert">{{ errors.reporter }}</p>
         </div>
 
         <!-- Deviation type chips -->
@@ -378,7 +378,7 @@ function handleSubmit() {
         <label :class="['field', { 'field--error': errors.description }]">
           <span>Beskriv avviket *</span>
           <Textarea v-model="description" rows="3" placeholder="Hva ble observert? Hvor skjedde det? Hvilke produkter/prosesser var berørt?" />
-          <p v-if="errors.description" class="error-message">{{ errors.description }}</p>
+          <p v-if="errors.description" class="error-message" role="alert">{{ errors.description }}</p>
         </label>
 
         <!-- Step 2 -->
@@ -386,7 +386,7 @@ function handleSubmit() {
         <label :class="['field', { 'field--error': errors.immediateAction }]">
           <span>Hva ble gjort umiddelbart? *</span>
           <Textarea v-model="immediateAction" rows="3" placeholder="F.eks.: Varer kastet, kjøleskap justert, område rengjort..." />
-          <p v-if="errors.immediateAction" class="error-message">{{ errors.immediateAction }}</p>
+          <p v-if="errors.immediateAction" class="error-message" role="alert">{{ errors.immediateAction }}</p>
         </label>
         <div class="row-2">
           <div :class="['field', { 'field--error': errors.immediateActionBy }]">
@@ -399,12 +399,12 @@ function handleSubmit() {
                 <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">{{ m.label }}</SelectItem>
               </SelectContent>
             </Select>
-            <p v-if="errors.immediateActionBy" class="error-message">{{ errors.immediateActionBy }}</p>
+            <p v-if="errors.immediateActionBy" class="error-message" role="alert">{{ errors.immediateActionBy }}</p>
           </div>
           <div :class="['field', { 'field--error': errors.immediateActionTime }]">
             <span>Tidspunkt for handling *</span>
             <TimePicker :hours="immediateActionHours" :minutes="immediateActionMinutes" @update:hours="immediateActionHours = $event" @update:minutes="immediateActionMinutes = $event" placeholder="Velg tid" />
-            <p v-if="errors.immediateActionTime" class="error-message">{{ errors.immediateActionTime }}</p>
+            <p v-if="errors.immediateActionTime" class="error-message" role="alert">{{ errors.immediateActionTime }}</p>
           </div>
         </div>
 
@@ -413,12 +413,12 @@ function handleSubmit() {
         <label :class="['field', { 'field--error': errors.cause }]">
           <span>Hva var årsaken til avviket? *</span>
           <Textarea v-model="cause" rows="3" placeholder="Hvorfor oppstod dette? Var det menneskelig feil, utstyrsfeil, manglende rutine?" />
-          <p v-if="errors.cause" class="error-message">{{ errors.cause }}</p>
+          <p v-if="errors.cause" class="error-message" role="alert">{{ errors.cause }}</p>
         </label>
         <label :class="['field', { 'field--error': errors.preventiveMeasures }]">
           <span>Forebyggende tiltak *</span>
           <Textarea v-model="preventiveMeasures" rows="3" placeholder="Hva gjør dere for å hindre at dette skjer igjen?" />
-          <p v-if="errors.preventiveMeasures" class="error-message">{{ errors.preventiveMeasures }}</p>
+          <p v-if="errors.preventiveMeasures" class="error-message" role="alert">{{ errors.preventiveMeasures }}</p>
         </label>
         <div class="row-2">
           <div :class="['field', { 'field--error': errors.preventiveResponsible }]">
@@ -431,12 +431,12 @@ function handleSubmit() {
                 <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">{{ m.label }}</SelectItem>
               </SelectContent>
             </Select>
-            <p v-if="errors.preventiveResponsible" class="error-message">{{ errors.preventiveResponsible }}</p>
+            <p v-if="errors.preventiveResponsible" class="error-message" role="alert">{{ errors.preventiveResponsible }}</p>
           </div>
           <div :class="['field', 'field--date-right', { 'field--error': errors.preventiveDeadline }]">
             <span>Frist for gjennomføring *</span>
             <DatePicker v-model="preventiveDeadline" placeholder="Velg frist" open-upward />
-            <p v-if="errors.preventiveDeadline" class="error-message">{{ errors.preventiveDeadline }}</p>
+            <p v-if="errors.preventiveDeadline" class="error-message" role="alert">{{ errors.preventiveDeadline }}</p>
           </div>
         </div>
 
@@ -498,7 +498,7 @@ function handleSubmit() {
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
 }
 .chip--active {
   border-color: hsl(var(--primary));
@@ -521,23 +521,23 @@ function handleSubmit() {
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  transition: all 150ms ease;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
 }
 .segment-button strong { font-size: 0.95rem; }
 .segment-button small { font-size: 0.78rem; color: hsl(var(--muted-foreground)); }
 
 .severity-btn--low.segment-button--active {
-  border-color: #71a66a; background: #dcebd8; color: #2f6f34;
+  border-color: var(--green); background: var(--green-soft); color: var(--green);
 }
-.severity-btn--low.segment-button--active small { color: #2f6f34; }
+.severity-btn--low.segment-button--active small { color: var(--green); }
 .severity-btn--medium.segment-button--active {
-  border-color: #d1a768; background: #f4e6d1; color: #946013;
+  border-color: var(--amber); background: var(--amber-soft); color: var(--amber);
 }
-.severity-btn--medium.segment-button--active small { color: #946013; }
+.severity-btn--medium.segment-button--active small { color: var(--amber); }
 .severity-btn--high.segment-button--active {
-  border-color: #c95d5d; background: #f4e0e0; color: #902324;
+  border-color: var(--red); background: var(--red-soft); color: var(--red);
 }
-.severity-btn--high.segment-button--active small { color: #902324; }
+.severity-btn--high.segment-button--active small { color: var(--red); }
 
 .step-header {
   font-size: 1.05rem;
@@ -564,7 +564,7 @@ function handleSubmit() {
   font-size: 0.88rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
 }
 .status-chip--active {
   border-color: hsl(var(--primary));

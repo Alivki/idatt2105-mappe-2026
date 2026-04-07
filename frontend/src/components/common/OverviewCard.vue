@@ -28,7 +28,7 @@ withDefaults(defineProps<{
   border-radius: var(--radius-lg);
   padding: 16px;
   border: 2px solid hsl(var(--border));
-  background: hsl(var(--card));
+  background: var(--card-bg);
   min-height: 6.25rem;
 }
 
@@ -43,7 +43,7 @@ withDefaults(defineProps<{
   font-size: 2rem;
   font-weight: 700;
   line-height: 1;
-  color: #111827;
+  color: hsl(var(--foreground));
   margin: 0;
 }
 
@@ -54,49 +54,36 @@ withDefaults(defineProps<{
 }
 
 /* Variants */
-.overview-card--neutral {
-  background: #ffffff;
-  border-color: #d1d5db;
-}
-
-.overview-card--neutral .card-value {
-  color: #111827;
-}
 
 .overview-card--open {
-  background: #f5e8ea;
-  border-color: #e0aeb5;
+  background: var(--red-soft);
+  border-color: color-mix(in srgb, var(--red-soft) 50%, var(--red) 20%);
 }
 
 .overview-card--open .card-value {
-  color: #a62929;
+  color: var(--red);
 }
 
 .overview-card--in-progress {
-  background: #f1e7d6;
-  border-color: #e0bf81;
+  background: var(--amber-soft);
+  border-color: color-mix(in srgb, var(--amber-soft) 50%, var(--amber) 20%);
 }
 
 .overview-card--in-progress .card-value {
-  color: #946013;
+  color: var(--amber);
 }
 
 .overview-card--resolved {
-  background: #e4eddc;
-  border-color: #b7d18e;
+  background: var(--green-soft);
+  border-color: color-mix(in srgb, var(--green-soft) 50%, var(--green) 20%);
 }
 
 .overview-card--resolved .card-value {
-  color: #3c8f2c;
+  color: var(--green);
 }
 
 /* Support for color classes from props */
-:deep(.val-green), .val-green { color: #059669; }
-:deep(.val-amber), .val-amber { color: #d97706; }
-:deep(.val-red), .val-red { color: #dc2626; }
-
-:deep(.text-emerald-700) { color: #059669; }
-:deep(.text-amber-600) { color: #d97706; }
-:deep(.text-red-600) { color: #dc2626; }
-:deep(.text-gray-900) { color: #111827; }
+:deep(.val-green), .val-green { color: var(--green); }
+:deep(.val-amber), .val-amber { color: var(--amber); }
+:deep(.val-red), .val-red { color: var(--red); }
 </style>

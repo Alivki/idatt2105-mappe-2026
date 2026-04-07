@@ -16,11 +16,17 @@ import {
   User,
   MapPin,
   Hash,
+  ScanEye,
+  HandMetal,
+  CircleHelp,
+  CreditCard,
+  Printer,
 } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import Badge from '@/components/ui/badge/Badge.vue'
 import Button from '@/components/ui/button/Button.vue'
 import Input from '@/components/ui/input/Input.vue'
 import Textarea from '@/components/ui/textarea/Textarea.vue'
@@ -340,6 +346,10 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
   { value: 'BOTH', label: 'Salg og skjenke' },
 ]
 
+function printPage() {
+  window.print()
+}
+
 function bevillingStatus(validUntil: string | null): { label: string; class: string } {
   if (!validUntil) return { label: 'Ukjent', class: 'status--neutral' }
   const diff = Math.ceil((new Date(validUntil).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
@@ -360,10 +370,16 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
     </header>
 
     <div class="page-content">
-      <p v-if="existsQuery.isLoading.value" class="state-line">Laster...</p>
+      <div v-if="existsQuery.isLoading.value" class="loading-state">
+        <div class="skeleton-card skeleton-card--header"></div>
+        <div class="skeleton-row">
+          <div class="skeleton-card skeleton-card--doc"></div>
+          <div class="skeleton-card skeleton-card--doc"></div>
+        </div>
+      </div>
 
       <template v-else-if="showForm">
-        <section class="form-wrapper"><section class="form-container form-card">
+        <section class="form-wrapper"><div class="form-container form-card">
           <div class="form-header">
             <h1>Skjenkepolicy</h1>
             <p class="form-subtitle">
@@ -567,7 +583,7 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
               </Button>
             </div>
           </form>
-        </section></section>
+        </div></section>
       </template>
 
       <template v-else-if="showCard">
@@ -576,12 +592,33 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
             <h1>Skjenkepolicy</h1>
             <p>Rutiner iht. alkoholloven §1-9 og alkoholforskriften kap. 8</p>
           </div>
-          <Button type="button" variant="outline" size="sm" @click="editing = true"><Pencil :size="14" /> Rediger</Button>
+          <div class="header-actions">
+            <Button type="button" variant="ghost" size="icon-sm" title="Skriv ut" aria-label="Skriv ut" @click="printPage"><Printer :size="16" aria-hidden="true" /></Button>
+            <Button type="button" variant="outline" size="sm" @click="editing = true"><Pencil :size="14" aria-hidden="true" /> Rediger</Button>
+          </div>
         </section>
+
+        <!-- Expiry warning banner -->
+        <div
+          v-if="bevillingStatus(policy!.bevillingValidUntil).class === 'status--warning' || bevillingStatus(policy!.bevillingValidUntil).class === 'status--expired'"
+          class="alert-banner"
+          :class="bevillingStatus(policy!.bevillingValidUntil).class === 'status--expired' ? 'alert-banner--danger' : 'alert-banner--warning'"
+        >
+          <div class="alert-banner__content">
+            <CalendarDays :size="16" />
+            <span v-if="bevillingStatus(policy!.bevillingValidUntil).class === 'status--expired'">
+              Bevillingen har utløpt. Oppdater bevillingsinformasjonen umiddelbart.
+            </span>
+            <span v-else>
+              Bevillingen utløper snart ({{ bevillingStatus(policy!.bevillingValidUntil).label }}). Planlegg fornyelse.
+            </span>
+          </div>
+          <Button variant="outline" size="sm" @click="editing = true">Oppdater</Button>
+        </div>
 
         <div class="cards-row">
           <div class="doc-card doc-card--bevilling">
-            <div class="doc-card__watermark"><ScrollText :size="120" /></div>
+            <div class="doc-card__watermark" aria-hidden="true"><ScrollText :size="120" /></div>
             <div class="doc-card__header">
               <div class="doc-card__badge">
                 <ShieldCheck :size="16" />
@@ -600,7 +637,7 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
                 </div>
                 <div class="doc-card__field">
                   <span class="doc-card__label"><CalendarDays :size="13" /> Gyldig til</span>
-                  <span class="doc-card__value">{{ formatDate(policy!.bevillingValidUntil) }}</span>
+                  <span class="doc-card__value" :class="{ 'doc-card__value--warn': bevillingStatus(policy!.bevillingValidUntil).class !== 'status--active' }">{{ formatDate(policy!.bevillingValidUntil) }}</span>
                 </div>
                 <div class="doc-card__field">
                   <span class="doc-card__label"><User :size="13" /> Styrer</span>
@@ -621,7 +658,7 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
           </div>
 
           <div class="doc-card doc-card--kunnskap">
-            <div class="doc-card__watermark"><Award :size="100" /></div>
+            <div class="doc-card__watermark" aria-hidden="true"><Award :size="100" /></div>
             <div class="doc-card__header">
               <div class="doc-card__badge doc-card__badge--kunnskap">
                 <Award :size="16" />
@@ -631,7 +668,7 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
             </div>
 
             <div class="doc-card__body">
-              <div class="doc-card__fields doc-card__fields--single">
+              <div class="doc-card__fields">
                 <div class="doc-card__field">
                   <span class="doc-card__label"><User :size="13" /> Kandidat</span>
                   <span class="doc-card__value">{{ policy!.kunnskapsproveCandidateName ?? '—' }}</span>
@@ -659,36 +696,80 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
           </div>
         </div>
 
+        <!-- Routines -->
         <div class="routines-card">
           <div class="routines-card__section">
-            <h4 class="routines-card__title">Rutiner for alderskontroll</h4>
-            <div class="license-grid">
-              <div class="license-field"><span class="license-label">Aldersgrense</span><span class="license-value">{{ ageCheckLabel[policy!.ageCheckLimit] }}</span></div>
-              <div class="license-field"><span class="license-label">Godkjent legitimasjon</span><span class="license-value">{{ policy!.acceptedIdTypes.map(t => idTypeLabel[t]).join(', ') }}</span></div>
+            <div class="routines-card__header">
+              <ScanEye :size="18" class="routines-card__icon routines-card__icon--brand" />
+              <h4 class="routines-card__title">Rutiner for alderskontroll</h4>
             </div>
-            <div v-if="policy!.doubtRoutine" class="license-text-block">
-              <span class="license-label">Rutine ved tvil</span>
-              <p class="license-value">{{ policy!.doubtRoutine }}</p>
+
+            <div class="routine-items">
+              <div class="routine-item">
+                <span class="routine-item__label">Aldersgrense for legitimasjonskontroll</span>
+                <Badge tone="brand">{{ ageCheckLabel[policy!.ageCheckLimit] }}</Badge>
+              </div>
+
+              <div class="routine-item">
+                <span class="routine-item__label">Godkjent legitimasjon</span>
+                <div class="id-chips">
+                  <span
+                    v-for="idType in policy!.acceptedIdTypes"
+                    :key="idType"
+                    class="id-chip"
+                  >
+                    <CreditCard :size="12" />
+                    {{ idTypeLabel[idType] }}
+                  </span>
+                </div>
+              </div>
+
+              <div v-if="policy!.doubtRoutine" class="routine-item routine-item--block">
+                <div class="routine-item__header">
+                  <CircleHelp :size="14" class="routine-item__icon" />
+                  <span class="routine-item__label">Rutine ved tvil om alder</span>
+                </div>
+                <p class="routine-item__text">{{ policy!.doubtRoutine }}</p>
+              </div>
             </div>
           </div>
 
           <Separator />
 
           <div class="routines-card__section">
-            <h4 class="routines-card__title">Ansvarlig servering</h4>
-            <div v-if="policy!.intoxicationSigns" class="license-text-block">
-              <span class="license-label">Identifisering av berusede gjester</span>
-              <p class="license-value">{{ policy!.intoxicationSigns }}</p>
+            <div class="routines-card__header">
+              <HandMetal :size="18" class="routines-card__icon routines-card__icon--amber" />
+              <h4 class="routines-card__title">Ansvarlig servering</h4>
             </div>
-            <div v-if="policy!.refusalProcedure" class="license-text-block">
-              <span class="license-label">Prosedyre ved nekt</span>
-              <p class="license-value">{{ policy!.refusalProcedure }}</p>
+
+            <div class="routine-items">
+              <div v-if="policy!.intoxicationSigns" class="routine-item routine-item--block">
+                <div class="routine-item__header">
+                  <ScanEye :size="14" class="routine-item__icon" />
+                  <span class="routine-item__label">Identifisering av berusede gjester</span>
+                </div>
+                <p class="routine-item__text">{{ policy!.intoxicationSigns }}</p>
+              </div>
+
+              <div v-if="policy!.refusalProcedure" class="routine-item routine-item--block">
+                <div class="routine-item__header">
+                  <HandMetal :size="14" class="routine-item__icon" />
+                  <span class="routine-item__label">Prosedyre ved nekt av servering</span>
+                </div>
+                <p class="routine-item__text">{{ policy!.refusalProcedure }}</p>
+              </div>
             </div>
           </div>
         </div>
       </template>
 
-      <p v-else-if="policyExists && policyQuery.isLoading.value" class="state-line">Laster skjenkepolicy...</p>
+      <div v-else-if="policyExists && policyQuery.isLoading.value" class="loading-state">
+        <div class="skeleton-card skeleton-card--header"></div>
+        <div class="skeleton-row">
+          <div class="skeleton-card skeleton-card--doc"></div>
+          <div class="skeleton-card skeleton-card--doc"></div>
+        </div>
+      </div>
     </div>
   </AppLayout>
 </template>
@@ -700,12 +781,31 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
 .page-title { font-weight: 500; color: hsl(var(--sidebar-primary, 245 43% 52%)); }
 .page-content { display: flex; flex: 1; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; }
 
-.state-line {
-  border-radius: var(--radius-md);
-  border: 1px solid hsl(var(--border));
-  background: hsl(var(--card));
-  padding: 12px;
-  color: var(--text-secondary);
+/* ── Loading skeletons ──────────────────────────────────── */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.skeleton-row {
+  display: flex;
+  gap: 14px;
+}
+
+.skeleton-card {
+  border-radius: var(--radius-xl);
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted) / 0.5) 50%, hsl(var(--muted)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+}
+
+.skeleton-card--header { height: 60px; max-width: 400px; }
+.skeleton-card--doc { height: 240px; flex: 1; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .header-row {
@@ -714,8 +814,8 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
   align-items: flex-start;
   gap: 12px;
 }
-.header-row h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
-.header-row p { margin-top: 6px; color: var(--text-secondary); font-size: 1.08rem; }
+.header-row h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
+.header-row p { margin-top: 4px; color: var(--text-secondary); font-size: 0.88rem; }
 
 .form-wrapper { display: flex; justify-content: center; width: 100%; }
 .form-container { width: 100%; max-width: 820px; }
@@ -738,7 +838,7 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
 .field--error .chip-btn:not(.chip-btn--active) {
   border-color: hsl(var(--destructive));
 }
-.form-header h1 { margin: 0; font-size: 2rem; letter-spacing: -0.02em; }
+.form-header h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 .form-subtitle { margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; }
 .form-section { border: none; padding: 0; margin: 2rem 0 0; }
 .section-title { font-size: 1.2rem; font-weight: 600; letter-spacing: -0.01em; }
@@ -960,6 +1060,142 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
 .license-text-block { margin-top: 1rem; }
 .license-text-block .license-value { margin-top: 0.25rem; font-weight: 400; line-height: 1.5; color: var(--text-secondary); }
 
+/* ── Header actions ────────────────────────────────────── */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Alert banner ─────────────────────────────────────── */
+.alert-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-xl);
+  font-size: 0.88rem;
+}
+
+.alert-banner--warning {
+  background: hsl(38 95% 92%);
+  border: 1px solid hsl(38 80% 80%);
+  color: hsl(30 80% 30%);
+}
+
+.alert-banner--danger {
+  background: hsl(0 70% 94%);
+  border: 1px solid hsl(0 60% 82%);
+  color: hsl(0 60% 35%);
+}
+
+.alert-banner__content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+/* ── Warn value ───────────────────────────────────────── */
+.doc-card__value--warn {
+  color: var(--red, hsl(0 60% 40%));
+  font-weight: 600;
+}
+
+/* ── Routines card header ─────────────────────────────── */
+.routines-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.routines-card__icon {
+  flex-shrink: 0;
+}
+
+.routines-card__icon--brand {
+  color: var(--brand, hsl(var(--primary)));
+}
+
+.routines-card__icon--amber {
+  color: var(--amber, hsl(30 80% 45%));
+}
+
+/* ── Routine items ────────────────────────────────────── */
+.routine-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.routine-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.routine-item--block {
+  flex-direction: column;
+  align-items: stretch;
+  background: hsl(var(--muted) / 0.5);
+  border-radius: var(--radius-lg, 8px);
+  padding: 14px 16px;
+  gap: 8px;
+}
+
+.routine-item__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.routine-item__icon {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.routine-item__label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary, #64748b);
+}
+
+.routine-item--block .routine-item__label {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  font-size: 0.82rem;
+}
+
+.routine-item__text {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #64748b);
+}
+
+/* ── ID chips ─────────────────────────────────────────── */
+.id-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.id-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill, 999px);
+  background: hsl(var(--muted));
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  white-space: nowrap;
+}
+
 .actions-trigger {
   display: flex; align-items: center; justify-content: center; width: 2rem; height: 2rem;
   border-radius: var(--radius-md); border: none; background: none; color: hsl(var(--muted-foreground));
@@ -970,8 +1206,12 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
 @media (max-width: 768px) {
   .field-row { flex-direction: column; }
   .cards-row { flex-direction: column; }
+  .skeleton-row { flex-direction: column; }
   .doc-card__fields { grid-template-columns: 1fr; }
   .license-grid { grid-template-columns: 1fr; }
   .toggle-group { flex-direction: column; }
+  .header-row { flex-direction: column; gap: 12px; }
+  .routine-item:not(.routine-item--block) { flex-direction: column; align-items: flex-start; }
+  .alert-banner { flex-direction: column; align-items: flex-start; }
 }
 </style>

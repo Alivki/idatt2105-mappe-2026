@@ -8,9 +8,9 @@ const wizard = defineModel<WizardState>('wizard', { required: true })
 const allHazardTypes: HazardType[] = ['BIOLOGICAL', 'CHEMICAL', 'PHYSICAL', 'ALLERGEN']
 
 const hazardColors: Record<HazardType, string> = {
-  BIOLOGICAL: '#dc2626',
-  CHEMICAL: '#ca8a04',
-  PHYSICAL: '#2563eb',
+  BIOLOGICAL: 'var(--red)',
+  CHEMICAL: 'var(--amber)',
+  PHYSICAL: 'var(--brand)',
   ALLERGEN: '#9333ea',
 }
 
@@ -46,7 +46,7 @@ function removeStep(stepId: string) {
 <template>
   <div class="step-content">
     <div class="info-banner">
-      <Info :size="16" :stroke-width="1.5" />
+      <Info :size="16" :stroke-width="1.5" aria-hidden="true" />
       <p>
         Flytskjemaet viser produksjonsprosessen fra varemottak til servering.
         Merk farer og KKP-kandidater for hvert trinn. Vi har forhåndsutfylt basert på svarene dine.
@@ -74,7 +74,7 @@ function removeStep(stepId: string) {
               title="Fjern"
               @click="removeStep(step.id)"
             >
-              <X :size="14" :stroke-width="1.5" />
+              <X :size="14" :stroke-width="1.5" aria-hidden="true" />
             </button>
           </div>
 
@@ -100,15 +100,15 @@ function removeStep(stepId: string) {
         </div>
 
         <div v-if="index < wizard.processSteps.length - 1" class="flow-connector">
-          <ArrowDown :size="14" :stroke-width="1.5" class="flow-arrow" />
+          <ArrowDown :size="14" :stroke-width="1.5" class="flow-arrow" aria-hidden="true" />
           <button class="flow-add-btn" title="Legg til trinn" @click="addStep(index)">
-            <Plus :size="12" :stroke-width="2" />
+            <Plus :size="12" :stroke-width="2" aria-hidden="true" />
           </button>
         </div>
       </div>
 
       <button class="flow-add-end" @click="addStep(wizard.processSteps.length - 1)">
-        <Plus :size="14" :stroke-width="2" />
+        <Plus :size="14" :stroke-width="2" aria-hidden="true" />
         Legg til trinn
       </button>
     </div>
@@ -160,13 +160,13 @@ function removeStep(stepId: string) {
   padding: 0.75rem 1rem;
   border: 1.5px solid hsl(var(--border));
   border-radius: 0.625rem;
-  background: white;
-  transition: all 0.15s ease;
+  background: hsl(var(--card));
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 }
 
 .flow-step--kkp {
-  border-color: #f59e0b;
-  background: #fffdf5;
+  border-color: var(--amber);
+  background: var(--amber-soft);
 }
 
 .flow-step-top {
@@ -191,8 +191,8 @@ function removeStep(stepId: string) {
 }
 
 .flow-step--kkp .flow-step-number {
-  background: #fef3c7;
-  color: #d97706;
+  background: var(--amber-soft);
+  color: var(--amber);
 }
 
 .flow-step-input {
@@ -222,12 +222,12 @@ function removeStep(stepId: string) {
   color: hsl(var(--muted-foreground));
   cursor: pointer;
   opacity: 0.5;
-  transition: all 0.15s ease;
+  transition: opacity 0.15s ease, color 0.15s ease;
 }
 
 .flow-step-remove:hover {
   opacity: 1;
-  color: #dc2626;
+  color: var(--red);
 }
 
 .flow-step-tags {
@@ -240,12 +240,12 @@ function removeStep(stepId: string) {
   padding: 0.125rem 0.5rem;
   border: 1px solid hsl(var(--border));
   border-radius: 999px;
-  background: white;
+  background: hsl(var(--card));
   cursor: pointer;
   font-size: 0.6875rem;
   font-weight: 500;
   color: hsl(var(--muted-foreground));
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 }
 
 .tag:hover {
@@ -263,9 +263,9 @@ function removeStep(stepId: string) {
 
 .tag--kkp-active {
   border-style: solid;
-  background: #fef3c7;
-  border-color: #fde68a;
-  color: #d97706;
+  background: var(--amber-soft);
+  border-color: color-mix(in srgb, var(--amber-soft) 50%, var(--amber) 30%);
+  color: var(--amber);
   font-weight: 600;
 }
 
@@ -288,10 +288,10 @@ function removeStep(stepId: string) {
   height: 1.25rem;
   border: 1.5px dashed hsl(var(--border));
   border-radius: 50%;
-  background: white;
+  background: hsl(var(--card));
   color: hsl(var(--muted-foreground));
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
   opacity: 0.5;
 }
 
@@ -308,12 +308,12 @@ function removeStep(stepId: string) {
   padding: 0.375rem 0.875rem;
   border: 1.5px dashed hsl(var(--border));
   border-radius: 999px;
-  background: white;
+  background: hsl(var(--card));
   color: hsl(var(--muted-foreground));
   cursor: pointer;
   font-size: 0.75rem;
   margin-top: 0.5rem;
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 }
 
 .flow-add-end:hover {

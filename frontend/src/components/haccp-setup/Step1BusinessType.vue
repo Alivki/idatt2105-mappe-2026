@@ -110,7 +110,7 @@ function toggleTempEquipment(equipment: TempEquipment) {
           :class="{ 'option-card--selected': wizard.businessType === opt.value }"
           @click="wizard.businessType = opt.value"
         >
-          <component :is="opt.icon" :size="20" :stroke-width="1.5" />
+          <component :is="opt.icon" :size="20" :stroke-width="1.5" aria-hidden="true" />
           <span>{{ opt.label }}</span>
         </button>
       </div>
@@ -144,7 +144,7 @@ function toggleTempEquipment(equipment: TempEquipment) {
           @click="toggleFoodType(opt.value)"
         >
           <span class="checkbox-box">
-            <Check v-if="wizard.foodTypes.includes(opt.value)" :size="14" :stroke-width="2.5" />
+            <Check v-if="wizard.foodTypes.includes(opt.value)" :size="14" :stroke-width="2.5" aria-hidden="true" />
           </span>
           <span>{{ opt.label }}</span>
         </button>
@@ -163,7 +163,7 @@ function toggleTempEquipment(equipment: TempEquipment) {
           @click="toggleProcess(opt.value)"
         >
           <span class="checkbox-box">
-            <Check v-if="wizard.processes.includes(opt.value)" :size="14" :stroke-width="2.5" />
+            <Check v-if="wizard.processes.includes(opt.value)" :size="14" :stroke-width="2.5" aria-hidden="true" />
           </span>
           <span class="checkbox-label-row">
             <span>{{ opt.label }}</span>
@@ -188,7 +188,7 @@ function toggleTempEquipment(equipment: TempEquipment) {
           @click="toggleFacility(opt.value)"
         >
           <span class="checkbox-box">
-            <Check v-if="wizard.facilities.includes(opt.value)" :size="14" :stroke-width="2.5" />
+            <Check v-if="wizard.facilities.includes(opt.value)" :size="14" :stroke-width="2.5" aria-hidden="true" />
           </span>
           <span>{{ opt.label }}</span>
         </button>
@@ -206,7 +206,7 @@ function toggleTempEquipment(equipment: TempEquipment) {
           @click="toggleTempEquipment(opt.value)"
         >
           <span class="checkbox-box">
-            <Check v-if="wizard.temperatureEquipment.includes(opt.value)" :size="14" :stroke-width="2.5" />
+            <Check v-if="wizard.temperatureEquipment.includes(opt.value)" :size="14" :stroke-width="2.5" aria-hidden="true" />
           </span>
           <span>{{ opt.label }}</span>
         </button>
@@ -265,7 +265,7 @@ function toggleTempEquipment(equipment: TempEquipment) {
 
     <div class="haccp-trinn-card">
       <div class="haccp-trinn-header">
-        <ShieldCheck :size="20" :stroke-width="1.5" />
+        <ShieldCheck :size="20" :stroke-width="1.5" aria-hidden="true" />
         <span class="haccp-trinn-label">Ditt HACCP-nivå</span>
       </div>
       <div class="haccp-trinn-level">{{ haccpTrinn.label }}</div>
@@ -308,11 +308,11 @@ function toggleTempEquipment(equipment: TempEquipment) {
   padding: 0.75rem 1rem;
   border: 1.5px solid hsl(var(--border));
   border-radius: 0.5rem;
-  background: white;
+  background: hsl(var(--card));
   cursor: pointer;
   font-size: 0.875rem;
   color: hsl(var(--foreground));
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
   text-align: left;
 }
 
@@ -339,11 +339,11 @@ function toggleTempEquipment(equipment: TempEquipment) {
   padding: 0.5rem 1.25rem;
   border: 1.5px solid hsl(var(--border));
   border-radius: 999px;
-  background: white;
+  background: hsl(var(--card));
   cursor: pointer;
   font-size: 0.875rem;
   color: hsl(var(--foreground));
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 }
 
 .option-pill:hover {
@@ -376,11 +376,11 @@ function toggleTempEquipment(equipment: TempEquipment) {
   padding: 0.625rem 0.875rem;
   border: 1.5px solid hsl(var(--border));
   border-radius: 0.5rem;
-  background: white;
+  background: hsl(var(--card));
   cursor: pointer;
   font-size: 0.875rem;
   color: hsl(var(--foreground));
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
   text-align: left;
 }
 
@@ -403,7 +403,7 @@ function toggleTempEquipment(equipment: TempEquipment) {
   border: 1.5px solid hsl(var(--border));
   border-radius: 0.25rem;
   flex-shrink: 0;
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 }
 
 .checkbox-item--selected .checkbox-box {
@@ -430,29 +430,29 @@ function toggleTempEquipment(equipment: TempEquipment) {
 }
 
 .trinn-badge--2 {
-  background: #fffbeb;
-  color: #d97706;
-  border: 1px solid #fde68a;
+  background: var(--amber-soft);
+  color: var(--amber);
+  border: 1px solid color-mix(in srgb, var(--amber-soft) 50%, var(--amber) 30%);
 }
 
 .trinn-badge--3 {
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
+  background: var(--red-soft);
+  color: var(--red);
+  border: 1px solid color-mix(in srgb, var(--red-soft) 50%, var(--red) 30%);
 }
 
 .haccp-trinn-card {
   padding: 1.25rem;
   border-radius: 0.75rem;
-  background: hsl(var(--primary) / 0.05);
-  border: 1px solid hsl(var(--primary) / 0.15);
+  background: hsl(var(--muted) / 0.5);
+  border: 1px solid hsl(var(--border));
 }
 
 .haccp-trinn-header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: hsl(var(--primary));
+  color: hsl(var(--foreground));
   margin-bottom: 0.5rem;
 }
 
@@ -466,7 +466,7 @@ function toggleTempEquipment(equipment: TempEquipment) {
 .haccp-trinn-level {
   font-size: 1.125rem;
   font-weight: 700;
-  color: hsl(var(--primary));
+  color: hsl(var(--foreground));
   margin-bottom: 0.375rem;
 }
 

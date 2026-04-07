@@ -4,6 +4,7 @@ import com.iksystem.common.exception.BadRequestException
 import com.iksystem.common.exception.ConflictException
 import com.iksystem.common.exception.ForbiddenException
 import com.iksystem.common.exception.NotFoundException
+import com.iksystem.common.membership.dto.MemberNameResponse
 import com.iksystem.common.membership.dto.MembershipResponse
 import com.iksystem.common.membership.model.Membership
 import com.iksystem.common.membership.repository.MembershipRepository
@@ -44,6 +45,17 @@ class UserService(
     fun listUsers(auth: AuthenticatedUser): List<MembershipResponse> {
         val orgId = auth.requireOrganizationId()
         return membershipRepository.findAllByOrganizationId(orgId).map { it.toMembershipResponse() }
+    }
+
+    /**
+     * Lists all member names in the caller's organization. Available to all roles.
+     */
+    @Transactional(readOnly = true)
+    fun listMemberNames(auth: AuthenticatedUser): List<MemberNameResponse> {
+        val orgId = auth.requireOrganizationId()
+        return membershipRepository.findAllByOrganizationId(orgId).map {
+            MemberNameResponse(userId = it.user.id, fullName = it.user.fullName)
+        }
     }
 
     /**
