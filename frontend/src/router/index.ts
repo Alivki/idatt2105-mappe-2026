@@ -91,6 +91,11 @@ const router = createRouter({
       component: AllowanceView,
     },
     {
+      path: '/bevilling/dag/:date',
+      name: 'bevilling-dag',
+      component: () => import('@/views/AgeVerificationDayDetailView.vue'),
+    },
+    {
       path: '/skjenkepolicy',
       name: 'skjenkepolicy',
       component: AlcoholPolicyView,

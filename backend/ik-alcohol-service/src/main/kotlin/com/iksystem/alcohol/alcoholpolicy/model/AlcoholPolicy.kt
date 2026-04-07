@@ -69,7 +69,7 @@ data class AlcoholPolicy (
     @Column(name = "refusal_procedure", columnDefinition = "TEXT")
     val refusalProcedure: String? = null,
 
-    val expiryNotified: Boolean = false,
+    var expiryNotified: Boolean = false,
 
     val createdAt: Instant = Instant.now(),
     val updatedAt: Instant = Instant.now()

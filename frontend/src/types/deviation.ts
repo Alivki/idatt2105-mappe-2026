@@ -85,6 +85,13 @@ export type AlcoholDeviationType =
   | 'MEDBRAKT_ALKOHOL'
   | 'REKLAMEBRUDD'
   | 'VILKAARSBRUDD'
+  // 0 points — age verification incidents
+  | 'NEKTET_VISE_LEGITIMASJON'
+  | 'GLEMTE_SJEKKE_LEGITIMASJON'
+  | 'MINDREAARIG_FORSOK'
+  | 'FALSK_LEGITIMASJON'
+  | 'UTGAATT_LEGITIMASJON'
+  | 'LEGITIMASJON_ANNET'
 
 export type AlcoholCausalAnalysis =
   | 'MANGLENDE_OPPLAERING'
@@ -189,6 +196,13 @@ export const PENALTY_POINTS_MAP: Record<AlcoholDeviationType, number> = {
   MEDBRAKT_ALKOHOL: 1,
   REKLAMEBRUDD: 1,
   VILKAARSBRUDD: 1,
+  // 0 points — age verification
+  NEKTET_VISE_LEGITIMASJON: 0,
+  GLEMTE_SJEKKE_LEGITIMASJON: 0,
+  MINDREAARIG_FORSOK: 0,
+  FALSK_LEGITIMASJON: 0,
+  UTGAATT_LEGITIMASJON: 0,
+  LEGITIMASJON_ANNET: 0,
 }
 
 export type { OrganizationMember } from './member'

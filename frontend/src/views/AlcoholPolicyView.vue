@@ -3,25 +3,24 @@ import { ref, computed, watch } from 'vue'
 import axios from 'axios'
 import {
   ScrollText,
-  MoreVertical,
+  Award,
   Pencil,
   FileText,
   ExternalLink,
   Upload,
   X,
   Loader2,
+  ShieldCheck,
+  CalendarDays,
+  User,
+  MapPin,
+  Hash,
 } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import Button from '@/components/ui/button/Button.vue'
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu'
 import {
   useAlcoholPolicyExistsQuery,
   useAlcoholPolicyQuery,
@@ -35,7 +34,6 @@ import type {
   CreateAlcoholPolicyRequest,
 } from '@/types/alcoholPolicy'
 
-// ── Queries ──
 const existsQuery = useAlcoholPolicyExistsQuery()
 const policyExists = computed(() => existsQuery.data.value === true)
 const policyQuery = useAlcoholPolicyQuery(() => policyExists.value)
@@ -52,11 +50,9 @@ const showForm = computed(() => {
 })
 const showCard = computed(() => policyExists.value && !editing.value && !!policy.value)
 
-// ── Form state ──
 const form = ref<CreateAlcoholPolicyRequest>({})
 const submitting = ref(false)
 
-// File upload state
 const bevillingFileName = ref<string | null>(null)
 const kunnskapsproveFileName = ref<string | null>(null)
 const bevillingUploading = ref(false)
@@ -64,7 +60,6 @@ const kunnskapsproveUploading = ref(false)
 const bevillingFileRef = ref<HTMLInputElement | null>(null)
 const kunnskapsproveFileRef = ref<HTMLInputElement | null>(null)
 
-// Populate form when editing existing policy
 watch(
   () => editing.value,
   (isEditing) => {
@@ -100,12 +95,10 @@ function resetForm() {
   editing.value = false
 }
 
-// ── Age check limit ──
 function setAgeCheck(val: AgeCheckLimit) {
   form.value.ageCheckLimit = val
 }
 
-// ── ID types ──
 const allIdTypes: { value: IdType; label: string }[] = [
   { value: 'PASS', label: 'Pass' },
   { value: 'FORERKORT', label: 'Førerkort' },
@@ -126,7 +119,6 @@ function isIdTypeSelected(id: IdType): boolean {
   return (form.value.acceptedIdTypes ?? ['PASS', 'FORERKORT', 'BANKKORT', 'NASJONALT_ID']).includes(id)
 }
 
-// ── Immediate file upload ──
 function validateFile(file: File): boolean {
   const allowed = ['application/pdf', 'image/jpeg', 'image/png']
   if (!allowed.includes(file.type)) {
@@ -201,7 +193,6 @@ function triggerFileInput(ref: HTMLInputElement | null) {
   ref?.click()
 }
 
-// ── Submit ──
 async function handleSubmit() {
   submitting.value = true
   try {
@@ -222,7 +213,6 @@ async function handleSubmit() {
   }
 }
 
-// ── View document ──
 async function openDocument(docId: number) {
   try {
     const res = await useDocumentUrlQuery(docId)
@@ -232,7 +222,6 @@ async function openDocument(docId: number) {
   }
 }
 
-// ── Helpers ──
 function formatDate(iso: string | null): string {
   if (!iso) return '—'
   const d = new Date(iso)
@@ -254,14 +243,22 @@ const idTypeLabel: Record<IdType, string> = {
 const knowledgeTestLabel: Record<KnowledgeTestType, string> = {
   SALG: 'Salg',
   SKJENKE: 'Skjenke',
-  BOTH: 'Begge',
+  BOTH: 'Salg og skjenke',
 }
 
 const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
   { value: 'SALG', label: 'Salg' },
   { value: 'SKJENKE', label: 'Skjenke' },
-  { value: 'BOTH', label: 'Begge' },
+  { value: 'BOTH', label: 'Salg og skjenke' },
 ]
+
+function bevillingStatus(validUntil: string | null): { label: string; class: string } {
+  if (!validUntil) return { label: 'Ukjent', class: 'status--neutral' }
+  const diff = Math.ceil((new Date(validUntil).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+  if (diff < 0) return { label: 'Utløpt', class: 'status--expired' }
+  if (diff <= 90) return { label: `${diff} dager igjen`, class: 'status--warning' }
+  return { label: 'Aktiv', class: 'status--active' }
+}
 </script>
 
 <template>
@@ -275,12 +272,10 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
     </header>
 
     <div class="page-content">
-      <!-- Loading exists check -->
       <p v-if="existsQuery.isLoading.value" class="state-line">Laster...</p>
 
-      <!-- ═══ FORM VIEW ═══ -->
       <template v-else-if="showForm">
-        <section class="form-container">
+        <section class="form-wrapper"><section class="form-container">
           <div class="form-header">
             <h1>Skjenkepolicy</h1>
             <p class="form-subtitle">
@@ -316,7 +311,6 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
                 </div>
               </div>
 
-              <!-- Bevilling document upload -->
               <div class="field">
                 <label class="field-label">Last opp bevillingsdokument</label>
                 <input ref="bevillingFileRef" type="file" accept=".pdf,.jpg,.jpeg,.png" class="file-hidden" @change="onFileChange($event, 'bevilling')" />
@@ -344,7 +338,6 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
               </div>
             </fieldset>
 
-            <!-- Kunnskapsprøve -->
             <fieldset class="form-section">
               <legend class="section-title">Kunnskapsprøve</legend>
 
@@ -386,7 +379,6 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
                 </div>
               </div>
 
-              <!-- Kunnskapsprøve document upload -->
               <div class="field">
                 <label class="field-label">Last opp kunnskapsprøve-bevis</label>
                 <input ref="kunnskapsproveFileRef" type="file" accept=".pdf,.jpg,.jpeg,.png" class="file-hidden" @change="onFileChange($event, 'kunnskapsprove')" />
@@ -414,7 +406,6 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
               </div>
             </fieldset>
 
-            <!-- Rutiner for alderskontroll -->
             <fieldset class="form-section">
               <legend class="section-title">Rutiner for alderskontroll</legend>
               <p class="section-subtitle">Beskriv hvordan dere kontrollerer alder. Lovpålagt iht. alkoholloven.</p>
@@ -454,7 +445,6 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
               </div>
             </fieldset>
 
-            <!-- Ansvarlig servering -->
             <fieldset class="form-section">
               <legend class="section-title">Ansvarlig servering</legend>
               <p class="section-subtitle">Rutiner for å hindre overskjenking og sikre forsvarlig drift.</p>
@@ -477,68 +467,101 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
               </Button>
             </div>
           </form>
-        </section>
+        </section></section>
       </template>
 
-      <!-- ═══ CARD VIEW ═══ -->
       <template v-else-if="showCard">
         <section class="header-row">
           <div>
             <h1>Skjenkepolicy</h1>
             <p>Rutiner iht. alkoholloven §1-9 og alkoholforskriften kap. 8</p>
           </div>
+          <Button type="button" variant="outline" size="sm" @click="editing = true"><Pencil :size="14" /> Rediger</Button>
         </section>
 
-        <div class="license-card">
-          <div class="license-card-header">
-            <div class="license-card-header-left">
-              <div class="license-icon"><ScrollText :size="20" /></div>
-              <div>
-                <h3 class="license-card-title">Bevillingslisens</h3>
-                <p v-if="policy!.bevillingValidUntil" class="license-card-sub">Gyldig til {{ formatDate(policy!.bevillingValidUntil) }}</p>
+        <div class="cards-row">
+          <div class="doc-card doc-card--bevilling">
+            <div class="doc-card__watermark"><ScrollText :size="120" /></div>
+            <div class="doc-card__header">
+              <div class="doc-card__badge">
+                <ShieldCheck :size="16" />
+                <span>Skjenkebevillingslisens</span>
+              </div>
+              <div class="doc-card__status" :class="bevillingStatus(policy!.bevillingValidUntil).class">
+                {{ bevillingStatus(policy!.bevillingValidUntil).label }}
               </div>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger as-child>
-                <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger"><MoreVertical :size="18" /></Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" :side-offset="4">
-                <DropdownMenuItem @click="editing = true"><Pencil :size="16" /> Rediger</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
 
-          <div class="license-card-body">
-            <div class="license-grid">
-              <div class="license-field"><span class="license-label">Bevillingsnummer</span><span class="license-value">{{ policy!.bevillingNumber ?? '—' }}</span></div>
-              <div class="license-field"><span class="license-label">Gyldig til</span><span class="license-value">{{ formatDate(policy!.bevillingValidUntil) }}</span></div>
-              <div class="license-field"><span class="license-label">Styrer</span><span class="license-value">{{ policy!.styrerName ?? '—' }}</span></div>
-              <div class="license-field"><span class="license-label">Stedfortreder</span><span class="license-value">{{ policy!.stedfortrederName ?? '—' }}</span></div>
+            <div class="doc-card__body">
+              <div class="doc-card__fields">
+                <div class="doc-card__field">
+                  <span class="doc-card__label"><Hash :size="13" /> Bevillingsnr.</span>
+                  <span class="doc-card__value doc-card__value--mono">{{ policy!.bevillingNumber ?? '—' }}</span>
+                </div>
+                <div class="doc-card__field">
+                  <span class="doc-card__label"><CalendarDays :size="13" /> Gyldig til</span>
+                  <span class="doc-card__value">{{ formatDate(policy!.bevillingValidUntil) }}</span>
+                </div>
+                <div class="doc-card__field">
+                  <span class="doc-card__label"><User :size="13" /> Styrer</span>
+                  <span class="doc-card__value">{{ policy!.styrerName ?? '—' }}</span>
+                </div>
+                <div class="doc-card__field">
+                  <span class="doc-card__label"><User :size="13" /> Stedfortreder</span>
+                  <span class="doc-card__value">{{ policy!.stedfortrederName ?? '—' }}</span>
+                </div>
+              </div>
             </div>
-            <Button v-if="policy!.bevillingDocumentId" variant="outline" size="sm" class="doc-link-btn" @click="openDocument(policy!.bevillingDocumentId!)">
-              <ExternalLink :size="14" /> Åpne bevillingsdokument
-            </Button>
-          </div>
 
-          <Separator />
-
-          <div class="license-card-body">
-            <h4 class="license-sub-title">Kunnskapsprøve</h4>
-            <div class="license-grid">
-              <div class="license-field"><span class="license-label">Kandidat</span><span class="license-value">{{ policy!.kunnskapsproveCandidateName ?? '—' }}</span></div>
-              <div class="license-field"><span class="license-label">Type</span><span class="license-value">{{ policy!.kunnskapsproveType ? knowledgeTestLabel[policy!.kunnskapsproveType] : '—' }}</span></div>
-              <div class="license-field"><span class="license-label">Kommune</span><span class="license-value">{{ policy!.kunnskapsproveMunicipality ?? '—' }}</span></div>
-              <div class="license-field"><span class="license-label">Bestått dato</span><span class="license-value">{{ formatDate(policy!.kunnskapsprovePassedDate) }}</span></div>
+            <div v-if="policy!.bevillingDocumentId" class="doc-card__footer">
+              <Button variant="outline" size="sm" class="doc-card__doc-btn" @click="openDocument(policy!.bevillingDocumentId!)">
+                <ExternalLink :size="14" /> Åpne dokument
+              </Button>
             </div>
-            <Button v-if="policy!.kunnskapsproveDocumentId" variant="outline" size="sm" class="doc-link-btn" @click="openDocument(policy!.kunnskapsproveDocumentId!)">
-              <ExternalLink :size="14" /> Åpne kunnskapsprøve-bevis
-            </Button>
           </div>
 
-          <Separator />
+          <div class="doc-card doc-card--kunnskap">
+            <div class="doc-card__watermark"><Award :size="100" /></div>
+            <div class="doc-card__header">
+              <div class="doc-card__badge doc-card__badge--kunnskap">
+                <Award :size="16" />
+                <span>Kunnskapsprøve</span>
+              </div>
+              <div class="doc-card__status status--active" v-if="policy!.kunnskapsprovePassedDate">Bestått</div>
+            </div>
 
-          <div class="license-card-body">
-            <h4 class="license-sub-title">Rutiner for alderskontroll</h4>
+            <div class="doc-card__body">
+              <div class="doc-card__fields doc-card__fields--single">
+                <div class="doc-card__field">
+                  <span class="doc-card__label"><User :size="13" /> Kandidat</span>
+                  <span class="doc-card__value">{{ policy!.kunnskapsproveCandidateName ?? '—' }}</span>
+                </div>
+                <div class="doc-card__field">
+                  <span class="doc-card__label"><ShieldCheck :size="13" /> Type</span>
+                  <span class="doc-card__value">{{ policy!.kunnskapsproveType ? knowledgeTestLabel[policy!.kunnskapsproveType] : '—' }}</span>
+                </div>
+                <div class="doc-card__field">
+                  <span class="doc-card__label"><MapPin :size="13" /> Kommune</span>
+                  <span class="doc-card__value">{{ policy!.kunnskapsproveMunicipality ?? '—' }}</span>
+                </div>
+                <div class="doc-card__field">
+                  <span class="doc-card__label"><CalendarDays :size="13" /> Bestått</span>
+                  <span class="doc-card__value">{{ formatDate(policy!.kunnskapsprovePassedDate) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="policy!.kunnskapsproveDocumentId" class="doc-card__footer">
+              <Button variant="outline" size="sm" class="doc-card__doc-btn" @click="openDocument(policy!.kunnskapsproveDocumentId!)">
+                <ExternalLink :size="14" /> Åpne bevis
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div class="routines-card">
+          <div class="routines-card__section">
+            <h4 class="routines-card__title">Rutiner for alderskontroll</h4>
             <div class="license-grid">
               <div class="license-field"><span class="license-label">Aldersgrense</span><span class="license-value">{{ ageCheckLabel[policy!.ageCheckLimit] }}</span></div>
               <div class="license-field"><span class="license-label">Godkjent legitimasjon</span><span class="license-value">{{ policy!.acceptedIdTypes.map(t => idTypeLabel[t]).join(', ') }}</span></div>
@@ -551,8 +574,8 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
 
           <Separator />
 
-          <div class="license-card-body">
-            <h4 class="license-sub-title">Ansvarlig servering</h4>
+          <div class="routines-card__section">
+            <h4 class="routines-card__title">Ansvarlig servering</h4>
             <div v-if="policy!.intoxicationSigns" class="license-text-block">
               <span class="license-label">Identifisering av berusede gjester</span>
               <p class="license-value">{{ policy!.intoxicationSigns }}</p>
@@ -565,7 +588,6 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
         </div>
       </template>
 
-      <!-- Policy exists but full data loading -->
       <p v-else-if="policyExists && policyQuery.isLoading.value" class="state-line">Laster skjenkepolicy...</p>
     </div>
   </AppLayout>
@@ -576,7 +598,7 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
 .page-header-inner { display: flex; align-items: center; gap: 0.5rem; padding: 0 1rem; }
 .header-separator { height: 1rem !important; width: 1px !important; margin-right: 0.5rem; }
 .page-title { font-weight: 500; color: hsl(var(--sidebar-primary, 245 43% 52%)); }
-.page-content { display: flex; flex: 1; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; align-items: center; }
+.page-content { display: flex; flex: 1; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; }
 
 .state-line {
   border-radius: var(--radius-md);
@@ -584,22 +606,18 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
   background: hsl(var(--card));
   padding: 12px;
   color: var(--text-secondary);
-  width: 100%;
-  max-width: 48rem;
 }
 
 .header-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
-  width: 100%;
-  max-width: 48rem;
+  gap: 12px;
 }
 .header-row h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 .header-row p { margin-top: 6px; color: var(--text-secondary); font-size: 1.08rem; }
 
-/* ═══ FORM ═══ */
+.form-wrapper { display: flex; justify-content: center; width: 100%; }
 .form-container { width: 100%; max-width: 48rem; }
 .form-header h1 { margin: 0; font-size: 2rem; letter-spacing: -0.02em; }
 .form-subtitle { margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; }
@@ -637,7 +655,6 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
 }
 .field-textarea:focus { outline: none; border-color: hsl(var(--ring)); box-shadow: 0 0 0 2px hsl(var(--ring) / 0.15); }
 
-/* Drop zone */
 .drop-zone {
   border: 2px dashed hsl(var(--border));
   border-radius: 0.5rem;
@@ -690,7 +707,6 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
 }
 .file-chip-remove:hover { background: hsl(var(--accent)); color: hsl(var(--foreground)); }
 
-/* Toggle group */
 .toggle-group { display: flex; gap: 0.75rem; }
 .toggle-btn {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.15rem;
@@ -702,7 +718,6 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
 .toggle-btn--active { border-color: hsl(var(--ring)); background: hsl(var(--accent) / 0.5); }
 .toggle-rec { font-size: 0.75rem; color: var(--green); font-weight: 500; }
 
-/* Chip group */
 .chip-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .chip-btn {
   padding: 0.4rem 0.85rem; border: 1.5px solid hsl(var(--border)); border-radius: var(--radius-pill);
@@ -712,25 +727,142 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
 .chip-btn:hover { border-color: hsl(var(--ring) / 0.5); }
 .chip-btn--active { border-color: hsl(var(--ring)); background: hsl(var(--accent)); color: hsl(var(--accent-foreground)); font-weight: 500; }
 
-/* Form actions */
 .form-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid hsl(var(--border)); }
 
-/* ═══ LICENSE CARD ═══ */
-.license-card { border: 1px solid hsl(var(--border)); border-radius: var(--radius-xl); background: hsl(var(--card)); overflow: hidden; width: 100%; max-width: 48rem; }
-.license-card-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; background: linear-gradient(135deg, hsl(var(--primary) / 0.04), hsl(var(--primary) / 0.08)); border-bottom: 1px solid hsl(var(--border)); }
-.license-card-header-left { display: flex; align-items: center; gap: 0.75rem; }
-.license-icon { display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border-radius: 0.625rem; background: hsl(var(--primary) / 0.1); color: hsl(var(--primary)); }
-.license-card-title { font-size: 1.1rem; font-weight: 600; margin: 0; }
-.license-card-sub { font-size: 0.8rem; color: var(--text-secondary); margin: 0; }
-.license-card-body { padding: 1.25rem 1.5rem; }
-.license-sub-title { font-size: 1rem; font-weight: 600; margin: 0 0 0.75rem; }
+.cards-row {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.doc-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-xl);
+  background: hsl(var(--card));
+  display: flex;
+  flex-direction: column;
+}
+.doc-card--bevilling { flex: 2; }
+.doc-card--kunnskap { flex: 1; }
+
+.doc-card__watermark {
+  position: absolute;
+  right: -16px;
+  bottom: -16px;
+  opacity: 0.035;
+  pointer-events: none;
+  color: hsl(var(--foreground));
+}
+
+.doc-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid hsl(var(--border));
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.03), hsl(var(--primary) / 0.07));
+}
+
+.doc-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: hsl(var(--primary));
+}
+.doc-card__badge--kunnskap {
+  color: hsl(142 60% 40%);
+}
+
+.doc-card__status {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.status--active { background: hsl(142 60% 94%); color: hsl(142 60% 30%); }
+.status--warning { background: hsl(38 95% 92%); color: hsl(30 80% 35%); }
+.status--expired { background: hsl(0 70% 94%); color: hsl(0 60% 40%); }
+.status--neutral { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+
+.doc-card__body {
+  padding: 1.25rem;
+  flex: 1;
+}
+
+.doc-card__fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem;
+}
+.doc-card__fields--single {
+  grid-template-columns: 1fr;
+}
+
+.doc-card__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.doc-card__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.doc-card__value {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+}
+.doc-card__value--mono {
+  font-family: ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
+  letter-spacing: 0.03em;
+}
+
+.doc-card__footer {
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid hsl(var(--border));
+}
+.doc-card__doc-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.routines-card {
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-xl);
+  background: hsl(var(--card));
+  overflow: hidden;
+}
+.routines-card__section {
+  padding: 1.25rem 1.5rem;
+}
+.routines-card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+}
+
 .license-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .license-field { display: flex; flex-direction: column; gap: 0.2rem; }
 .license-label { font-size: 0.78rem; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em; }
 .license-value { font-size: 0.95rem; font-weight: 500; margin: 0; }
 .license-text-block { margin-top: 1rem; }
 .license-text-block .license-value { margin-top: 0.25rem; font-weight: 400; line-height: 1.5; color: var(--text-secondary); }
-.doc-link-btn { margin-top: 1rem; }
 
 .actions-trigger {
   display: flex; align-items: center; justify-content: center; width: 2rem; height: 2rem;
@@ -741,6 +873,8 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
 
 @media (max-width: 768px) {
   .field-row { flex-direction: column; }
+  .cards-row { flex-direction: column; }
+  .doc-card__fields { grid-template-columns: 1fr; }
   .license-grid { grid-template-columns: 1fr; }
   .toggle-group { flex-direction: column; }
 }

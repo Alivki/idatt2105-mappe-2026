@@ -77,6 +77,7 @@ data class AlcoholDeviationResponse(
     val preventiveResponsibleUserId: Long?,
     val preventiveResponsibleUserName: String?,
     val status: AlcoholDeviationStatus,
+    val ageVerificationShiftId: Long?,
     val createdAt: String,
     val updatedAt: String,
 )
