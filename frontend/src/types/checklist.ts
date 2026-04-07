@@ -10,12 +10,15 @@ export interface ChecklistItem {
 
 export type ChecklistStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED'
 
+export type ChecklistSource = 'MANUAL' | 'HACCP_WIZARD'
+
 export interface Checklist {
   id: number
   name: string
   description: string | null
   frequency: ChecklistFrequency
   active: boolean
+  source: ChecklistSource
   itemCount: number
   completedItemCount: number
   status: ChecklistStatus

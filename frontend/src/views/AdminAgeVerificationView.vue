@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Search, ArrowUpDown, AlertTriangle, IdCard, CalendarDays, TrendingUp } from 'lucide-vue-next'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import Button from '@/components/ui/button/Button.vue'
+import DatePicker from '@/components/ui/date-picker/DatePicker.vue'
+import { CalendarDate } from '@internationalized/date'
+import type { DateValue } from '@internationalized/date'
 import {
   Table,
   TableBody,
@@ -26,8 +29,17 @@ const today = new Date()
 const thirtyDaysAgo = new Date(today)
 thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-const from = ref(thirtyDaysAgo.toISOString().slice(0, 10))
-const to = ref(today.toISOString().slice(0, 10))
+const fromDate = ref(new CalendarDate(thirtyDaysAgo.getFullYear(), thirtyDaysAgo.getMonth() + 1, thirtyDaysAgo.getDate())) as Ref<DateValue>
+const toDate = ref(new CalendarDate(today.getFullYear(), today.getMonth() + 1, today.getDate())) as Ref<DateValue>
+
+const from = computed(() => {
+  const d = fromDate.value
+  return `${d.year}-${String(d.month).padStart(2, '0')}-${String(d.day).padStart(2, '0')}`
+})
+const to = computed(() => {
+  const d = toDate.value
+  return `${d.year}-${String(d.month).padStart(2, '0')}-${String(d.day).padStart(2, '0')}`
+})
 
 const summariesQuery = useDailySummariesQuery(from, to)
 const statsQuery = useStatsQuery(from, to)
@@ -136,14 +148,14 @@ function navigateToDay(date: string) {
           <input v-model="search" class="search-input" placeholder="Søk etter dato..." />
         </div>
         <div class="date-filters">
-          <label class="date-label">
-            Fra
-            <input v-model="from" type="date" class="date-input" />
-          </label>
-          <label class="date-label">
-            Til
-            <input v-model="to" type="date" class="date-input" />
-          </label>
+          <div class="date-label">
+            <span>Fra</span>
+            <DatePicker v-model="fromDate" placeholder="Fra dato" />
+          </div>
+          <div class="date-label">
+            <span>Til</span>
+            <DatePicker v-model="toDate" placeholder="Til dato" />
+          </div>
         </div>
       </div>
 
@@ -252,21 +264,6 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   color: hsl(var(--muted-foreground));
 }
 
-.date-input {
-  border: 1px solid hsl(var(--border));
-  border-radius: 0.5rem;
-  padding: 0.4rem 0.6rem;
-  font: inherit;
-  font-size: 0.85rem;
-  background: hsl(var(--card));
-}
-
-.date-input:focus {
-  outline: none;
-  border-color: hsl(var(--ring));
-  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.15);
-}
-
 .cards-group {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -332,9 +329,9 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 }
 
 .search-input {
-  width: 100%; border: 1px solid hsl(var(--border)); border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem 0.5rem 2.1rem; font: inherit; font-size: 0.85rem;
-  background: hsl(var(--card));
+  width: 100%; height: 2.5rem; border: 1px solid hsl(var(--border)); border-radius: 0.5rem;
+  padding: 0 0.75rem 0 2.1rem; font: inherit; font-size: 0.85rem;
+  background: hsl(var(--card)); box-sizing: border-box;
 }
 
 .search-input:focus {

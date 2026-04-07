@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { z } from 'zod'
 import { MoreVertical, Pencil, Plus, Power, PowerOff, Refrigerator, Snowflake, Trash2 } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import OverviewCard from '@/components/common/OverviewCard.vue'
@@ -72,6 +73,10 @@ const editName = ref('')
 const editType = ref<TemperatureApplianceType>('FRIDGE')
 const editMin = ref(0)
 const editMax = ref(4)
+
+const createErrors = ref<Record<string, string>>({})
+const editErrors = ref<Record<string, string>>({})
+const applianceNameSchema = z.string().min(1, 'Navn er påkrevd')
 const {
   sortOption,
   groupOption,
@@ -135,23 +140,29 @@ function openCreateDialog(): void {
   createType.value = 'FRIDGE'
   createMin.value = getDefaultThreshold('FRIDGE').min
   createMax.value = getDefaultThreshold('FRIDGE').max
+  createErrors.value = {}
   isCreateDialogOpen.value = true
 }
 
 async function submitCreate(): Promise<void> {
+  const newErrors: Record<string, string> = {}
   const name = createName.value.trim()
-  if (!name) {
-    return
-  }
+
+  const nameResult = applianceNameSchema.safeParse(name)
+  if (!nameResult.success) newErrors.name = nameResult.error.issues[0]?.message ?? ''
 
   const threshold: TemperatureThreshold = {
     min: Number(createMin.value),
     max: Number(createMax.value),
   }
 
-  if (threshold.min >= threshold.max) {
+  if (threshold.min >= threshold.max) newErrors.threshold = 'Min må være lavere enn maks'
+
+  if (Object.keys(newErrors).length > 0) {
+    createErrors.value = newErrors
     return
   }
+  createErrors.value = {}
 
   const created = await createAppliance({
     name,
@@ -172,27 +183,30 @@ function openEditDialog(appliance: TemperatureAppliance): void {
   editType.value = appliance.type
   editMin.value = appliance.threshold.min
   editMax.value = appliance.threshold.max
+  editErrors.value = {}
   isEditDialogOpen.value = true
 }
 
 async function submitEdit(): Promise<void> {
-  if (!editingApplianceId.value) {
-    return
-  }
-
+  if (!editingApplianceId.value) return
+  const newErrors: Record<string, string> = {}
   const name = editName.value.trim()
-  if (!name) {
-    return
-  }
+
+  const nameResult = applianceNameSchema.safeParse(name)
+  if (!nameResult.success) newErrors.name = nameResult.error.issues[0]?.message ?? ''
 
   const threshold: TemperatureThreshold = {
     min: Number(editMin.value),
     max: Number(editMax.value),
   }
 
-  if (threshold.min >= threshold.max) {
+  if (threshold.min >= threshold.max) newErrors.threshold = 'Min må være lavere enn maks'
+
+  if (Object.keys(newErrors).length > 0) {
+    editErrors.value = newErrors
     return
   }
+  editErrors.value = {}
 
   const updated = await updateAppliance(editingApplianceId.value, {
     name,
@@ -265,7 +279,7 @@ async function confirmDeleteAppliance(): Promise<void> {
       </section>
 
       <section class="controls-row">
-        <label class="control-field">
+        <div class="control-field">
           <span>Sortering</span>
           <Select :model-value="sortOption" @update:model-value="(v) => (sortOption = v as ApplianceSortOption)">
             <SelectTrigger>
@@ -281,9 +295,9 @@ async function confirmDeleteAppliance(): Promise<void> {
               <SelectItem value="DEVIATION_FIRST">Avvik først</SelectItem>
             </SelectContent>
           </Select>
-        </label>
+        </div>
 
-        <label class="control-field">
+        <div class="control-field">
           <span>Gruppering</span>
           <Select :model-value="groupOption" @update:model-value="(v) => (groupOption = v as ApplianceGroupOption)">
             <SelectTrigger>
@@ -295,10 +309,27 @@ async function confirmDeleteAppliance(): Promise<void> {
               <SelectItem value="STATUS">Grupper etter aktiv/inaktiv</SelectItem>
             </SelectContent>
           </Select>
-        </label>
+        </div>
       </section>
 
-      <section class="groups-wrap">
+      <section v-if="appliancesWithLastEntry.length === 0" class="empty-state">
+        <div class="empty-state-bg" />
+        <div class="empty-state-inner">
+          <div class="empty-state-icon">
+            <Refrigerator :stroke-width="1.5" />
+          </div>
+          <div class="empty-state-text">
+            <h3>Ingen hvitevarer registrert</h3>
+            <p>Legg til kjøleskap og frysere for å komme i gang med temperaturovervåking.</p>
+          </div>
+          <Button @click="openCreateDialog">
+            <Plus />
+            Legg til hvitevare
+          </Button>
+        </div>
+      </section>
+
+      <section v-if="appliancesWithLastEntry.length > 0" class="groups-wrap">
         <section v-for="group in groupedAppliances" :key="group.key" class="group-section">
           <h2 v-if="group.label" class="group-title">{{ group.label }}</h2>
 
@@ -315,13 +346,8 @@ async function confirmDeleteAppliance(): Promise<void> {
                 </div>
                 <div>
                   <h3>{{ item.name }}</h3>
-                  <p>{{ toTypeLabel(item.type) }}</p>
                 </div>
                 <div class="device-meta-actions">
-                  <Badge :tone="item.isActive ? 'ok' : 'neutral'">
-                    {{ item.isActive ? 'Aktiv' : 'Inaktiv' }}
-                  </Badge>
-
                   <DropdownMenu>
                     <DropdownMenuTrigger as-child>
                       <Button variant="ghost" size="icon-sm" class="actions-trigger" aria-label="Åpne handlinger">
@@ -347,6 +373,10 @@ async function confirmDeleteAppliance(): Promise<void> {
                   </DropdownMenu>
                 </div>
               </div>
+
+              <Badge class="device-status-badge" :tone="item.isActive ? 'ok' : 'neutral'">
+                {{ item.isActive ? 'Aktiv' : 'Inaktiv' }}
+              </Badge>
 
               <dl class="device-facts">
                 <div>
@@ -407,12 +437,13 @@ async function confirmDeleteAppliance(): Promise<void> {
         </DialogHeader>
 
         <div class="form-grid">
-          <label class="field">
+          <label :class="['field', { 'field--error': createErrors.name }]">
             <span>Navn</span>
             <Input v-model="createName" placeholder="For eksempel: Kjøleskap kjøkken" />
+            <p v-if="createErrors.name" class="field-error">{{ createErrors.name }}</p>
           </label>
 
-          <label class="field">
+          <div class="field">
             <span>Type</span>
             <Select :model-value="createType" @update:model-value="(v) => (createType = v as TemperatureApplianceType)">
               <SelectTrigger>
@@ -423,16 +454,17 @@ async function confirmDeleteAppliance(): Promise<void> {
                 <SelectItem value="FREEZER">Fryser</SelectItem>
               </SelectContent>
             </Select>
-          </label>
+          </div>
 
           <label class="field">
             <span>Min temperatur (°C)</span>
             <Input v-model="createMin" type="number" />
           </label>
 
-          <label class="field">
+          <label :class="['field', { 'field--error': createErrors.threshold }]">
             <span>Maks temperatur (°C)</span>
             <Input v-model="createMax" type="number" />
+            <p v-if="createErrors.threshold" class="field-error">{{ createErrors.threshold }}</p>
           </label>
         </div>
 
@@ -453,9 +485,10 @@ async function confirmDeleteAppliance(): Promise<void> {
         </DialogHeader>
 
         <div class="form-grid">
-          <label class="field">
+          <label :class="['field', { 'field--error': editErrors.name }]">
             <span>Navn</span>
             <Input v-model="editName" placeholder="Navn" />
+            <p v-if="editErrors.name" class="field-error">{{ editErrors.name }}</p>
           </label>
 
           <label class="field">
@@ -468,9 +501,10 @@ async function confirmDeleteAppliance(): Promise<void> {
             <Input v-model="editMin" type="number" />
           </label>
 
-          <label class="field">
+          <label :class="['field', { 'field--error': editErrors.threshold }]">
             <span>Maks temperatur (°C)</span>
             <Input v-model="editMax" type="number" />
+            <p v-if="editErrors.threshold" class="field-error">{{ editErrors.threshold }}</p>
           </label>
         </div>
 
@@ -543,7 +577,7 @@ async function confirmDeleteAppliance(): Promise<void> {
 
 .device-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 0.75rem;
 }
 
@@ -585,10 +619,12 @@ async function confirmDeleteAppliance(): Promise<void> {
 
 .device-card {
   border-radius: 14px;
-  border: 1px solid #ddd9d1;
-  background: color-mix(in srgb, #ffffff 85%, #f3f2ee 15%);
-  backdrop-filter: blur(6px);
-  padding: 0.95rem;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 1;
 }
 
 .device-card--inactive {
@@ -596,63 +632,84 @@ async function confirmDeleteAppliance(): Promise<void> {
 }
 
 .device-card-head {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.5rem;
 }
 
 .device-meta-actions {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  justify-self: end;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .device-icon-wrap {
   display: flex;
-  height: 2.25rem;
-  width: 2.25rem;
+  height: 2rem;
+  width: 2rem;
   align-items: center;
   justify-content: center;
-  border-radius: 0.75rem;
+  border-radius: 0.5rem;
   background: var(--brand-soft);
   color: #423ea8;
+  flex-shrink: 0;
 }
 
 .device-icon-wrap :deep(svg) {
-  width: 1.1rem;
-  height: 1.1rem;
+  width: 1rem;
+  height: 1rem;
 }
 
 .device-card-head h3 {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .device-card-head p {
-  margin-top: 0.125rem;
-  font-size: 0.85rem;
-  color: hsl(var(--muted-foreground));
+  display: none;
+}
+
+.device-status-badge {
+  margin-top: 0.5rem;
+  align-self: flex-start;
 }
 
 .device-facts {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.55rem;
-  margin-top: 0.85rem;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0;
+  flex: 1;
+  margin-top: 0.65rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.device-facts > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0.5rem 0.35rem;
 }
 
 .device-facts dt {
-  font-size: 0.73rem;
+  font-size: 0.65rem;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   color: hsl(var(--muted-foreground));
 }
 
 .device-facts dd {
-  margin-top: 0.125rem;
-  font-size: 0.95rem;
+  margin-top: 0.2rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
@@ -684,6 +741,77 @@ async function confirmDeleteAppliance(): Promise<void> {
 .field span {
   font-size: 0.85rem;
   color: hsl(var(--muted-foreground));
+}
+
+.field-error {
+  color: hsl(var(--destructive));
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+.field--error :deep(.input),
+.field--error :deep(.select-trigger) {
+  border-color: hsl(var(--destructive));
+}
+
+.empty-state {
+  position: relative;
+  display: flex;
+  min-height: 260px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 2px dashed hsl(var(--muted-foreground) / 0.2);
+  background: linear-gradient(to bottom right, hsl(var(--muted) / 0.4), hsl(var(--muted) / 0.2), hsl(var(--background)));
+  padding: 2rem;
+}
+
+.empty-state-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, hsl(var(--muted)) 0%, transparent 70%);
+  opacity: 0.5;
+}
+
+.empty-state-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.empty-state-icon {
+  display: flex;
+  height: 5rem;
+  width: 5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  background-color: hsl(var(--primary) / 0.1);
+  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.05);
+}
+
+.empty-state-icon :deep(svg) {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: hsl(var(--primary) / 0.7);
+}
+
+.empty-state-text h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.empty-state-text p {
+  max-width: 24rem;
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+  margin-top: 0.25rem;
 }
 
 @media (max-width: 920px) {

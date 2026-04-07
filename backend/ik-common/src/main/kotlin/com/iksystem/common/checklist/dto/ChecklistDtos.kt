@@ -74,6 +74,7 @@ data class ChecklistResponse(
     val description: String?,
     val frequency: ChecklistFrequency,
     val active: Boolean,
+    val source: String,
     val itemCount: Int,
     val completedItemCount: Int,
     val status: ChecklistStatus,
