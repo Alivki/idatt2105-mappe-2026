@@ -41,7 +41,6 @@ import type {
   AlcoholReportSource,
   AlcoholDeviationType,
   AlcoholCausalAnalysis,
-  DeviationSeverity,
   UpdateFoodDeviationRequest,
   UpdateAlcoholDeviationRequest,
 } from '@/types/deviation'
@@ -105,10 +104,6 @@ const foodTypeLabel: Record<FoodDeviationType, string> = {
   ALLERGEN: 'Allergen', SKADEDYR: 'Skadedyr', MOTTAKSKONTROLL: 'Mottakskontroll', ANNET: 'Annet',
 }
 
-const severityLabel: Record<DeviationSeverity, string> = {
-  LOW: 'Lav', MEDIUM: 'Middels', HIGH: 'Høy', CRITICAL: 'Kritisk',
-}
-
 const foodStatusLabel: Record<FoodDeviationStatus, string> = {
   OPEN: 'Åpen', UNDER_TREATMENT: 'Under behandling', CLOSED: 'Lukket',
 }
@@ -143,10 +138,6 @@ const causalLabel: Record<AlcoholCausalAnalysis, string> = {
 // ── Computed helpers ───────────────────────────────────────
 const currentStatus = computed<FoodDeviationStatus | AlcoholDeviationStatus | null>(() => {
   return foodDeviation.value?.status ?? alcoholDeviation.value?.status ?? null
-})
-
-const currentSeverity = computed<DeviationSeverity | null>(() => {
-  return foodDeviation.value?.severity ?? null
 })
 
 const statusSteps = computed(() => {
