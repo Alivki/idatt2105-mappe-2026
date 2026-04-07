@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeft, AlertTriangle, IdCard, Clock, User } from 'lucide-vue-next'
+import { ArrowLeft, AlertTriangle, IdCard } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
