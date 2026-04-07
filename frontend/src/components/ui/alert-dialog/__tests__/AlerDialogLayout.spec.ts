@@ -52,4 +52,5 @@ describe('AlertDialog presentational components', () => {
     expect(wrapper.classes()).toContain('alert-footer')
     expect(wrapper.classes()).toContain('custom-footer')
   })
+
 })
