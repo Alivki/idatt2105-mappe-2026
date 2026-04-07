@@ -7,6 +7,7 @@ import TemperatureView from '@/views/TemperatureView.vue'
 import DeviationsView from '@/views/DeviationsView.vue'
 import TrainingView from '@/views/TrainingView.vue'
 import AllowanceView from '@/views/AllowanceView.vue'
+import AlcoholPolicyView from '@/views/AlcoholPolicyView.vue'
 import { useAuthStore } from '@/stores/auth'
 import { getInitPromise } from '@/composables/useInitAuth'
 
@@ -88,6 +89,11 @@ const router = createRouter({
       path: '/bevilling',
       name: 'bevilling',
       component: AllowanceView,
+    },
+    {
+      path: '/skjenkepolicy',
+      name: 'skjenkepolicy',
+      component: AlcoholPolicyView,
     },
     {
       path: '/avvik',

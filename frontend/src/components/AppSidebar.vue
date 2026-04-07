@@ -6,6 +6,7 @@ import {
   Refrigerator,
   GraduationCap,
   ScrollText,
+  ShieldCheck,
   AlertTriangle,
   Users,
   Settings,
@@ -60,6 +61,7 @@ const navMain = [
     items: [
       { title: 'Opplæring', url: '/opplaering', icon: GraduationCap },
       { title: 'Bevilling', url: '/bevilling', icon: ScrollText },
+      { title: 'Skjenkepolicy', url: '/skjenkepolicy', icon: ShieldCheck },
     ],
   },
   {
