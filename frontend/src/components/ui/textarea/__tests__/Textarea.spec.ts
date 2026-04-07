@@ -2,23 +2,23 @@ import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 
-import Textarea from '../Textarea.vue'
+import TextareaComponent from '../Textarea.vue'
 
 describe('Textarea', () => {
   it('renders a textarea element', () => {
-    const wrapper = mount(Textarea)
+    const wrapper = mount(TextareaComponent)
 
     expect(wrapper.element.tagName.toLowerCase()).toBe('textarea')
   })
 
   it('applies the base textarea class', () => {
-    const wrapper = mount(Textarea)
+    const wrapper = mount(TextareaComponent)
 
     expect(wrapper.classes()).toContain('textarea')
   })
 
   it('applies a custom class', () => {
-    const wrapper = mount(Textarea, {
+    const wrapper = mount(TextareaComponent, {
       props: {
         class: 'custom-textarea',
       },
@@ -29,7 +29,7 @@ describe('Textarea', () => {
   })
 
   it('forwards attrs to the textarea element', () => {
-    const wrapper = mount(Textarea, {
+    const wrapper = mount(TextareaComponent, {
       attrs: {
         id: 'message',
         name: 'message',
@@ -49,7 +49,7 @@ describe('Textarea', () => {
   })
 
   it('uses modelValue when provided', () => {
-    const wrapper = mount(Textarea, {
+    const wrapper = mount(TextareaComponent, {
       props: {
         modelValue: 'hello',
       },
@@ -59,7 +59,7 @@ describe('Textarea', () => {
   })
 
   it('uses defaultValue when modelValue is not provided', () => {
-    const wrapper = mount(Textarea, {
+    const wrapper = mount(TextareaComponent, {
       props: {
         defaultValue: 'default text',
       },
@@ -69,7 +69,7 @@ describe('Textarea', () => {
   })
 
   it('prefers modelValue over defaultValue when both are provided', () => {
-    const wrapper = mount(Textarea, {
+    const wrapper = mount(TextareaComponent, {
       props: {
         modelValue: 'controlled',
         defaultValue: 'fallback',
@@ -80,7 +80,7 @@ describe('Textarea', () => {
   })
 
   it('emits update:modelValue when user types a string', async () => {
-    const wrapper = mount(Textarea, {
+    const wrapper = mount(TextareaComponent, {
       props: {
         modelValue: '',
       },
@@ -92,7 +92,7 @@ describe('Textarea', () => {
   })
 
   it('emits update:modelValue multiple times as value changes', async () => {
-    const wrapper = mount(Textarea, {
+    const wrapper = mount(TextareaComponent, {
       props: {
         modelValue: '',
       },
@@ -106,7 +106,7 @@ describe('Textarea', () => {
   })
 
   it('updates rendered value when controlled modelValue changes', async () => {
-    const wrapper = mount(Textarea, {
+    const wrapper = mount(TextareaComponent, {
       props: {
         modelValue: 'first',
       },
@@ -122,13 +122,13 @@ describe('Textarea', () => {
 
   it('works with v-model in a parent component', async () => {
     const Host = defineComponent({
-      components: { Textarea },
+      components: { AppTextarea: TextareaComponent },
       setup() {
         const value = ref('start')
         return { value }
       },
       template: `
-        <Textarea v-model="value" data-test="textarea" />
+        <AppTextarea v-model="value" data-test="textarea" />
       `,
     })
 
@@ -146,7 +146,7 @@ describe('Textarea', () => {
   })
 
   it('handles numeric modelValue', async () => {
-    const wrapper = mount(Textarea, {
+    const wrapper = mount(TextareaComponent, {
       props: {
         modelValue: 10,
       },
@@ -161,7 +161,7 @@ describe('Textarea', () => {
   })
 
   it('handles numeric defaultValue', () => {
-    const wrapper = mount(Textarea, {
+    const wrapper = mount(TextareaComponent, {
       props: {
         defaultValue: 42,
       },
