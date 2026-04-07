@@ -23,7 +23,6 @@ data class ChecklistTemplate(
 object ChecklistTemplates {
 
     val all: List<ChecklistTemplate> = listOf(
-        // ── DAILY ──────────────────────────────────────────────
         ChecklistTemplate(
             id = "daily-cleaning",
             name = "Daglig renhold",
@@ -178,7 +177,6 @@ object ChecklistTemplates {
             ),
             condition = { req -> TempEquipment.HOT_HOLDING in req.temperatureEquipment },
         ),
-        // ── WEEKLY ─────────────────────────────────────────────
         ChecklistTemplate(
             id = "weekly-cleaning",
             name = "Ukentlig renhold",
@@ -194,7 +192,6 @@ object ChecklistTemplates {
             ),
             condition = { true },
         ),
-        // ── MONTHLY ────────────────────────────────────────────
         ChecklistTemplate(
             id = "pest-control",
             name = "Skadedyrkontroll",
@@ -225,7 +222,6 @@ object ChecklistTemplates {
                 req.temperatureEquipment.isNotEmpty() && TempEquipment.NONE !in req.temperatureEquipment
             },
         ),
-        // ── YEARLY ─────────────────────────────────────────────
         ChecklistTemplate(
             id = "annual-ik-review",
             name = "Årlig gjennomgang av IK-mat",

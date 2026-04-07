@@ -25,7 +25,6 @@ class HaccpSetupService(
     fun generateChecklists(request: HaccpSetupRequest, auth: AuthenticatedUser): HaccpSetupResponse {
         val orgId = auth.requireOrganizationId()
 
-        // Delete previously generated wizard checklists for this org
         checklistRepository.deleteAllByOrganizationIdAndSource(orgId, HACCP_WIZARD_SOURCE)
 
         val matchingTemplates = ChecklistTemplates.all.filter { it.condition(request) }
