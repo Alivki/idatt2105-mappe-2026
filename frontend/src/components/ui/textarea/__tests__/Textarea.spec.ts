@@ -169,4 +169,5 @@ describe('Textarea', () => {
 
     expect((wrapper.element as HTMLTextAreaElement).value).toBe(42 as unknown as string)
   })
+
 })
