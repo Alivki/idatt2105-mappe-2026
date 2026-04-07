@@ -76,6 +76,12 @@ const POINTS_MAP: Record<AlcoholDeviationType, number> = {
   MEDBRAKT_ALKOHOL: 1,
   REKLAMEBRUDD: 1,
   VILKAARSBRUDD: 1,
+  NEKTET_VISE_LEGITIMASJON: 0,
+  GLEMTE_SJEKKE_LEGITIMASJON: 0,
+  MINDREAARIG_FORSOK: 0,
+  FALSK_LEGITIMASJON: 0,
+  UTGAATT_LEGITIMASJON: 0,
+  LEGITIMASJON_ANNET: 0,
 }
 
 const reportSourceOptions: Array<{ value: AlcoholReportSource; label: string; sub: string }> = [
@@ -107,6 +113,14 @@ const deviationTypeGroups = [
     { value: 'MEDBRAKT_ALKOHOL' as AlcoholDeviationType, label: 'Medbrakt alkohol' },
     { value: 'REKLAMEBRUDD' as AlcoholDeviationType, label: 'Reklamebrudd' },
     { value: 'VILKAARSBRUDD' as AlcoholDeviationType, label: 'Vilkårsbrudd' },
+  ]},
+  { points: 0, types: [
+    { value: 'NEKTET_VISE_LEGITIMASJON' as AlcoholDeviationType, label: 'Nektet å vise legitimasjon' },
+    { value: 'GLEMTE_SJEKKE_LEGITIMASJON' as AlcoholDeviationType, label: 'Glemte å sjekke legitimasjon' },
+    { value: 'MINDREAARIG_FORSOK' as AlcoholDeviationType, label: 'Mindreårig forsøk' },
+    { value: 'FALSK_LEGITIMASJON' as AlcoholDeviationType, label: 'Falsk legitimasjon' },
+    { value: 'UTGAATT_LEGITIMASJON' as AlcoholDeviationType, label: 'Utgått legitimasjon' },
+    { value: 'LEGITIMASJON_ANNET' as AlcoholDeviationType, label: 'Legitimasjon – annet' },
   ]},
 ]
 
@@ -155,12 +169,12 @@ watch(
   () => [props.open, props.mode, props.initial],
   () => {
     if (!props.open) return
-    if (props.mode === 'edit' && props.initial) {
+    if (props.initial) {
       const d = props.initial
       const dt = d.reportedAt ? new Date(d.reportedAt) : null
       reportedDate.value = dt ? dt.toISOString().slice(0, 10) : ''
       reportedTime.value = dt ? dt.toISOString().slice(11, 16) : ''
-      reportedByUserId.value = ''
+      reportedByUserId.value = d.reportedByUserId ? String(d.reportedByUserId) : ''
       reportSource.value = d.reportSource
       deviationType.value = d.deviationType
       description.value = d.description

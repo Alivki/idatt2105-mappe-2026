@@ -6,6 +6,7 @@ import {
   Refrigerator,
   GraduationCap,
   ScrollText,
+  ShieldCheck,
   AlertTriangle,
   Users,
   Settings,
@@ -41,7 +42,11 @@ const orgNumber = computed(() => {
   return auth.organizationId ? `Org. nr: ${auth.organizationId}` : ''
 })
 
-const navMain = [
+const isManagerOrAdmin = computed(() =>
+  ['ADMIN', 'MANAGER'].includes(auth.role ?? ''),
+)
+
+const navMain = computed(() => [
   {
     label: 'OVERSIKT',
     items: [
@@ -53,24 +58,33 @@ const navMain = [
     items: [
       { title: 'Sjekklister', url: '/sjekklister', icon: ClipboardCheck },
       { title: 'Temperaturlogg', url: '/temperatur', icon: Thermometer },
-      { title: 'Hvitevarer', url: '/temperatur/hvitevarer', icon: Refrigerator },
+      ...(isManagerOrAdmin.value
+        ? [{ title: 'Hvitevarer', url: '/temperatur/hvitevarer', icon: Refrigerator }]
+        : []),
     ],
   },
   {
     label: 'IK-ALKOHOL',
     items: [
-      { title: 'Opplæring', url: '/opplaering', icon: GraduationCap },
+      ...(isManagerOrAdmin.value
+        ? [{ title: 'Opplæring', url: '/opplaering', icon: GraduationCap }]
+        : []),
       { title: 'Bevilling', url: '/bevilling', icon: ScrollText },
+      ...(isManagerOrAdmin.value
+        ? [{ title: 'Skjenkepolicy', url: '/skjenkepolicy', icon: ShieldCheck }]
+        : []),
     ],
   },
   {
     label: 'FELLES',
     items: [
       { title: 'Avvik', url: '/avvik', icon: AlertTriangle },
-      { title: 'Ansatte', url: '/ansatte', icon: Users },
+      ...(isManagerOrAdmin.value
+        ? [{ title: 'Ansatte', url: '/ansatte', icon: Users }]
+        : []),
     ],
   },
-]
+])
 
 const navSecondary = [
   { title: 'Innstillinger', url: '/innstillinger', icon: Settings },

@@ -54,6 +54,12 @@ const deviationTypeLabel: Record<AlcoholDeviationType, string> = {
   MEDBRAKT_ALKOHOL: 'Medbrakt alkohol',
   REKLAMEBRUDD: 'Reklamebrudd',
   VILKAARSBRUDD: 'Vilkårsbrudd',
+  NEKTET_VISE_LEGITIMASJON: 'Nektet å vise leg',
+  GLEMTE_SJEKKE_LEGITIMASJON: 'Glemte å sjekke leg',
+  MINDREAARIG_FORSOK: 'Mindreårig forsøk',
+  FALSK_LEGITIMASJON: 'Falsk legitimasjon',
+  UTGAATT_LEGITIMASJON: 'Utgått legitimasjon',
+  LEGITIMASJON_ANNET: 'Annet (legitimasjon)',
 }
 
 const statusLabel: Record<AlcoholDeviationStatus, string> = {

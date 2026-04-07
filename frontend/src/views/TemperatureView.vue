@@ -23,7 +23,7 @@ import {
 import { useCreateFoodDeviationMutation } from '@/composables/useFoodDeviations'
 import { useMembersQuery } from '@/composables/useMembers'
 import { useAuthStore } from '@/stores/auth'
-import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import type { CreateFoodDeviationRequest, DeviationSeverity } from '@/types/deviation'
 import { toast } from 'vue-sonner'
 

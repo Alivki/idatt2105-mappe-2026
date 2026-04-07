@@ -173,6 +173,7 @@ private fun AlcoholDeviation.toResponse() = AlcoholDeviationResponse(
     preventiveResponsibleUserId = preventiveResponsibleUser?.id,
     preventiveResponsibleUserName = preventiveResponsibleUser?.fullName,
     status = status,
+    ageVerificationShiftId = ageVerificationShiftId,
     createdAt = createdAt.toString(),
     updatedAt = updatedAt.toString(),
 )

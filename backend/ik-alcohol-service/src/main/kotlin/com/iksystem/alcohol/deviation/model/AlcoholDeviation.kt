@@ -52,6 +52,9 @@ data class AlcoholDeviation(
     @JoinColumn(name = "preventive_responsible_user_id")
     val preventiveResponsibleUser: User? = null,
 
+    @Column(name = "age_verification_shift_id")
+    val ageVerificationShiftId: Long? = null,
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     val status: AlcoholDeviationStatus = AlcoholDeviationStatus.OPEN,

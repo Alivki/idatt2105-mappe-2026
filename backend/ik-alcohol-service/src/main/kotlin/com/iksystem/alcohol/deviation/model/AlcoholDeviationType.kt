@@ -27,4 +27,12 @@ enum class AlcoholDeviationType(val penaltyPoints: Int) {
     MEDBRAKT_ALKOHOL(1),
     REKLAMEBRUDD(1),
     VILKAARSBRUDD(1),
+
+    // 0 points — age verification incidents (internal use)
+    NEKTET_VISE_LEGITIMASJON(0),
+    GLEMTE_SJEKKE_LEGITIMASJON(0),
+    MINDREAARIG_FORSOK(0),
+    FALSK_LEGITIMASJON(0),
+    UTGAATT_LEGITIMASJON(0),
+    LEGITIMASJON_ANNET(0),
 }

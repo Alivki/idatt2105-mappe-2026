@@ -127,6 +127,9 @@ const alcoholTypeLabel: Record<AlcoholDeviationType, string> = {
   MANGLER_IK_SYSTEM: 'Mangler IK-system', MANGLER_STYRER_STEDFORTREDER: 'Mangler styrer/stedfortreder',
   NARKOTIKA: 'Narkotika', ALKOHOLFRI_ALTERNATIV_MANGLER: 'Alkoholfri alternativ mangler',
   MEDBRAKT_ALKOHOL: 'Medbrakt alkohol', REKLAMEBRUDD: 'Reklamebrudd', VILKAARSBRUDD: 'Vilkårsbrudd',
+  NEKTET_VISE_LEGITIMASJON: 'Nektet å vise legitimasjon', GLEMTE_SJEKKE_LEGITIMASJON: 'Glemte å sjekke legitimasjon',
+  MINDREAARIG_FORSOK: 'Mindreårig forsøk', FALSK_LEGITIMASJON: 'Falsk legitimasjon',
+  UTGAATT_LEGITIMASJON: 'Utgått legitimasjon', LEGITIMASJON_ANNET: 'Annet (legitimasjon)',
 }
 
 const causalLabel: Record<AlcoholCausalAnalysis, string> = {
@@ -212,7 +215,6 @@ function handleError(error: unknown, fallback: string) {
         </div>
       </div>
 
-      <!-- Food detail -->
       <template v-else-if="foodDeviation">
         <div class="detail-layout">
           <div class="detail-main">
@@ -279,7 +281,6 @@ function handleError(error: unknown, fallback: string) {
         </div>
       </template>
 
-      <!-- Alcohol detail -->
       <template v-else-if="alcoholDeviation">
         <div class="detail-layout">
           <div class="detail-main">
@@ -344,7 +345,6 @@ function handleError(error: unknown, fallback: string) {
       </template>
     </div>
 
-    <!-- Delete dialog -->
     <AlertDialog v-model:open="deleteDialogOpen">
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -358,7 +358,6 @@ function handleError(error: unknown, fallback: string) {
       </AlertDialogContent>
     </AlertDialog>
 
-    <!-- Edit dialogs -->
     <FoodDeviationFormDialog
       v-model:open="editFoodOpen"
       mode="edit"
