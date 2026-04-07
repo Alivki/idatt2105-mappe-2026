@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h, nextTick, ref } from 'vue'
 
-import Dialog from '../Dialog.vue'
+import DialogComponent from '../Dialog.vue'
 import DialogTrigger from '../DialogTrigger.vue'
 import DialogClose from '../DialogClose.vue'
 import DialogContent from '../DialogContent.vue'
@@ -26,7 +26,7 @@ afterEach(() => {
 
 describe('Dialog behavior', () => {
   it('renders slot content', () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       slots: {
         default: '<div data-test="inside">Hei</div>',
       },
@@ -37,7 +37,7 @@ describe('Dialog behavior', () => {
   })
 
   it('starts closed by default', async () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       attachTo: document.body,
       slots: {
         default: `
@@ -60,7 +60,7 @@ describe('Dialog behavior', () => {
   })
 
   it('respects defaultOpen', async () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       props: { defaultOpen: true },
       attachTo: document.body,
       slots: {
@@ -91,7 +91,7 @@ describe('Dialog behavior', () => {
   })
 
   it('syncs internal state when controlled open prop changes', async () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       props: { open: false },
       attachTo: document.body,
       slots: {
@@ -122,7 +122,7 @@ describe('Dialog behavior', () => {
   })
 
   it('trigger toggles dialog open and closed and emits update:open', async () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       attachTo: document.body,
       slots: {
         default: `
@@ -156,7 +156,7 @@ describe('Dialog behavior', () => {
   })
 
   it('close component closes dialog and emits update:open=false', async () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       props: { defaultOpen: true },
       attachTo: document.body,
       slots: {
@@ -191,7 +191,7 @@ describe('Dialog behavior', () => {
   })
 
   it('content overlay click closes dialog', async () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       props: { defaultOpen: true },
       attachTo: document.body,
       slots: {
@@ -222,7 +222,7 @@ describe('Dialog behavior', () => {
   })
 
   it('content close button closes dialog and renders icon + sr text', async () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       props: { defaultOpen: true },
       attachTo: document.body,
       slots: {
@@ -255,7 +255,7 @@ describe('Dialog behavior', () => {
   })
 
   it('pressing Escape closes DialogContent', async () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       props: { defaultOpen: true },
       attachTo: document.body,
       slots: {
@@ -283,7 +283,7 @@ describe('Dialog behavior', () => {
   })
 
   it('non-Escape key does not close DialogContent', async () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       props: { defaultOpen: true },
       attachTo: document.body,
       slots: {
@@ -310,7 +310,7 @@ describe('Dialog behavior', () => {
   })
 
   it('DialogScrollContent renders when open and respects custom class', async () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       props: { defaultOpen: true },
       attachTo: document.body,
       slots: {
@@ -341,7 +341,7 @@ describe('Dialog behavior', () => {
   })
 
   it('DialogScrollContent closes on overlay self click but not inner content click', async () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       props: { defaultOpen: true },
       attachTo: document.body,
       slots: {
@@ -378,7 +378,7 @@ describe('Dialog behavior', () => {
   })
 
   it('DialogScrollContent close button closes dialog', async () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       props: { defaultOpen: true },
       attachTo: document.body,
       slots: {
@@ -410,7 +410,7 @@ describe('Dialog behavior', () => {
   })
 
   it('pressing Escape closes DialogScrollContent', async () => {
-    const wrapper = mount(Dialog, {
+    const wrapper = mount(DialogComponent, {
       props: { defaultOpen: true },
       attachTo: document.body,
       slots: {
@@ -440,23 +440,23 @@ describe('Dialog behavior', () => {
   it('can be used as a fully controlled component from the parent', async () => {
     const ControlledHost = defineComponent({
       components: {
-        Dialog,
-        DialogTrigger,
-        DialogContent,
+        AppDialog: DialogComponent,
+        AppDialogTrigger: DialogTrigger,
+        AppDialogContent: DialogContent,
       },
       setup() {
         const open = ref(false)
         return { open }
       },
       template: `
-        <Dialog v-model:open="open">
-          <DialogTrigger>
+        <AppDialog v-model:open="open">
+          <AppDialogTrigger>
             <button data-test="trigger">Toggle</button>
-          </DialogTrigger>
-          <DialogContent>
+          </AppDialogTrigger>
+          <AppDialogContent>
             Controlled by parent
-          </DialogContent>
-        </Dialog>
+          </AppDialogContent>
+        </AppDialog>
       `,
     })
 
@@ -469,19 +469,19 @@ describe('Dialog behavior', () => {
 
     await nextTick()
 
-    expect(wrapper.vm.open).toBe(false)
+    expect((wrapper.vm as { open: boolean }).open).toBe(false)
     expect(document.body.querySelector('[role="dialog"]')).toBeNull()
 
     await wrapper.get('[data-test="trigger"]').trigger('click')
     await nextTick()
 
-    expect(wrapper.vm.open).toBe(true)
+    expect((wrapper.vm as { open: boolean }).open).toBe(true)
     expect(document.body.querySelector('[role="dialog"]')).not.toBeNull()
 
     await wrapper.get('[data-test="trigger"]').trigger('click')
     await nextTick()
 
-    expect(wrapper.vm.open).toBe(false)
+    expect((wrapper.vm as { open: boolean }).open).toBe(false)
     expect(document.body.querySelector('[role="dialog"]')).toBeNull()
 
     wrapper.unmount()

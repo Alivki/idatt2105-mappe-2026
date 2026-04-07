@@ -2,23 +2,23 @@ import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 
-import Input from '../Input.vue'
+import InputComponent from '../Input.vue'
 
 describe('Input', () => {
   it('renders an input element', () => {
-    const wrapper = mount(Input)
+    const wrapper = mount(InputComponent)
 
     expect(wrapper.element.tagName).toBe('INPUT')
   })
 
   it('applies the base input class', () => {
-    const wrapper = mount(Input)
+    const wrapper = mount(InputComponent)
 
     expect(wrapper.classes()).toContain('input')
   })
 
   it('applies a custom class', () => {
-    const wrapper = mount(Input, {
+    const wrapper = mount(InputComponent, {
       props: {
         class: 'custom-input',
       },
@@ -29,7 +29,7 @@ describe('Input', () => {
   })
 
   it('forwards attrs to the input element', () => {
-    const wrapper = mount(Input, {
+    const wrapper = mount(InputComponent, {
       attrs: {
         id: 'email',
         name: 'email',
@@ -49,7 +49,7 @@ describe('Input', () => {
   })
 
   it('uses modelValue when provided', () => {
-    const wrapper = mount(Input, {
+    const wrapper = mount(InputComponent, {
       props: {
         modelValue: 'hello',
       },
@@ -59,7 +59,7 @@ describe('Input', () => {
   })
 
   it('uses defaultValue when modelValue is not provided', () => {
-    const wrapper = mount(Input, {
+    const wrapper = mount(InputComponent, {
       props: {
         defaultValue: 'default text',
       },
@@ -69,7 +69,7 @@ describe('Input', () => {
   })
 
   it('prefers modelValue over defaultValue when both are provided', () => {
-    const wrapper = mount(Input, {
+    const wrapper = mount(InputComponent, {
       props: {
         modelValue: 'controlled',
         defaultValue: 'fallback',
@@ -80,7 +80,7 @@ describe('Input', () => {
   })
 
   it('emits update:modelValue when user types a string', async () => {
-    const wrapper = mount(Input, {
+    const wrapper = mount(InputComponent, {
       props: {
         modelValue: '',
       },
@@ -92,7 +92,7 @@ describe('Input', () => {
   })
 
   it('emits update:modelValue multiple times as value changes', async () => {
-    const wrapper = mount(Input, {
+    const wrapper = mount(InputComponent, {
       props: {
         modelValue: '',
       },
@@ -106,7 +106,7 @@ describe('Input', () => {
   })
 
   it('updates rendered value when controlled modelValue changes', async () => {
-    const wrapper = mount(Input, {
+    const wrapper = mount(InputComponent, {
       props: {
         modelValue: 'first',
       },
@@ -122,13 +122,13 @@ describe('Input', () => {
 
   it('works with v-model in a parent component', async () => {
     const Host = defineComponent({
-      components: { Input },
+      components: { AppInput: InputComponent },
       setup() {
         const value = ref('start')
         return { value }
       },
       template: `
-        <Input v-model="value" data-test="input" />
+        <AppInput v-model="value" data-test="input" />
       `,
     })
 
@@ -146,7 +146,7 @@ describe('Input', () => {
   })
 
   it('handles numeric modelValue', async () => {
-    const wrapper = mount(Input, {
+    const wrapper = mount(InputComponent, {
       props: {
         modelValue: 123,
       },
@@ -161,7 +161,7 @@ describe('Input', () => {
   })
 
   it('handles numeric defaultValue', () => {
-    const wrapper = mount(Input, {
+    const wrapper = mount(InputComponent, {
       props: {
         defaultValue: 42,
       },

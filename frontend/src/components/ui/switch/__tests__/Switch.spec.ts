@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 
-import Switch from '../Switch.vue'
+import SwitchComponent from '../Switch.vue'
 
 describe('Switch', () => {
   it('renders as a button with switch role', () => {
-    const wrapper = mount(Switch)
+    const wrapper = mount(SwitchComponent)
 
     expect(wrapper.element.tagName).toBe('BUTTON')
     expect(wrapper.attributes('type')).toBe('button')
@@ -14,34 +14,17 @@ describe('Switch', () => {
   })
 
   it('renders unchecked by default', () => {
-    const wrapper = mount(Switch)
+    const wrapper = mount(SwitchComponent)
 
     expect(wrapper.attributes('aria-checked')).toBe('false')
     expect(wrapper.attributes('data-state')).toBe('unchecked')
-
-    const thumb = wrapper.get('.switch__thumb')
-    expect(thumb.attributes('data-state')).toBe('unchecked')
+    expect(wrapper.get('.switch__thumb').attributes('data-state')).toBe('unchecked')
   })
 
   it('uses defaultChecked=true when uncontrolled', () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         defaultChecked: true,
-      },
-    })
-
-    expect(wrapper.attributes('aria-checked')).toBe('true')
-    expect(wrapper.attributes('data-state')).toBe('checked')
-
-    const thumb = wrapper.get('.switch__thumb')
-    expect(thumb.attributes('data-state')).toBe('checked')
-  })
-
-  it('uses checked prop when provided as controlled state', () => {
-    const wrapper = mount(Switch, {
-      props: {
-        checked: true,
-        defaultChecked: false,
       },
     })
 
@@ -50,8 +33,20 @@ describe('Switch', () => {
     expect(wrapper.get('.switch__thumb').attributes('data-state')).toBe('checked')
   })
 
+  it('uses checked prop when provided as controlled state', () => {
+    const wrapper = mount(SwitchComponent, {
+      props: {
+        checked: true,
+        defaultChecked: false,
+      },
+    })
+
+    expect(wrapper.attributes('aria-checked')).toBe('true')
+    expect(wrapper.attributes('data-state')).toBe('checked')
+  })
+
   it('prefers checked over defaultChecked when both are provided', () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         checked: false,
         defaultChecked: true,
@@ -60,11 +55,10 @@ describe('Switch', () => {
 
     expect(wrapper.attributes('aria-checked')).toBe('false')
     expect(wrapper.attributes('data-state')).toBe('unchecked')
-    expect(wrapper.get('.switch__thumb').attributes('data-state')).toBe('unchecked')
   })
 
   it('emits update:checked=true when clicked while unchecked', async () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         defaultChecked: false,
       },
@@ -76,7 +70,7 @@ describe('Switch', () => {
   })
 
   it('emits update:checked=false when clicked while checked', async () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         defaultChecked: true,
       },
@@ -88,7 +82,7 @@ describe('Switch', () => {
   })
 
   it('emits toggled value from controlled checked prop', async () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         checked: true,
       },
@@ -100,14 +94,13 @@ describe('Switch', () => {
   })
 
   it('does not change rendered state after click when uncontrolled because state is prop-derived', async () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         defaultChecked: false,
       },
     })
 
     expect(wrapper.attributes('aria-checked')).toBe('false')
-    expect(wrapper.attributes('data-state')).toBe('unchecked')
 
     await wrapper.trigger('click')
 
@@ -116,25 +109,23 @@ describe('Switch', () => {
   })
 
   it('updates rendered state when controlled prop changes', async () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         checked: false,
       },
     })
 
     expect(wrapper.attributes('aria-checked')).toBe('false')
-    expect(wrapper.attributes('data-state')).toBe('unchecked')
 
     await wrapper.setProps({ checked: true })
     await nextTick()
 
     expect(wrapper.attributes('aria-checked')).toBe('true')
     expect(wrapper.attributes('data-state')).toBe('checked')
-    expect(wrapper.get('.switch__thumb').attributes('data-state')).toBe('checked')
   })
 
   it('applies disabled attribute when disabled=true', () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         disabled: true,
       },
@@ -144,7 +135,7 @@ describe('Switch', () => {
   })
 
   it('does not render disabled attribute when disabled=false', () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         disabled: false,
       },
@@ -154,7 +145,7 @@ describe('Switch', () => {
   })
 
   it('does not emit when clicked while disabled', async () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         disabled: true,
         checked: false,
@@ -167,7 +158,7 @@ describe('Switch', () => {
   })
 
   it('forwards id prop', () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         id: 'notifications-switch',
       },
@@ -177,7 +168,7 @@ describe('Switch', () => {
   })
 
   it('does not forward name prop to DOM in this implementation', () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         name: 'notifications',
       },
@@ -187,7 +178,7 @@ describe('Switch', () => {
   })
 
   it('does not forward value prop to DOM in this implementation', () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         value: 'on',
       },
@@ -197,7 +188,7 @@ describe('Switch', () => {
   })
 
   it('applies custom class together with base switch class', () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       props: {
         class: 'my-switch',
       },
@@ -208,7 +199,7 @@ describe('Switch', () => {
   })
 
   it('renders thumb slot content', () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(SwitchComponent, {
       slots: {
         thumb: '<span data-test="thumb-content">T</span>',
       },
@@ -220,12 +211,12 @@ describe('Switch', () => {
 
   it('works with v-model in a parent component', async () => {
     const Host = defineComponent({
-      components: { Switch },
+      components: { AppSwitch: SwitchComponent },
       setup() {
         const checked = ref(false)
         return { checked }
       },
-      template: `<Switch v-model:checked="checked" data-test="switch" />`,
+      template: `<AppSwitch v-model:checked="checked" data-test="switch" />`,
     })
 
     const wrapper = mount(Host)

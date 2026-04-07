@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 
-import Select from '../Select.vue'
+import SelectComponent from '../Select.vue'
 import SelectTrigger from '../SelectTrigger.vue'
 import SelectValue from '../SelectValue.vue'
 import SelectContent from '../SelectContent.vue'
@@ -25,7 +25,7 @@ afterEach(() => {
 
 describe('Select core behavior', () => {
   it('renders slot content', () => {
-    const wrapper = mount(Select, {
+    const wrapper = mount(SelectComponent, {
       slots: {
         default: '<div data-test="inside">Hei</div>',
       },
@@ -36,7 +36,7 @@ describe('Select core behavior', () => {
   })
 
   it('renders root with base class and forwards attrs', () => {
-    const wrapper = mount(Select, {
+    const wrapper = mount(SelectComponent, {
       attrs: {
         id: 'my-select',
         'data-test': 'root',
@@ -48,15 +48,19 @@ describe('Select core behavior', () => {
     expect(wrapper.attributes('data-test')).toBe('root')
   })
 
-  it('SelectValue shows placeholder when nothing is selected', async () => {
+  it('SelectValue shows placeholder when nothing is selected', () => {
     const Host = defineComponent({
-      components: { Select, SelectTrigger, SelectValue },
+      components: {
+        AppSelect: SelectComponent,
+        AppSelectTrigger: SelectTrigger,
+        AppSelectValue: SelectValue,
+      },
       template: `
-        <Select>
-          <SelectTrigger>
-            <SelectValue placeholder="Choose one" />
-          </SelectTrigger>
-        </Select>
+        <AppSelect>
+          <AppSelectTrigger>
+            <AppSelectValue placeholder="Choose one" />
+          </AppSelectTrigger>
+        </AppSelect>
       `,
     })
 
@@ -69,54 +73,61 @@ describe('Select core behavior', () => {
 
   it('uses defaultValue as initial selection and shows registered label', async () => {
     const Host = defineComponent({
-      components: { Select, SelectTrigger, SelectValue, SelectContent, SelectItem },
+      components: {
+        AppSelect: SelectComponent,
+        AppSelectTrigger: SelectTrigger,
+        AppSelectValue: SelectValue,
+        AppSelectContent: SelectContent,
+        AppSelectItem: SelectItem,
+      },
       template: `
-        <Select defaultValue="b">
-          <SelectTrigger>
-            <SelectValue placeholder="Choose one" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="a">Apple</SelectItem>
-            <SelectItem value="b">Banana</SelectItem>
-          </SelectContent>
-        </Select>
+        <AppSelect defaultValue="b">
+          <AppSelectTrigger>
+            <AppSelectValue placeholder="Choose one" />
+          </AppSelectTrigger>
+          <AppSelectContent>
+            <AppSelectItem value="a">Apple</AppSelectItem>
+            <AppSelectItem value="b">Banana</AppSelectItem>
+          </AppSelectContent>
+        </AppSelect>
       `,
     })
 
     const wrapper = mount(Host, {
-      global: {
-        stubs: { transition: true },
-      },
+      global: { stubs: { transition: true } },
     })
 
     await nextTick()
     await nextTick()
 
-    const value = wrapper.get('.select-value')
-    expect(value.text()).toContain('Banana')
-    expect(value.classes()).not.toContain('select-value--placeholder')
+    expect(wrapper.get('.select-value').text()).toContain('Banana')
+    expect(wrapper.get('.select-value').classes()).not.toContain('select-value--placeholder')
   })
 
   it('uses modelValue over defaultValue', async () => {
     const Host = defineComponent({
-      components: { Select, SelectTrigger, SelectValue, SelectContent, SelectItem },
+      components: {
+        AppSelect: SelectComponent,
+        AppSelectTrigger: SelectTrigger,
+        AppSelectValue: SelectValue,
+        AppSelectContent: SelectContent,
+        AppSelectItem: SelectItem,
+      },
       template: `
-        <Select modelValue="a" defaultValue="b">
-          <SelectTrigger>
-            <SelectValue placeholder="Choose one" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="a">Apple</SelectItem>
-            <SelectItem value="b">Banana</SelectItem>
-          </SelectContent>
-        </Select>
+        <AppSelect modelValue="a" defaultValue="b">
+          <AppSelectTrigger>
+            <AppSelectValue placeholder="Choose one" />
+          </AppSelectTrigger>
+          <AppSelectContent>
+            <AppSelectItem value="a">Apple</AppSelectItem>
+            <AppSelectItem value="b">Banana</AppSelectItem>
+          </AppSelectContent>
+        </AppSelect>
       `,
     })
 
     const wrapper = mount(Host, {
-      global: {
-        stubs: { transition: true },
-      },
+      global: { stubs: { transition: true } },
     })
 
     await nextTick()
@@ -127,7 +138,13 @@ describe('Select core behavior', () => {
 
   it('syncs selection when controlled modelValue prop changes', async () => {
     const Host = defineComponent({
-      components: { Select, SelectTrigger, SelectValue, SelectContent, SelectItem },
+      components: {
+        AppSelect: SelectComponent,
+        AppSelectTrigger: SelectTrigger,
+        AppSelectValue: SelectValue,
+        AppSelectContent: SelectContent,
+        AppSelectItem: SelectItem,
+      },
       props: {
         modelValue: {
           type: String,
@@ -135,30 +152,25 @@ describe('Select core behavior', () => {
         },
       },
       template: `
-        <Select :modelValue="modelValue">
-          <SelectTrigger>
-            <SelectValue placeholder="Choose one" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="a">Apple</SelectItem>
-            <SelectItem value="b">Banana</SelectItem>
-          </SelectContent>
-        </Select>
+        <AppSelect :modelValue="modelValue">
+          <AppSelectTrigger>
+            <AppSelectValue placeholder="Choose one" />
+          </AppSelectTrigger>
+          <AppSelectContent>
+            <AppSelectItem value="a">Apple</AppSelectItem>
+            <AppSelectItem value="b">Banana</AppSelectItem>
+          </AppSelectContent>
+        </AppSelect>
       `,
     })
 
     const wrapper = mount(Host, {
-      props: {
-        modelValue: 'a',
-      },
-      global: {
-        stubs: { transition: true },
-      },
+      props: { modelValue: 'a' },
+      global: { stubs: { transition: true } },
     })
 
     await nextTick()
     await nextTick()
-
     expect(wrapper.get('.select-value').text()).toContain('Apple')
 
     await wrapper.setProps({ modelValue: 'b' })
@@ -169,22 +181,24 @@ describe('Select core behavior', () => {
 
   it('trigger toggles aria-expanded state', async () => {
     const Host = defineComponent({
-      components: { Select, SelectTrigger, SelectContent },
+      components: {
+        AppSelect: SelectComponent,
+        AppSelectTrigger: SelectTrigger,
+        AppSelectContent: SelectContent,
+      },
       template: `
-        <Select>
-          <SelectTrigger data-test="trigger">Open</SelectTrigger>
-          <SelectContent>
+        <AppSelect>
+          <AppSelectTrigger data-test="trigger">Open</AppSelectTrigger>
+          <AppSelectContent>
             <div data-test="content">Menu</div>
-          </SelectContent>
-        </Select>
+          </AppSelectContent>
+        </AppSelect>
       `,
     })
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: {
-        stubs: { transition: true },
-      },
+      global: { stubs: { transition: true } },
     })
 
     const trigger = wrapper.get('[data-test="trigger"]')
@@ -210,11 +224,14 @@ describe('Select core behavior', () => {
 
   it('trigger renders icon and respects disabled/class', () => {
     const Host = defineComponent({
-      components: { Select, SelectTrigger },
+      components: {
+        AppSelect: SelectComponent,
+        AppSelectTrigger: SelectTrigger,
+      },
       template: `
-        <Select>
-          <SelectTrigger disabled class="extra-trigger" data-test="trigger">Open</SelectTrigger>
-        </Select>
+        <AppSelect>
+          <AppSelectTrigger disabled class="extra-trigger" data-test="trigger">Open</AppSelectTrigger>
+        </AppSelect>
       `,
     })
 
@@ -229,29 +246,30 @@ describe('Select core behavior', () => {
 
   it('content renders and keeps content mounted after outside click in this implementation', async () => {
     const Host = defineComponent({
-      components: { Select, SelectTrigger, SelectContent },
+      components: {
+        AppSelect: SelectComponent,
+        AppSelectTrigger: SelectTrigger,
+        AppSelectContent: SelectContent,
+      },
       template: `
-        <Select>
-          <SelectTrigger data-test="trigger">Open</SelectTrigger>
-          <SelectContent class="extra-content">
+        <AppSelect>
+          <AppSelectTrigger data-test="trigger">Open</AppSelectTrigger>
+          <AppSelectContent class="extra-content">
             <div data-test="content">Menu</div>
-          </SelectContent>
-        </Select>
+          </AppSelectContent>
+        </AppSelect>
       `,
     })
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: {
-        stubs: { transition: true },
-      },
+      global: { stubs: { transition: true } },
     })
 
     await wrapper.get('[data-test="trigger"]').trigger('click')
     await nextTick()
 
-    const content = wrapper.get('.select-content')
-    expect(content.classes()).toContain('extra-content')
+    expect(wrapper.get('.select-content').classes()).toContain('extra-content')
     expect(wrapper.find('[data-test="content"]').exists()).toBe(true)
 
     document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
@@ -264,22 +282,24 @@ describe('Select core behavior', () => {
 
   it('content does not close when clicking inside root', async () => {
     const Host = defineComponent({
-      components: { Select, SelectTrigger, SelectContent },
+      components: {
+        AppSelect: SelectComponent,
+        AppSelectTrigger: SelectTrigger,
+        AppSelectContent: SelectContent,
+      },
       template: `
-        <Select data-test="root">
-          <SelectTrigger data-test="trigger">Open</SelectTrigger>
-          <SelectContent>
+        <AppSelect data-test="root">
+          <AppSelectTrigger data-test="trigger">Open</AppSelectTrigger>
+          <AppSelectContent>
             <div data-test="content">Menu</div>
-          </SelectContent>
-        </Select>
+          </AppSelectContent>
+        </AppSelect>
       `,
     })
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: {
-        stubs: { transition: true },
-      },
+      global: { stubs: { transition: true } },
     })
 
     await wrapper.get('[data-test="trigger"]').trigger('click')
@@ -297,22 +317,24 @@ describe('Select core behavior', () => {
 
   it('Escape does not close the content in this implementation', async () => {
     const Host = defineComponent({
-      components: { Select, SelectTrigger, SelectContent },
+      components: {
+        AppSelect: SelectComponent,
+        AppSelectTrigger: SelectTrigger,
+        AppSelectContent: SelectContent,
+      },
       template: `
-        <Select>
-          <SelectTrigger data-test="trigger">Open</SelectTrigger>
-          <SelectContent>
+        <AppSelect>
+          <AppSelectTrigger data-test="trigger">Open</AppSelectTrigger>
+          <AppSelectContent>
             <div data-test="content">Menu</div>
-          </SelectContent>
-        </Select>
+          </AppSelectContent>
+        </AppSelect>
       `,
     })
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: {
-        stubs: { transition: true },
-      },
+      global: { stubs: { transition: true } },
     })
 
     await wrapper.get('[data-test="trigger"]').trigger('click')
@@ -330,28 +352,32 @@ describe('Select core behavior', () => {
 
   it('selecting an item emits update:modelValue, closes content and updates displayed label', async () => {
     const Host = defineComponent({
-      components: { Select, SelectTrigger, SelectValue, SelectContent, SelectItem },
+      components: {
+        AppSelect: SelectComponent,
+        AppSelectTrigger: SelectTrigger,
+        AppSelectValue: SelectValue,
+        AppSelectContent: SelectContent,
+        AppSelectItem: SelectItem,
+      },
       template: `
-        <Select>
-          <SelectTrigger data-test="trigger">
-            <SelectValue placeholder="Choose one" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="a" data-test="item-a">Apple</SelectItem>
-            <SelectItem value="b" data-test="item-b">Banana</SelectItem>
-          </SelectContent>
-        </Select>
+        <AppSelect>
+          <AppSelectTrigger data-test="trigger">
+            <AppSelectValue placeholder="Choose one" />
+          </AppSelectTrigger>
+          <AppSelectContent>
+            <AppSelectItem value="a" data-test="item-a">Apple</AppSelectItem>
+            <AppSelectItem value="b" data-test="item-b">Banana</AppSelectItem>
+          </AppSelectContent>
+        </AppSelect>
       `,
     })
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: {
-        stubs: { transition: true },
-      },
+      global: { stubs: { transition: true } },
     })
 
-    const select = wrapper.findComponent(Select)
+    const select = wrapper.findComponent(SelectComponent)
 
     await wrapper.get('[data-test="trigger"]').trigger('click')
     await nextTick()
@@ -371,21 +397,23 @@ describe('Select core behavior', () => {
 
   it('selected item shows selected state and check icon', async () => {
     const Host = defineComponent({
-      components: { Select, SelectContent, SelectItem },
+      components: {
+        AppSelect: SelectComponent,
+        AppSelectContent: SelectContent,
+        AppSelectItem: SelectItem,
+      },
       template: `
-        <Select defaultValue="a">
-          <SelectContent>
-            <SelectItem value="a" data-test="item-a">Apple</SelectItem>
-            <SelectItem value="b" data-test="item-b">Banana</SelectItem>
-          </SelectContent>
-        </Select>
+        <AppSelect defaultValue="a">
+          <AppSelectContent>
+            <AppSelectItem value="a" data-test="item-a">Apple</AppSelectItem>
+            <AppSelectItem value="b" data-test="item-b">Banana</AppSelectItem>
+          </AppSelectContent>
+        </AppSelect>
       `,
     })
 
     const wrapper = mount(Host, {
-      global: {
-        stubs: { transition: true },
-      },
+      global: { stubs: { transition: true } },
     })
 
     await nextTick()
@@ -405,27 +433,31 @@ describe('Select core behavior', () => {
 
   it('disabled item does not select and applies disabled state', async () => {
     const Host = defineComponent({
-      components: { Select, SelectTrigger, SelectValue, SelectContent, SelectItem },
+      components: {
+        AppSelect: SelectComponent,
+        AppSelectTrigger: SelectTrigger,
+        AppSelectValue: SelectValue,
+        AppSelectContent: SelectContent,
+        AppSelectItem: SelectItem,
+      },
       template: `
-        <Select>
-          <SelectTrigger data-test="trigger">
-            <SelectValue placeholder="Choose one" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="a" disabled class="extra-item" data-test="item-a">Apple</SelectItem>
-          </SelectContent>
-        </Select>
+        <AppSelect>
+          <AppSelectTrigger data-test="trigger">
+            <AppSelectValue placeholder="Choose one" />
+          </AppSelectTrigger>
+          <AppSelectContent>
+            <AppSelectItem value="a" disabled class="extra-item" data-test="item-a">Apple</AppSelectItem>
+          </AppSelectContent>
+        </AppSelect>
       `,
     })
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: {
-        stubs: { transition: true },
-      },
+      global: { stubs: { transition: true } },
     })
 
-    const select = wrapper.findComponent(Select)
+    const select = wrapper.findComponent(SelectComponent)
 
     await wrapper.get('[data-test="trigger"]').trigger('click')
     await nextTick()
@@ -444,29 +476,33 @@ describe('Select core behavior', () => {
 
   it('works with v-model in a parent component', async () => {
     const Host = defineComponent({
-      components: { Select, SelectTrigger, SelectValue, SelectContent, SelectItem },
+      components: {
+        AppSelect: SelectComponent,
+        AppSelectTrigger: SelectTrigger,
+        AppSelectValue: SelectValue,
+        AppSelectContent: SelectContent,
+        AppSelectItem: SelectItem,
+      },
       setup() {
         const value = ref('')
         return { value }
       },
       template: `
-        <Select v-model="value">
-          <SelectTrigger data-test="trigger">
-            <SelectValue placeholder="Choose one" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="a" data-test="item-a">Apple</SelectItem>
-            <SelectItem value="b" data-test="item-b">Banana</SelectItem>
-          </SelectContent>
-        </Select>
+        <AppSelect v-model="value">
+          <AppSelectTrigger data-test="trigger">
+            <AppSelectValue placeholder="Choose one" />
+          </AppSelectTrigger>
+          <AppSelectContent>
+            <AppSelectItem value="a" data-test="item-a">Apple</AppSelectItem>
+            <AppSelectItem value="b" data-test="item-b">Banana</AppSelectItem>
+          </AppSelectContent>
+        </AppSelect>
       `,
     })
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: {
-        stubs: { transition: true },
-      },
+      global: { stubs: { transition: true } },
     })
 
     expect((wrapper.vm as { value: string }).value).toBe('')
