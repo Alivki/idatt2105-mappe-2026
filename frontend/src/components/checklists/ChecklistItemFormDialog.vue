@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { z } from 'zod'
 import type {
   Checklist,
   ChecklistItem,
@@ -38,7 +39,8 @@ const emits = defineEmits<{
 
 const formTitle = ref('')
 const formDescription = ref('')
-const errorMessage = ref('')
+const titleSchema = z.string().min(1, 'Oppgaven må ha en tittel')
+const errors = ref<Record<string, string>>({})
 
 const modalTitle = computed(() =>
   props.mode === 'create' ? 'Legg til oppgave' : 'Rediger oppgave',
@@ -66,7 +68,7 @@ watch(
       formDescription.value = ''
     }
 
-    errorMessage.value = ''
+    errors.value = {}
   },
   { immediate: true },
 )
@@ -76,11 +78,17 @@ function closeDialog() {
 }
 
 function handleSubmit() {
-  const title = formTitle.value.trim()
-  if (!title) {
-    errorMessage.value = 'Oppgaven må ha en tittel.'
+  const newErrors: Record<string, string> = {}
+  const titleResult = titleSchema.safeParse(formTitle.value.trim())
+  if (!titleResult.success) newErrors.title = titleResult.error.issues[0]?.message ?? ''
+
+  if (Object.keys(newErrors).length > 0) {
+    errors.value = newErrors
     return
   }
+  errors.value = {}
+
+  const title = formTitle.value.trim()
 
   if (!props.checklist) {
     return
@@ -90,8 +98,6 @@ function handleSubmit() {
     title,
     description: formDescription.value.trim() || undefined,
   }
-
-  errorMessage.value = ''
 
   if (props.mode === 'create') {
     emits('create', {
@@ -124,17 +130,16 @@ function handleSubmit() {
       </DialogHeader>
 
       <form class="form" @submit.prevent="handleSubmit">
-        <label class="field">
+        <label :class="['field', { 'field--error': errors.title }]">
           <span>Tittel</span>
           <Input v-model="formTitle" placeholder="For eksempel: Sjekk temperatur i kjøleskap" />
+          <p v-if="errors.title" class="error-message">{{ errors.title }}</p>
         </label>
 
         <label class="field">
           <span>Beskrivelse (valgfritt)</span>
           <Textarea v-model="formDescription" rows="3" placeholder="Detaljerte instrukser" />
         </label>
-
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
         <DialogFooter>
           <Button type="button" variant="outline" @click="closeDialog">Avbryt</Button>
@@ -166,6 +171,11 @@ function handleSubmit() {
 .error-message {
   color: hsl(var(--destructive));
   font-size: 0.86rem;
+}
+
+.field--error :deep(.input),
+.field--error :deep(.textarea) {
+  border-color: hsl(var(--destructive));
 }
 
 @media (max-width: 720px) {
