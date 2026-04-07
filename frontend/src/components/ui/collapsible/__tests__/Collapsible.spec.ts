@@ -1,10 +1,9 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick } from 'vue'
+import { defineComponent, nextTick, ref } from 'vue'
 
 import Collapsible from '../Collapsible.vue'
 import CollapsibleTrigger from '../CollapsibleTrigger.vue'
-import CollapsibleContent from '../CollapsibleContent.vue'
 
 describe('Collapsible', () => {
   it('renders slot content', () => {

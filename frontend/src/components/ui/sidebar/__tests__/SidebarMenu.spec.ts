@@ -45,8 +45,8 @@ function mountWithSidebar(component: unknown, options: Record<string, unknown> =
             h(
               component as never,
               {
-                ...(options.props ?? {}),
-                ...(options.attrs ?? {}),
+                ...options.props,
+                ...options.attrs,
               } as never,
               options.slots ?? {},
             ),
