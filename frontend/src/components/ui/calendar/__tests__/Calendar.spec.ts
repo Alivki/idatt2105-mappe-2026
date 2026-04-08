@@ -5,7 +5,6 @@ import { CalendarDate } from '@internationalized/date'
 import Calendar from '../Calendar.vue'
 
 const SelectStub = defineComponent({
-  name: 'Select',
   props: {
     modelValue: String,
   },
