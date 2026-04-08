@@ -20,7 +20,6 @@ import {
   HandMetal,
   CircleHelp,
   CreditCard,
-  Printer,
 } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
@@ -346,10 +345,6 @@ const knowledgeTestTypes: { value: KnowledgeTestType; label: string }[] = [
   { value: 'BOTH', label: 'Salg og skjenke' },
 ]
 
-function printPage() {
-  window.print()
-}
-
 function bevillingStatus(validUntil: string | null): { label: string; class: string } {
   if (!validUntil) return { label: 'Ukjent', class: 'status--neutral' }
   const diff = Math.ceil((new Date(validUntil).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
@@ -593,7 +588,6 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
             <p>Rutiner iht. alkoholloven §1-9 og alkoholforskriften kap. 8</p>
           </div>
           <div class="header-actions">
-            <Button type="button" variant="ghost" size="icon-sm" title="Skriv ut" aria-label="Skriv ut" @click="printPage"><Printer :size="16" aria-hidden="true" /></Button>
             <Button type="button" variant="outline" size="sm" @click="editing = true"><Pencil :size="14" aria-hidden="true" /> Rediger</Button>
           </div>
         </section>
@@ -1207,6 +1201,8 @@ function bevillingStatus(validUntil: string | null): { label: string; class: str
   .field-row { flex-direction: column; }
   .cards-row { flex-direction: column; }
   .skeleton-row { flex-direction: column; }
+  .doc-card--bevilling, .doc-card--kunnskap { flex: none; }
+  .doc-card__body { flex: none; }
   .doc-card__fields { grid-template-columns: 1fr; }
   .license-grid { grid-template-columns: 1fr; }
   .toggle-group { flex-direction: column; }

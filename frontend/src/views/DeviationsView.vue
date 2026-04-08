@@ -68,12 +68,10 @@ const auth = useAuthStore()
 const canManage = computed(() => auth.role === 'ADMIN' || auth.role === 'MANAGER')
 const memberNamesQuery = useMemberNamesQuery()
 
-// Queries
 const foodQuery = useFoodDeviationsQuery()
 const alcoholQuery = useAlcoholDeviationsQuery()
 const penaltyQuery = usePenaltyPointsQuery()
 
-// Mutations
 const createFood = useCreateFoodDeviationMutation()
 const updateFood = useUpdateFoodDeviationMutation()
 const deleteFood = useDeleteFoodDeviationMutation()
@@ -81,12 +79,10 @@ const createAlcohol = useCreateAlcoholDeviationMutation()
 const updateAlcohol = useUpdateAlcoholDeviationMutation()
 const deleteAlcohol = useDeleteAlcoholDeviationMutation()
 
-// Filters
 const activeModuleFilter = ref<ModuleFilter>('ALL')
 const activeStatusFilter = ref<StatusFilter>('OPEN')
 const sortOrder = ref<SortOrder>('NEWEST_FIRST')
 
-// Dialogs
 const createDialogOpen = ref(false)
 const createTab = ref<DeviationModule>('IK_MAT')
 const editFoodOpen = ref(false)
@@ -94,7 +90,6 @@ const editAlcoholOpen = ref(false)
 const activeFoodDeviation = ref<FoodDeviation | null>(null)
 const activeAlcoholDeviation = ref<AlcoholDeviation | null>(null)
 
-// Member options for dropdowns
 const memberOptions = computed(() => {
   return (memberNamesQuery.data.value ?? []).map((m) => ({
     userId: m.userId,
@@ -102,7 +97,6 @@ const memberOptions = computed(() => {
   }))
 })
 
-// Combined list
 const isLoading = computed(() => foodQuery.isLoading.value || alcoholQuery.isLoading.value)
 const isError = computed(() => foodQuery.isError.value || alcoholQuery.isError.value)
 
@@ -115,17 +109,14 @@ const combinedDeviations = computed<CombinedDeviation[]>(() => {
 const filteredAndSorted = computed(() => {
   let items = combinedDeviations.value
 
-  // Module filter
   if (activeModuleFilter.value === 'IK_MAT') {
     items = items.filter((i) => i._type === 'food')
   } else if (activeModuleFilter.value === 'IK_ALKOHOL') {
     items = items.filter((i) => i._type === 'alcohol')
   }
 
-  // Status filter
   items = items.filter((i) => i.data.status === activeStatusFilter.value)
 
-  // Sort
   return [...items].sort((a, b) => {
     const aTime = new Date(a.data.reportedAt).getTime()
     const bTime = new Date(b.data.reportedAt).getTime()
@@ -133,7 +124,6 @@ const filteredAndSorted = computed(() => {
   })
 })
 
-// Counts
 const foodCount = computed(() => (foodQuery.data.value ?? []).length)
 const alcoholCount = computed(() => (alcoholQuery.data.value ?? []).length)
 const openCount = computed(() => combinedDeviations.value.filter((i) => i.data.status === 'OPEN').length)
@@ -163,7 +153,6 @@ const moduleFilters: Array<{ label: string; value: ModuleFilter }> = [
   { label: 'IK-Alkohol', value: 'IK_ALKOHOL' },
 ]
 
-// --- Create flow ---
 function openCreateDialog() {
   createTab.value = 'IK_MAT'
   createDialogOpen.value = true
@@ -185,7 +174,6 @@ async function handleCreateAlcohol(payload: CreateAlcoholDeviationRequest) {
   } catch (err) { handleError(err, 'Kunne ikke registrere alkoholavvik') }
 }
 
-// --- Edit flow ---
 function handleEditFood(d: FoodDeviation) {
   activeFoodDeviation.value = d
   editFoodOpen.value = true
@@ -214,7 +202,6 @@ async function handleUpdateAlcohol(p: { id: number; data: UpdateAlcoholDeviation
   } catch (err) { handleError(err, 'Kunne ikke oppdatere alkoholavvik') }
 }
 
-// --- Delete ---
 async function handleDeleteFood(id: number) {
   try {
     await deleteFood.mutateAsync(id)
@@ -241,7 +228,6 @@ async function handleDeleteAllClosed() {
   } catch (err) { handleError(err, 'Kunne ikke slette alle lukkede avvik') }
 }
 
-// --- Status change ---
 async function handleFoodStatusChange(id: number, newStatus: FoodDeviationStatus) {
   try {
     await updateFood.mutateAsync({ id, payload: { status: newStatus } as UpdateFoodDeviationRequest })
@@ -256,7 +242,6 @@ async function handleAlcoholStatusChange(id: number, newStatus: AlcoholDeviation
   } catch (err) { handleError(err, 'Kunne ikke oppdatere status') }
 }
 
-// --- Navigation ---
 function handleOpenFood(d: FoodDeviation) {
   router.push(`/avvik/mat/${d.id}`)
 }
@@ -299,19 +284,16 @@ function handleError(error: unknown, fallback: string) {
         </Button>
       </section>
 
-      <!-- Info cards -->
       <section class="cards-section" aria-label="Statusoversikt">
         <OverviewCard v-for="card in moduleCards" :key="card.key" :label="card.label" :value="card.count" :variant="card.variant" :icon="card.icon" />
         <OverviewCard v-for="card in statusCards" :key="card.key" :label="card.label" :value="card.count" :variant="card.variant" :icon="card.icon" />
       </section>
 
-      <!-- Penalty points cards -->
       <section class="penalty-section">
         <PenaltyPointsStatus :summary="penaltyQuery.data.value ?? null" />
         <PenaltyPointsGuide />
       </section>
 
-      <!-- Filters -->
       <section class="filters-row" aria-label="Filtre">
         <div class="filters-left">
           <div class="filter-group" role="group" aria-label="Statusfilter">
@@ -378,7 +360,6 @@ function handleError(error: unknown, fallback: string) {
         </div>
       </section>
 
-      <!-- Deviation list -->
       <section class="list-section">
         <div v-if="isLoading" class="loading-state">
           <div class="skeleton-item" v-for="n in 4" :key="n"></div>
@@ -432,7 +413,6 @@ function handleError(error: unknown, fallback: string) {
       </section>
     </div>
 
-    <!-- Create dialog with tabs -->
     <Dialog :open="createDialogOpen" @update:open="(v) => createDialogOpen = v">
       <DialogContent class="create-dialog">
         <h2 class="create-dialog-title">Registrer avvik</h2>
@@ -484,7 +464,6 @@ function handleError(error: unknown, fallback: string) {
       </DialogContent>
     </Dialog>
 
-    <!-- Edit food dialog -->
     <FoodDeviationFormDialog
       v-model:open="editFoodOpen"
       mode="edit"
@@ -494,7 +473,6 @@ function handleError(error: unknown, fallback: string) {
       @update="handleUpdateFood"
     />
 
-    <!-- Edit alcohol dialog -->
     <AlcoholDeviationFormDialog
       v-model:open="editAlcoholOpen"
       mode="edit"
@@ -661,8 +639,8 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 
 @media (max-width: 760px) {
   h1 { font-size: 1.5rem; }
-  .header-row { flex-direction: column; }
-  .create-actions { width: 100%; }
+  .header-row { flex-direction: column; align-items: stretch; }
+  .header-row > :last-child { align-self: flex-end; }
   .cards-section { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .filters-row { align-items: stretch; }
   .filters-left { flex-direction: column; }

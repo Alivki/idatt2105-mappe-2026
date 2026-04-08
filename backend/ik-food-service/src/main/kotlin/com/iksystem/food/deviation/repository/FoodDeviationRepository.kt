@@ -17,4 +17,6 @@ interface FoodDeviationRepository : JpaRepository<FoodDeviation, Long> {
 
     @Query("SELECT d FROM FoodDeviation d WHERE d.organizationId = :orgId AND d.reportedAt >= :since ORDER BY d.reportedAt ASC")
     fun findRecentByOrganizationId(orgId: Long, since: Instant): List<FoodDeviation>
+
+    fun findAllByOrganizationIdAndReportedAtBetween(organizationId: Long, from: Instant, to: Instant): List<FoodDeviation>
 }

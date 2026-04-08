@@ -11,6 +11,7 @@ import {
   AlertTriangle,
   Users,
   Settings,
+  FileText,
 } from 'lucide-vue-next'
 
 import NavMain from '@/components/NavMain.vue'
@@ -84,7 +85,10 @@ const navMain = computed(() => [
     items: [
       { title: 'Avvik', url: '/avvik', icon: AlertTriangle },
       ...(isManagerOrAdmin.value
-        ? [{ title: 'Ansatte', url: '/ansatte', icon: Users }]
+        ? [
+            { title: 'Rapporter', url: '/rapporter', icon: FileText },
+            { title: 'Ansatte', url: '/ansatte', icon: Users },
+          ]
         : []),
     ],
   },

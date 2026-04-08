@@ -121,6 +121,11 @@ const router = createRouter({
       component: () => import('@/views/EmployeesView.vue'),
     },
     {
+      path: '/rapporter',
+      name: 'rapporter',
+      component: () => import('@/views/ReportsView.vue'),
+    },
+    {
       path: '/innstillinger',
       name: 'innstillinger',
       component: () => import('@/views/SettingsView.vue'),

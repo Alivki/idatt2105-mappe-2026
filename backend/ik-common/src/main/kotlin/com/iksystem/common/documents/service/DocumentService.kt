@@ -107,6 +107,37 @@ class DocumentsService(
      * @param duration How long the URL is valid (default 1 hour)
      * @return A presigned URL that can be used directly in the browser
      */
+    fun uploadBytes(
+        bytes: ByteArray,
+        fileName: String,
+        contentType: String,
+        folder: String,
+        auth: AuthenticatedUser,
+    ): Document {
+        val s3Key = "$folder/${UUID.randomUUID()}-$fileName"
+
+        val putObjectRequest = PutObjectRequest.builder()
+            .bucket(bucketName)
+            .key(s3Key)
+            .contentType(contentType)
+            .build()
+
+        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes))
+
+        val user = userRepository.findById(auth.userId)
+            .orElseThrow { IllegalArgumentException("User not found") }
+
+        val document = Document(
+            organizationId = auth.requireOrganizationId(),
+            s3Key = s3Key,
+            fileName = fileName,
+            contentType = contentType,
+            uploadedByUser = user,
+        )
+
+        return documentRepository.save(document)
+    }
+
     fun getFileUrl(documentId: Long, organizationId: Long, duration: Duration = Duration.ofHours(1)): String {
         val document = getDocument(documentId, organizationId)
             ?: throw IllegalArgumentException("Document not found")

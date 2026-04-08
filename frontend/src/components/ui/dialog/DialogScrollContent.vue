@@ -61,7 +61,7 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKeydown))
   z-index: 50;
   display: grid;
   width: 100%;
-  max-width: 32rem;
+  max-width: var(--dialog-max-width, 32rem);
   margin: 2rem 0;
   gap: 1rem;
   border: 1px solid hsl(var(--border, 35 15% 90%));

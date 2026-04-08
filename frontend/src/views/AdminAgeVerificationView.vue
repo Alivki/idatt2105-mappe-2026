@@ -161,21 +161,23 @@ function navigateToDay(date: string) {
           class="mobile-summary-card"
           @click="navigateToDay(row.date)"
         >
-          <div class="mobile-summary-row">
-            <span>Dato</span>
+          <div class="mobile-card-header">
             <strong>{{ formatDate(row.date) }}</strong>
+            <span v-if="row.totalDeviations > 0" class="mobile-deviation-badge">{{ row.totalDeviations }} avvik</span>
           </div>
-          <div class="mobile-summary-row">
-            <span>Skift</span>
-            <span>{{ row.shiftCount }}</span>
-          </div>
-          <div class="mobile-summary-row">
-            <span>Leg sjekket</span>
-            <span>{{ row.totalIdsChecked }}</span>
-          </div>
-          <div class="mobile-summary-row">
-            <span>Avvik</span>
-            <span :class="row.totalDeviations > 0 ? 'deviation-count' : ''">{{ row.totalDeviations }}</span>
+          <div class="mobile-card-stats">
+            <div class="mobile-stat">
+              <span class="mobile-stat-value">{{ row.shiftCount }}</span>
+              <span class="mobile-stat-label">Skift</span>
+            </div>
+            <div class="mobile-stat">
+              <span class="mobile-stat-value">{{ row.totalIdsChecked }}</span>
+              <span class="mobile-stat-label">Leg sjekket</span>
+            </div>
+            <div class="mobile-stat">
+              <span class="mobile-stat-value" :class="row.totalDeviations > 0 ? 'deviation-count' : ''">{{ row.totalDeviations }}</span>
+              <span class="mobile-stat-label">Avvik</span>
+            </div>
           </div>
         </article>
 
@@ -399,7 +401,7 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   border: 1px solid hsl(var(--border));
   border-radius: 0.65rem;
   background: hsl(var(--card));
-  padding: 0.45rem 0.65rem;
+  padding: 0.75rem;
   cursor: pointer;
 }
 
@@ -407,24 +409,53 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   background: hsl(var(--accent) / 0.35);
 }
 
-.mobile-summary-row {
+.mobile-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.34rem 0;
+  align-items: center;
+  margin-bottom: 0.6rem;
 }
 
-.mobile-summary-row > span:first-child {
-  font-size: 0.73rem;
+.mobile-card-header strong {
+  font-size: 0.875rem;
+}
+
+.mobile-deviation-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--red);
+  background: var(--red-soft);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.mobile-card-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.mobile-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.4rem 0;
+  border-radius: 0.375rem;
+  background: hsl(var(--muted) / 0.5);
+}
+
+.mobile-stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.mobile-stat-label {
+  font-size: 0.65rem;
   font-weight: 600;
   color: hsl(var(--muted-foreground));
   text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.mobile-summary-row > :last-child {
-  text-align: right;
+  letter-spacing: 0.03em;
 }
 
 .th-date { min-width: 12rem; }

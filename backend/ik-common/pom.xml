@@ -97,6 +97,19 @@
             <artifactId>s3</artifactId>
         </dependency>
 
+        <!-- PDF Generation -->
+        <dependency>
+            <groupId>com.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-pdfbox</artifactId>
+            <version>1.0.10</version>
+        </dependency>
+
+        <!-- Thymeleaf (standalone, for PDF HTML templating) -->
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf</artifactId>
+        </dependency>
+
         <!-- API Documentation -->
         <dependency>
             <groupId>org.springdoc</groupId>

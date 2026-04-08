@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="no">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        @page {
+            size: A4;
+            margin: 22mm 20mm 18mm 20mm;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+            color: #1a1a2e;
+            line-height: 1.5;
+        }
+
+        .report-header {
+            border-bottom: 3px solid #1a1a2e;
+            padding-bottom: 12px;
+            margin-bottom: 22px;
+        }
+
+        .header-table { width: 100%; border-collapse: collapse; }
+        .header-table td { vertical-align: top; padding: 0; }
+        .header-left { width: 55%; }
+        .header-right { width: 45%; text-align: right; font-size: 8.5pt; color: #666; }
+
+        .header-label {
+            font-size: 7pt;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .header-org {
+            font-size: 16pt;
+            font-weight: 900;
+            color: #1a1a2e;
+            letter-spacing: -0.3px;
+            margin: 2px 0 4px 0;
+        }
+
+        .header-orgnr {
+            font-size: 8.5pt;
+            color: #666;
+        }
+
+        .header-right-line {
+            margin: 1px 0;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+
+        .section-title {
+            font-size: 10.5pt;
+            font-weight: 900;
+            color: #1a1a2e;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding-bottom: 4px;
+            border-bottom: 3px solid #1a1a2e;
+            margin-bottom: 10px;
+        }
+
+        .module-badge {
+            display: inline-block;
+            background: #1a1a2e;
+            color: #fff;
+            font-size: 7pt;
+            font-weight: bold;
+            letter-spacing: 0.8px;
+            padding: 3px 10px;
+            border-radius: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .kpi-grid { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+        .kpi-grid td {
+            width: 25%;
+            padding: 10px 12px;
+            background: #f5f5f8;
+            border-radius: 4px;
+            vertical-align: top;
+        }
+        .kpi-grid td.kpi-spacer { width: 6px; background: none; padding: 0; }
+
+        .kpi-border-green { border-left: 4px solid #2d5a27; }
+        .kpi-border-olive { border-left: 4px solid #8b7d3c; }
+        .kpi-border-gold { border-left: 4px solid #b8960c; }
+        .kpi-border-red { border-left: 4px solid #c0392b; }
+
+        .kpi-label {
+            font-size: 6.5pt;
+            font-weight: bold;
+            letter-spacing: 0.8px;
+            color: #888;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        .kpi-value {
+            font-size: 18pt;
+            font-weight: 900;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .kpi-value-green { color: #2d5a27; }
+        .kpi-value-olive { color: #8b7d3c; }
+        .kpi-value-gold { color: #b8960c; }
+        .kpi-value-red { color: #c0392b; }
+
+        .kpi-bottom { width: 100%; border-collapse: collapse; margin-top: 6px; }
+        .kpi-bottom td {
+            padding: 6px 12px;
+            background: #f5f5f8;
+            border-radius: 3px;
+            font-size: 8.5pt;
+        }
+        .kpi-bottom td.kpi-spacer { width: 6px; background: none; padding: 0; }
+        .kpi-bottom .kpi-stat-label { color: #666; }
+        .kpi-bottom .kpi-stat-value { font-weight: bold; font-size: 10pt; float: right; color: #1a1a2e; }
+
+        /* ── Tables ── */
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+        }
+
+        table.data-table thead th {
+            text-align: left;
+            padding: 6px 8px;
+            font-size: 7pt;
+            font-weight: bold;
+            letter-spacing: 0.8px;
+            color: #888;
+            text-transform: uppercase;
+            border-bottom: 3px solid #1a1a2e;
+        }
+
+        table.data-table tbody td {
+            padding: 7px 8px;
+            border-bottom: 1px solid #e8e8f0;
+            vertical-align: top;
+        }
+
+        table.data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .td-bold { font-weight: bold; }
+
+        .badge {
+            display: inline-block;
+            padding: 1px 8px;
+            border-radius: 3px;
+            font-size: 7.5pt;
+            font-weight: bold;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-green { background: #dcf5dc; color: #1a6b1a; }
+        .badge-yellow { background: #fef3cd; color: #856404; }
+        .badge-red { background: #fde2e2; color: #c0392b; }
+        .badge-gray { background: #e8e8f0; color: #555; }
+
+        .text-red { color: #c0392b; font-weight: bold; }
+
+        /* ── Progress Bars ── */
+        .progress-row-table { width: 100%; border-collapse: collapse; }
+        .progress-row-table td { padding: 5px 0; vertical-align: middle; }
+        .progress-name { width: 150px; font-size: 8.5pt; font-weight: bold; color: #1a1a2e; }
+        .progress-bar-outer {
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress-bar-fill-green { height: 10px; background-color: #2d5a27; border-radius: 5px; }
+        .progress-bar-fill-gold { height: 10px; background-color: #b8960c; border-radius: 5px; }
+        .progress-pct { width: 40px; text-align: right; font-size: 8pt; font-weight: bold; }
+        .pct-green { color: #2d5a27; }
+        .pct-gold { color: #b8960c; }
+
+        .haccp-block {
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 8px 10px;
+            page-break-inside: avoid;
+        }
+
+        .haccp-header { font-weight: bold; font-size: 9pt; color: #333; margin-bottom: 3px; }
+        .haccp-freq { font-size: 7.5pt; color: #888; font-weight: normal; margin-left: 6px; }
+        .haccp-item { padding: 2px 0; font-size: 8.5pt; }
+        .check-yes { color: #16a34a; }
+        .check-no { color: #ccc; }
+
+        /* ── License ── */
+        .license-card {
+            background: #f5f5f8;
+            border-radius: 4px;
+            padding: 12px;
+        }
+
+        .license-grid { width: 100%; border-collapse: collapse; }
+        .license-grid td { padding: 6px 10px; vertical-align: top; width: 50%; }
+        .license-label {
+            font-size: 6.5pt;
+            font-weight: bold;
+            letter-spacing: 0.8px;
+            color: #888;
+            text-transform: uppercase;
+            display: block;
+        }
+        .license-value { font-size: 9.5pt; font-weight: bold; color: #1a1a2e; display: block; margin-top: 2px; }
+
+        .signoff-box {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 16px;
+        }
+
+        .signoff-table { width: 100%; border-collapse: collapse; }
+        .signoff-table td { padding: 6px 10px; vertical-align: top; }
+
+        .signoff-label {
+            font-size: 6.5pt;
+            font-weight: bold;
+            letter-spacing: 0.8px;
+            color: #888;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        .signoff-name {
+            font-size: 12pt;
+            font-style: italic;
+            font-weight: bold;
+            color: #1a1a2e;
+            margin-top: 20px;
+        }
+
+        .signoff-date {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #1a1a2e;
+            margin-top: 20px;
+        }
+
+        .signature-line {
+            border-bottom: 2px solid #1a1a2e;
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+
+        .signoff-role {
+            font-size: 8pt;
+            color: #888;
+        }
+
+        .signoff-comments {
+            margin-top: 12px;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 8.5pt;
+            font-style: italic;
+            color: #555;
+        }
+
+        .signoff-comments-label {
+            font-size: 6.5pt;
+            font-weight: bold;
+            letter-spacing: 0.8px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .page-footer {
+            font-size: 7pt;
+            color: #aaa;
+            text-align: center;
+            margin-top: 24px;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="report-header">
+    <table class="header-table">
+        <tr>
+            <td class="header-left">
+                <div class="header-label">Internkontroll Rapport</div>
+                <div class="header-org" th:text="${header.organizationName}">Organisasjon</div>
+                <div th:if="${header.orgNumber != null}" class="header-orgnr" th:text="'Org.nr: ' + ${header.orgNumber}">Org.nr: 000 000 000</div>
+            </td>
+            <td class="header-right">
+                <div class="header-right-line" th:text="'Periode: ' + ${header.periodFrom} + ' – ' + ${header.periodTo}">Periode: 01.03.2026 – 31.03.2026</div>
+                <div class="header-right-line" th:text="'Generert: ' + ${header.generatedDate}">Generert: 01.04.2026</div>
+                <div class="header-right-line">
+                    <span th:text="'Av: ' + ${header.generatedByName}">Av: Navn</span>
+                    <span th:if="${header.generatedByRole != null}" th:text="' (' + ${header.generatedByRole} + ')'">(Administrator)</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="section" th:if="${complianceSummary != null}">
+    <div class="section-title">Samsvarssammendrag</div>
+    <table class="kpi-grid">
+        <tr>
+            <td class="kpi-border-green">
+                <span class="kpi-label">Samsvarsrate</span>
+                <span class="kpi-value kpi-value-green" th:text="${#numbers.formatDecimal(complianceSummary.complianceRate, 1, 1) + '%'}">93.1%</span>
+            </td>
+            <td class="kpi-spacer"></td>
+            <td class="kpi-border-olive">
+                <span class="kpi-label">Forfalte oppgaver</span>
+                <span class="kpi-value kpi-value-olive" th:text="${complianceSummary.overdueTasks}">9</span>
+            </td>
+            <td class="kpi-spacer"></td>
+            <td class="kpi-border-gold">
+                <span class="kpi-label">&#197;pne avvik</span>
+                <span class="kpi-value kpi-value-gold" th:text="${complianceSummary.openDeviations}">3</span>
+            </td>
+            <td class="kpi-spacer"></td>
+            <td class="kpi-border-red">
+                <span class="kpi-label">Temp.avvik</span>
+                <span class="kpi-value kpi-value-red" th:text="${complianceSummary.temperatureDeviations}">2</span>
+            </td>
+        </tr>
+    </table>
+    <table class="kpi-bottom">
+        <tr>
+            <td>
+                <span class="kpi-stat-label">Totalt oppgaver</span>
+                <span class="kpi-stat-value" th:text="${complianceSummary.totalTasks}">248</span>
+            </td>
+            <td class="kpi-spacer"></td>
+            <td>
+                <span class="kpi-stat-label">Lukkede avvik</span>
+                <span class="kpi-stat-value" th:text="${complianceSummary.closedDeviations}">14</span>
+            </td>
+            <td class="kpi-spacer"></td>
+            <td>
+                <span class="kpi-stat-label">Alkoholhendelser</span>
+                <span class="kpi-stat-value" th:text="${complianceSummary.alcoholIncidents}">1</span>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="section" th:if="${temperatureLogs != null}">
+    <div class="module-badge">IK-Mat &#8212; Matsamsvar</div>
+    <div class="section-title">Temperaturlogg</div>
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>Plassering</th>
+            <th>Sni &#176;C</th>
+            <th>Min &#176;C</th>
+            <th>Maks &#176;C</th>
+            <th>Avvik</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="log : ${temperatureLogs}">
+            <td class="td-bold" th:text="${log.location}">Walk-in Cooler A</td>
+            <td th:text="${#numbers.formatDecimal(log.avgTemp, 1, 1)}">3.1</td>
+            <td th:text="${#numbers.formatDecimal(log.minTemp, 1, 1)}">2.4</td>
+            <td th:text="${#numbers.formatDecimal(log.maxTemp, 1, 1)}">4.8</td>
+            <td th:text="${log.deviationCount}">0</td>
+            <td>
+                <span th:class="${log.status == 'Normal' ? 'badge badge-green' : (log.status == 'Advarsel' ? 'badge badge-yellow' : 'badge badge-red')}"
+                      th:text="${log.status == 'Normal' ? 'NORMAL' : (log.status == 'Advarsel' ? 'ADVARSEL' : 'KRITISK')}">NORMAL</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="section" th:if="${checklists != null}">
+    <div class="section-title">Sjekkliste-fullf&#248;ring</div>
+    <table class="progress-row-table">
+        <tr th:each="cl : ${checklists}">
+            <td class="progress-name" th:text="${cl.name}">Kitchen</td>
+            <td>
+                <div class="progress-bar-outer">
+                    <div th:class="${cl.completionRate >= 100 ? 'progress-bar-fill-green' : 'progress-bar-fill-gold'}"
+                         th:style="'width:' + ${cl.completionRate} + '%'"></div>
+                </div>
+            </td>
+            <td th:class="'progress-pct ' + (${cl.completionRate >= 100} ? 'pct-green' : 'pct-gold')"
+                th:text="${#numbers.formatDecimal(cl.completionRate, 1, 0) + '% (' + cl.completedCount + '/' + cl.expectedCount + ')'}">100%</td>
+        </tr>
+    </table>
+</div>
+
+<div class="section" th:if="${haccpChecklists != null}">
+    <div class="section-title">HACCP-sjekklister</div>
+    <div th:each="hc : ${haccpChecklists.checklists}" class="haccp-block">
+        <div class="haccp-header">
+            <span th:text="${hc.name}">Daglig rengj&#248;ring</span>
+            <span class="haccp-freq" th:text="${hc.frequency}">DAILY</span>
+            <span style="float:right; font-size:9pt; font-weight:bold; color:#2d5a27;"
+                  th:text="${#numbers.formatDecimal(hc.completionRate, 1, 0) + '%'}">100%</span>
+        </div>
+        <div class="progress-bar-outer" style="margin: 4px 0 6px 0;">
+            <div th:class="${hc.completionRate >= 100 ? 'progress-bar-fill-green' : 'progress-bar-fill-gold'}"
+                 th:style="'width:' + ${hc.completionRate} + '%'"></div>
+        </div>
+        <div th:each="item : ${hc.items}" class="haccp-item">
+            <span th:if="${item.completed}" class="check-yes">&#10003;</span>
+            <span th:unless="${item.completed}" class="check-no">&#9675;</span>
+            <span th:text="${item.title}">Rengj&#248;r arbeidsflater</span>
+            <span th:if="${item.completedAt != null}" style="font-size:7pt; color:#999;"
+                  th:text="' (' + ${item.completedAt} + ')'"></span>
+        </div>
+    </div>
+</div>
+
+<div class="section" th:if="${correctiveActions != null}">
+    <div class="section-title">Korrigerende tiltak</div>
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Dato</th>
+            <th>Problem</th>
+            <th>Tiltak</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="ca : ${correctiveActions}">
+            <td class="td-bold" th:text="${ca.id}">CA-042</td>
+            <td th:text="${ca.date}">08.03.2026</td>
+            <td th:text="${ca.issue}">Issue description</td>
+            <td th:text="${ca.actionTaken}">Action taken</td>
+            <td>
+                <span th:class="${ca.status == 'Lukket' ? 'badge badge-green' : 'badge badge-yellow'}"
+                      th:text="${ca.status == 'Lukket' ? 'LUKKET' : '&#197;PEN'}">LUKKET</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="section" th:if="${foodDeviations != null}">
+    <div class="section-title">Matavvik</div>
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Dato</th>
+            <th>Type</th>
+            <th>Alvorlighet</th>
+            <th>Beskrivelse</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="dev : ${foodDeviations}">
+            <td class="td-bold" th:text="${dev.id}">1</td>
+            <td th:text="${dev.date}">08.03.2026</td>
+            <td th:text="${dev.type}">TEMPERATUR</td>
+            <td th:text="${dev.severity}">HIGH</td>
+            <td th:text="${dev.description}">Description</td>
+            <td>
+                <span th:class="${dev.status == 'Lukket' ? 'badge badge-green' : (dev.status == 'Under behandling' ? 'badge badge-yellow' : 'badge badge-red')}"
+                      th:text="${dev.status}">Åpen</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="section" th:if="${alcoholDeviations != null}">
+    <div class="module-badge">IK-Alkohol &#8212; Alkoholsamsvar</div>
+    <div class="section-title">Hendelsesrapporter</div>
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Dato</th>
+            <th>Beskrivelse</th>
+            <th>Tiltak</th>
+            <th>L&#248;st</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="dev : ${alcoholDeviations}">
+            <td class="td-bold" th:text="'INC-' + ${dev.id}">INC-017</td>
+            <td th:text="${dev.date}">12.03.2026</td>
+            <td th:text="${dev.description}">Description</td>
+            <td th:text="${dev.immediateAction}">–</td>
+            <td>
+                <span th:class="${dev.status == 'Lukket' ? 'badge badge-green' : 'badge badge-yellow'}"
+                      th:text="${dev.status == 'Lukket' ? 'JA' : 'NEI'}">JA</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="section" th:if="${ageVerificationLogs != null}">
+    <div class="section-title">Alderskontroll</div>
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>Dato</th>
+            <th>Skift</th>
+            <th>Totalt sjekket</th>
+            <th>ID forespurt</th>
+            <th>Avvisninger</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="av : ${ageVerificationLogs}">
+            <td th:text="${av.date}">05.03.2026</td>
+            <td th:text="${av.shift}">Evening</td>
+            <td th:text="${av.totalChecks}">14</td>
+            <td th:text="${av.idRequested}">14</td>
+            <td th:class="${av.refusals > 0 ? 'text-red' : ''}" th:text="${av.refusals}">2</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="section" th:if="${trainingOverview != null}">
+    <div class="section-title">Oppl&#230;ringsoversikt</div>
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>Navn</th>
+            <th>Rolle</th>
+            <th>Sertifisering</th>
+            <th>Utl&#248;per</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="t : ${trainingOverview}">
+            <td class="td-bold" th:text="${t.name}">Kari Nordmann</td>
+            <td th:text="${t.role}">Bartender</td>
+            <td th:text="${t.certification}">Ansvarlig Vertskap</td>
+            <td th:text="${t.expires}">15.09.2026</td>
+            <td>
+                <span th:class="${t.status == 'Gyldig' ? 'badge badge-green' : (t.status == 'Utløper snart' ? 'badge badge-yellow' : 'badge badge-red')}"
+                      th:text="${t.status == 'Gyldig' ? 'GYLDIG' : (t.status == 'Utløper snart' ? 'UTLØPER SNART' : 'UTLØPT')}">GYLDIG</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="section" th:if="${licenseInfo != null}">
+    <div class="section-title">Lisensinformasjon</div>
+
+    <div th:if="${licenseInfo.bevillingNumber != null or licenseInfo.holder != null or licenseInfo.styrerName != null or licenseInfo.stedfortrederName != null}"
+         class="license-card" style="margin-bottom: 10px;">
+        <div style="font-size: 8pt; font-weight: bold; letter-spacing: 0.8px; color: #1a1a2e; text-transform: uppercase; margin-bottom: 8px;">Skjenkebevilling</div>
+        <table class="license-grid">
+            <tr th:if="${licenseInfo.bevillingNumber != null or licenseInfo.bevillingValidTo != null}">
+                <td th:if="${licenseInfo.bevillingNumber != null}">
+                    <span class="license-label">Bevillingsnummer</span>
+                    <span class="license-value" th:text="${licenseInfo.bevillingNumber}">SKJ-2024-0891</span>
+                </td>
+                <td th:if="${licenseInfo.bevillingValidTo != null}">
+                    <span class="license-label">Gyldig til</span>
+                    <span class="license-value" th:text="${licenseInfo.bevillingValidTo}">31.12.2028</span>
+                </td>
+            </tr>
+            <tr th:if="${licenseInfo.holder != null or licenseInfo.styrerName != null}">
+                <td th:if="${licenseInfo.holder != null}">
+                    <span class="license-label">Bevillingshaver</span>
+                    <span class="license-value" th:text="${licenseInfo.holder}">Org</span>
+                </td>
+                <td th:if="${licenseInfo.styrerName != null}">
+                    <span class="license-label">Styrer</span>
+                    <span class="license-value" th:text="${licenseInfo.styrerName}">Navn</span>
+                </td>
+            </tr>
+            <tr th:if="${licenseInfo.stedfortrederName != null}">
+                <td>
+                    <span class="license-label">Stedfortreder</span>
+                    <span class="license-value" th:text="${licenseInfo.stedfortrederName}">Navn</span>
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+    <div th:if="${licenseInfo.kunnskapsproveType != null or licenseInfo.kunnskapsproveCandidateName != null}"
+         class="license-card">
+        <div style="font-size: 8pt; font-weight: bold; letter-spacing: 0.8px; color: #1a1a2e; text-transform: uppercase; margin-bottom: 8px;">Kunnskapspr&#248;ve</div>
+        <table class="license-grid">
+            <tr>
+                <td th:if="${licenseInfo.kunnskapsproveType != null}">
+                    <span class="license-label">Type</span>
+                    <span class="license-value" th:text="${licenseInfo.kunnskapsproveType}">SKJENKE</span>
+                </td>
+                <td th:if="${licenseInfo.kunnskapsproveCandidateName != null}">
+                    <span class="license-label">Kandidat</span>
+                    <span class="license-value" th:text="${licenseInfo.kunnskapsproveCandidateName}">Navn</span>
+                </td>
+            </tr>
+            <tr th:if="${licenseInfo.kunnskapsprovePassedDate != null or licenseInfo.kunnskapsproveMunicipality != null}">
+                <td th:if="${licenseInfo.kunnskapsprovePassedDate != null}">
+                    <span class="license-label">Best&#229;tt dato</span>
+                    <span class="license-value" th:text="${licenseInfo.kunnskapsprovePassedDate}">01.06.2024</span>
+                </td>
+                <td th:if="${licenseInfo.kunnskapsproveMunicipality != null}">
+                    <span class="license-label">Kommune</span>
+                    <span class="license-value" th:text="${licenseInfo.kunnskapsproveMunicipality}">Trondheim</span>
+                </td>
+            </tr>
+            <tr th:if="${licenseInfo.kunnskapsproveBirthDate != null}">
+                <td>
+                    <span class="license-label">F&#248;dselsdato</span>
+                    <span class="license-value" th:text="${licenseInfo.kunnskapsproveBirthDate}">01.01.1985</span>
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="section" th:if="${signOff != null}">
+    <div class="section-title">Signering</div>
+    <div class="signoff-box">
+        <table class="signoff-table">
+            <tr>
+                <td style="width:55%;">
+                    <div class="signoff-label">Leders signatur</div>
+                    <div class="signoff-name" th:text="${signOff.name}">Erik Bakken</div>
+                    <div class="signature-line"></div>
+                    <div class="signoff-role">
+                        <span th:text="${signOff.name}">Erik Bakken</span>
+                        <span th:if="${signOff.title != null}" th:text="' — ' + ${signOff.title}"> — Daglig leder</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="signoff-label">Dato</div>
+                    <div class="signoff-date" th:text="${signOff.date}">01.04.2026</div>
+                    <div class="signature-line"></div>
+                </td>
+            </tr>
+        </table>
+        <div th:if="${signOff.comments != null}" style="margin-top:12px;">
+            <div class="signoff-comments-label">Kommentarer</div>
+            <div class="signoff-comments" th:text="${signOff.comments}">Comments here.</div>
+        </div>
+    </div>
+</div>
+
+<div class="page-footer">
+    Generert av IK-System &#8212; Internkontrollsystem for mat- og alkoholsamsvar
+</div>
+
+</body>
+</html>

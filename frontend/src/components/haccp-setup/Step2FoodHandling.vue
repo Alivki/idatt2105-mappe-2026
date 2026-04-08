@@ -242,4 +242,19 @@ const summary = computed(() => {
   color: var(--red);
   font-weight: 600;
 }
+
+@media (max-width: 600px) {
+  .prereq-main {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .prereq-status-row {
+    align-self: flex-start;
+  }
+
+  .info-banner {
+    font-size: 0.75rem;
+  }
+}
 </style>
