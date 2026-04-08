@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { Thermometer, TriangleAlert } from 'lucide-vue-next'
+import { Thermometer, TriangleAlert, CheckCircle2, Clock3 } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import OverviewCard from '@/components/common/OverviewCard.vue'
 import Badge from '@/components/ui/badge/Badge.vue'
@@ -331,19 +331,22 @@ function goToNextPage(): void {
         <OverviewCard
           label="Målinger i dag"
           :value="`${measurementsTodayCount}/${expectedMeasurementsToday}`"
+          :icon="Thermometer"
           :variant="measurementsTodayVariant"
           sub-label="Mål: 2 målinger per aktiv enhet"
         />
         <OverviewCard
           label="Ferdigmålte enheter"
           :value="`${completedUnitsToday}/${completedUnitsTarget}`"
+          :icon="CheckCircle2"
           :variant="completedUnitsVariant"
           sub-label="En enhet er ferdig når den har 2 målinger i dag"
         />
-        <OverviewCard label="Avvik registrert" :value="deviationCount" variant="open" />
+        <OverviewCard label="Avvik registrert" :value="deviationCount" :icon="TriangleAlert" variant="open" />
         <OverviewCard
           label="Siste måling"
           :value="latestEntry ? `${latestEntry.temperature.toFixed(1)}°C` : '-'"
+          :icon="Clock3"
           :sub-label="latestEntry ? `${formatDateTime(latestEntry.measuredAt)} • ${latestEntry.measuredBy}` : 'Ingen målinger ennå'"
           :value-class="latestEntry?.status === 'DEVIATION' ? 'val-red' : 'val-green'"
         />

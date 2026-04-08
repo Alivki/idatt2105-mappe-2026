@@ -5,6 +5,7 @@ import { Search, ArrowUpDown, AlertTriangle, IdCard, CalendarDays, TrendingUp } 
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import Button from '@/components/ui/button/Button.vue'
+import OverviewCard from '@/components/common/OverviewCard.vue'
 import DatePicker from '@/components/ui/date-picker/DatePicker.vue'
 import { CalendarDate } from '@internationalized/date'
 import type { DateValue } from '@internationalized/date'
@@ -111,34 +112,10 @@ function navigateToDay(date: string) {
     </section>
 
     <section v-if="stats" class="cards-group">
-      <div class="stat-card stat-card--neutral">
-        <div class="stat-card-header">
-          <CalendarDays :size="16" class="stat-card-icon" aria-hidden="true" />
-          <span class="stat-card-label">Totalt skift</span>
-        </div>
-        <p class="stat-card-value">{{ stats.totalShifts }}</p>
-      </div>
-      <div class="stat-card stat-card--resolved">
-        <div class="stat-card-header">
-          <IdCard :size="16" class="stat-card-icon" aria-hidden="true" />
-          <span class="stat-card-label">Leg sjekket</span>
-        </div>
-        <p class="stat-card-value">{{ stats.totalIdsChecked }}</p>
-      </div>
-      <div class="stat-card" :class="stats.totalDeviations > 0 ? 'stat-card--open' : 'stat-card--neutral'">
-        <div class="stat-card-header">
-          <AlertTriangle :size="16" class="stat-card-icon" aria-hidden="true" />
-          <span class="stat-card-label">Avvik</span>
-        </div>
-        <p class="stat-card-value">{{ stats.totalDeviations }}</p>
-      </div>
-      <div class="stat-card stat-card--in-progress">
-        <div class="stat-card-header">
-          <TrendingUp :size="16" class="stat-card-icon" aria-hidden="true" />
-          <span class="stat-card-label">Snitt leg/skift</span>
-        </div>
-        <p class="stat-card-value">{{ stats.avgIdsPerShift.toFixed(1) }}</p>
-      </div>
+      <OverviewCard label="Totalt skift" :value="stats.totalShifts" :icon="CalendarDays" />
+      <OverviewCard label="Leg sjekket" :value="stats.totalIdsChecked" :icon="IdCard" variant="resolved" />
+      <OverviewCard label="Avvik" :value="stats.totalDeviations" :icon="AlertTriangle" :variant="stats.totalDeviations > 0 ? 'open' : 'neutral'" />
+      <OverviewCard label="Snitt leg/skift" :value="stats.avgIdsPerShift.toFixed(1)" :icon="TrendingUp" variant="in-progress" />
     </section>
 
     <section class="table-section">

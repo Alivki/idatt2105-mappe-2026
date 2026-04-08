@@ -1,19 +1,25 @@
 <script setup lang="ts">
+import type { Component } from 'vue'
+
 withDefaults(defineProps<{
   label: string
   value: string | number
   variant?: 'neutral' | 'open' | 'in-progress' | 'resolved'
   subLabel?: string
   valueClass?: string
-}>(), { 
+  icon?: Component
+}>(), {
   variant: 'neutral',
-  valueClass: '' 
+  valueClass: '',
 })
 </script>
 
 <template>
   <div :class="['overview-card', `overview-card--${variant}`]">
-    <p class="card-label">{{ label }}</p>
+    <div class="card-header">
+      <component :is="icon" v-if="icon" :size="16" class="card-icon" aria-hidden="true" />
+      <p class="card-label">{{ label }}</p>
+    </div>
     <p class="card-value" :class="valueClass">{{ value }}</p>
     <slot />
     <p v-if="subLabel" class="card-sub">{{ subLabel }}</p>
@@ -28,8 +34,19 @@ withDefaults(defineProps<{
   border-radius: var(--radius-lg);
   padding: 16px;
   border: 2px solid hsl(var(--border));
-  background: var(--card-bg);
+  background: hsl(var(--card));
   min-height: 6.25rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-icon {
+  flex-shrink: 0;
+  opacity: 0.6;
 }
 
 .card-label {
@@ -64,12 +81,20 @@ withDefaults(defineProps<{
   color: var(--red);
 }
 
+.overview-card--open .card-icon {
+  color: var(--red);
+}
+
 .overview-card--in-progress {
   background: var(--amber-soft);
   border-color: color-mix(in srgb, var(--amber-soft) 50%, var(--amber) 20%);
 }
 
 .overview-card--in-progress .card-value {
+  color: var(--amber);
+}
+
+.overview-card--in-progress .card-icon {
   color: var(--amber);
 }
 
@@ -80,6 +105,14 @@ withDefaults(defineProps<{
 
 .overview-card--resolved .card-value {
   color: var(--green);
+}
+
+.overview-card--resolved .card-icon {
+  color: var(--green);
+}
+
+.overview-card--neutral .card-icon {
+  color: hsl(var(--muted-foreground));
 }
 
 /* Support for color classes from props */

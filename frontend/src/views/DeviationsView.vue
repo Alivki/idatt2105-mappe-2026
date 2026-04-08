@@ -2,7 +2,7 @@
 import axios from 'axios'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import {AlertTriangle, Plus, Trash2, RefreshCw} from 'lucide-vue-next'
+import { AlertTriangle, Plus, Trash2, RefreshCw, ChefHat, Beer, TriangleAlert, Clock3, CircleCheckBig } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -141,14 +141,14 @@ const underTreatmentCount = computed(() => combinedDeviations.value.filter((i) =
 const closedCount = computed(() => combinedDeviations.value.filter((i) => i.data.status === 'CLOSED').length)
 
 const moduleCards = computed(() => [
-  { key: 'IK_MAT', label: 'IK-Mat', count: foodCount.value, variant: 'neutral' as const },
-  { key: 'IK_ALKOHOL', label: 'IK-Alkohol', count: alcoholCount.value, variant: 'neutral' as const },
+  { key: 'IK_MAT', label: 'IK-Mat', count: foodCount.value, variant: 'neutral' as const, icon: ChefHat },
+  { key: 'IK_ALKOHOL', label: 'IK-Alkohol', count: alcoholCount.value, variant: 'neutral' as const, icon: Beer },
 ])
 
 const statusCards = computed(() => [
-  { key: 'OPEN', label: 'Åpne', count: openCount.value, variant: 'open' as const },
-  { key: 'UNDER_TREATMENT', label: 'Under behandling', count: underTreatmentCount.value, variant: 'in-progress' as const },
-  { key: 'CLOSED', label: 'Lukket', count: closedCount.value, variant: 'resolved' as const },
+  { key: 'OPEN', label: 'Åpne', count: openCount.value, variant: 'open' as const, icon: TriangleAlert },
+  { key: 'UNDER_TREATMENT', label: 'Under behandling', count: underTreatmentCount.value, variant: 'in-progress' as const, icon: Clock3 },
+  { key: 'CLOSED', label: 'Lukket', count: closedCount.value, variant: 'resolved' as const, icon: CircleCheckBig },
 ])
 
 const statusFilters: Array<{ label: string; value: StatusFilter }> = [
@@ -301,8 +301,8 @@ function handleError(error: unknown, fallback: string) {
 
       <!-- Info cards -->
       <section class="cards-section" aria-label="Statusoversikt">
-        <OverviewCard v-for="card in moduleCards" :key="card.key" :label="card.label" :value="card.count" :variant="card.variant" />
-        <OverviewCard v-for="card in statusCards" :key="card.key" :label="card.label" :value="card.count" :variant="card.variant" />
+        <OverviewCard v-for="card in moduleCards" :key="card.key" :label="card.label" :value="card.count" :variant="card.variant" :icon="card.icon" />
+        <OverviewCard v-for="card in statusCards" :key="card.key" :label="card.label" :value="card.count" :variant="card.variant" :icon="card.icon" />
       </section>
 
       <!-- Penalty points cards -->

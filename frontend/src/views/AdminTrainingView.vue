@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import axios from 'axios'
-import { MoreVertical, ArrowUpDown, Search, Plus, Pencil, Trash2, AlertTriangle } from 'lucide-vue-next'
+import { MoreVertical, ArrowUpDown, Search, Plus, Pencil, Trash2, AlertTriangle, Users, ShieldCheck, Clock, UserX } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
@@ -227,11 +227,11 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 
     <!-- Stats cards -->
     <section class="cards-group">
-      <OverviewCard label="Totalt opplærte" :value="stats.total" />
-      <OverviewCard label="Fullført" :value="stats.completed" variant="resolved" />
-      <OverviewCard label="Utløper snart" :value="stats.expiringSoon" variant="in-progress" />
-      <OverviewCard label="Utgått" :value="stats.expired" variant="open" />
-      <OverviewCard label="Mangler" :value="stats.notCompleted" variant="open" />
+      <OverviewCard label="Totalt opplærte" :value="stats.total" :icon="Users" />
+      <OverviewCard label="Fullført" :value="stats.completed" :icon="ShieldCheck" variant="resolved" />
+      <OverviewCard label="Utløper snart" :value="stats.expiringSoon" :icon="Clock" variant="in-progress" />
+      <OverviewCard label="Utgått" :value="stats.expired" :icon="AlertTriangle" variant="open" />
+      <OverviewCard label="Mangler" :value="stats.notCompleted" :icon="UserX" variant="open" />
     </section>
 
     <!-- Table -->

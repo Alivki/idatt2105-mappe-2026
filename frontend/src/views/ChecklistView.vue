@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { ClipboardCheck, ListChecks } from 'lucide-vue-next'
+import { ClipboardCheck, ListChecks, Clock3, CircleCheckBig, CircleDashed } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
@@ -214,10 +214,10 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 
       <!-- Stats cards -->
       <section class="cards-section" aria-label="Sjekklisteoversikt">
-        <OverviewCard label="Totalt sjekklister" :value="stats.total" />
-        <OverviewCard label="Fullført" :value="stats.completed" variant="resolved" />
-        <OverviewCard label="Under arbeid" :value="stats.inProgress" variant="in-progress" />
-        <OverviewCard label="Ikke startet" :value="stats.notStarted" variant="open" />
+        <OverviewCard label="Totalt sjekklister" :value="stats.total" :icon="ClipboardCheck" />
+        <OverviewCard label="Fullført" :value="stats.completed" :icon="CircleCheckBig" variant="resolved" />
+        <OverviewCard label="Under arbeid" :value="stats.inProgress" :icon="Clock3" variant="in-progress" />
+        <OverviewCard label="Ikke startet" :value="stats.notStarted" :icon="CircleDashed" variant="open" />
       </section>
 
       <section class="filters-row" aria-label="Filtrer frekvens">
