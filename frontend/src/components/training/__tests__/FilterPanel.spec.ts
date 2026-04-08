@@ -2,7 +2,6 @@ import { describe, it, expect} from 'vitest'
 import { mount } from '@vue/test-utils'
 import FilterPanel from '../FilterPanel.vue'
 
-// Stub lucide icon
 const XStub = { template: '<span class="icon-x" />' }
 
 const defaultProps = {
