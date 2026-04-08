@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { SIDEBAR_WIDTH_MOBILE, useSidebar } from "./utils"
+import { useSidebar } from "./utils"
 
 defineOptions({
   inheritAttrs: false,
@@ -49,7 +49,7 @@ const { isMobile, state, openMobile, setOpenMobile } = ctx
       data-mobile="true"
       :side="side"
       class="sidebar-mobile-sheet"
-      :style="{ '--sidebar-width': SIDEBAR_WIDTH_MOBILE }"
+      :style="{ '--sidebar-width': 'min(90vw, 20rem)' }"
     >
       <div class="sidebar-mobile-inner">
         <slot />
@@ -215,7 +215,7 @@ const { isMobile, state, openMobile, setOpenMobile } = ctx
 .sidebar-mobile-sheet {
   width: var(--sidebar-width);
   background-color: hsl(var(--sidebar-background, 40 25% 98%));
-  padding: 0;
+  padding: 0.75rem;
   color: hsl(var(--sidebar-foreground, 24 10% 10%));
 }
 
@@ -228,5 +228,6 @@ const { isMobile, state, openMobile, setOpenMobile } = ctx
   height: 100%;
   width: 100%;
   flex-direction: column;
+  min-height: 0;
 }
 </style>

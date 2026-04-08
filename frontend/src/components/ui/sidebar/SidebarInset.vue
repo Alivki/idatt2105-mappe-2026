@@ -23,6 +23,8 @@ const { variant } = useSidebar()
   min-height: 100svh;
   flex: 1;
   flex-direction: column;
+  min-width: 0;
+  overflow-x: clip;
   background-color: hsl(var(--background, 43 30% 96%));
 }
 
