@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, type Ref } from 'vue'
+import { useMediaQuery } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 import { Search, ArrowUpDown, AlertTriangle, IdCard, CalendarDays, TrendingUp } from 'lucide-vue-next'
 import { Separator } from '@/components/ui/separator'
@@ -25,6 +26,7 @@ import {
 import type { DailySummaryResponse } from '@/types/ageVerification'
 
 const router = useRouter()
+const isMobile = useMediaQuery('(max-width: 768px)')
 
 const today = new Date()
 const thirtyDaysAgo = new Date(today)
@@ -152,8 +154,46 @@ function navigateToDay(date: string) {
         </div>
       </div>
 
+      <div v-else-if="isMobile" class="mobile-summary-list">
+        <article
+          v-for="row in filteredAndSorted"
+          :key="row.date"
+          class="mobile-summary-card"
+          @click="navigateToDay(row.date)"
+        >
+          <div class="mobile-summary-row">
+            <span>Dato</span>
+            <strong>{{ formatDate(row.date) }}</strong>
+          </div>
+          <div class="mobile-summary-row">
+            <span>Skift</span>
+            <span>{{ row.shiftCount }}</span>
+          </div>
+          <div class="mobile-summary-row">
+            <span>Leg sjekket</span>
+            <span>{{ row.totalIdsChecked }}</span>
+          </div>
+          <div class="mobile-summary-row">
+            <span>Avvik</span>
+            <span :class="row.totalDeviations > 0 ? 'deviation-count' : ''">{{ row.totalDeviations }}</span>
+          </div>
+        </article>
+
+        <div v-if="filteredAndSorted.length === 0" class="empty-state">
+          <div class="empty-state-inner">
+            <div class="empty-state-icon">
+              <AlertTriangle :stroke-width="1.5" aria-hidden="true" />
+            </div>
+            <div class="empty-state-text">
+              <h2>Ingen data for valgt periode.</h2>
+              <p>Juster datoperiode for å se registreringer.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div v-else class="table-card">
-        <Table>
+        <Table class="age-verification-table">
           <TableHeader>
             <TableRow>
               <TableHead class="th-date">
@@ -190,10 +230,10 @@ function navigateToDay(date: string) {
               class="clickable-row"
               @click="navigateToDay(row.date)"
             >
-              <TableCell class="cell-bold">{{ formatDate(row.date) }}</TableCell>
-              <TableCell class="cell-text">{{ row.shiftCount }}</TableCell>
-              <TableCell class="cell-text">{{ row.totalIdsChecked }}</TableCell>
-              <TableCell>
+              <TableCell class="cell-bold" data-label="Dato">{{ formatDate(row.date) }}</TableCell>
+              <TableCell class="cell-text" data-label="Skift">{{ row.shiftCount }}</TableCell>
+              <TableCell class="cell-text" data-label="Leg sjekket">{{ row.totalIdsChecked }}</TableCell>
+              <TableCell data-label="Avvik">
                 <span :class="row.totalDeviations > 0 ? 'deviation-count' : 'cell-text'">
                   {{ row.totalDeviations }}
                 </span>
@@ -349,6 +389,44 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 .cell-text { color: hsl(var(--muted-foreground)); }
 .deviation-count { color: var(--red); font-weight: 600; }
 
+.mobile-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.mobile-summary-card {
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.65rem;
+  background: hsl(var(--card));
+  padding: 0.45rem 0.65rem;
+  cursor: pointer;
+}
+
+.mobile-summary-card:hover {
+  background: hsl(var(--accent) / 0.35);
+}
+
+.mobile-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.34rem 0;
+}
+
+.mobile-summary-row > span:first-child {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.mobile-summary-row > :last-child {
+  text-align: right;
+}
+
 .th-date { min-width: 12rem; }
 
 .loading-state {
@@ -398,6 +476,50 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   .header-row { flex-direction: column; }
   .search-row { flex-direction: column; align-items: stretch; gap: 0.75rem; }
   .date-filters { width: 100%; }
+  .date-filters { flex-wrap: wrap; }
   .search-wrapper { max-width: none; }
+
+  .age-verification-table :deep(thead) {
+    display: none;
+  }
+
+  .age-verification-table :deep(tbody) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .age-verification-table :deep(tr.table-row) {
+    display: block;
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.65rem;
+    background: hsl(var(--card));
+    padding: 0.35rem 0.55rem;
+  }
+
+  .age-verification-table :deep(td.table-cell) {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.38rem 0;
+    border: none;
+  }
+
+  .age-verification-table :deep(td.table-cell[data-label]::before) {
+    content: attr(data-label);
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+
+  .age-verification-table :deep(td.table-cell > *) {
+    margin-left: auto;
+    text-align: right;
+  }
 }
 </style>

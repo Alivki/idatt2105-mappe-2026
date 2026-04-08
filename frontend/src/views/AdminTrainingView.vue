@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useMediaQuery } from '@vueuse/core'
 import axios from 'axios'
 import { MoreVertical, ArrowUpDown, Search, Plus, Pencil, Trash2, AlertTriangle, Users, ShieldCheck, Clock, UserX } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
@@ -44,6 +45,7 @@ import type { TrainingLog, TrainingStatus } from '@/types/training'
 
 const trainingLogsQuery = useTrainingLogsQuery()
 const deleteTrainingLog = useDeleteTrainingLogMutation()
+const isMobile = useMediaQuery('(max-width: 768px)')
 
 const trainingLogs = computed(() => trainingLogsQuery.data.value ?? [])
 
@@ -268,8 +270,75 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
         </div>
       </div>
 
+      <div v-else-if="isMobile" class="mobile-training-list">
+        <article
+          v-for="log in filteredAndSorted"
+          :key="log.id"
+          class="mobile-training-card"
+          :class="selected.has(log.id) ? 'mobile-training-card--selected' : ''"
+        >
+          <div class="mobile-training-top">
+            <Checkbox :checked="selected.has(log.id)" @update:checked="toggleSelect(log.id)" />
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger">
+                  <MoreVertical :size="18" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" :side-offset="4">
+                <DropdownMenuLabel>Handlinger</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem @click="openEdit(log)">
+                  <Pencil :size="16" />
+                  Rediger
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem class="menu-item--danger" @click="openDeleteSingle(log)">
+                  <Trash2 :size="16" />
+                  Slett
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div class="mobile-training-row">
+            <span>Ansatt</span>
+            <strong>{{ log.employeeUserName }}</strong>
+          </div>
+          <div class="mobile-training-row">
+            <span>Opplæringstype</span>
+            <span>{{ log.title }}</span>
+          </div>
+          <div class="mobile-training-row">
+            <span>Fullført</span>
+            <span>{{ formatDate(log.completedAt) }}</span>
+          </div>
+          <div class="mobile-training-row">
+            <span>Utløper</span>
+            <span :class="log.status === 'EXPIRES_SOON' ? 'cell-expires-soon' : ''">{{ formatDate(log.expiresAt) }}</span>
+          </div>
+          <div class="mobile-training-row">
+            <span>Status</span>
+            <StatusBadge :status="statusLabel[log.status]" />
+          </div>
+        </article>
+
+        <div v-if="filteredAndSorted.length === 0" class="empty-state">
+          <div class="empty-state-bg" />
+          <div class="empty-state-inner">
+            <div class="empty-state-icon">
+              <AlertTriangle :stroke-width="1.5" />
+            </div>
+            <div class="empty-state-text">
+              <h3>Ingen opplæringer matcher søket</h3>
+              <p>Prøv et annet søk eller registrer ny opplæring.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div v-else class="table-card">
-        <Table>
+        <Table class="training-table">
           <TableHeader>
             <TableRow>
               <TableHead class="th-check">
@@ -315,10 +384,10 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
               :key="log.id"
               :class="selected.has(log.id) ? 'row-selected' : ''"
             >
-              <TableCell class="td-check">
+              <TableCell class="td-check" data-label="Velg">
                 <Checkbox :checked="selected.has(log.id)" @update:checked="toggleSelect(log.id)" />
               </TableCell>
-              <TableCell>
+              <TableCell data-label="Ansatt">
                 <div class="cell-user">
                   <div class="user-avatar">
                     {{ log.employeeUserName.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() }}
@@ -326,15 +395,15 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
                   <span class="user-name">{{ log.employeeUserName }}</span>
                 </div>
               </TableCell>
-              <TableCell class="cell-text">{{ log.title }}</TableCell>
-              <TableCell class="cell-text hide-mobile">{{ formatDate(log.completedAt) }}</TableCell>
-              <TableCell :class="`cell-text hide-mobile${log.status === 'EXPIRES_SOON' ? ' cell-expires-soon' : ''}`">
+              <TableCell class="cell-text" data-label="Opplæringstype">{{ log.title }}</TableCell>
+              <TableCell class="cell-text hide-mobile" data-label="Fullført">{{ formatDate(log.completedAt) }}</TableCell>
+              <TableCell :class="`cell-text hide-mobile${log.status === 'EXPIRES_SOON' ? ' cell-expires-soon' : ''}`" data-label="Utløper">
                 {{ formatDate(log.expiresAt) }}
               </TableCell>
-              <TableCell>
+              <TableCell data-label="Status">
                 <StatusBadge :status="statusLabel[log.status]" />
               </TableCell>
-              <TableCell class="cell-actions">
+              <TableCell class="cell-actions" data-label="Handlinger">
                 <DropdownMenu>
                   <DropdownMenuTrigger as-child>
                     <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger">
@@ -557,6 +626,49 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 
 .menu-item--danger { color: var(--red); }
 
+.mobile-training-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.mobile-training-card {
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.65rem;
+  background: hsl(var(--card));
+  padding: 0.45rem 0.65rem;
+}
+
+.mobile-training-card--selected {
+  background-color: hsl(var(--muted, 40 18% 93%) / 0.6);
+}
+
+.mobile-training-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobile-training-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.32rem 0;
+}
+
+.mobile-training-row > span:first-child {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.mobile-training-row > :last-child {
+  text-align: right;
+}
+
 /* Column widths */
 .th-employee { min-width: 10rem; }
 .th-title { min-width: 8rem; }
@@ -649,9 +761,65 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 }
 
 @media (max-width: 768px) {
-  .hide-mobile { display: none; }
+  .hide-mobile { display: none !important; }
   .cards-group { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .header-row { flex-direction: column; }
+  .header-actions { width: 100%; }
+  .header-actions :deep(button) { width: 100%; }
+  .search-row { flex-direction: column; align-items: stretch; }
   .search-wrapper { width: 100%; }
+
+  .training-table :deep(thead) {
+    display: none;
+  }
+
+  .training-table :deep(tbody) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .training-table :deep(tr.table-row) {
+    display: block;
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.65rem;
+    background: hsl(var(--card));
+    padding: 0.35rem 0.55rem;
+  }
+
+  .training-table :deep(td.table-cell) {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.38rem 0;
+    border: none;
+  }
+
+  .training-table :deep(td.table-cell[data-label='Velg']),
+  .training-table :deep(td.table-cell[data-label='Handlinger']) {
+    justify-content: flex-end;
+  }
+
+  .training-table :deep(td.table-cell[data-label]::before) {
+    content: attr(data-label);
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+
+  .training-table :deep(td.table-cell > *) {
+    margin-left: auto;
+    text-align: right;
+    min-width: 0;
+  }
+
+  .training-table :deep(.cell-user) {
+    justify-content: flex-end;
+  }
 }
 </style>
