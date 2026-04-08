@@ -37,7 +37,7 @@ import {
   useEndShiftMutation,
 } from '@/composables/useAgeVerification'
 import { useDeleteAlcoholDeviationMutation } from '@/composables/useAlcoholDeviations'
-import { useMembersQuery } from '@/composables/useMembers'
+import { useMemberNamesQuery } from '@/composables/useMembers'
 import type { AlcoholDeviationType, CreateAlcoholDeviationRequest } from '@/types/deviation'
 
 const auth = useAuthStore()
@@ -47,7 +47,7 @@ const updateCount = useUpdateIdCheckCountMutation()
 const createDeviation = useCreateShiftDeviationMutation()
 const endShift = useEndShiftMutation()
 const deleteDeviation = useDeleteAlcoholDeviationMutation()
-const membersQuery = useMembersQuery()
+const memberNamesQuery = useMemberNamesQuery()
 
 const shift = computed(() => activeShiftQuery.data.value?.shift ?? null)
 const deviations = computed(() => activeShiftQuery.data.value?.deviations ?? [])
@@ -58,9 +58,9 @@ const deviationFormOpen = ref(false)
 const prefillDeviationType = ref<AlcoholDeviationType | ''>('')
 
 const memberOptions = computed(() =>
-  (membersQuery.data.value ?? []).map((m) => ({
+  (memberNamesQuery.data.value ?? []).map((m) => ({
     userId: m.userId,
-    label: m.userFullName,
+    label: m.fullName,
   })),
 )
 

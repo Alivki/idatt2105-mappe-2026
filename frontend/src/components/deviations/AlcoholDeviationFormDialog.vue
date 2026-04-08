@@ -15,6 +15,7 @@ import SelectContent from '@/components/ui/select/SelectContent.vue'
 import SelectItem from '@/components/ui/select/SelectItem.vue'
 import SelectTrigger from '@/components/ui/select/SelectTrigger.vue'
 import SelectValue from '@/components/ui/select/SelectValue.vue'
+import { useAuthStore } from '@/stores/auth'
 import { CalendarDate } from '@internationalized/date'
 import type { DateValue } from '@internationalized/date'
 import type {
@@ -48,6 +49,8 @@ const emits = defineEmits<{
   (e: 'create', payload: CreateAlcoholDeviationRequest): void
   (e: 'update', payload: { id: number; data: UpdateAlcoholDeviationRequest }): void
 }>()
+
+const auth = useAuthStore()
 
 function stringToCalendarDate(str: string): CalendarDate | undefined {
   if (!str) return undefined
@@ -225,7 +228,7 @@ watch(
       reportedDate.value = undefined
       reportedHours.value = undefined
       reportedMinutes.value = undefined
-      reportedByUserId.value = ''
+      reportedByUserId.value = auth.user ? String(auth.user.id) : ''
       reportSource.value = 'EGENRAPPORT'
       deviationType.value = ''
       description.value = ''
