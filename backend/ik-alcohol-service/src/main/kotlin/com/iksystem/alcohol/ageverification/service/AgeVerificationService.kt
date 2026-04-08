@@ -31,7 +31,14 @@ class AgeVerificationService(
         val orgId = auth.requireOrganizationId()
         val shift = shiftRepository.findByUserIdAndOrganizationIdAndStatus(
             auth.userId, orgId, ShiftStatus.ACTIVE
-        ) ?: return null
+        )
+            ?: shiftRepository.findFirstByUserIdAndOrganizationIdAndShiftDateOrderByStartedAtDesc(
+                auth.userId,
+                orgId,
+                LocalDate.now(),
+            )
+            ?.takeIf { it.status == ShiftStatus.COMPLETED }
+            ?: return null
         return toShiftDetail(shift)
     }
 
@@ -39,6 +46,7 @@ class AgeVerificationService(
     fun startShift(auth: AuthenticatedUser): ShiftResponse {
         val orgId = auth.requireOrganizationId()
         val user = requireUser(auth.userId)
+        val today = LocalDate.now()
 
         val existing = shiftRepository.findByUserIdAndOrganizationIdAndStatus(
             auth.userId, orgId, ShiftStatus.ACTIVE
@@ -47,11 +55,20 @@ class AgeVerificationService(
             throw ConflictException("Du har allerede et aktivt skift")
         }
 
+        val todayShift = shiftRepository.findFirstByUserIdAndOrganizationIdAndShiftDateOrderByStartedAtDesc(
+            auth.userId,
+            orgId,
+            today,
+        )
+        if (todayShift != null) {
+            throw BadRequestException("Skiftet for i dag er allerede avsluttet. Du kan gjenapne dagens skift, eller starte nytt i morgen.")
+        }
+
         val shift = shiftRepository.save(
             AgeVerificationShift(
                 organizationId = orgId,
                 user = user,
-                shiftDate = LocalDate.now(),
+                shiftDate = today,
             )
         )
         return shift.toResponse(0)
@@ -103,6 +120,40 @@ class AgeVerificationService(
                 signedOffAt = now,
                 status = ShiftStatus.COMPLETED,
                 updatedAt = now,
+            )
+        )
+        val deviationCount = deviationRepository.findAllByAgeVerificationShiftId(shiftId).size
+        return updated.toResponse(deviationCount)
+    }
+
+    @Transactional
+    fun reopenShift(shiftId: Long, auth: AuthenticatedUser): ShiftResponse {
+        val orgId = auth.requireOrganizationId()
+        val shift = shiftRepository.findByIdAndOrganizationId(shiftId, orgId)
+            ?: throw NotFoundException("Skift ikke funnet")
+
+        if (shift.user.id != auth.userId) {
+            throw ForbiddenException("Du kan bare gjenapne ditt eget skift")
+        }
+        if (shift.status != ShiftStatus.COMPLETED) {
+            throw BadRequestException("Kun avsluttede skift kan gjenapnes")
+        }
+        if (shift.shiftDate != LocalDate.now()) {
+            throw BadRequestException("Kun dagens skift kan gjenapnes")
+        }
+
+        val active = shiftRepository.findByUserIdAndOrganizationIdAndStatus(auth.userId, orgId, ShiftStatus.ACTIVE)
+        if (active != null && active.id != shift.id) {
+            throw ConflictException("Du har allerede et aktivt skift")
+        }
+
+        val updated = shiftRepository.save(
+            shift.copy(
+                endedAt = null,
+                signedOff = false,
+                signedOffAt = null,
+                status = ShiftStatus.ACTIVE,
+                updatedAt = Instant.now(),
             )
         )
         val deviationCount = deviationRepository.findAllByAgeVerificationShiftId(shiftId).size

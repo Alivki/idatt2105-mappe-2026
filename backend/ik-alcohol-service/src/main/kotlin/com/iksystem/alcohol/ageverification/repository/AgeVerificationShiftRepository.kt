@@ -18,6 +18,12 @@ interface AgeVerificationShiftRepository : JpaRepository<AgeVerificationShift, L
         status: ShiftStatus,
     ): AgeVerificationShift?
 
+    fun findFirstByUserIdAndOrganizationIdAndShiftDateOrderByStartedAtDesc(
+        userId: Long,
+        organizationId: Long,
+        shiftDate: LocalDate,
+    ): AgeVerificationShift?
+
     fun findByOrganizationIdAndShiftDateBetweenOrderByShiftDateDesc(
         organizationId: Long,
         from: LocalDate,
