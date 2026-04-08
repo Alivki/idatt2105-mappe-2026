@@ -293,4 +293,5 @@ describe('ChecklistCard', () => {
     expect(wrapper.text()).not.toContain('Fullfør hele')
     expect(wrapper.text()).not.toContain('Angre fullføring')
   })
+
 })
