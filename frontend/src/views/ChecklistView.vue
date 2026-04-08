@@ -225,6 +225,7 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
           v-for="filter in filters"
           :key="filter.value"
           :class="activeFilter === filter.value ? 'filter-button filter-button--active' : 'filter-button'"
+          :aria-pressed="activeFilter === filter.value"
           variant="outline"
           size="sm"
           @click="activeFilter = filter.value"
@@ -234,28 +235,31 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
       </section>
 
       <section class="list-section">
-        <p v-if="checklistQuery.isLoading.value" class="state-line">Laster sjekklister...</p>
+        <div v-if="checklistQuery.isLoading.value" class="skeleton-list">
+          <div v-for="n in 4" :key="n" class="skeleton-card">
+            <div class="skeleton-line skeleton-line--title"></div>
+            <div class="skeleton-line skeleton-line--short"></div>
+          </div>
+        </div>
         <div v-else-if="checklistQuery.isError.value" class="empty-state">
-          <div class="empty-state-bg" />
           <div class="empty-state-inner">
             <div class="empty-state-icon">
-              <ClipboardCheck :stroke-width="1.5" />
+              <ClipboardCheck :stroke-width="1.5" aria-hidden="true" />
             </div>
             <div class="empty-state-text">
-              <h3>Kunne ikke hente sjekklister</h3>
+              <h2>Kunne ikke hente sjekklister</h2>
               <p>Noe gikk galt under lasting av sjekklister. Prøv igjen senere.</p>
             </div>
           </div>
         </div>
 
         <div v-else-if="checklists.length === 0" class="empty-state">
-          <div class="empty-state-bg" />
           <div class="empty-state-inner">
             <div class="empty-state-icon empty-state-icon--green">
-              <ListChecks :stroke-width="1.5" />
+              <ListChecks :stroke-width="1.5" aria-hidden="true" />
             </div>
             <div class="empty-state-text">
-              <h3>Ingen sjekklister ennå</h3>
+              <h2>Ingen sjekklister ennå</h2>
               <p>Vi anbefaler å bruke HACCP-veiviseren for å sette opp sjekklistene dine. Veiviseren stiller noen spørsmål om virksomheten og genererer skreddersydde sjekklister basert på Mattilsynets krav.</p>
             </div>
             <div class="empty-state-actions">
@@ -270,13 +274,12 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
         </div>
 
         <div v-else-if="groupedChecklists.length === 0" class="empty-state">
-          <div class="empty-state-bg" />
           <div class="empty-state-inner">
             <div class="empty-state-icon">
-              <ClipboardCheck :stroke-width="1.5" />
+              <ClipboardCheck :stroke-width="1.5" aria-hidden="true" />
             </div>
             <div class="empty-state-text">
-              <h3>Ingen sjekklister i valgt frekvens</h3>
+              <h2>Ingen sjekklister i valgt frekvens</h2>
               <p>Prøv å endre filteret for å se sjekklister med en annen frekvens.</p>
             </div>
           </div>
@@ -334,8 +337,9 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 
 h1 {
   margin: 0;
-  font-size: 2.4rem;
-  letter-spacing: -0.02em;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
 .header-row p {
@@ -356,32 +360,32 @@ h1 {
 }
 
 .filter-button {
-  border: 1px solid #cfcfc9;
+  border: 1px solid hsl(var(--border));
   border-radius: var(--radius-pill);
-  background: #f3f3f2;
+  background: hsl(var(--muted));
   padding: 8px 16px;
   cursor: pointer;
   font-size: 0.95rem;
-  color: #32363d;
+  color: hsl(var(--foreground));
 }
 
 .filter-button--active {
-  border-color: #4f4bcf;
-  background: #eeedff;
-  color: #403db1;
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: color-mix(in srgb, var(--brand) 80%, black);
   font-weight: 600;
 }
 
 .state-line {
   padding: 14px;
   border-radius: var(--radius-md);
-  background: #ececea;
-  color: #4b5056;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
 }
 
 .state-line--danger {
-  background: #f6e5e5;
-  color: #913333;
+  background: var(--red-soft);
+  color: var(--red);
 }
 
 .empty-state {
@@ -391,18 +395,10 @@ h1 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   border-radius: 1rem;
   border: 2px dashed hsl(var(--muted-foreground) / 0.2);
-  background: linear-gradient(to bottom right, hsl(var(--muted) / 0.4), hsl(var(--muted) / 0.2), hsl(var(--background)));
+  background: hsl(var(--muted) / 0.3);
   padding: 2rem;
-}
-
-.empty-state-bg {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at center, hsl(var(--muted)) 0%, transparent 70%);
-  opacity: 0.5;
 }
 
 .empty-state-inner {
@@ -416,22 +412,21 @@ h1 {
 
 .empty-state-icon {
   display: flex;
-  height: 5rem;
-  width: 5rem;
+  height: 4rem;
+  width: 4rem;
   align-items: center;
   justify-content: center;
   border-radius: 1rem;
-  background-color: hsl(var(--primary) / 0.1);
-  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.05);
+  background-color: hsl(var(--muted));
 }
 
 .empty-state-icon :deep(svg) {
-  width: 2.5rem;
-  height: 2.5rem;
-  color: hsl(var(--primary) / 0.7);
+  width: 2rem;
+  height: 2rem;
+  color: hsl(var(--muted-foreground));
 }
 
-.empty-state-text h3 {
+.empty-state-text h2 {
   font-size: 1.125rem;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -445,12 +440,12 @@ h1 {
 }
 
 .empty-state-icon--green {
-  background-color: #f0fdf4;
-  box-shadow: 0 0 0 4px #dcfce7;
+  background-color: var(--green-soft);
+  box-shadow: 0 0 0 4px var(--green-soft);
 }
 
 .empty-state-icon--green :deep(svg) {
-  color: #16a34a;
+  color: var(--green);
 }
 
 .empty-state-actions {
@@ -484,7 +479,7 @@ h1 {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-size: 0.96rem;
-  color: #474c53;
+  color: hsl(var(--foreground));
   font-weight: 700;
 }
 
@@ -494,7 +489,14 @@ h1 {
   }
 
   h1 {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
 }
+
+.skeleton-list { display: flex; flex-direction: column; gap: 12px; }
+.skeleton-card { padding: 16px; border-radius: var(--radius-lg); border: 1px solid hsl(var(--border)); background: var(--card-bg); }
+.skeleton-line { height: 14px; border-radius: 6px; background: hsl(var(--muted)); animation: shimmer 1.4s ease-in-out infinite; }
+.skeleton-line--title { width: 55%; margin-bottom: 10px; }
+.skeleton-line--short { width: 35%; }
+@keyframes shimmer { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 </style>

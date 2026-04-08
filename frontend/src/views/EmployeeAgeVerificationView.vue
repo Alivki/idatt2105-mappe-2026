@@ -196,15 +196,15 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
       <div class="start-card">
         <div class="start-card-body">
           <div class="start-icon">
-            <ShieldCheck :size="36" :stroke-width="1.5" />
+            <ShieldCheck :size="36" :stroke-width="1.5" aria-hidden="true" />
           </div>
           <div class="start-info">
             <div class="info-item">
-              <IdCard :size="18" />
+              <IdCard :size="18" aria-hidden="true" />
               <span>Tell hver ID-sjekk med + og - knappene</span>
             </div>
             <div class="info-item">
-              <AlertTriangle :size="18" />
+              <AlertTriangle :size="18" aria-hidden="true" />
               <span>Registrer avvik raskt med snarveisknapper</span>
             </div>
           </div>
@@ -212,7 +212,7 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
             :disabled="startShift.isPending.value"
             @click="handleStartShift"
           >
-            <Play :size="18" />
+            <Play :size="18" aria-hidden="true" />
             Start skift
           </Button>
         </div>
@@ -235,18 +235,20 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
         <div class="counter">
           <button
             class="counter-btn"
+            aria-label="Reduser antall"
             :disabled="shift!.idsCheckedCount <= 0 || updateCount.isPending.value"
             @click="handleDecrement"
           >
-            <Minus :size="22" />
+            <Minus :size="22" aria-hidden="true" />
           </button>
           <span class="counter-value">{{ shift!.idsCheckedCount }}</span>
           <button
             class="counter-btn"
+            aria-label="Øk antall"
             :disabled="updateCount.isPending.value"
             @click="handleIncrement"
           >
-            <Plus :size="22" />
+            <Plus :size="22" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -260,7 +262,7 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
             class="deviation-btn"
             @click="openDeviationForm(d.type)"
           >
-            <component :is="d.icon" :size="18" />
+            <component :is="d.icon" :size="18" aria-hidden="true" />
             <span>{{ d.label }}</span>
           </button>
         </div>
@@ -271,13 +273,13 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
         <p class="section-label">Avvik i dette skiftet ({{ deviations.length }})</p>
         <div class="deviation-list">
           <div v-for="dev in deviations" :key="dev.id" class="deviation-item">
-            <AlertTriangle :size="16" class="deviation-item-icon" />
+            <AlertTriangle :size="16" class="deviation-item-icon" aria-hidden="true" />
             <div class="deviation-item-content">
               <span class="deviation-item-type">{{ deviationLabel[dev.deviationType] ?? dev.deviationType }}</span>
               <span class="deviation-item-time">{{ formatTime(dev.reportedAt) }}</span>
             </div>
-            <button class="deviation-item-delete" @click="handleDeleteDeviation(dev.id)">
-              <Trash2 :size="15" />
+            <button class="deviation-item-delete" aria-label="Slett avvik" @click="handleDeleteDeviation(dev.id)">
+              <Trash2 :size="15" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -358,7 +360,7 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
   align-items: flex-start;
 }
 
-h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
+h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 .header-row p { margin-top: 6px; color: var(--text-secondary); font-size: 1.08rem; }
 
 .start-card {
@@ -386,8 +388,8 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   width: 64px;
   height: 64px;
   border-radius: 16px;
-  background: hsl(var(--primary) / 0.1);
-  color: hsl(var(--primary));
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
 }
 
 .start-info {
@@ -404,7 +406,7 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   color: hsl(var(--muted-foreground));
 }
 
-.info-item svg { flex-shrink: 0; color: hsl(var(--primary) / 0.5); }
+.info-item svg { flex-shrink: 0; color: hsl(var(--muted-foreground)); }
 
 .counter-row {
   display: flex;
@@ -437,7 +439,7 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   background: hsl(var(--card));
   color: hsl(var(--foreground));
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: background 150ms ease, color 150ms ease;
 }
 
 .counter-btn:hover:not(:disabled) {
@@ -498,13 +500,13 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   font-weight: 500;
   color: hsl(var(--foreground));
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
 }
 
 .deviation-btn:hover {
-  border-color: #dc2626;
-  background: #fef2f2;
-  color: #dc2626;
+  border-color: var(--red);
+  background: var(--red-soft);
+  color: var(--red);
 }
 
 .deviation-btn:active { transform: scale(0.98); }
@@ -529,7 +531,7 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   background: hsl(var(--card));
 }
 
-.deviation-item-icon { flex-shrink: 0; color: #dc2626; }
+.deviation-item-icon { flex-shrink: 0; color: var(--red); }
 
 .deviation-item-content {
   flex: 1;
@@ -548,23 +550,24 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border-radius: 6px;
   border: none;
   background: none;
   color: hsl(var(--muted-foreground));
   cursor: pointer;
   flex-shrink: 0;
-  transition: all 150ms ease;
+  transition: background 150ms ease, color 150ms ease;
 }
 
 .deviation-item-delete:hover {
-  background: #fef2f2;
-  color: #dc2626;
+  background: var(--red-soft);
+  color: var(--red);
 }
 
 @media (max-width: 400px) {
+  h1 { font-size: 1.5rem; }
   .deviation-grid { grid-template-columns: 1fr; }
   .counter-row { flex-direction: column; gap: 12px; align-items: stretch; }
   .counter { align-self: center; }

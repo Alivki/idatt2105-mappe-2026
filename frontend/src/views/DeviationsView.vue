@@ -2,7 +2,7 @@
 import axios from 'axios'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import {AlertTriangle, Plus, Trash2} from 'lucide-vue-next'
+import {AlertTriangle, Plus, Trash2, RefreshCw} from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -30,7 +30,7 @@ import PenaltyPointsStatus from '@/components/deviations/PenaltyPointsStatus.vue
 import PenaltyPointsGuide from '@/components/deviations/PenaltyPointsGuide.vue'
 import OverviewCard from '@/components/common/OverviewCard.vue'
 import { useAuthStore } from '@/stores/auth'
-import { useMembersQuery } from '@/composables/useMembers'
+import { useMemberNamesQuery } from '@/composables/useMembers'
 import {
   useFoodDeviationsQuery,
   useCreateFoodDeviationMutation,
@@ -66,7 +66,7 @@ type SortOrder = 'NEWEST_FIRST' | 'OLDEST_FIRST'
 const router = useRouter()
 const auth = useAuthStore()
 const canManage = computed(() => auth.role === 'ADMIN' || auth.role === 'MANAGER')
-const membersQuery = useMembersQuery(canManage)
+const memberNamesQuery = useMemberNamesQuery()
 
 // Queries
 const foodQuery = useFoodDeviationsQuery()
@@ -96,14 +96,10 @@ const activeAlcoholDeviation = ref<AlcoholDeviation | null>(null)
 
 // Member options for dropdowns
 const memberOptions = computed(() => {
-  if (canManage.value) {
-    return (membersQuery.data.value ?? []).map((m) => ({
-      userId: m.userId,
-      label: `${m.userFullName} (${m.role})`,
-    }))
-  }
-  if (!auth.user) return []
-  return [{ userId: auth.user.id, label: `${auth.user.fullName} (Deg)` }]
+  return (memberNamesQuery.data.value ?? []).map((m) => ({
+    userId: m.userId,
+    label: m.fullName,
+  }))
 })
 
 // Combined list
@@ -298,7 +294,7 @@ function handleError(error: unknown, fallback: string) {
         </div>
 
         <Button @click="openCreateDialog">
-          <Plus :size="16" />
+          <Plus :size="16" aria-hidden="true" />
           Registrer avvik
         </Button>
       </section>
@@ -316,27 +312,29 @@ function handleError(error: unknown, fallback: string) {
       </section>
 
       <!-- Filters -->
-      <section class="filters-row">
+      <section class="filters-row" aria-label="Filtre">
         <div class="filters-left">
-          <div class="filter-group">
+          <div class="filter-group" role="group" aria-label="Statusfilter">
             <Button
               v-for="filter in statusFilters"
               :key="filter.value"
               :class="activeStatusFilter === filter.value ? 'filter-button filter-button--active' : 'filter-button'"
               variant="outline"
               size="sm"
+              :aria-pressed="activeStatusFilter === filter.value"
               @click="activeStatusFilter = filter.value"
             >
               {{ filter.label }}
             </Button>
           </div>
-          <div class="filter-group">
+          <div class="filter-group" role="group" aria-label="Modulfilter">
             <Button
               v-for="filter in moduleFilters"
               :key="filter.value"
               :class="activeModuleFilter === filter.value ? 'filter-button filter-button--active' : 'filter-button'"
               variant="outline"
               size="sm"
+              :aria-pressed="activeModuleFilter === filter.value"
               @click="activeModuleFilter = filter.value"
             >
               {{ filter.label }}
@@ -346,7 +344,7 @@ function handleError(error: unknown, fallback: string) {
 
         <div class="filters-right">
           <Select :model-value="sortOrder" default-value="NEWEST_FIRST" @update:model-value="onSortChange">
-            <SelectTrigger class="sort-trigger">
+            <SelectTrigger class="sort-trigger" aria-label="Sortering">
               <SelectValue placeholder="Nyeste først" />
             </SelectTrigger>
             <SelectContent>
@@ -358,7 +356,7 @@ function handleError(error: unknown, fallback: string) {
           <AlertDialog v-if="activeStatusFilter === 'CLOSED'">
             <AlertDialogTrigger>
               <Button variant="destructive" class="delete-all-btn" :disabled="filteredAndSorted.length === 0">
-                <Trash2 />
+                <Trash2 aria-hidden="true" />
                 Slett alle lukkede
               </Button>
             </AlertDialogTrigger>
@@ -382,25 +380,28 @@ function handleError(error: unknown, fallback: string) {
 
       <!-- Deviation list -->
       <section class="list-section">
-        <p v-if="isLoading" class="state-line">Laster avvik...</p>
+        <div v-if="isLoading" class="loading-state">
+          <div class="skeleton-item" v-for="n in 4" :key="n"></div>
+        </div>
 
         <div v-else-if="isError" class="empty-state">
-          <div class="empty-state-bg" />
           <div class="empty-state-inner">
-            <div class="empty-state-icon"><AlertTriangle :stroke-width="1.5" /></div>
+            <div class="empty-state-icon"><AlertTriangle :stroke-width="1.5" aria-hidden="true" /></div>
             <div class="empty-state-text">
-              <h3>Kunne ikke hente avvik</h3>
+              <h2>Kunne ikke hente avvik</h2>
               <p>Noe gikk galt under lasting av avvik. Prøv igjen senere.</p>
             </div>
+            <Button variant="outline" size="sm" @click="() => { foodQuery.refetch(); alcoholQuery.refetch() }">
+              <RefreshCw :size="14" aria-hidden="true" /> Prøv igjen
+            </Button>
           </div>
         </div>
 
         <div v-else-if="filteredAndSorted.length === 0" class="empty-state">
-          <div class="empty-state-bg" />
           <div class="empty-state-inner">
-            <div class="empty-state-icon"><AlertTriangle :stroke-width="1.5" /></div>
+            <div class="empty-state-icon"><AlertTriangle :stroke-width="1.5" aria-hidden="true" /></div>
             <div class="empty-state-text">
-              <h3>Ingen avvik i valgt liste</h3>
+              <h2>Ingen avvik i valgt liste</h2>
               <p>Det finnes ingen registrerte avvik med valgte filtre.</p>
             </div>
           </div>
@@ -441,6 +442,7 @@ function handleError(error: unknown, fallback: string) {
             :class="createTab === 'IK_MAT' ? 'create-tab create-tab--active' : 'create-tab'"
             variant="outline"
             size="sm"
+            :aria-pressed="createTab === 'IK_MAT'"
             @click="createTab = 'IK_MAT'"
           >
             IK-Mat
@@ -450,6 +452,7 @@ function handleError(error: unknown, fallback: string) {
             :class="createTab === 'IK_ALKOHOL' ? 'create-tab create-tab--active' : 'create-tab'"
             variant="outline"
             size="sm"
+            :aria-pressed="createTab === 'IK_ALKOHOL'"
             @click="createTab = 'IK_ALKOHOL'"
           >
             IK-Alkohol
@@ -518,8 +521,8 @@ function handleError(error: unknown, fallback: string) {
   gap: 12px;
 }
 
-h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
-.header-row p { margin-top: 6px; color: var(--text-secondary); font-size: 1.08rem; }
+h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
+.header-row p { margin-top: 4px; color: var(--text-secondary); font-size: 0.88rem; }
 
 .create-dialog {
   max-width: 48rem;
@@ -553,7 +556,7 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   border-radius: var(--radius-pill);
   cursor: pointer;
   color: hsl(var(--muted-foreground));
-  transition: all 150ms ease;
+  transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
 }
 
 .create-tab--active {
@@ -592,58 +595,63 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 .filters-left { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
 .filter-group { display: flex; gap: 4px; flex-wrap: wrap; }
 .filter-button {
-  border: 1px solid #cfcfc9;
+  border: 1px solid hsl(var(--border));
   border-radius: var(--radius-pill);
-  background: #f3f3f2;
+  background: hsl(var(--muted));
   padding: 8px 16px;
   cursor: pointer;
   font-size: 0.95rem;
-  color: #32363d;
+  color: hsl(var(--foreground));
 }
 .filter-button--active {
-  border-color: #4f4bcf;
-  background: #eeedff;
-  color: #403db1;
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
   font-weight: 600;
 }
 .filters-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
-.sort-trigger { width: 10rem; }
+.sort-trigger { min-width: 10rem; }
 
-.delete-all-btn { background-color: #fde8e8; color: #c62828; border: none; box-shadow: none; }
-.delete-all-btn:hover { background-color: #fad4d4; }
+.delete-all-btn { background-color: var(--red-soft); color: var(--red); border: none; box-shadow: none; }
+.delete-all-btn:hover { background-color: color-mix(in srgb, var(--red-soft) 70%, var(--red) 10%); }
 
 .list-section { display: flex; flex-direction: column; gap: 10px; }
 .list-wrap { display: flex; flex-direction: column; gap: 10px; }
 
-.state-line {
-  border-radius: var(--radius-md);
-  border: 1px solid hsl(var(--border));
-  background: hsl(var(--card));
-  padding: 12px;
-  color: var(--text-secondary);
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeleton-item {
+  height: 88px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted) / 0.5) 50%, hsl(var(--muted)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .empty-state {
-  position: relative; display: flex; min-height: 260px;
+  display: flex; min-height: 220px;
   flex-direction: column; align-items: center; justify-content: center;
-  overflow: hidden; border-radius: 1rem;
+  border-radius: 1rem;
   border: 2px dashed hsl(var(--muted-foreground) / 0.2);
-  background: linear-gradient(to bottom right, hsl(var(--muted) / 0.4), hsl(var(--muted) / 0.2), hsl(var(--background)));
+  background: hsl(var(--muted) / 0.3);
   padding: 2rem;
 }
-.empty-state-bg {
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse at center, hsl(var(--muted)) 0%, transparent 70%);
-  opacity: 0.5;
-}
-.empty-state-inner { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
+.empty-state-inner { display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
 .empty-state-icon {
-  display: flex; height: 5rem; width: 5rem; align-items: center; justify-content: center;
-  border-radius: 1rem; background-color: hsl(var(--primary) / 0.1);
-  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.05);
+  display: flex; height: 4rem; width: 4rem; align-items: center; justify-content: center;
+  border-radius: var(--radius-lg); background-color: hsl(var(--muted));
 }
-.empty-state-icon :deep(svg) { width: 2.5rem; height: 2.5rem; color: hsl(var(--primary) / 0.7); }
-.empty-state-text h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; }
+.empty-state-icon :deep(svg) { width: 2rem; height: 2rem; color: hsl(var(--muted-foreground)); }
+.empty-state-text h2 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; }
 .empty-state-text p { max-width: 24rem; font-size: 0.875rem; color: hsl(var(--muted-foreground)); margin-top: 0.25rem; }
 
 @media (max-width: 1100px) {
@@ -652,6 +660,7 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 }
 
 @media (max-width: 760px) {
+  h1 { font-size: 1.5rem; }
   .header-row { flex-direction: column; }
   .create-actions { width: 100%; }
   .cards-section { grid-template-columns: 1fr; }

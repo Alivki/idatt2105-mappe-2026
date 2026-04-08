@@ -266,7 +266,7 @@ async function confirmDeleteAppliance(): Promise<void> {
 
         <div>
           <Button @click="openCreateDialog">
-            <Plus />
+            <Plus aria-hidden="true" />
             Ny enhet
           </Button>
         </div>
@@ -313,17 +313,16 @@ async function confirmDeleteAppliance(): Promise<void> {
       </section>
 
       <section v-if="appliancesWithLastEntry.length === 0" class="empty-state">
-        <div class="empty-state-bg" />
         <div class="empty-state-inner">
           <div class="empty-state-icon">
-            <Refrigerator :stroke-width="1.5" />
+            <Refrigerator :stroke-width="1.5" aria-hidden="true" />
           </div>
           <div class="empty-state-text">
-            <h3>Ingen hvitevarer registrert</h3>
+            <h2>Ingen hvitevarer registrert</h2>
             <p>Legg til kjøleskap og frysere for å komme i gang med temperaturovervåking.</p>
           </div>
           <Button @click="openCreateDialog">
-            <Plus />
+            <Plus aria-hidden="true" />
             Legg til hvitevare
           </Button>
         </div>
@@ -341,8 +340,8 @@ async function confirmDeleteAppliance(): Promise<void> {
             >
               <div class="device-card-head">
                 <div class="device-icon-wrap">
-                  <Refrigerator v-if="item.type === 'FRIDGE'" />
-                  <Snowflake v-else />
+                  <Refrigerator v-if="item.type === 'FRIDGE'" aria-hidden="true" />
+                  <Snowflake v-else aria-hidden="true" />
                 </div>
                 <div>
                   <h3>{{ item.name }}</h3>
@@ -351,22 +350,22 @@ async function confirmDeleteAppliance(): Promise<void> {
                   <DropdownMenu>
                     <DropdownMenuTrigger as-child>
                       <Button variant="ghost" size="icon-sm" class="actions-trigger" aria-label="Åpne handlinger">
-                        <MoreVertical :size="18" />
+                        <MoreVertical :size="18" aria-hidden="true" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" :side-offset="4">
                       <DropdownMenuItem @click="openEditDialog(item)">
-                        <Pencil :size="16" />
+                        <Pencil :size="16" aria-hidden="true" />
                         Rediger
                       </DropdownMenuItem>
                       <DropdownMenuItem @click="toggleActive(item)">
-                        <PowerOff v-if="item.isActive" :size="16" />
-                        <Power v-else :size="16" />
+                        <PowerOff v-if="item.isActive" :size="16" aria-hidden="true" />
+                        <Power v-else :size="16" aria-hidden="true" />
                         {{ item.isActive ? 'Sett inaktiv' : 'Aktiver' }}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem class="menu-item--danger" @click="openDeleteDialog(item)">
-                        <Trash2 :size="16" />
+                        <Trash2 :size="16" aria-hidden="true" />
                         Slett enhet
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -440,7 +439,7 @@ async function confirmDeleteAppliance(): Promise<void> {
           <label :class="['field', { 'field--error': createErrors.name }]">
             <span>Navn</span>
             <Input v-model="createName" placeholder="For eksempel: Kjøleskap kjøkken" />
-            <p v-if="createErrors.name" class="field-error">{{ createErrors.name }}</p>
+            <p v-if="createErrors.name" class="field-error" role="alert">{{ createErrors.name }}</p>
           </label>
 
           <div class="field">
@@ -464,7 +463,7 @@ async function confirmDeleteAppliance(): Promise<void> {
           <label :class="['field', { 'field--error': createErrors.threshold }]">
             <span>Maks temperatur (°C)</span>
             <Input v-model="createMax" type="number" />
-            <p v-if="createErrors.threshold" class="field-error">{{ createErrors.threshold }}</p>
+            <p v-if="createErrors.threshold" class="field-error" role="alert">{{ createErrors.threshold }}</p>
           </label>
         </div>
 
@@ -488,7 +487,7 @@ async function confirmDeleteAppliance(): Promise<void> {
           <label :class="['field', { 'field--error': editErrors.name }]">
             <span>Navn</span>
             <Input v-model="editName" placeholder="Navn" />
-            <p v-if="editErrors.name" class="field-error">{{ editErrors.name }}</p>
+            <p v-if="editErrors.name" class="field-error" role="alert">{{ editErrors.name }}</p>
           </label>
 
           <label class="field">
@@ -504,7 +503,7 @@ async function confirmDeleteAppliance(): Promise<void> {
           <label :class="['field', { 'field--error': editErrors.threshold }]">
             <span>Maks temperatur (°C)</span>
             <Input v-model="editMax" type="number" />
-            <p v-if="editErrors.threshold" class="field-error">{{ editErrors.threshold }}</p>
+            <p v-if="editErrors.threshold" class="field-error" role="alert">{{ editErrors.threshold }}</p>
           </label>
         </div>
 
@@ -560,7 +559,9 @@ async function confirmDeleteAppliance(): Promise<void> {
 
 .page-intro h1 {
   margin-top: 0;
-  font-size: 1.45rem;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   line-height: 1.2;
 }
 
@@ -653,7 +654,7 @@ async function confirmDeleteAppliance(): Promise<void> {
   justify-content: center;
   border-radius: 0.5rem;
   background: var(--brand-soft);
-  color: #423ea8;
+  color: var(--brand);
   flex-shrink: 0;
 }
 
@@ -755,53 +756,24 @@ async function confirmDeleteAppliance(): Promise<void> {
 }
 
 .empty-state {
-  position: relative;
-  display: flex;
-  min-height: 260px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  display: flex; min-height: 220px;
+  flex-direction: column; align-items: center; justify-content: center;
   border-radius: 1rem;
   border: 2px dashed hsl(var(--muted-foreground) / 0.2);
-  background: linear-gradient(to bottom right, hsl(var(--muted) / 0.4), hsl(var(--muted) / 0.2), hsl(var(--background)));
+  background: hsl(var(--muted) / 0.3);
   padding: 2rem;
 }
 
-.empty-state-bg {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at center, hsl(var(--muted)) 0%, transparent 70%);
-  opacity: 0.5;
-}
-
-.empty-state-inner {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  text-align: center;
-}
+.empty-state-inner { display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
 
 .empty-state-icon {
-  display: flex;
-  height: 5rem;
-  width: 5rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: 1rem;
-  background-color: hsl(var(--primary) / 0.1);
-  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.05);
+  display: flex; height: 4rem; width: 4rem; align-items: center; justify-content: center;
+  border-radius: var(--radius-lg); background-color: hsl(var(--muted));
 }
 
-.empty-state-icon :deep(svg) {
-  width: 2.5rem;
-  height: 2.5rem;
-  color: hsl(var(--primary) / 0.7);
-}
+.empty-state-icon :deep(svg) { width: 2rem; height: 2rem; color: hsl(var(--muted-foreground)); }
 
-.empty-state-text h3 {
+.empty-state-text h2 {
   font-size: 1.125rem;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -825,6 +797,10 @@ async function confirmDeleteAppliance(): Promise<void> {
 
   .controls-row {
     flex-direction: column;
+  }
+
+  .page-intro h1 {
+    font-size: 1.5rem;
   }
 
   .form-grid {

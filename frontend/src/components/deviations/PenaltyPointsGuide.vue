@@ -32,7 +32,7 @@
 .guide-card {
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius-lg);
-  background: #ffffff;
+  background: var(--card-bg);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -59,7 +59,7 @@
   gap: 12px;
   padding: 10px 12px;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid hsl(var(--border));
 }
 
 .tier-badge {
@@ -74,19 +74,19 @@
   line-height: 1.4;
 }
 
-.tier--8p { background: #f4e0e0; }
-.tier--8p .tier-badge { color: #7f1d1d; }
-.tier--8p .tier-text { color: #7f1d1d; }
+.tier--8p { background: var(--red-soft); }
+.tier--8p .tier-badge { color: var(--red); }
+.tier--8p .tier-text { color: var(--red); }
 
-.tier--4p { background: #f6dfc8; }
-.tier--4p .tier-badge { color: #7c2d12; }
-.tier--4p .tier-text { color: #7c2d12; }
+.tier--4p { background: var(--amber-soft); }
+.tier--4p .tier-badge { color: var(--amber); }
+.tier--4p .tier-text { color: var(--amber); }
 
-.tier--2p { background: #f4e6d1; }
-.tier--2p .tier-badge { color: #78350f; }
-.tier--2p .tier-text { color: #78350f; }
+.tier--2p { background: var(--amber-soft); }
+.tier--2p .tier-badge { color: var(--amber); }
+.tier--2p .tier-text { color: var(--amber); }
 
-.tier--1p { background: #f5f0e6; }
-.tier--1p .tier-badge { color: #78350f; }
-.tier--1p .tier-text { color: #78350f; }
+.tier--1p { background: var(--amber-soft); }
+.tier--1p .tier-badge { color: var(--amber); }
+.tier--1p .tier-text { color: var(--amber); }
 </style>

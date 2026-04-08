@@ -1,6 +1,7 @@
 package com.iksystem.common.checklist.service
 
 import com.iksystem.common.exception.BadRequestException
+import com.iksystem.common.exception.ForbiddenException
 import com.iksystem.common.exception.NotFoundException
 import com.iksystem.common.checklist.dto.ChecklistItemResponse
 import com.iksystem.common.checklist.dto.ChecklistResponse
@@ -125,6 +126,12 @@ class ChecklistService(
 
         if (request.title == null && request.description == null && request.completed == null) {
             throw BadRequestException("No fields provided to update")
+        }
+
+        val role = auth.requireRole()
+        val isManager = role == "ADMIN" || role == "MANAGER"
+        if (!isManager && (request.title != null || request.description != null)) {
+            throw ForbiddenException("Only managers can edit item title or description")
         }
 
         val item = checklistItemRepository.findByIdAndChecklistId(itemId, checklistId)

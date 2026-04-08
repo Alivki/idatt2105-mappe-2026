@@ -1,15 +1,23 @@
 import { computed, type Ref } from 'vue'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import api from '@/lib/api'
-import type { OrganizationMember, OrganizationInfo, UpdateMemberRoleRequest } from '@/types/member'
+import type { MemberName, OrganizationMember, OrganizationInfo, UpdateMemberRoleRequest } from '@/types/member'
 
 export const membersQueryKey = ['members']
+export const memberNamesQueryKey = ['member-names']
 
 export function useMembersQuery(enabled?: Ref<boolean>) {
   return useQuery({
     queryKey: membersQueryKey,
     queryFn: () => api.get<OrganizationMember[]>('/users').then((r) => r.data),
     ...(enabled ? { enabled: computed(() => enabled.value) } : {}),
+  })
+}
+
+export function useMemberNamesQuery() {
+  return useQuery({
+    queryKey: memberNamesQueryKey,
+    queryFn: () => api.get<MemberName[]>('/users/names').then((r) => r.data),
   })
 }
 

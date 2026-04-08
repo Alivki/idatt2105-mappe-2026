@@ -47,6 +47,11 @@ interface AgeVerificationShiftRepository : JpaRepository<AgeVerificationShift, L
         from: LocalDate,
         to: LocalDate,
     ): List<DailySummaryProjection>
+
+    fun countByOrganizationIdAndStatus(organizationId: Long, status: ShiftStatus): Long
+
+    @Query("SELECT COALESCE(SUM(s.idsCheckedCount), 0) FROM AgeVerificationShift s WHERE s.organizationId = :orgId AND s.status = 'COMPLETED'")
+    fun sumIdsCheckedByOrganizationId(orgId: Long): Long
 }
 
 interface DailySummaryProjection {

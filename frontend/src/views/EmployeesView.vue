@@ -251,13 +251,14 @@ function handleInvite() {
           <p>Administrer og se oversikt over alle ansatte.</p>
         </div>
         <Button @click="openAddDialog">
-          <Plus :size="16" />
+          <Plus :size="16" aria-hidden="true" />
           Legg til ansatt
         </Button>
       </section>
 
       <div v-if="membersLoading" class="loading-state">
-        Laster ansatte...
+        <div class="skeleton-item skeleton-item--wide"></div>
+        <div class="skeleton-item skeleton-item--table"></div>
       </div>
 
       <template v-else-if="members && members.length > 0">
@@ -287,8 +288,8 @@ function handleInvite() {
 
         <section class="table-section">
           <div class="search-wrapper">
-            <Search :size="16" class="search-icon" />
-            <input v-model="search" class="search-input" placeholder="Søk etter ansatt..." />
+            <Search :size="16" class="search-icon" aria-hidden="true" />
+            <input v-model="search" class="search-input" placeholder="Søk etter ansatt..." aria-label="Søk etter ansatt" />
           </div>
 
           <div class="table-card">
@@ -298,19 +299,19 @@ function handleInvite() {
                   <TableHead class="th-name">
                     <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('name')">
                       Navn
-                      <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'name' }" />
+                      <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'name' }" aria-hidden="true" />
                     </Button>
                   </TableHead>
                   <TableHead class="th-email">
                     <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('email')">
                       E-post
-                      <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'email' }" />
+                      <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'email' }" aria-hidden="true" />
                     </Button>
                   </TableHead>
                   <TableHead class="th-role">
                     <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('role')">
                       Rolle
-                      <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'role' }" />
+                      <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'role' }" aria-hidden="true" />
                     </Button>
                   </TableHead>
                   <TableHead class="th-actions" />
@@ -344,21 +345,21 @@ function handleInvite() {
                     <div v-if="!isSelf(member)" class="actions-wrapper">
                       <DropdownMenu>
                         <DropdownMenuTrigger as-child>
-                          <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger">
-                            <MoreVertical :size="18" />
+                          <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger" aria-label="Handlinger">
+                            <MoreVertical :size="18" aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" :side-offset="4">
                           <DropdownMenuLabel>Handlinger</DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem @click="openRoleEdit(member)">
-                            <ShieldCheck :size="16" />
+                            <ShieldCheck :size="16" aria-hidden="true" />
                             Endre rolle
                           </DropdownMenuItem>
                           <template v-if="isAdmin">
                             <DropdownMenuSeparator />
                             <DropdownMenuItem class="menu-item--danger" @click="openRemoveDialog(member)">
-                              <UserMinus :size="16" />
+                              <UserMinus :size="16" aria-hidden="true" />
                               Fjern fra organisasjon
                             </DropdownMenuItem>
                           </template>
@@ -404,9 +405,9 @@ function handleInvite() {
             :class="{ 'role-option--selected': selectedRole === role }"
           >
             <input v-model="selectedRole" type="radio" :value="role" class="sr-only" />
-            <Shield v-if="role === 'ADMIN'" :size="18" />
-            <ShieldCheck v-else-if="role === 'MANAGER'" :size="18" />
-            <User v-else :size="18" />
+            <Shield v-if="role === 'ADMIN'" :size="18" aria-hidden="true" />
+            <ShieldCheck v-else-if="role === 'MANAGER'" :size="18" aria-hidden="true" />
+            <User v-else :size="18" aria-hidden="true" />
             <span>{{ roleLabel[role] }}</span>
           </label>
         </div>
@@ -446,7 +447,7 @@ function handleInvite() {
           <div class="form-field">
             <label class="form-label" for="invite-email">E-post</label>
             <div :class="['email-input-wrapper', { 'email-input-wrapper--error': inviteError }]">
-              <Mail :size="16" class="email-input-icon" />
+              <Mail :size="16" class="email-input-icon" aria-hidden="true" />
               <input
                 id="invite-email"
                 v-model="inviteEmail"
@@ -456,7 +457,7 @@ function handleInvite() {
                 autocomplete="off"
               />
             </div>
-            <span v-if="inviteError" class="form-error">{{ inviteError }}</span>
+            <span v-if="inviteError" class="form-error" role="alert">{{ inviteError }}</span>
           </div>
 
           <div class="form-field">
@@ -499,10 +500,29 @@ function handleInvite() {
   gap: 1rem;
 }
 
-h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
-.header-row p { margin-top: 6px; color: var(--text-secondary); font-size: 1.08rem; }
+h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
+.header-row p { margin-top: 4px; color: var(--text-secondary); font-size: 0.88rem; }
 
-.loading-state { padding: 3rem; text-align: center; color: hsl(var(--muted-foreground, 24 5% 46%)); }
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-item {
+  border-radius: var(--radius-xl);
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted) / 0.5) 50%, hsl(var(--muted)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+}
+
+.skeleton-item--wide { height: 80px; }
+.skeleton-item--table { height: 300px; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
 .org-card {
   display: flex;
@@ -529,8 +549,8 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #d9d0ff;
-  color: #5a4fd6;
+  background: var(--brand-soft);
+  color: var(--brand);
   font-size: 1.1rem;
   font-weight: 700;
   flex-shrink: 0;
@@ -588,6 +608,7 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   padding: 0.5rem 0.75rem 0.5rem 2.1rem;
   font: inherit;
   font-size: 0.85rem;
+  color: hsl(var(--foreground, 24 10% 15%));
   background: hsl(var(--card, 40 25% 98%));
 }
 
@@ -658,8 +679,8 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 }
 
 .user-avatar--self {
-  background: #d9d0ff;
-  color: #5a4fd6;
+  background: var(--brand-soft);
+  color: var(--brand);
 }
 
 .user-name { font-weight: 500; }
@@ -681,8 +702,8 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: var(--radius-md, 0.375rem);
   border: none;
   background: none;
@@ -696,7 +717,7 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   color: hsl(var(--foreground, 24 10% 15%));
 }
 
-.menu-item--danger { color: #dc2626; }
+.menu-item--danger { color: var(--red); }
 
 .th-name { min-width: 10rem; }
 .th-email { min-width: 10rem; }
@@ -709,12 +730,12 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   border-radius: 1rem;
   background: hsl(var(--card, 40 25% 98%));
 }
-.landing-card h1 { margin: 0; font-size: 2.4rem; font-weight: 800; }
+.landing-card h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 .landing-card p { margin: 0.35rem 0 1.25rem; color: hsl(var(--muted-foreground, 24 5% 46%)); }
 .landing-box {
-  border: 1px dashed #d8cfff;
-  background: #f6f1ff;
-  color: #5a4fd6;
+  border: 1px dashed color-mix(in srgb, var(--brand-soft) 60%, var(--brand) 15%);
+  background: var(--brand-soft);
+  color: var(--brand);
   border-radius: 1rem;
   padding: 1.25rem;
   display: flex;
@@ -736,7 +757,7 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   transition: border-color 0.15s, background 0.15s;
 }
 .role-option:hover { background: hsl(var(--muted, 40 18% 93%) / 0.5); }
-.role-option--selected { border-color: #5a4fd6; background: #f3f0ff; }
+.role-option--selected { border-color: var(--brand); background: var(--brand-soft); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
 .invite-form {
@@ -781,9 +802,9 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   font-size: 0.875rem;
   line-height: 1.25rem;
   color: inherit;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  box-shadow: 0 1px 2px 0 hsl(var(--foreground, 24 10% 15%) / 0.05);
   outline: none;
-  transition: all 150ms ease;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
   font-family: inherit;
 }
 
@@ -806,8 +827,11 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 }
 
 @media (max-width: 700px) {
+  h1 { font-size: 1.5rem; }
+  .header-row { flex-direction: column; gap: 0.75rem; }
   .th-email, .cell-email { display: none; }
   .org-card { flex-direction: column; align-items: flex-start; }
   .org-stats { align-self: flex-start; }
+  .search-wrapper { width: 100%; }
 }
 </style>

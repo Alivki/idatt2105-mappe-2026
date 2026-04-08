@@ -74,9 +74,9 @@ const isComplete = computed(() =>
 
 const progressColor = computed(() => {
   switch (props.checklist.status) {
-    case 'COMPLETED': return 'var(--green, #3c8f2c)'
-    case 'IN_PROGRESS': return 'var(--amber, #c08a2c)'
-    default: return '#9a9a96'
+    case 'COMPLETED': return 'var(--green)'
+    case 'IN_PROGRESS': return 'var(--amber)'
+    default: return 'hsl(var(--muted-foreground))'
   }
 })
 
@@ -147,7 +147,7 @@ const metaLine = computed(() => {
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger">
-            <MoreVertical :size="18" />
+            <MoreVertical :size="18" aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" :side-offset="4">
@@ -155,16 +155,16 @@ const metaLine = computed(() => {
             v-if="canComplete && checklist.itemCount > 0"
             @click="emits('toggle-checklist-completed', { checklistId: checklist.id, completed: !isComplete })"
           >
-            <CheckCircle2 :size="16" class="menu-icon--green" />
+            <CheckCircle2 :size="16" class="menu-icon--green" aria-hidden="true" />
             {{ isComplete ? 'Angre fullf\u00F8ring' : 'Fullf\u00F8r hele' }}
           </DropdownMenuItem>
           <DropdownMenuSeparator v-if="canComplete && canManage && checklist.itemCount > 0" />
           <DropdownMenuItem v-if="canManage" @click="emits('edit-checklist', checklist)">
-            <Pencil :size="16" />
+            <Pencil :size="16" aria-hidden="true" />
             Rediger
           </DropdownMenuItem>
           <DropdownMenuItem v-if="canManage" class="menu-item--danger" @click="deleteDialogOpen = true">
-            <Trash2 :size="16" />
+            <Trash2 :size="16" aria-hidden="true" />
             Slett sjekkliste
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -194,7 +194,7 @@ const metaLine = computed(() => {
 .checklist-card {
   position: relative;
   width: 100%;
-  border: 1px solid var(--border);
+  border: 1px solid hsl(var(--border));
   border-radius: var(--radius-lg);
   background: var(--card-bg);
   display: flex;
@@ -203,7 +203,7 @@ const metaLine = computed(() => {
 }
 
 .checklist-card:hover {
-  box-shadow: 0 6px 14px rgb(0 0 0 / 0.08);
+  box-shadow: 0 6px 14px hsl(var(--foreground) / 0.08);
 }
 
 .card-body {
@@ -241,25 +241,25 @@ const metaLine = computed(() => {
 }
 
 .circle--done {
-  background-color: var(--green-soft, #e6f4e6);
-  color: #2f6f34;
+  background-color: var(--green-soft);
+  color: var(--green);
 }
 
 .circle-check {
   width: 1.5rem;
   height: 1.5rem;
-  color: #2f6f34;
+  color: var(--green);
   stroke-width: 3;
 }
 
 .circle--progress {
-  background-color: var(--amber-soft, #fdf3e0);
-  color: #8e5713;
+  background-color: var(--amber-soft);
+  color: var(--amber);
 }
 
 .circle--idle {
-  background-color: #e9e9e8;
-  color: #464b52;
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
 }
 
 .circle-count {
@@ -303,7 +303,7 @@ h3 {
 .meta {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary);
   line-height: 1.4;
   white-space: nowrap;
   overflow: hidden;
@@ -314,7 +314,7 @@ h3 {
   margin-top: 6px;
   height: 5px;
   border-radius: var(--radius-pill);
-  background: #d8d8d5;
+  background: hsl(var(--muted));
   overflow: hidden;
   width: 100%;
 }
@@ -337,8 +337,8 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: var(--radius-md);
   border: none;
   background: none;
@@ -352,11 +352,11 @@ h3 {
   color: hsl(var(--foreground));
 }
 
-.menu-icon--green { color: #3c8f2c; }
+.menu-icon--green { color: var(--green); }
 
-.menu-item--danger { color: #c62828; }
+.menu-item--danger { color: var(--red); }
 .menu-item--danger:hover {
-  background-color: #fde8e8 !important;
-  color: #c62828 !important;
+  background-color: var(--red-soft) !important;
+  color: var(--red) !important;
 }
 </style>

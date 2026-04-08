@@ -113,28 +113,28 @@ function navigateToDay(date: string) {
     <section v-if="stats" class="cards-group">
       <div class="stat-card stat-card--neutral">
         <div class="stat-card-header">
-          <CalendarDays :size="16" class="stat-card-icon" />
+          <CalendarDays :size="16" class="stat-card-icon" aria-hidden="true" />
           <span class="stat-card-label">Totalt skift</span>
         </div>
         <p class="stat-card-value">{{ stats.totalShifts }}</p>
       </div>
       <div class="stat-card stat-card--resolved">
         <div class="stat-card-header">
-          <IdCard :size="16" class="stat-card-icon" />
+          <IdCard :size="16" class="stat-card-icon" aria-hidden="true" />
           <span class="stat-card-label">Leg sjekket</span>
         </div>
         <p class="stat-card-value">{{ stats.totalIdsChecked }}</p>
       </div>
       <div class="stat-card" :class="stats.totalDeviations > 0 ? 'stat-card--open' : 'stat-card--neutral'">
         <div class="stat-card-header">
-          <AlertTriangle :size="16" class="stat-card-icon" />
+          <AlertTriangle :size="16" class="stat-card-icon" aria-hidden="true" />
           <span class="stat-card-label">Avvik</span>
         </div>
         <p class="stat-card-value">{{ stats.totalDeviations }}</p>
       </div>
       <div class="stat-card stat-card--in-progress">
         <div class="stat-card-header">
-          <TrendingUp :size="16" class="stat-card-icon" />
+          <TrendingUp :size="16" class="stat-card-icon" aria-hidden="true" />
           <span class="stat-card-label">Snitt leg/skift</span>
         </div>
         <p class="stat-card-value">{{ stats.avgIdsPerShift.toFixed(1) }}</p>
@@ -144,8 +144,8 @@ function navigateToDay(date: string) {
     <section class="table-section">
       <div class="search-row">
         <div class="search-wrapper">
-          <Search :size="16" class="search-icon" />
-          <input v-model="search" class="search-input" placeholder="Søk etter dato..." />
+          <Search :size="16" class="search-icon" aria-hidden="true" />
+          <input v-model="search" class="search-input" placeholder="Søk etter dato..." aria-label="Søk etter dato" />
         </div>
         <div class="date-filters">
           <div class="date-label">
@@ -159,16 +159,17 @@ function navigateToDay(date: string) {
         </div>
       </div>
 
-      <p v-if="summariesQuery.isLoading.value" class="state-line">Laster data...</p>
+      <div v-if="summariesQuery.isLoading.value" class="loading-state">
+        <div class="skeleton-item" v-for="n in 4" :key="n"></div>
+      </div>
 
       <div v-else-if="summariesQuery.isError.value" class="empty-state">
-        <div class="empty-state-bg" />
         <div class="empty-state-inner">
           <div class="empty-state-icon">
-            <AlertTriangle :stroke-width="1.5" />
+            <AlertTriangle :stroke-width="1.5" aria-hidden="true" />
           </div>
           <div class="empty-state-text">
-            <h3>Kunne ikke hente data</h3>
+            <h2>Kunne ikke hente data</h2>
             <p>Noe gikk galt under lasting. Prøv igjen senere.</p>
           </div>
         </div>
@@ -181,25 +182,25 @@ function navigateToDay(date: string) {
               <TableHead class="th-date">
                 <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('date')">
                   Dato
-                  <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'date' }" />
+                  <ArrowUpDown :size="14" class="sort-icon" aria-hidden="true" :class="{ 'sort-icon--active': sortField === 'date' }" />
                 </Button>
               </TableHead>
               <TableHead>
                 <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('shifts')">
                   Skift
-                  <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'shifts' }" />
+                  <ArrowUpDown :size="14" class="sort-icon" aria-hidden="true" :class="{ 'sort-icon--active': sortField === 'shifts' }" />
                 </Button>
               </TableHead>
               <TableHead>
                 <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('ids')">
                   Leg sjekket
-                  <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'ids' }" />
+                  <ArrowUpDown :size="14" class="sort-icon" aria-hidden="true" :class="{ 'sort-icon--active': sortField === 'ids' }" />
                 </Button>
               </TableHead>
               <TableHead>
                 <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('deviations')">
                   Avvik
-                  <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'deviations' }" />
+                  <ArrowUpDown :size="14" class="sort-icon" aria-hidden="true" :class="{ 'sort-icon--active': sortField === 'deviations' }" />
                 </Button>
               </TableHead>
             </TableRow>
@@ -246,8 +247,8 @@ function navigateToDay(date: string) {
   gap: 1rem;
 }
 
-h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
-.header-row p { margin-top: 6px; color: var(--text-secondary); font-size: 1.08rem; }
+h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
+.header-row p { margin-top: 4px; color: var(--text-secondary); font-size: 0.88rem; }
 
 .date-filters {
   display: flex;
@@ -305,21 +306,21 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   margin: 0;
 }
 
-.stat-card--neutral { background: #ffffff; border-color: #d1d5db; }
-.stat-card--neutral .stat-card-value { color: #111827; }
-.stat-card--neutral .stat-card-icon { color: #6b7280; }
+.stat-card--neutral { background: var(--card-bg); border-color: hsl(var(--border)); }
+.stat-card--neutral .stat-card-value { color: hsl(var(--foreground)); }
+.stat-card--neutral .stat-card-icon { color: hsl(var(--muted-foreground)); }
 
-.stat-card--resolved { background: #e4eddc; border-color: #b7d18e; }
-.stat-card--resolved .stat-card-value { color: #3c8f2c; }
-.stat-card--resolved .stat-card-icon { color: #3c8f2c; }
+.stat-card--resolved { background: var(--green-soft); border-color: color-mix(in srgb, var(--green-soft) 50%, var(--green) 20%); }
+.stat-card--resolved .stat-card-value { color: var(--green); }
+.stat-card--resolved .stat-card-icon { color: var(--green); }
 
-.stat-card--open { background: #f5e8ea; border-color: #e0aeb5; }
-.stat-card--open .stat-card-value { color: #a62929; }
-.stat-card--open .stat-card-icon { color: #a62929; }
+.stat-card--open { background: var(--red-soft); border-color: color-mix(in srgb, var(--red-soft) 50%, var(--red) 20%); }
+.stat-card--open .stat-card-value { color: var(--red); }
+.stat-card--open .stat-card-icon { color: var(--red); }
 
-.stat-card--in-progress { background: #f1e7d6; border-color: #e0bf81; }
-.stat-card--in-progress .stat-card-value { color: #946013; }
-.stat-card--in-progress .stat-card-icon { color: #946013; }
+.stat-card--in-progress { background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber-soft) 50%, var(--amber) 20%); }
+.stat-card--in-progress .stat-card-value { color: var(--amber); }
+.stat-card--in-progress .stat-card-icon { color: var(--amber); }
 
 .search-wrapper { position: relative; flex: 1; max-width: 20rem; }
 
@@ -331,7 +332,7 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 .search-input {
   width: 100%; height: 2.5rem; border: 1px solid hsl(var(--border)); border-radius: 0.5rem;
   padding: 0 0.75rem 0 2.1rem; font: inherit; font-size: 0.85rem;
-  background: hsl(var(--card)); box-sizing: border-box;
+  background: hsl(var(--card)); color: hsl(var(--foreground)); box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -369,28 +370,45 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 
 .cell-bold { font-weight: 600; color: hsl(var(--foreground)); }
 .cell-text { color: hsl(var(--muted-foreground)); }
-.deviation-count { color: #dc2626; font-weight: 600; }
+.deviation-count { color: var(--red); font-weight: 600; }
 
 .th-date { min-width: 12rem; }
 
-.state-line {
-  border-radius: var(--radius-md); border: 1px solid hsl(var(--border));
-  background: hsl(var(--card)); padding: 12px; color: var(--text-secondary);
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeleton-item {
+  height: 56px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted) / 0.5) 50%, hsl(var(--muted)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .empty-state {
-  position: relative; display: flex; min-height: 260px; flex-direction: column;
-  align-items: center; justify-content: center; overflow: hidden; border-radius: 1rem;
+  display: flex; min-height: 220px;
+  flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 1rem;
   border: 2px dashed hsl(var(--muted-foreground) / 0.2);
-  background: linear-gradient(to bottom right, hsl(var(--muted) / 0.4), hsl(var(--muted) / 0.2), hsl(var(--background)));
+  background: hsl(var(--muted) / 0.3);
   padding: 2rem;
 }
 
-.empty-state-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at center, hsl(var(--muted)) 0%, transparent 70%); opacity: 0.5; }
-.empty-state-inner { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
-.empty-state-icon { display: flex; height: 5rem; width: 5rem; align-items: center; justify-content: center; border-radius: 1rem; background-color: hsl(var(--primary) / 0.1); box-shadow: 0 0 0 4px hsl(var(--primary) / 0.05); }
-.empty-state-icon :deep(svg) { width: 2.5rem; height: 2.5rem; color: hsl(var(--primary) / 0.7); }
-.empty-state-text h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; }
+.empty-state-inner { display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
+.empty-state-icon {
+  display: flex; height: 4rem; width: 4rem; align-items: center; justify-content: center;
+  border-radius: var(--radius-lg); background-color: hsl(var(--muted));
+}
+.empty-state-icon :deep(svg) { width: 2rem; height: 2rem; color: hsl(var(--muted-foreground)); }
+.empty-state-text h2 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; }
 .empty-state-text p { max-width: 24rem; font-size: 0.875rem; color: hsl(var(--muted-foreground)); margin-top: 0.25rem; }
 
 @media (max-width: 1100px) {
@@ -398,6 +416,7 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 }
 
 @media (max-width: 768px) {
+  h1 { font-size: 1.5rem; }
   .cards-group { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .header-row { flex-direction: column; }
   .search-row { flex-direction: column; align-items: stretch; gap: 0.75rem; }

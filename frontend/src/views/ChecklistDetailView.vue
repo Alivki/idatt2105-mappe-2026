@@ -248,21 +248,25 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
     </header>
 
     <div class="page-content">
-      <Button variant="ghost" class="back-button" @click="router.push('/sjekklister')">
-        <ArrowLeft :size="18" />
-        <span>Tilbake til sjekklister</span>
+      <Button variant="ghost" size="sm" class="back-btn" @click="router.push('/sjekklister')">
+        <ArrowLeft :size="16" aria-hidden="true" />
+        Tilbake til sjekklister
       </Button>
 
-      <p v-if="checklistsQuery.isLoading.value" class="state-line">Laster sjekkliste...</p>
+      <div v-if="checklistsQuery.isLoading.value" class="skeleton-list">
+        <div v-for="n in 4" :key="n" class="skeleton-card">
+          <div class="skeleton-line skeleton-line--title"></div>
+          <div class="skeleton-line skeleton-line--short"></div>
+        </div>
+      </div>
 
       <div v-else-if="!checklist" class="empty-state">
-        <div class="empty-state-bg" />
         <div class="empty-state-inner">
           <div class="empty-state-icon">
-            <ClipboardCheck :stroke-width="1.5" />
+            <ClipboardCheck :stroke-width="1.5" aria-hidden="true" />
           </div>
           <div class="empty-state-text">
-            <h3>Sjekkliste ikke funnet</h3>
+            <h2>Sjekkliste ikke funnet</h2>
             <p>Sjekklisten du leter etter finnes ikke eller har blitt slettet.</p>
           </div>
           <Button @click="router.push('/sjekklister')">Tilbake til sjekklister</Button>
@@ -290,13 +294,12 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 
         <section class="items-section">
           <div v-if="checklist.items.length === 0" class="empty-state">
-            <div class="empty-state-bg" />
             <div class="empty-state-inner">
               <div class="empty-state-icon">
-                <ClipboardCheck :stroke-width="1.5" />
+                <ClipboardCheck :stroke-width="1.5" aria-hidden="true" />
               </div>
               <div class="empty-state-text">
-                <h3>Ingen oppgaver ennå</h3>
+                <h2>Ingen oppgaver ennå</h2>
                 <p>Legg til en oppgave for å komme i gang.</p>
               </div>
               <Button v-if="canManage" @click="openCreateItemDialog">
@@ -328,17 +331,17 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
                     <div v-if="canManage" class="item-actions" @click.stop>
                       <DropdownMenu>
                         <DropdownMenuTrigger as-child>
-                          <Button type="button" variant="ghost" size="icon-sm" class="item-action-btn">
-                            <MoreVertical :size="16" />
+                          <Button type="button" variant="ghost" size="icon-sm" class="item-action-btn" aria-label="Oppgavemeny">
+                            <MoreVertical :size="16" aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" :side-offset="4">
                           <DropdownMenuItem @click="openEditItemDialog(item)">
-                            <Pencil :size="16" />
+                            <Pencil :size="16" aria-hidden="true" />
                             Rediger
                           </DropdownMenuItem>
                           <DropdownMenuItem class="menu-item--danger" @click="deleteItemDialogId = item.id">
-                            <Trash2 :size="16" />
+                            <Trash2 :size="16" aria-hidden="true" />
                             Slett oppgave
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -398,12 +401,12 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 
         <div v-if="canManage" class="detail-actions">
           <Button variant="secondary" @click="editChecklistDialogOpen = true">
-            <Pencil />
+            <Pencil aria-hidden="true" />
             Rediger sjekkliste
           </Button>
 
           <Button variant="destructive" class="delete-btn" @click="deleteChecklistDialogOpen = true">
-            <Trash2 />
+            <Trash2 aria-hidden="true" />
             Slett sjekkliste
           </Button>
 
@@ -454,31 +457,14 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 .page-title { font-weight: 500; color: hsl(var(--sidebar-primary, 245 43% 52%)); }
 .page-content { display: flex; flex: 1; flex-direction: column; gap: 1.25rem; padding: 0 1rem 2rem; }
 
-.back-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: hsl(var(--muted-foreground));
-  font-size: 0.9rem;
-  padding: 4px 0;
-  transition: color 150ms ease;
-}
-.back-button:hover { color: hsl(var(--foreground)); }
+.back-btn { margin-bottom: 0.5rem; align-self: flex-start; }
 
-.state-line {
-  padding: 14px;
-  border-radius: var(--radius-md);
-  background: #ececea;
-  color: #4b5056;
-}
-
-.state-line--danger {
-  background: #f6e5e5;
-  color: #913333;
-}
+.skeleton-list { display: flex; flex-direction: column; gap: 12px; }
+.skeleton-card { padding: 16px; border-radius: var(--radius-lg); border: 1px solid hsl(var(--border)); background: var(--card-bg); }
+.skeleton-line { height: 14px; border-radius: 6px; background: hsl(var(--muted)); animation: shimmer 1.4s ease-in-out infinite; }
+.skeleton-line--title { width: 55%; margin-bottom: 10px; }
+.skeleton-line--short { width: 35%; }
+@keyframes shimmer { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 
 .detail-header {
   display: flex;
@@ -496,8 +482,9 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 
 h1 {
   margin: 0;
-  font-size: 2rem;
-  letter-spacing: -0.02em;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
 .detail-description {
@@ -524,18 +511,10 @@ h1 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   border-radius: 1rem;
   border: 2px dashed hsl(var(--muted-foreground) / 0.2);
-  background: linear-gradient(to bottom right, hsl(var(--muted) / 0.4), hsl(var(--muted) / 0.2), hsl(var(--background)));
+  background: hsl(var(--muted) / 0.3);
   padding: 2rem;
-}
-
-.empty-state-bg {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at center, hsl(var(--muted)) 0%, transparent 70%);
-  opacity: 0.5;
 }
 
 .empty-state-inner {
@@ -549,22 +528,21 @@ h1 {
 
 .empty-state-icon {
   display: flex;
-  height: 5rem;
-  width: 5rem;
+  height: 4rem;
+  width: 4rem;
   align-items: center;
   justify-content: center;
   border-radius: 1rem;
-  background-color: hsl(var(--primary) / 0.1);
-  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.05);
+  background-color: hsl(var(--muted));
 }
 
 .empty-state-icon :deep(svg) {
-  width: 2.5rem;
-  height: 2.5rem;
-  color: hsl(var(--primary) / 0.7);
+  width: 2rem;
+  height: 2rem;
+  color: hsl(var(--muted-foreground));
 }
 
-.empty-state-text h3 {
+.empty-state-text h2 {
   font-size: 1.125rem;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -580,7 +558,7 @@ h1 {
 .item-list {
   display: flex;
   flex-direction: column;
-  border: 1px solid #d9d9d6;
+  border: 1px solid hsl(var(--border));
   border-radius: var(--radius-md);
 }
 
@@ -590,8 +568,8 @@ h1 {
   align-items: center;
   padding: 12px 16px;
   gap: 12px;
-  background: #fff;
-  border-bottom: 1px solid #e0e0dd;
+  background: var(--card-bg);
+  border-bottom: 1px solid hsl(var(--border));
 }
 
 .item-list > :deep(:last-child) .item-row {
@@ -620,7 +598,7 @@ h1 {
 
 .item-title--done {
   text-decoration: line-through;
-  color: #5b615f;
+  color: var(--text-secondary);
 }
 
 .item-right {
@@ -645,8 +623,8 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: var(--radius-md);
   border: none;
   background: none;
@@ -660,10 +638,10 @@ h1 {
   color: hsl(var(--foreground));
 }
 
-.menu-item--danger { color: #c62828; }
+.menu-item--danger { color: var(--red); }
 .menu-item--danger:hover {
-  background-color: #fde8e8 !important;
-  color: #c62828 !important;
+  background-color: var(--red-soft) !important;
+  color: var(--red) !important;
 }
 
 .actions-section {
@@ -679,16 +657,16 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  border: 1px solid #d9d9d6;
+  border: 1px solid hsl(var(--border));
   border-radius: var(--radius-md);
   padding: 16px;
-  background: #fff;
+  background: var(--card-bg);
 }
 
 .progress-track {
   height: 6px;
   border-radius: var(--radius-pill);
-  background: #d8d8d5;
+  background: hsl(var(--muted));
   overflow: hidden;
   width: 100%;
 }
@@ -701,7 +679,7 @@ h1 {
 
 .progress-fill--ok { background: var(--green); }
 .progress-fill--warning { background: var(--amber); }
-.progress-fill--neutral { background: #9a9a96; }
+.progress-fill--neutral { background: hsl(var(--muted-foreground)); }
 
 .progress-stats {
   display: flex;
@@ -721,7 +699,7 @@ h1 {
 }
 
 .stat-number--green {
-  color: #3c8f2c;
+  color: var(--green);
 }
 
 .detail-actions {
@@ -730,13 +708,13 @@ h1 {
 }
 
 .delete-btn {
-  background-color: #fde8e8;
-  color: #c62828;
+  background-color: var(--red-soft);
+  color: var(--red);
   border: none;
   box-shadow: none;
 }
-.delete-btn:hover { background-color: #fad4d4; }
-.delete-btn:active { background-color: #f5c2c2; }
+.delete-btn:hover { background-color: var(--red-soft); opacity: 0.85; }
+.delete-btn:active { background-color: var(--red-soft); opacity: 0.7; }
 
 @media (max-width: 760px) {
   .detail-header {
@@ -744,7 +722,7 @@ h1 {
   }
 
   h1 {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
   }
 
   .actions-section {

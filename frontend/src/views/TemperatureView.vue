@@ -21,7 +21,7 @@ import {
   useTemperatureMonitoring,
 } from '@/composables/useTemperatureMonitoring'
 import { useCreateFoodDeviationMutation } from '@/composables/useFoodDeviations'
-import { useMembersQuery } from '@/composables/useMembers'
+import { useMemberNamesQuery } from '@/composables/useMembers'
 import { useAuthStore } from '@/stores/auth'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import type { CreateFoodDeviationRequest, DeviationSeverity } from '@/types/deviation'
@@ -29,7 +29,7 @@ import { toast } from 'vue-sonner'
 
 const auth = useAuthStore()
 const canManage = computed(() => auth.role === 'ADMIN' || auth.role === 'MANAGER')
-const membersQuery = useMembersQuery(canManage)
+const memberNamesQuery = useMemberNamesQuery()
 const createFoodDeviation = useCreateFoodDeviationMutation()
 const { activeAppliances, appliances, entries, deleteEntries, registerTemperature } = useTemperatureMonitoring()
 
@@ -159,18 +159,10 @@ const completedUnitsVariant = computed(() => {
 const isCreatingDeviation = computed(() => createFoodDeviation.isPending.value)
 
 const memberOptions = computed(() => {
-  if (canManage.value) {
-    return (membersQuery.data.value ?? []).map((member) => ({
-      userId: member.userId,
-      label: `${member.userFullName} (${member.role})`,
-    }))
-  }
-
-  if (!auth.user) {
-    return []
-  }
-
-  return [{ userId: auth.user.id, label: `${auth.user.fullName} (Deg)` }]
+  return (memberNamesQuery.data.value ?? []).map((m) => ({
+    userId: m.userId,
+    label: m.fullName,
+  }))
 })
 
 watch(recentEntries, (rows) => {
@@ -353,7 +345,7 @@ function goToNextPage(): void {
           label="Siste måling"
           :value="latestEntry ? `${latestEntry.temperature.toFixed(1)}°C` : '-'"
           :sub-label="latestEntry ? `${formatDateTime(latestEntry.measuredAt)} • ${latestEntry.measuredBy}` : 'Ingen målinger ennå'"
-          :value-class="latestEntry?.status === 'DEVIATION' ? 'text-red-600' : 'text-emerald-700'"
+          :value-class="latestEntry?.status === 'DEVIATION' ? 'val-red' : 'val-green'"
         />
       </section>
 
@@ -361,14 +353,13 @@ function goToNextPage(): void {
         <article class="form-panel">
           <div class="panel-header">
             <div>
-              <Badge tone="ok">Ny registrering</Badge>
               <h2>Velg enhet og logg temp</h2>
               <p>Bruk samme liste av registrerte enheter hver gang, så slipper du manuell tekstinnskriving.</p>
             </div>
           </div>
 
           <div v-if="activeAppliances.length === 0" class="empty-warning">
-            <TriangleAlert />
+            <TriangleAlert aria-hidden="true" />
             <div>
               <strong>Ingen aktive enheter</strong>
               <p>Legg til eller aktiver kjøleskap og frysere før du registrerer målinger.</p>
@@ -420,7 +411,7 @@ function goToNextPage(): void {
           </div>
 
           <Button class="submit-btn" :disabled="activeAppliances.length === 0 || !selectedAppliance || !temperatureInput" @click="submitTemperature">
-            <Thermometer />
+            <Thermometer aria-hidden="true" />
             Lagre temperatur
           </Button>
         </article>
@@ -428,11 +419,10 @@ function goToNextPage(): void {
         <article class="log-panel">
           <div class="panel-header">
             <div>
-              <Badge tone="neutral">Logg</Badge>
               <h2>Siste registreringer</h2>
               <p>En oversikt som viser temp, grense, ansvarlig og om målingen ga avvik.</p>
             </div>
-            <Button variant="outline" size="sm" :disabled="selectedEntryIds.length === 0" @click="deleteSelectedMeasurements">
+            <Button v-if="canManage" variant="outline" size="sm" :disabled="selectedEntryIds.length === 0" @click="deleteSelectedMeasurements">
               Slett valgte ({{ selectedEntryIds.length }})
             </Button>
           </div>
@@ -441,7 +431,7 @@ function goToNextPage(): void {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>
+                  <TableHead v-if="canManage">
                     <Checkbox :checked="allRowsSelected" @update:checked="toggleSelectAll" />
                   </TableHead>
                   <TableHead>Tidspunkt</TableHead>
@@ -453,20 +443,20 @@ function goToNextPage(): void {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableEmpty v-if="recentEntries.length === 0" :colspan="7">
+                <TableEmpty v-if="recentEntries.length === 0" :colspan="canManage ? 7 : 6">
                   <div class="table-empty-state">
                     <div class="table-empty-icon">
-                      <Thermometer :stroke-width="1.5" />
+                      <Thermometer :stroke-width="1.5" aria-hidden="true" />
                     </div>
                     <div class="table-empty-text">
-                      <h3>Ingen temperaturregistreringer enda</h3>
+                      <h2>Ingen temperaturregistreringer enda</h2>
                       <p>Registrer den første målingen i panelet til venstre.</p>
                     </div>
                   </div>
                 </TableEmpty>
 
                 <TableRow v-for="entry in pagedEntries" :key="entry.id" :class="entry.status === 'DEVIATION' ? 'row--deviation' : ''">
-                  <TableCell>
+                  <TableCell v-if="canManage">
                     <Checkbox
                       :checked="selectedEntryIds.includes(entry.id)"
                       @update:checked="(checked) => toggleEntrySelection(entry.id, checked)"
@@ -563,12 +553,14 @@ function goToNextPage(): void {
   border-radius: 14px;
   border: 1px solid hsl(var(--border));
   background: hsl(var(--card));
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+  box-shadow: 0 1px 2px hsl(var(--foreground) / 0.04);
 }
 
 .page-intro h1 {
   margin-top: 0;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   line-height: 1.2;
 }
 
@@ -647,27 +639,27 @@ function goToNextPage(): void {
   gap: 0.75rem;
   margin-top: 0.9rem;
   border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--amber-soft) 65%, #8e5713 35%);
-  background: #f8edd6;
+  border: 1px solid color-mix(in srgb, var(--amber-soft) 65%, var(--amber) 35%);
+  background: var(--amber-soft);
   padding: 0.75rem;
 }
 
 .empty-warning :deep(svg) {
   width: 1.1rem;
   height: 1.1rem;
-  color: #8e5713;
+  color: var(--amber);
   flex-shrink: 0;
   margin-top: 0.1rem;
 }
 
 .empty-warning strong {
   display: block;
-  color: #7a4a0d;
+  color: var(--amber);
 }
 
 .empty-warning p {
   margin-top: 0.15rem;
-  color: #7a4a0d;
+  color: var(--amber);
 }
 
 .form-grid {
@@ -743,16 +735,16 @@ function goToNextPage(): void {
   align-items: center;
   justify-content: center;
   border-radius: 0.75rem;
-  background-color: hsl(var(--primary) / 0.1);
+  background-color: hsl(var(--muted));
 }
 
 .table-empty-icon :deep(svg) {
   width: 1.5rem;
   height: 1.5rem;
-  color: hsl(var(--primary) / 0.7);
+  color: hsl(var(--muted-foreground));
 }
 
-.table-empty-text h3 {
+.table-empty-text h2 {
   font-size: 0.95rem;
   font-weight: 600;
 }
@@ -775,21 +767,29 @@ function goToNextPage(): void {
 }
 
 .row--deviation {
-  background: #fdf0f0;
+  background: var(--red-soft);
 }
 
 .danger-text {
-  color: #ae2c2d;
+  color: var(--red);
 }
 
 .ok-text {
-  color: #1a7a4f;
+  color: var(--green);
 }
 
 @media (max-width: 1080px) {
+  .page-intro h1 {
+    font-size: 1.5rem;
+  }
+
   .overview-grid,
   .workspace-grid {
     grid-template-columns: 1fr;
+  }
+
+  .overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .log-panel {

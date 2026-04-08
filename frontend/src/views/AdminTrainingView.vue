@@ -239,7 +239,7 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
       <div class="search-row">
         <div class="search-wrapper">
           <Search :size="16" class="search-icon" />
-          <input v-model="search" class="search-input" placeholder="Søk etter ansatt, type eller status..." />
+          <input v-model="search" class="search-input" placeholder="Søk etter ansatt, type eller status..." aria-label="Søk etter ansatt, type eller status" />
         </div>
         <Button
           v-if="selected.size > 0"
@@ -251,7 +251,9 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
         </Button>
       </div>
 
-      <p v-if="trainingLogsQuery.isLoading.value" class="state-line">Laster opplæringer...</p>
+      <div v-if="trainingLogsQuery.isLoading.value" class="loading-state">
+        <div class="skeleton-item" v-for="n in 4" :key="n"></div>
+      </div>
 
       <div v-else-if="trainingLogsQuery.isError.value" class="empty-state">
         <div class="empty-state-bg" />
@@ -413,8 +415,8 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
   gap: 8px;
 }
 
-h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
-.header-row p { margin-top: 6px; color: var(--text-secondary); font-size: 1.08rem; }
+h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
+.header-row p { margin-top: 4px; color: var(--text-secondary); font-size: 0.88rem; }
 
 /* Stats cards */
 .cards-group {
@@ -526,7 +528,7 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 
 .user-name { font-weight: 500; }
 .cell-text { color: hsl(var(--muted-foreground, 24 5% 46%)); }
-.cell-expires-soon { color: #d97706; font-weight: 600; }
+.cell-expires-soon { color: var(--amber); font-weight: 600; }
 
 /* Actions cell */
 .cell-actions {
@@ -553,7 +555,7 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
   color: hsl(var(--foreground, 24 10% 15%));
 }
 
-.menu-item--danger { color: #dc2626; }
+.menu-item--danger { color: var(--red); }
 
 /* Column widths */
 .th-employee { min-width: 10rem; }
@@ -563,12 +565,23 @@ h1 { margin: 0; font-size: 2.4rem; letter-spacing: -0.02em; }
 .th-actions { width: 3rem; }
 
 /* Loading / Error states */
-.state-line {
-  border-radius: var(--radius-md);
-  border: 1px solid hsl(var(--border));
-  background: hsl(var(--card));
-  padding: 12px;
-  color: var(--text-secondary);
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeleton-item {
+  height: 56px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted) / 0.5) 50%, hsl(var(--muted)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .empty-state {

@@ -1,3 +1,8 @@
+export interface MemberName {
+  userId: number
+  fullName: string
+}
+
 export interface OrganizationMember {
   id: number
   userId: number

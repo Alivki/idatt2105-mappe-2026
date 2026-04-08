@@ -28,7 +28,7 @@ const summary = computed(() => {
 <template>
   <div class="step-content">
     <div class="info-banner">
-      <Info :size="16" :stroke-width="1.5" />
+      <Info :size="16" :stroke-width="1.5" aria-hidden="true" />
       <div>
         <p>
           Grunnforutsetninger er basiskravene fra Mattilsynet som må være på plass for et fungerende IK-mat-system.
@@ -39,21 +39,21 @@ const summary = computed(() => {
     </div>
 
     <div class="checklist-note">
-      <ClipboardCheck :size="15" :stroke-width="1.5" />
+      <ClipboardCheck :size="15" :stroke-width="1.5" aria-hidden="true" />
       <span>Sjekklister vil bli opprettet for disse områdene basert på dine svar.</span>
     </div>
 
     <div class="summary-bar">
       <div class="summary-item summary-item--ok">
-        <CircleCheck :size="14" :stroke-width="2" />
+        <CircleCheck :size="14" :stroke-width="2" aria-hidden="true" />
         {{ summary.ok }} på plass
       </div>
       <div class="summary-item summary-item--work">
-        <AlertTriangle :size="14" :stroke-width="2" />
+        <AlertTriangle :size="14" :stroke-width="2" aria-hidden="true" />
         {{ summary.work }} under arbeid
       </div>
       <div class="summary-item summary-item--missing">
-        <CircleX :size="14" :stroke-width="2" />
+        <CircleX :size="14" :stroke-width="2" aria-hidden="true" />
         {{ summary.missing }} mangler
       </div>
     </div>
@@ -86,7 +86,7 @@ const summary = computed(() => {
               }"
               @click="setStatus(prereq.id, opt.value)"
             >
-              <component :is="opt.icon" :size="12" :stroke-width="2" />
+              <component :is="opt.icon" :size="12" :stroke-width="2" aria-hidden="true" />
               {{ opt.label }}
             </button>
           </div>
@@ -148,9 +148,9 @@ const summary = computed(() => {
   font-weight: 500;
 }
 
-.summary-item--ok { color: #16a34a; }
-.summary-item--work { color: #d97706; }
-.summary-item--missing { color: #dc2626; }
+.summary-item--ok { color: var(--green); }
+.summary-item--work { color: var(--amber); }
+.summary-item--missing { color: var(--red); }
 
 .prereq-list {
   display: flex;
@@ -163,13 +163,13 @@ const summary = computed(() => {
   border: 1px solid hsl(var(--border));
   border-left: 3px solid hsl(var(--border));
   border-radius: 0.5rem;
-  background: white;
+  background: hsl(var(--card));
   transition: border-color 0.15s ease;
 }
 
-.prereq-card--ok { border-left-color: #16a34a; }
-.prereq-card--work { border-left-color: #d97706; }
-.prereq-card--missing { border-left-color: #dc2626; }
+.prereq-card--ok { border-left-color: var(--green); }
+.prereq-card--work { border-left-color: var(--amber); }
+.prereq-card--missing { border-left-color: var(--red); }
 
 .prereq-main {
   display: flex;
@@ -209,12 +209,12 @@ const summary = computed(() => {
   padding: 0.25rem 0.625rem;
   border: 1.5px solid hsl(var(--border));
   border-radius: 999px;
-  background: white;
+  background: hsl(var(--card));
   cursor: pointer;
   font-size: 0.6875rem;
   font-weight: 500;
   color: hsl(var(--muted-foreground));
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
   white-space: nowrap;
 }
 
@@ -223,23 +223,23 @@ const summary = computed(() => {
 }
 
 .status-btn--ok {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
-  color: #16a34a;
+  background: var(--green-soft);
+  border-color: color-mix(in srgb, var(--green-soft) 50%, var(--green) 30%);
+  color: var(--green);
   font-weight: 600;
 }
 
 .status-btn--work {
-  background: #fffbeb;
-  border-color: #fde68a;
-  color: #d97706;
+  background: var(--amber-soft);
+  border-color: color-mix(in srgb, var(--amber-soft) 50%, var(--amber) 30%);
+  color: var(--amber);
   font-weight: 600;
 }
 
 .status-btn--missing {
-  background: #fef2f2;
-  border-color: #fecaca;
-  color: #dc2626;
+  background: var(--red-soft);
+  border-color: color-mix(in srgb, var(--red-soft) 50%, var(--red) 30%);
+  color: var(--red);
   font-weight: 600;
 }
 </style>

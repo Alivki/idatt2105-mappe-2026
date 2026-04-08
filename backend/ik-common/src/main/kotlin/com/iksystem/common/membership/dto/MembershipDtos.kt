@@ -18,6 +18,17 @@ data class MembershipSummary(
 )
 
 /**
+ * Lightweight member info for dropdowns/selects. Available to all authenticated users.
+ */
+@Schema(description = "Lightweight member name for select inputs")
+data class MemberNameResponse(
+    @Schema(description = "User ID", example = "1")
+    val userId: Long,
+    @Schema(description = "User full name", example = "Ola Nordmann")
+    val fullName: String,
+)
+
+/**
  * Full membership response including user details.
  */
 @Schema(description = "Membership response with role and organization info")

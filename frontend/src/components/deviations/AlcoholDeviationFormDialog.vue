@@ -335,12 +335,12 @@ function handleSubmit() {
           <label :class="['field', { 'field--error': errors.reportedDate }]">
             <span>Dato for hendelse *</span>
             <DatePicker v-model="reportedDate" placeholder="Velg dato" />
-            <p v-if="errors.reportedDate" class="error-message">{{ errors.reportedDate }}</p>
+            <p v-if="errors.reportedDate" class="error-message" role="alert">{{ errors.reportedDate }}</p>
           </label>
           <label :class="['field', { 'field--error': errors.reportedTime }]">
             <span>Tidspunkt (ca.) *</span>
             <TimePicker :hours="reportedHours" :minutes="reportedMinutes" @update:hours="reportedHours = $event" @update:minutes="reportedMinutes = $event" placeholder="Velg tid" />
-            <p v-if="errors.reportedTime" class="error-message">{{ errors.reportedTime }}</p>
+            <p v-if="errors.reportedTime" class="error-message" role="alert">{{ errors.reportedTime }}</p>
           </label>
         </div>
         <div :class="['field', { 'field--error': errors.reporter }]">
@@ -353,7 +353,7 @@ function handleSubmit() {
               <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">{{ m.label }}</SelectItem>
             </SelectContent>
           </Select>
-          <p v-if="errors.reporter" class="error-message">{{ errors.reporter }}</p>
+          <p v-if="errors.reporter" class="error-message" role="alert">{{ errors.reporter }}</p>
         </div>
 
         <!-- Source -->
@@ -388,7 +388,7 @@ function handleSubmit() {
               </SelectItem>
             </SelectContent>
           </Select>
-          <p v-if="errors.deviationType" class="error-message">{{ errors.deviationType }}</p>
+          <p v-if="errors.deviationType" class="error-message" role="alert">{{ errors.deviationType }}</p>
         </div>
 
         <!-- Penalty warning -->
@@ -405,7 +405,7 @@ function handleSubmit() {
         <label :class="['field', { 'field--error': errors.description }]">
           <span>Beskriv hendelsen i detalj *</span>
           <Textarea v-model="description" rows="3" placeholder="Hva skjedde? Hvem var involvert? Hvor i lokalet? Var det vitner?" />
-          <p v-if="errors.description" class="error-message">{{ errors.description }}</p>
+          <p v-if="errors.description" class="error-message" role="alert">{{ errors.description }}</p>
         </label>
 
         <!-- 3. Umiddelbar handling -->
@@ -413,7 +413,7 @@ function handleSubmit() {
         <label :class="['field', { 'field--error': errors.immediateAction }]">
           <span>Hva ble gjort med en gang for å håndtere situasjonen? *</span>
           <Textarea v-model="immediateAction" rows="3" placeholder="F.eks.: Stoppet servering, sjekket ID, tilkalte vekter, ringte taxi..." />
-          <p v-if="errors.immediateAction" class="error-message">{{ errors.immediateAction }}</p>
+          <p v-if="errors.immediateAction" class="error-message" role="alert">{{ errors.immediateAction }}</p>
         </label>
 
         <!-- 4. Årsaksanalyse -->
@@ -432,12 +432,12 @@ function handleSubmit() {
               {{ opt.label }}
             </button>
           </div>
-          <p v-if="errors.causalAnalysis" class="error-message">{{ errors.causalAnalysis }}</p>
+          <p v-if="errors.causalAnalysis" class="error-message" role="alert">{{ errors.causalAnalysis }}</p>
         </div>
         <label :class="['field', { 'field--error': errors.causalExplanation }]">
           <span>Utdyp: Hva er den egentlige årsaken? *</span>
           <Textarea v-model="causalExplanation" rows="2" placeholder="Utdyp: Hva er den egentlige årsaken?" />
-          <p v-if="errors.causalExplanation" class="error-message">{{ errors.causalExplanation }}</p>
+          <p v-if="errors.causalExplanation" class="error-message" role="alert">{{ errors.causalExplanation }}</p>
         </label>
 
         <!-- 5. Forebyggende tiltak -->
@@ -445,7 +445,7 @@ function handleSubmit() {
         <label :class="['field', { 'field--error': errors.preventiveMeasures }]">
           <span>Hva skal gjøres for å hindre at dette skjer igjen? *</span>
           <Textarea v-model="preventiveMeasures" rows="3" placeholder="F.eks.: Oppdatere rutine, gjennomføre ny opplæring, endre bemanning..." />
-          <p v-if="errors.preventiveMeasures" class="error-message">{{ errors.preventiveMeasures }}</p>
+          <p v-if="errors.preventiveMeasures" class="error-message" role="alert">{{ errors.preventiveMeasures }}</p>
         </label>
         <div class="row-2">
           <div :class="['field', { 'field--error': errors.preventiveResponsible }]">
@@ -458,12 +458,12 @@ function handleSubmit() {
                 <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">{{ m.label }}</SelectItem>
               </SelectContent>
             </Select>
-            <p v-if="errors.preventiveResponsible" class="error-message">{{ errors.preventiveResponsible }}</p>
+            <p v-if="errors.preventiveResponsible" class="error-message" role="alert">{{ errors.preventiveResponsible }}</p>
           </div>
           <div :class="['field', 'field--date-right', { 'field--error': errors.preventiveDeadline }]">
             <span>Frist for gjennomføring *</span>
             <DatePicker v-model="preventiveDeadline" placeholder="Velg frist" open-upward />
-            <p v-if="errors.preventiveDeadline" class="error-message">{{ errors.preventiveDeadline }}</p>
+            <p v-if="errors.preventiveDeadline" class="error-message" role="alert">{{ errors.preventiveDeadline }}</p>
           </div>
         </div>
 
@@ -536,7 +536,7 @@ function handleSubmit() {
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  transition: all 150ms ease;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
 }
 .segment-button strong { font-size: 0.95rem; }
 .segment-button small { font-size: 0.78rem; color: hsl(var(--muted-foreground)); }
@@ -557,7 +557,7 @@ function handleSubmit() {
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
 }
 .chip--active {
   border-color: hsl(var(--primary));
@@ -567,8 +567,8 @@ function handleSubmit() {
 }
 
 .penalty-warning {
-  background: #fde8e8;
-  border-left: 4px solid #c62828;
+  background: var(--red-soft);
+  border-left: 4px solid var(--red);
   border-radius: var(--radius-md);
   padding: 12px 14px;
 }
@@ -579,11 +579,11 @@ function handleSubmit() {
 }
 .penalty-points {
   font-size: 1.5rem;
-  color: #c62828;
+  color: var(--red);
   line-height: 1;
 }
-.penalty-warning strong { color: #7f1d1d; font-size: 0.9rem; }
-.penalty-warning p { margin: 2px 0 0; color: #991b1b; font-size: 0.82rem; }
+.penalty-warning strong { color: var(--red); font-size: 0.9rem; }
+.penalty-warning p { margin: 2px 0 0; color: var(--red); font-size: 0.82rem; }
 
 .status-section {
   background: hsl(var(--secondary));
@@ -603,7 +603,7 @@ function handleSubmit() {
   font-size: 0.88rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
 }
 .status-chip--active {
   border-color: hsl(var(--primary));

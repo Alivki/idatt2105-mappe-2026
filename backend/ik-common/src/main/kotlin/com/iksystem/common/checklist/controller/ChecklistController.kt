@@ -125,7 +125,6 @@ class ChecklistController(
         ApiResponse(responseCode = "404", description = "Checklist or checklist item not found"),
     )
     @PatchMapping("/{checklistId}/items/{itemId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     fun updateItem(
         @PathVariable checklistId: Long,
         @PathVariable itemId: Long,
