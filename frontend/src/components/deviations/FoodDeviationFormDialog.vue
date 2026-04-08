@@ -15,6 +15,7 @@ import SelectContent from '@/components/ui/select/SelectContent.vue'
 import SelectItem from '@/components/ui/select/SelectItem.vue'
 import SelectTrigger from '@/components/ui/select/SelectTrigger.vue'
 import SelectValue from '@/components/ui/select/SelectValue.vue'
+import { useAuthStore } from '@/stores/auth'
 import { CalendarDate } from '@internationalized/date'
 import type { DateValue } from '@internationalized/date'
 import type {
@@ -46,6 +47,8 @@ const emits = defineEmits<{
   (e: 'create', payload: CreateFoodDeviationRequest): void
   (e: 'update', payload: { id: number; data: UpdateFoodDeviationRequest }): void
 }>()
+
+const auth = useAuthStore()
 
 function stringToCalendarDate(str: string): CalendarDate | undefined {
   if (!str) return undefined
@@ -137,7 +140,7 @@ watch(
       reportedDate.value = dt ? new CalendarDate(dt.getFullYear(), dt.getMonth() + 1, dt.getDate()) : undefined
       reportedHours.value = dt ? dt.getHours() : undefined
       reportedMinutes.value = dt ? dt.getMinutes() : undefined
-      reportedByUserId.value = ''
+      reportedByUserId.value = d.reportedByUserId ? String(d.reportedByUserId) : ''
       deviationType.value = d.deviationType
       severity.value = d.severity
       description.value = d.description
@@ -157,7 +160,7 @@ watch(
       reportedDate.value = undefined
       reportedHours.value = undefined
       reportedMinutes.value = undefined
-      reportedByUserId.value = ''
+      reportedByUserId.value = auth.user ? String(auth.user.id) : ''
       deviationType.value = 'TEMPERATUR'
       severity.value = 'LOW'
       description.value = ''

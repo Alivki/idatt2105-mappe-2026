@@ -35,9 +35,10 @@ import {
   useUpdateIdCheckCountMutation,
   useCreateShiftDeviationMutation,
   useEndShiftMutation,
+  useReopenShiftMutation,
 } from '@/composables/useAgeVerification'
 import { useDeleteAlcoholDeviationMutation } from '@/composables/useAlcoholDeviations'
-import { useMembersQuery } from '@/composables/useMembers'
+import { useMemberNamesQuery } from '@/composables/useMembers'
 import type { AlcoholDeviationType, CreateAlcoholDeviationRequest } from '@/types/deviation'
 
 const auth = useAuthStore()
@@ -46,21 +47,23 @@ const startShift = useStartShiftMutation()
 const updateCount = useUpdateIdCheckCountMutation()
 const createDeviation = useCreateShiftDeviationMutation()
 const endShift = useEndShiftMutation()
+const reopenShift = useReopenShiftMutation()
 const deleteDeviation = useDeleteAlcoholDeviationMutation()
-const membersQuery = useMembersQuery()
+const memberNamesQuery = useMemberNamesQuery()
 
 const shift = computed(() => activeShiftQuery.data.value?.shift ?? null)
 const deviations = computed(() => activeShiftQuery.data.value?.deviations ?? [])
 const hasActiveShift = computed(() => shift.value !== null && shift.value.status === 'ACTIVE')
+const hasCompletedTodayShift = computed(() => shift.value !== null && shift.value.status === 'COMPLETED')
 
 const endShiftDialogOpen = ref(false)
 const deviationFormOpen = ref(false)
 const prefillDeviationType = ref<AlcoholDeviationType | ''>('')
 
 const memberOptions = computed(() =>
-  (membersQuery.data.value ?? []).map((m) => ({
+  (memberNamesQuery.data.value ?? []).map((m) => ({
     userId: m.userId,
-    label: m.userFullName,
+    label: m.fullName,
   })),
 )
 
@@ -153,10 +156,21 @@ async function handleEndShift() {
   if (!shift.value) return
   try {
     await endShift.mutateAsync(shift.value.id)
+    await activeShiftQuery.refetch()
     toast.success('Skift avsluttet og signert')
     endShiftDialogOpen.value = false
   } catch (e) {
     handleError(e, 'Kunne ikke avslutte skift')
+  }
+}
+
+async function handleReopenShift() {
+  if (!shift.value) return
+  try {
+    await reopenShift.mutateAsync(shift.value.id)
+    toast.success('Dagens skift er gjenapnet')
+  } catch (e) {
+    handleError(e, 'Kunne ikke gjenapne skift')
   }
 }
 
@@ -184,8 +198,41 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
   </header>
 
   <div class="page-content">
-    <!-- No active shift: show start view -->
-    <template v-if="!hasActiveShift && !activeShiftQuery.isLoading.value">
+    <template v-if="hasCompletedTodayShift && !activeShiftQuery.isLoading.value">
+      <section class="header-row">
+        <div>
+          <h1>Alderskontroll</h1>
+          <p>Skiftet ditt er ferdig for i dag. Du kan starte nytt skift i morgen.</p>
+        </div>
+      </section>
+
+      <div class="start-card">
+        <div class="start-card-body">
+          <div class="start-icon">
+            <ShieldCheck :size="36" :stroke-width="1.5" aria-hidden="true" />
+          </div>
+          <div class="start-info">
+            <div class="info-item">
+              <IdCard :size="18" aria-hidden="true" />
+              <span>Skift ferdig: {{ shift?.idsCheckedCount ?? 0 }} legitimasjoner sjekket</span>
+            </div>
+            <div class="info-item">
+              <AlertTriangle :size="18" aria-hidden="true" />
+              <span>{{ deviations.length }} avvik registrert i dagens skift</span>
+            </div>
+          </div>
+          <Button
+            :disabled="reopenShift.isPending.value"
+            @click="handleReopenShift"
+          >
+            Gjenapne dagens skift
+          </Button>
+        </div>
+      </div>
+    </template>
+
+    <!-- No shift today: show start view -->
+    <template v-else-if="!hasActiveShift && !activeShiftQuery.isLoading.value">
       <section class="header-row">
         <div>
           <h1>Alderskontroll</h1>
@@ -324,8 +371,6 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
             Ved å avslutte skiftet bekrefter du at informasjonen du har registrert er korrekt.
             Du har sjekket <strong>{{ shift?.idsCheckedCount ?? 0 }}</strong> legitimasjoner
             og registrert <strong>{{ deviations.length }}</strong> avvik.
-            <br /><br />
-            Dette kan ikke angres.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

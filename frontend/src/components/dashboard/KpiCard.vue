@@ -96,4 +96,22 @@ const progressPercent = computed(() => {
   background: var(--brand);
   border-radius: var(--radius-pill);
 }
+
+@media (max-width: 640px) {
+  .kpi-title {
+    font-size: 0.95rem;
+  }
+
+  .kpi-value {
+    font-size: 1.75rem;
+  }
+
+  .kpi-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .progress-track {
+    max-width: none;
+  }
+}
 </style>

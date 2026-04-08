@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { z } from 'zod'
-import { MoreVertical, Pencil, Plus, Power, PowerOff, Refrigerator, Snowflake, Trash2 } from 'lucide-vue-next'
+import { MoreVertical, Pencil, Plus, Power, PowerOff, Refrigerator, Snowflake, Trash2, TriangleAlert } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import OverviewCard from '@/components/common/OverviewCard.vue'
 import Badge from '@/components/ui/badge/Badge.vue'
@@ -273,9 +273,9 @@ async function confirmDeleteAppliance(): Promise<void> {
       </section>
 
       <section class="overview-grid">
-        <OverviewCard label="Aktive enheter" :value="activeCount" variant="resolved" />
-        <OverviewCard label="Inaktive enheter" :value="inactiveCount" variant="neutral" />
-        <OverviewCard label="Avvik sist målt" :value="withDeviationCount" variant="open" :sub-label="lastRegisteredLabel" />
+        <OverviewCard label="Aktive enheter" :value="activeCount" :icon="Power" variant="resolved" />
+        <OverviewCard label="Inaktive enheter" :value="inactiveCount" :icon="PowerOff" variant="neutral" />
+        <OverviewCard label="Avvik sist målt" :value="withDeviationCount" :icon="TriangleAlert" variant="open" :sub-label="lastRegisteredLabel" />
       </section>
 
       <section class="controls-row">
@@ -788,7 +788,11 @@ async function confirmDeleteAppliance(): Promise<void> {
 
 @media (max-width: 920px) {
   .overview-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .device-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .page-intro {

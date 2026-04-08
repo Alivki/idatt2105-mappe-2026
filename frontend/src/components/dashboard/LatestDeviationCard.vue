@@ -106,9 +106,25 @@ h2 {
 }
 
 @media (max-width: 760px) {
+  .panel {
+    padding: 16px;
+  }
+
+  h2 {
+    font-size: 1.45rem;
+  }
+
   .entry {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .entry h3 {
+    font-size: 1.05rem;
+  }
+
+  .entry p {
+    font-size: 0.95rem;
   }
 }
 </style>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeft, AlertTriangle, IdCard } from 'lucide-vue-next'
+import { ArrowLeft, AlertTriangle, IdCard, CalendarDays } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
@@ -76,9 +76,9 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
         </section>
 
         <section class="cards-group">
-          <OverviewCard label="Skift" :value="detail.shifts.length" />
-          <OverviewCard label="Leg sjekket" :value="detail.totalIdsChecked" variant="resolved" />
-          <OverviewCard label="Avvik totalt" :value="detail.totalDeviations" :variant="detail.totalDeviations > 0 ? 'open' : 'neutral'" />
+          <OverviewCard label="Skift" :value="detail.shifts.length" :icon="CalendarDays" />
+          <OverviewCard label="Leg sjekket" :value="detail.totalIdsChecked" :icon="IdCard" variant="resolved" />
+          <OverviewCard label="Avvik totalt" :value="detail.totalDeviations" :icon="AlertTriangle" :variant="detail.totalDeviations > 0 ? 'open' : 'neutral'" />
         </section>
 
         <section v-if="Object.keys(detail.deviationsByType).length > 0" class="breakdown-section">

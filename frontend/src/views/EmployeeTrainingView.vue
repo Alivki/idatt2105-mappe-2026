@@ -33,15 +33,9 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
     </div>
 
     <div class="stat-grid">
-      <OverviewCard label="Gyldige" :value="valid.length" value-class="val-green">
-        <Award class="stat-icon icon-green" :size="18" />
-      </OverviewCard>
-      <OverviewCard label="Utløper snart" :value="expiring.length" value-class="val-amber">
-        <Clock class="stat-icon icon-amber" :size="18" />
-      </OverviewCard>
-      <OverviewCard label="Mangler" :value="missing.length" value-class="val-red">
-        <AlertTriangle class="stat-icon icon-red" :size="18" />
-      </OverviewCard>
+      <OverviewCard label="Gyldige" :value="valid.length" :icon="Award" value-class="val-green" />
+      <OverviewCard label="Utløper snart" :value="expiring.length" :icon="Clock" value-class="val-amber" />
+      <OverviewCard label="Mangler" :value="missing.length" :icon="AlertTriangle" value-class="val-red" />
     </div>
 
     <div class="table-card">

@@ -20,6 +20,7 @@ export function useActiveShiftQuery() {
     queryKey: activeShiftQueryKey,
     queryFn: () =>
       api.get<ShiftDetailResponse | null>('/age-verification/shifts/active').then((r) => r.data),
+    refetchInterval: 30000,
   })
 }
 
@@ -63,6 +64,18 @@ export function useEndShiftMutation() {
   return useMutation({
     mutationFn: (id: number) =>
       api.post<ShiftResponse>(`/age-verification/shifts/${id}/end`).then((r) => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: activeShiftQueryKey })
+      qc.invalidateQueries({ queryKey: ageVerificationQueryKey })
+    },
+  })
+}
+
+export function useReopenShiftMutation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) =>
+      api.post<ShiftResponse>(`/age-verification/shifts/${id}/reopen`).then((r) => r.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: activeShiftQueryKey })
       qc.invalidateQueries({ queryKey: ageVerificationQueryKey })

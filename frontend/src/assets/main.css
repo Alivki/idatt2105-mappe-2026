@@ -54,6 +54,11 @@
   --radius-pill: 999px;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 *,
 *::before,
 *::after {
@@ -70,12 +75,35 @@ body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  min-width: 320px;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
 }
 
 html,
 body,
 #app {
   min-height: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
 }
 
 a {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, toRef } from 'vue'
+import { useMediaQuery } from '@vueuse/core'
 import { MoreVertical, Shield, ShieldCheck, User, UserMinus, ArrowUpDown, Search, Plus, Mail } from 'lucide-vue-next'
 import { z } from 'zod/v4'
 import { toast } from 'vue-sonner'
@@ -67,6 +68,7 @@ const { data: org } = useOrganizationQuery(orgId)
 const updateRoleMutation = useUpdateMemberRoleMutation()
 const removeMemberMutation = useRemoveMemberMutation()
 const inviteMutation = useInviteMutation()
+const isMobile = useMediaQuery('(max-width: 768px)')
 
 const roleLabel: Record<string, string> = {
   ADMIN: 'Admin',
@@ -292,7 +294,69 @@ function handleInvite() {
             <input v-model="search" class="search-input" placeholder="Søk etter ansatt..." aria-label="Søk etter ansatt" />
           </div>
 
-          <div class="table-card">
+          <div v-if="isMobile" class="mobile-member-list">
+            <article
+              v-for="member in sortedAndFilteredMembers"
+              :key="member.id"
+              class="mobile-member-card"
+              :class="isSelf(member) ? 'row-self' : ''"
+            >
+              <div class="mobile-member-top">
+                <div class="cell-user">
+                  <div class="user-avatar" :class="{ 'user-avatar--self': isSelf(member) }">
+                    {{ initials(member.userFullName) }}
+                  </div>
+                  <div>
+                    <span class="user-name">{{ member.userFullName }}</span>
+                    <span v-if="isSelf(member)" class="you-label">(deg)</span>
+                  </div>
+                </div>
+
+                <div v-if="!isSelf(member)" class="actions-wrapper">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger as-child>
+                      <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger" aria-label="Handlinger">
+                        <MoreVertical :size="18" aria-hidden="true" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" :side-offset="4">
+                      <DropdownMenuLabel>Handlinger</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem @click="openRoleEdit(member)">
+                        <ShieldCheck :size="16" aria-hidden="true" />
+                        Endre rolle
+                      </DropdownMenuItem>
+                      <template v-if="isAdmin">
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem class="menu-item--danger" @click="openRemoveDialog(member)">
+                          <UserMinus :size="16" aria-hidden="true" />
+                          Fjern fra organisasjon
+                        </DropdownMenuItem>
+                      </template>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+
+              <div class="mobile-member-row">
+                <span>E-post</span>
+                <span class="cell-email">{{ member.userEmail }}</span>
+              </div>
+              <div class="mobile-member-row">
+                <span>Rolle</span>
+                <Badge :tone="badgeTone(member.role)">
+                  {{ roleLabel[member.role] ?? member.role }}
+                </Badge>
+              </div>
+            </article>
+
+            <div v-if="sortedAndFilteredMembers.length === 0" class="landing-box">
+              <h3>Ingen ansatte matcher søket</h3>
+              <span>Prøv et annet søk eller inviter en ny ansatt.</span>
+            </div>
+          </div>
+
+          <div v-else class="table-card">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -624,6 +688,8 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   border: 1px solid hsl(var(--border, 35 18% 88%));
   border-radius: 0.75rem;
   background: hsl(var(--card, 40 25% 98%));
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sort-btn {
@@ -718,6 +784,47 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 }
 
 .menu-item--danger { color: var(--red); }
+
+.mobile-member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.mobile-member-card {
+  border: 1px solid hsl(var(--border, 35 18% 88%));
+  border-radius: 0.75rem;
+  background: hsl(var(--card, 40 25% 98%));
+  padding: 0.5rem 0.65rem;
+}
+
+.mobile-member-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.mobile-member-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.3rem 0;
+}
+
+.mobile-member-row > span:first-child {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground, 24 5% 46%));
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.mobile-member-row > :last-child {
+  text-align: right;
+  min-width: 0;
+}
 
 .th-name { min-width: 10rem; }
 .th-email { min-width: 10rem; }
@@ -831,7 +938,12 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   .header-row { flex-direction: column; gap: 0.75rem; }
   .th-email, .cell-email { display: none; }
   .org-card { flex-direction: column; align-items: flex-start; }
-  .org-stats { align-self: flex-start; }
+  .org-stats { align-self: flex-start; flex-wrap: wrap; gap: 0.75rem 1rem; }
   .search-wrapper { width: 100%; }
+  .table-card :deep(table) { min-width: 36rem; }
+  .table-section { gap: 0.5rem; }
+  .header-row > :last-child { width: 100%; }
+  .header-row > :last-child :deep(button) { width: 100%; }
+  .org-card { padding: 0.9rem 1rem; }
 }
 </style>

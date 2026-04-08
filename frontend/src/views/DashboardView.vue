@@ -295,16 +295,35 @@ function getDailyChecklistStats(checklists: Checklist[]): { total: number; compl
 }
 
 @media (max-width: 760px) {
+  .page-header-inner {
+    width: 100%;
+    padding: 0 0.75rem;
+  }
+
+  .page-content {
+    padding: 0 0.75rem 0.75rem;
+    gap: 0.75rem;
+  }
+
   .dashboard-header {
     flex-direction: column;
   }
 
   .dashboard-header h1 {
-    font-size: 2.4rem;
+    font-size: 1.9rem;
   }
 
   .dashboard-header p {
-    font-size: 1.35rem;
+    font-size: 1rem;
+  }
+
+  .module-toggle {
+    flex-wrap: wrap;
+  }
+
+  .module-toggle :deep(.badge),
+  .module-toggle :deep([class*='badge']) {
+    flex: 0 0 auto;
   }
 
   .kpi-grid {

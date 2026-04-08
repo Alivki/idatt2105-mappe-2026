@@ -16,7 +16,7 @@ const { toggleSidebar } = useSidebar()
     variant="ghost"
     size="icon"
     :class="props.class"
-    style="height: 1.75rem; width: 1.75rem;"
+    style="height: 2.25rem; width: 2.25rem;"
     @click="toggleSidebar"
   >
     <PanelLeft />

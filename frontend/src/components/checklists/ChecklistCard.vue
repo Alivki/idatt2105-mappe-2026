@@ -209,7 +209,7 @@ const metaLine = computed(() => {
 .card-body {
   flex: 1;
   min-width: 0;
-  padding: 16px 16px 16px 20px;
+  padding: 16px 56px 16px 20px;
   text-align: left;
   cursor: pointer;
   background: none;
@@ -327,9 +327,13 @@ h3 {
 
 /* Actions */
 .card-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
   display: flex;
   align-items: flex-start;
-  padding: 12px 12px 0 0;
+  padding: 0;
   flex-shrink: 0;
 }
 
@@ -358,5 +362,33 @@ h3 {
 .menu-item--danger:hover {
   background-color: var(--red-soft) !important;
   color: var(--red) !important;
+}
+
+@media (max-width: 640px) {
+  .card-body {
+    padding: 14px 48px 14px 14px;
+  }
+
+  .title-row {
+    align-items: flex-start;
+  }
+
+  h3,
+  .meta {
+    white-space: normal;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+
+  .meta {
+    font-size: 0.82rem;
+  }
+
+  .circle {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
 }
 </style>

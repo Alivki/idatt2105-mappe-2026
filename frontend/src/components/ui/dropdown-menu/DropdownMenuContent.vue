@@ -21,49 +21,100 @@ const { isOpen, triggerRef, close } = inject("dropdown-menu") as {
 }
 const contentRef = ref<HTMLElement | null>(null)
 const posStyle = ref<Record<string, string>>({})
+const VIEWPORT_PADDING = 8
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max)
+}
 
 function updatePosition() {
   const trigger = triggerRef.value
   if (!trigger) return
+
+  const content = contentRef.value
   const rect = trigger.getBoundingClientRect()
   const s: Record<string, string> = { position: "fixed", zIndex: "999" }
+  const menuWidth = content?.offsetWidth ?? 0
+  const menuHeight = content?.offsetHeight ?? 0
   const isVertical = props.side === "bottom" || props.side === "top"
 
-  // Side axis: which edge of the trigger does the dropdown attach to
-  if (props.side === "bottom") {
-    s.top = `${rect.bottom + props.sideOffset}px`
-  } else if (props.side === "top") {
-    s.bottom = `${window.innerHeight - rect.top + props.sideOffset}px`
-  } else if (props.side === "right") {
-    s.left = `${rect.right + props.sideOffset}px`
-  } else if (props.side === "left") {
-    s.right = `${window.innerWidth - rect.left + props.sideOffset}px`
-  }
-
-  // Align axis: perpendicular to side
   if (isVertical) {
-    // Horizontal alignment
-    if (props.align === "start") {
-      s.left = `${rect.left}px`
-    } else if (props.align === "center") {
-      s.left = `${rect.left + rect.width / 2}px`
-      s.transform = "translateX(-50%)"
-    } else if (props.align === "end") {
-      s.right = `${window.innerWidth - rect.right}px`
+    let top = props.side === "bottom"
+      ? rect.bottom + props.sideOffset
+      : rect.top - props.sideOffset - menuHeight
+
+    if (props.side === "bottom" && menuHeight > 0 && top + menuHeight + VIEWPORT_PADDING > window.innerHeight) {
+      const flippedTop = rect.top - props.sideOffset - menuHeight
+      top = flippedTop >= VIEWPORT_PADDING
+        ? flippedTop
+        : Math.max(VIEWPORT_PADDING, window.innerHeight - menuHeight - VIEWPORT_PADDING)
     }
+
+    if (props.side === "top" && menuHeight > 0 && top < VIEWPORT_PADDING) {
+      const flippedTop = rect.bottom + props.sideOffset
+      top = flippedTop + menuHeight + VIEWPORT_PADDING <= window.innerHeight
+        ? flippedTop
+        : VIEWPORT_PADDING
+    }
+
+    s.top = `${Math.round(top)}px`
+
+    let left = rect.left
+    if (props.align === "start") {
+      left = rect.left
+    } else if (props.align === "center") {
+      left = rect.left + (rect.width - menuWidth) / 2
+    } else if (props.align === "end") {
+      left = rect.right - menuWidth
+    }
+
+    if (menuWidth > 0) {
+      left = clamp(left, VIEWPORT_PADDING, window.innerWidth - menuWidth - VIEWPORT_PADDING)
+    }
+
+    s.left = `${Math.round(left)}px`
   } else {
-    // Vertical alignment for side left/right
-    if (props.align === "start") {
-      s.top = `${rect.top}px`
-    } else if (props.align === "center") {
-      s.top = `${rect.top + rect.height / 2}px`
-      s.transform = "translateY(-50%)"
-    } else if (props.align === "end") {
-      s.bottom = `${window.innerHeight - rect.bottom}px`
+    let left = props.side === "right"
+      ? rect.right + props.sideOffset
+      : rect.left - props.sideOffset - menuWidth
+
+    if (props.side === "right" && menuWidth > 0 && left + menuWidth + VIEWPORT_PADDING > window.innerWidth) {
+      const flippedLeft = rect.left - props.sideOffset - menuWidth
+      left = flippedLeft >= VIEWPORT_PADDING
+        ? flippedLeft
+        : Math.max(VIEWPORT_PADDING, window.innerWidth - menuWidth - VIEWPORT_PADDING)
     }
+
+    if (props.side === "left" && menuWidth > 0 && left < VIEWPORT_PADDING) {
+      const flippedLeft = rect.right + props.sideOffset
+      left = flippedLeft + menuWidth + VIEWPORT_PADDING <= window.innerWidth
+        ? flippedLeft
+        : VIEWPORT_PADDING
+    }
+
+    s.left = `${Math.round(left)}px`
+
+    let top = rect.top
+    if (props.align === "start") {
+      top = rect.top
+    } else if (props.align === "center") {
+      top = rect.top + (rect.height - menuHeight) / 2
+    } else if (props.align === "end") {
+      top = rect.bottom - menuHeight
+    }
+
+    if (menuHeight > 0) {
+      top = clamp(top, VIEWPORT_PADDING, window.innerHeight - menuHeight - VIEWPORT_PADDING)
+    }
+
+    s.top = `${Math.round(top)}px`
   }
 
   posStyle.value = s
+}
+
+function onViewportChange() {
+  if (isOpen.value) updatePosition()
 }
 
 function onClickOutside(e: MouseEvent) {
@@ -83,17 +134,24 @@ watch(isOpen, async (open: boolean) => {
   if (open) {
     updatePosition()
     await nextTick()
+    updatePosition()
     document.addEventListener("mousedown", onClickOutside)
     document.addEventListener("keydown", onKeydown)
+    window.addEventListener("resize", onViewportChange)
+    window.addEventListener("scroll", onViewportChange, true)
   } else {
     document.removeEventListener("mousedown", onClickOutside)
     document.removeEventListener("keydown", onKeydown)
+    window.removeEventListener("resize", onViewportChange)
+    window.removeEventListener("scroll", onViewportChange, true)
   }
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener("mousedown", onClickOutside)
   document.removeEventListener("keydown", onKeydown)
+  window.removeEventListener("resize", onViewportChange)
+  window.removeEventListener("scroll", onViewportChange, true)
 })
 </script>
 

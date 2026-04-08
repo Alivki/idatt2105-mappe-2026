@@ -83,6 +83,18 @@ class AgeVerificationController(
     ): ResponseEntity<ShiftResponse> =
         ResponseEntity.ok(service.endShift(id, auth))
 
+    @Operation(summary = "Reopen today's completed shift")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Shift reopened"),
+        ApiResponse(responseCode = "400", description = "Shift cannot be reopened"),
+    )
+    @PostMapping("/shifts/{id}/reopen")
+    fun reopenShift(
+        @PathVariable id: Long,
+        @AuthenticationPrincipal auth: AuthenticatedUser,
+    ): ResponseEntity<ShiftResponse> =
+        ResponseEntity.ok(service.reopenShift(id, auth))
+
     @Operation(summary = "Get shift by ID (own shift or manager access)")
     @ApiResponse(responseCode = "200", description = "Shift details")
     @GetMapping("/shifts/{id}")

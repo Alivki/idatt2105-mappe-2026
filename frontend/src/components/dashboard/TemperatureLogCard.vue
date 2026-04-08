@@ -85,6 +85,14 @@ tbody tr:last-child td {
 }
 
 @media (max-width: 720px) {
+  .panel {
+    padding: 16px;
+  }
+
+  h2 {
+    font-size: 1.45rem;
+  }
+
   table,
   thead,
   tbody,
@@ -110,6 +118,11 @@ tbody tr:last-child td {
   td {
     border: none;
     padding: 5px 0;
+    font-size: 0.95rem;
+  }
+
+  th {
+    font-size: 0.85rem;
   }
 
   .status-col {
