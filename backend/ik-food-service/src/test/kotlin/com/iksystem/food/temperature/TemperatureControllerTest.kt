@@ -300,4 +300,5 @@ class TemperatureControllerTest {
         status = status,
         createdAt = createdAt
     )
+
 }
