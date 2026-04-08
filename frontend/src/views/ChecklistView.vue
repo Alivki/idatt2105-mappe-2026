@@ -484,12 +484,54 @@ h1 {
 }
 
 @media (max-width: 760px) {
+  .page-header-inner {
+    width: 100%;
+    padding: 0 0.75rem;
+  }
+
+  .page-content {
+    padding: 0 0.75rem 0.75rem;
+    gap: 0.75rem;
+  }
+
   .header-row {
     flex-direction: column;
   }
 
   h1 {
     font-size: 1.5rem;
+  }
+
+  .cards-section {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filters-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none;
+  }
+
+  .filters-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-button {
+    flex: 0 0 auto;
+  }
+
+  .empty-state-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .empty-state-actions > * {
+    width: 100%;
+  }
+
+  .section-divider span {
+    font-size: 0.85rem;
   }
 }
 

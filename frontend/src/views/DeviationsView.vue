@@ -663,7 +663,7 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   h1 { font-size: 1.5rem; }
   .header-row { flex-direction: column; }
   .create-actions { width: 100%; }
-  .cards-section { grid-template-columns: 1fr; }
+  .cards-section { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .filters-row { align-items: stretch; }
   .filters-left { flex-direction: column; }
   .filters-right { width: 100%; justify-content: flex-end; }

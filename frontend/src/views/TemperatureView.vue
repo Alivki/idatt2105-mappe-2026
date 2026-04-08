@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { Thermometer, TriangleAlert, CheckCircle2, Clock3 } from 'lucide-vue-next'
+import { useMediaQuery } from '@vueuse/core'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import OverviewCard from '@/components/common/OverviewCard.vue'
 import Badge from '@/components/ui/badge/Badge.vue'
@@ -41,6 +42,7 @@ const deviationDialogOpen = ref(false)
 const deviationFormPrefill = ref<Partial<CreateFoodDeviationRequest> | null>(null)
 const currentPage = ref(1)
 const entriesPerPage = 10
+const isMobile = useMediaQuery('(max-width: 768px)')
 
 watch(
   activeAppliances,
@@ -431,7 +433,63 @@ function goToNextPage(): void {
           </div>
 
           <div class="log-table-scroll">
-            <Table>
+            <div v-if="isMobile" class="mobile-entries">
+              <article
+                v-for="entry in pagedEntries"
+                :key="entry.id"
+                class="mobile-entry"
+                :class="entry.status === 'DEVIATION' ? 'mobile-entry--deviation' : ''"
+              >
+                <div v-if="canManage" class="mobile-entry-row mobile-entry-row--checkbox">
+                  <Checkbox
+                    :checked="selectedEntryIds.includes(entry.id)"
+                    @update:checked="(checked) => toggleEntrySelection(entry.id, checked)"
+                  />
+                </div>
+                <div class="mobile-entry-row">
+                  <span>Tidspunkt</span>
+                  <strong>{{ formatDateTime(entry.measuredAt) }}</strong>
+                </div>
+                <div class="mobile-entry-row">
+                  <span>Enhet</span>
+                  <strong>{{ entry.applianceName }}</strong>
+                </div>
+                <div class="mobile-entry-row">
+                  <span>Type</span>
+                  <span>{{ entry.applianceType === 'FRIDGE' ? 'Kjøleskap' : 'Fryser' }}</span>
+                </div>
+                <div class="mobile-entry-row">
+                  <span>Temp</span>
+                  <strong :class="entry.status === 'DEVIATION' ? 'danger-text' : 'ok-text'">{{ entry.temperature.toFixed(1) }}°C</strong>
+                </div>
+                <div class="mobile-entry-row">
+                  <span>Grense</span>
+                  <span>{{ entry.threshold }}</span>
+                </div>
+                <div class="mobile-entry-row">
+                  <span>Registrert av</span>
+                  <span>{{ entry.measuredBy }}</span>
+                </div>
+                <div class="mobile-entry-row">
+                  <span>Status</span>
+                  <Badge :tone="entry.statusTone">{{ entry.status === 'OK' ? 'OK' : 'Avvik' }}</Badge>
+                </div>
+                <div v-if="entry.note" class="mobile-entry-note">
+                  {{ entry.note }}
+                </div>
+              </article>
+              <div v-if="pagedEntries.length === 0" class="table-empty-state">
+                <div class="table-empty-icon">
+                  <Thermometer :stroke-width="1.5" aria-hidden="true" />
+                </div>
+                <div class="table-empty-text">
+                  <h2>Ingen temperaturregistreringer enda</h2>
+                  <p>Registrer den første målingen i panelet til venstre.</p>
+                </div>
+              </div>
+            </div>
+
+            <Table v-else class="temperature-table">
               <TableHeader>
                 <TableRow>
                   <TableHead v-if="canManage">
@@ -459,30 +517,30 @@ function goToNextPage(): void {
                 </TableEmpty>
 
                 <TableRow v-for="entry in pagedEntries" :key="entry.id" :class="entry.status === 'DEVIATION' ? 'row--deviation' : ''">
-                  <TableCell v-if="canManage">
+                  <TableCell v-if="canManage" data-label="Velg">
                     <Checkbox
                       :checked="selectedEntryIds.includes(entry.id)"
                       @update:checked="(checked) => toggleEntrySelection(entry.id, checked)"
                     />
                   </TableCell>
-                  <TableCell>
+                  <TableCell data-label="Tidspunkt">
                     <div class="cell-stack">
                       <strong>{{ formatDateTime(entry.measuredAt) }}</strong>
                       <span>{{ entry.note || 'Måling registrert' }}</span>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell data-label="Enhet">
                     <div class="cell-stack">
                       <strong>{{ entry.applianceName }}</strong>
                       <span>{{ entry.applianceType === 'FRIDGE' ? 'Kjøleskap' : 'Fryser' }}</span>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell data-label="Temp">
                     <strong :class="entry.status === 'DEVIATION' ? 'danger-text' : 'ok-text'">{{ entry.temperature.toFixed(1) }}°C</strong>
                   </TableCell>
-                  <TableCell>{{ entry.threshold }}</TableCell>
-                  <TableCell>{{ entry.measuredBy }}</TableCell>
-                  <TableCell>
+                  <TableCell data-label="Grense">{{ entry.threshold }}</TableCell>
+                  <TableCell data-label="Registrert av">{{ entry.measuredBy }}</TableCell>
+                  <TableCell data-label="Status">
                     <Badge :tone="entry.statusTone">{{ entry.status === 'OK' ? 'OK' : 'Avvik' }}</Badge>
                   </TableCell>
                 </TableRow>
@@ -557,6 +615,7 @@ function goToNextPage(): void {
   border: 1px solid hsl(var(--border));
   background: hsl(var(--card));
   box-shadow: 0 1px 2px hsl(var(--foreground) / 0.04);
+  min-width: 0;
 }
 
 .page-intro h1 {
@@ -583,6 +642,7 @@ function goToNextPage(): void {
   grid-template-columns: 0.9fr 1.1fr;
   gap: 0.75rem;
   align-items: start;
+  min-width: 0;
 }
 
 .form-panel,
@@ -769,6 +829,55 @@ function goToNextPage(): void {
   color: hsl(var(--muted-foreground));
 }
 
+.mobile-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.mobile-entry {
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.65rem;
+  background: hsl(var(--card));
+  padding: 0.45rem 0.65rem;
+}
+
+.mobile-entry--deviation {
+  background: var(--red-soft);
+}
+
+.mobile-entry-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.34rem 0;
+}
+
+.mobile-entry-row > span:first-child {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.mobile-entry-row > :last-child {
+  text-align: right;
+}
+
+.mobile-entry-row--checkbox {
+  justify-content: flex-end;
+}
+
+.mobile-entry-note {
+  margin-top: 0.25rem;
+  padding-top: 0.35rem;
+  border-top: 1px dashed hsl(var(--border));
+  font-size: 0.8rem;
+  color: hsl(var(--muted-foreground));
+}
+
 .row--deviation {
   background: var(--red-soft);
 }
@@ -801,8 +910,85 @@ function goToNextPage(): void {
 }
 
 @media (max-width: 720px) {
+  .page-content {
+    padding: 0 0.75rem 0.75rem;
+  }
+
+  .page-header-inner {
+    width: 100%;
+    padding: 0 0.75rem;
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .status-strip {
+    flex-direction: column;
+  }
+
+  .panel-header {
+    flex-direction: column;
+  }
+
+  .log-panel {
+    height: auto;
+  }
+
+  .log-table-scroll {
+    overflow: visible;
+  }
+
+  .temperature-table :deep(thead) {
+    display: none;
+  }
+
+  .temperature-table :deep(tbody) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .temperature-table :deep(tr.table-row) {
+    display: block;
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.65rem;
+    background: hsl(var(--card));
+    padding: 0.4rem 0.55rem;
+  }
+
+  .temperature-table :deep(td.table-cell) {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.38rem 0;
+    border: none;
+  }
+
+  .temperature-table :deep(td.table-cell[data-label='Velg']) {
+    justify-content: flex-end;
+  }
+
+  .temperature-table :deep(td.table-cell[data-label]::before) {
+    content: attr(data-label);
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+
+  .temperature-table :deep(td.table-cell > *) {
+    margin-left: auto;
+    text-align: right;
+    min-width: 0;
+  }
+
+  .temperature-table :deep(td.table-cell .cell-stack) {
+    align-items: flex-end;
   }
 
   .pagination-row {
