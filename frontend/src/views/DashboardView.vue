@@ -24,11 +24,7 @@ import {useTemperatureMonitoring} from '@/composables/useTemperatureMonitoring'
 import {useTrainingLogsQuery} from '@/composables/useTrainingLogs'
 import {useAlcoholPolicyExistsQuery} from '@/composables/useAlcoholPolicy'
 import {useDayDetailQuery} from '@/composables/useAgeVerification'
-import {useAuthStore} from '@/stores/auth'
 import type {Checklist} from '@/types/checklist'
-
-const auth = useAuthStore()
-const isManagerOrAdmin = computed(() => ['ADMIN', 'MANAGER'].includes(auth.role ?? ''))
 
 const foodQuery = useFoodDeviationsQuery()
 const alcoholQuery = useAlcoholDeviationsQuery()
