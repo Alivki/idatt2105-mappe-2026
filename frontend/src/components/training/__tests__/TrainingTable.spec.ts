@@ -198,7 +198,7 @@ describe('TrainingTable', () => {
       })
       const tds = wrapper.findAll('td')
       const expiresTd = tds.find((td) => td.text().includes('2024-06-01'))
-      expect(expiresTd?.classes()).toContain('text-amber-600')
+      expect(expiresTd?.classes()).toContain('td--warning')
     })
 
     it('renders multiple rows in the same group', () => {
@@ -255,7 +255,7 @@ describe('TrainingTable', () => {
         props: {groupedTrainings: makeGrouped([makeRow()])},
         global: {stubs: globalStubs},
       })
-      expect(wrapper.find('.absolute.right-0').exists()).toBe(false)
+      expect(wrapper.find('.ctx-menu').exists()).toBe(false)
     })
 
     it('opens context menu on MoreVertical button click', async () => {
@@ -266,7 +266,7 @@ describe('TrainingTable', () => {
       })
       const menuBtn = wrapper.find('.ctx-wrap button')
       await menuBtn.trigger('click')
-      expect(wrapper.find('.ctx-wrap .absolute').exists()).toBe(true)
+      expect(wrapper.find('.ctx-menu').exists()).toBe(true)
       wrapper.unmount()
     })
 
@@ -279,7 +279,7 @@ describe('TrainingTable', () => {
       const menuBtn = wrapper.find('.ctx-wrap button')
       await menuBtn.trigger('click')
       await menuBtn.trigger('click')
-      expect(wrapper.find('.ctx-wrap .absolute').exists()).toBe(false)
+      expect(wrapper.find('.ctx-menu').exists()).toBe(false)
       wrapper.unmount()
     })
 
@@ -291,7 +291,7 @@ describe('TrainingTable', () => {
         attachTo: document.body,
       })
       await wrapper.find('.ctx-wrap button').trigger('click')
-      const dropdownBtns = wrapper.findAll('.ctx-wrap .absolute button')
+      const dropdownBtns = wrapper.findAll('.ctx-menu button')
       await dropdownBtns[0].trigger('click')
       expect(wrapper.emitted('edit')).toBeTruthy()
       expect(wrapper.emitted('edit')?.[0]).toEqual([row])
@@ -306,7 +306,7 @@ describe('TrainingTable', () => {
         attachTo: document.body,
       })
       await wrapper.find('.ctx-wrap button').trigger('click')
-      const dropdownBtns = wrapper.findAll('.ctx-wrap .absolute button')
+      const dropdownBtns = wrapper.findAll('.ctx-menu button')
       await dropdownBtns[1].trigger('click')
       expect(wrapper.emitted('delete')).toBeTruthy()
       expect(wrapper.emitted('delete')?.[0]).toEqual([row])
@@ -320,9 +320,9 @@ describe('TrainingTable', () => {
         attachTo: document.body,
       })
       await wrapper.find('.ctx-wrap button').trigger('click')
-      const dropdownBtns = wrapper.findAll('.ctx-wrap .absolute button')
+      const dropdownBtns = wrapper.findAll('.ctx-menu button')
       await dropdownBtns[0].trigger('click')
-      expect(wrapper.find('.ctx-wrap .absolute').exists()).toBe(false)
+      expect(wrapper.find('.ctx-menu').exists()).toBe(false)
       wrapper.unmount()
     })
 
@@ -333,9 +333,9 @@ describe('TrainingTable', () => {
         attachTo: document.body,
       })
       await wrapper.find('.ctx-wrap button').trigger('click')
-      const dropdownBtns = wrapper.findAll('.ctx-wrap .absolute button')
+      const dropdownBtns = wrapper.findAll('.ctx-menu button')
       await dropdownBtns[1].trigger('click')
-      expect(wrapper.find('.ctx-wrap .absolute').exists()).toBe(false)
+      expect(wrapper.find('.ctx-menu').exists()).toBe(false)
       wrapper.unmount()
     })
   })
@@ -348,11 +348,11 @@ describe('TrainingTable', () => {
         attachTo: document.body,
       })
       await wrapper.find('.ctx-wrap button').trigger('click')
-      expect(wrapper.find('.ctx-wrap .absolute').exists()).toBe(true)
+      expect(wrapper.find('.ctx-menu').exists()).toBe(true)
 
       document.body.dispatchEvent(new MouseEvent('click', {bubbles: true}))
       await wrapper.vm.$nextTick()
-      expect(wrapper.find('.ctx-wrap .absolute').exists()).toBe(false)
+      expect(wrapper.find('.ctx-menu').exists()).toBe(false)
       wrapper.unmount()
     })
   })

@@ -15,12 +15,9 @@ const canSeeAll = computed(() =>
 <template>
   <AppLayout>
     <template #header>
-      <div class="flex items-center gap-3 px-4 py-3 border-b border-stone-200 bg-stone-50">
+      <div class="section-header">
         <SidebarTrigger/>
-        <span
-          class="text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-3 py-1">
-          IK-Alkohol
-        </span>
+        <span class="section-badge">IK-Alkohol</span>
       </div>
     </template>
 
@@ -28,3 +25,24 @@ const canSeeAll = computed(() =>
     <EmployeeTrainingView v-else/>
   </AppLayout>
 </template>
+
+<style scoped>
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid hsl(var(--border));
+  background: hsl(var(--muted) / 0.5);
+}
+
+.section-badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: hsl(var(--green-bg, 143 60% 95%));
+  color: var(--green);
+  border: 1px solid hsl(var(--green-border, 143 40% 80%));
+  border-radius: var(--radius-pill);
+  padding: 0.25rem 0.75rem;
+}
+</style>
