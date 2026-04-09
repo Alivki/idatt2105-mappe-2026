@@ -15,7 +15,6 @@ vi.mock('vue-sonner', () => ({
 }))
 
 const DialogStub = defineComponent({
-  name: 'Dialog',
   props: {
     open: { type: Boolean, default: false },
   },
@@ -47,7 +46,6 @@ const DialogStub = defineComponent({
 })
 
 const InputStub = defineComponent({
-  name: 'Input',
   props: {
     modelValue: { type: String, default: '' },
     placeholder: { type: String, default: '' },
@@ -110,7 +108,6 @@ const DatePickerStub = defineComponent({
 })
 
 const ButtonStub = defineComponent({
-  name: 'Button',
   props: {
     disabled: { type: Boolean, default: false },
     variant: { type: String, default: undefined },

@@ -48,7 +48,6 @@ vi.mock('@/components/ui/badge/Badge.vue', () => ({
 
 vi.mock('@/components/ui/button/Button.vue', () => ({
   default: defineComponent({
-    name: 'Button',
     emits: ['click'],
     props: {
       type: { type: String, default: 'button' },

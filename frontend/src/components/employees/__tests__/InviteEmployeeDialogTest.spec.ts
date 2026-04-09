@@ -14,7 +14,6 @@ vi.mock('lucide-vue-next', () => ({
 
 vi.mock('@/components/ui/button/Button.vue', () => ({
   default: defineComponent({
-    name: 'Button',
     emits: ['click'],
     props: {
       type: { type: String, default: 'button' },
@@ -33,7 +32,6 @@ vi.mock('@/components/ui/button/Button.vue', () => ({
 
 vi.mock('@/components/ui/dialog/Dialog.vue', () => ({
   default: defineComponent({
-    name: 'Dialog',
     props: { open: { type: Boolean, default: false } },
     emits: ['update:open'],
     setup(_, { slots }) {
@@ -71,7 +69,6 @@ vi.mock('@/components/ui/dialog/DialogTitle.vue', () => ({
 
 vi.mock('@/components/ui/select/Select.vue', () => ({
   default: defineComponent({
-    name: 'Select',
     props: { modelValue: { type: String, default: '' } },
     emits: ['update:modelValue'],
     setup(props, { emit, slots }) {

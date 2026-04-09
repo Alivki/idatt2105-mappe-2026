@@ -62,7 +62,6 @@ vi.mock('@/composables/useDocumentUpload', () => ({
 
 vi.mock('@/components/ui/button/Button.vue', () => ({
   default: defineComponent({
-    name: 'Button',
     emits: ['click'],
     props: {
       type: { type: String, default: 'button' },
@@ -86,7 +85,6 @@ vi.mock('@/components/ui/button/Button.vue', () => ({
 
 vi.mock('@/components/ui/input/Input.vue', () => ({
   default: defineComponent({
-    name: 'Input',
     props: { modelValue: { type: String, default: '' } },
     emits: ['update:model-value'],
     setup(props, { emit, attrs }) {
@@ -102,7 +100,6 @@ vi.mock('@/components/ui/input/Input.vue', () => ({
 
 vi.mock('@/components/ui/textarea/Textarea.vue', () => ({
   default: defineComponent({
-    name: 'Textarea',
     props: { modelValue: { type: String, default: '' } },
     emits: ['update:model-value'],
     setup(props, { emit, attrs }) {
