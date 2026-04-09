@@ -42,6 +42,8 @@ interface ChecklistRepository : JpaRepository<Checklist, Long> {
 
     fun findAllByOrganizationIdAndFrequencyAndActive(organizationId: Long, frequency: ChecklistFrequency, active: Boolean): List<Checklist>
 
+    fun findAllByOrganizationIdAndSource(organizationId: Long, source: String): List<Checklist>
+
     fun deleteAllByOrganizationIdAndSource(organizationId: Long, source: String)
 
     @Query(

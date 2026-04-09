@@ -49,10 +49,8 @@ const isMobile = useMediaQuery('(max-width: 768px)')
 
 const trainingLogs = computed(() => trainingLogsQuery.data.value ?? [])
 
-// ── Search ──
 const search = ref('')
 
-// ── Sorting ──
 type SortField = 'employee' | 'title' | 'completed' | 'expires' | 'status'
 type SortDir = 'asc' | 'desc'
 const sortField = ref<SortField>('employee')
@@ -139,7 +137,6 @@ function toggleSelectAll() {
     : new Set(filteredAndSorted.value.map((r) => r.id))
 }
 
-// ── Stats ──
 const stats = computed(() => {
   const list = trainingLogs.value
   return {
@@ -151,10 +148,8 @@ const stats = computed(() => {
   }
 })
 
-// ── Register modal ──
 const showRegister = ref(false)
 
-// ── Edit modal ──
 const editModalOpen = ref(false)
 const editingLog = ref<TrainingLog | null>(null)
 
@@ -163,7 +158,6 @@ function openEdit(log: TrainingLog) {
   editModalOpen.value = true
 }
 
-// ── Delete ──
 const deleteDialogOpen = ref(false)
 const deletingIds = ref<number[]>([])
 
@@ -227,7 +221,6 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
       </div>
     </section>
 
-    <!-- Stats cards -->
     <section class="cards-group">
       <OverviewCard label="Totalt opplærte" :value="stats.total" :icon="Users" />
       <OverviewCard label="Fullført" :value="stats.completed" :icon="ShieldCheck" variant="resolved" />
@@ -236,7 +229,6 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
       <OverviewCard label="Mangler" :value="stats.notCompleted" :icon="UserX" variant="open" />
     </section>
 
-    <!-- Table -->
     <section class="table-section">
       <div class="search-row">
         <div class="search-wrapper">
@@ -435,7 +427,6 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
       </div>
     </section>
 
-    <!-- Modals -->
     <RegisterTrainingModal :open="showRegister" @update:open="(v) => { showRegister = v }" />
     <EditTrainingModal
       :open="editModalOpen"
@@ -443,7 +434,6 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
       @update:open="(v) => { editModalOpen = v }"
     />
 
-    <!-- Delete confirmation dialog -->
     <AlertDialog :open="deleteDialogOpen" @update:open="(v: boolean) => { deleteDialogOpen = v }">
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -494,7 +484,6 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   gap: 10px;
 }
 
-/* Search */
 .search-wrapper {
   position: relative;
   width: 20rem;
@@ -525,7 +514,6 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   box-shadow: 0 0 0 2px hsl(var(--ring, 245 43% 52%) / 0.15);
 }
 
-/* Table */
 .table-section { display: flex; flex-direction: column; gap: 0.75rem; }
 
 .search-row {
@@ -541,7 +529,6 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   background: hsl(var(--card, 40 25% 98%));
 }
 
-/* Sort buttons */
 .sort-btn {
   display: inline-flex;
   align-items: center;
@@ -566,15 +553,12 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 .sort-icon { opacity: 0.4; transition: opacity 150ms; }
 .sort-icon--active { opacity: 1; }
 
-/* Checkbox */
 .th-check, .td-check { width: 3rem; padding-left: 1rem; padding-right: 0; }
 
-/* Row selection */
 .row-selected {
   background-color: hsl(var(--muted, 40 18% 93%) / 0.6) !important;
 }
 
-/* User cell */
 .cell-user {
   display: flex;
   align-items: center;
@@ -599,7 +583,6 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 .cell-text { color: hsl(var(--muted-foreground, 24 5% 46%)); }
 .cell-expires-soon { color: var(--amber); font-weight: 600; }
 
-/* Actions cell */
 .cell-actions {
   width: 3rem;
   text-align: right;
@@ -669,14 +652,12 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   text-align: right;
 }
 
-/* Column widths */
 .th-employee { min-width: 10rem; }
 .th-title { min-width: 8rem; }
 .th-date { min-width: 6rem; }
 .th-status { min-width: 6rem; }
 .th-actions { width: 3rem; }
 
-/* Loading / Error states */
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -763,9 +744,8 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 @media (max-width: 768px) {
   .hide-mobile { display: none !important; }
   .cards-group { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .header-row { flex-direction: column; }
-  .header-actions { width: 100%; }
-  .header-actions :deep(button) { width: 100%; }
+  .header-row { flex-direction: column; align-items: stretch; }
+  .header-actions { align-self: flex-end; }
   .search-row { flex-direction: column; align-items: stretch; }
   .search-wrapper { width: 100%; }
 

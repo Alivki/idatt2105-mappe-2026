@@ -936,7 +936,7 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 @media (max-width: 700px) {
   h1 { font-size: 1.5rem; }
   .header-row { flex-direction: column; gap: 0.75rem; }
-  .th-email, .cell-email { display: none; }
+  .table-card .th-email, .table-card .cell-email { display: none; }
   .org-card { flex-direction: column; align-items: flex-start; }
   .org-stats { align-self: flex-start; flex-wrap: wrap; gap: 0.75rem 1rem; }
   .search-wrapper { width: 100%; }

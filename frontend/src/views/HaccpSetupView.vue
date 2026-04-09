@@ -353,5 +353,23 @@ const nextStepLabels = [
   .wizard-card {
     padding: 1.25rem 1rem;
   }
+
+  .intro-wrapper {
+    padding: 1.5rem 1rem;
+  }
+
+  .completed-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .wizard-nav {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .wizard-nav :deep(button) {
+    font-size: 0.85rem;
+  }
 }
 </style>

@@ -13,10 +13,13 @@ import com.iksystem.common.checklist.dto.SetChecklistCompletionRequest
 import com.iksystem.common.checklist.dto.UpdateChecklistItemRequest
 import com.iksystem.common.checklist.dto.UpdateChecklistRequest
 import com.iksystem.common.checklist.model.Checklist
+import com.iksystem.common.checklist.model.ChecklistCompletion
 import com.iksystem.common.checklist.model.ChecklistItem
+import com.iksystem.common.checklist.repository.ChecklistCompletionRepository
 import com.iksystem.common.checklist.repository.ChecklistItemRepository
 import com.iksystem.common.checklist.repository.ChecklistRepository
 import com.iksystem.common.security.AuthenticatedUser
+import com.iksystem.common.user.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -25,6 +28,8 @@ import java.time.Instant
 class ChecklistService(
     private val checklistRepository: ChecklistRepository,
     private val checklistItemRepository: ChecklistItemRepository,
+    private val checklistCompletionRepository: ChecklistCompletionRepository,
+    private val userRepository: UserRepository,
 ) {
 
     @Transactional(readOnly = true)
@@ -151,6 +156,15 @@ class ChecklistService(
             )
         )
 
+        // Record completion if this was the last item to be checked off
+        if (request.completed == true) {
+            val checklist = requireChecklist(checklistId, orgId)
+            val allItems = checklistItemRepository.findAllByChecklistIdOrderByIdAsc(checklistId)
+            if (allItems.all { it.completed }) {
+                recordCompletion(checklist, auth)
+            }
+        }
+
         return updated.toResponse()
     }
 
@@ -182,8 +196,24 @@ class ChecklistService(
             updatedAt = now,
         )
 
+        // Record completion when all items are marked complete
+        if (request.completed) {
+            recordCompletion(checklist, auth)
+        }
+
         val items = checklistItemRepository.findAllByChecklistIdOrderByIdAsc(checklist.id)
         return checklist.toResponse(items)
+    }
+
+    private fun recordCompletion(checklist: Checklist, auth: AuthenticatedUser) {
+        val user = userRepository.findById(auth.userId).orElse(null) ?: return
+        checklistCompletionRepository.save(
+            ChecklistCompletion(
+                checklist = checklist,
+                organizationId = checklist.organizationId,
+                completedByUser = user,
+            )
+        )
     }
 
     private fun requireChecklist(checklistId: Long, organizationId: Long): Checklist {

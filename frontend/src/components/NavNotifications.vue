@@ -69,11 +69,34 @@ function updatePosition() {
   const trigger = triggerRef.value
   if (!trigger) return
   const rect = trigger.getBoundingClientRect()
-  panelStyle.value = {
-    position: 'fixed',
-    zIndex: '999',
-    left: `${rect.right + 4}px`,
-    bottom: `${window.innerHeight - rect.bottom}px`,
+  const panelWidth = 352 // 22rem
+  const isMobile = window.innerWidth < 640
+
+  if (isMobile) {
+    // On mobile, position above the trigger, centered horizontally
+    panelStyle.value = {
+      position: 'fixed',
+      zIndex: '999',
+      left: '0.5rem',
+      right: '0.5rem',
+      width: 'auto',
+      bottom: `${window.innerHeight - rect.top + 8}px`,
+    }
+  } else if (rect.right + 4 + panelWidth > window.innerWidth) {
+    // Not enough space to the right, open to the left
+    panelStyle.value = {
+      position: 'fixed',
+      zIndex: '999',
+      right: `${window.innerWidth - rect.left + 4}px`,
+      bottom: `${window.innerHeight - rect.bottom}px`,
+    }
+  } else {
+    panelStyle.value = {
+      position: 'fixed',
+      zIndex: '999',
+      left: `${rect.right + 4}px`,
+      bottom: `${window.innerHeight - rect.bottom}px`,
+    }
   }
 }
 
@@ -451,6 +474,13 @@ function typeLabel(type: string): string {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+@media (max-width: 639px) {
+  .notif-panel {
+    width: auto;
+    max-height: 60vh;
+  }
 }
 
 /* Animation */

@@ -212,7 +212,6 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
         </Button>
       </section>
 
-      <!-- Stats cards -->
       <section class="cards-section" aria-label="Sjekklisteoversikt">
         <OverviewCard label="Totalt sjekklister" :value="stats.total" :icon="ClipboardCheck" />
         <OverviewCard label="Fullført" :value="stats.completed" :icon="CircleCheckBig" variant="resolved" />
@@ -496,6 +495,11 @@ h1 {
 
   .header-row {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-row > :last-child {
+    align-self: flex-end;
   }
 
   h1 {

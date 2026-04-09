@@ -797,6 +797,11 @@ async function confirmDeleteAppliance(): Promise<void> {
 
   .page-intro {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-intro > div:last-child {
+    align-self: flex-end;
   }
 
   .controls-row {
@@ -809,6 +814,16 @@ async function confirmDeleteAppliance(): Promise<void> {
 
   .form-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .device-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .device-card {
+    aspect-ratio: auto;
   }
 }
 </style>

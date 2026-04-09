@@ -12,4 +12,5 @@ interface TemperatureMeasurementRepository : JpaRepository<TemperatureMeasuremen
     fun findTopByOrganizationIdAndApplianceIdOrderByMeasuredAtDesc(organizationId: Long, applianceId: Long): TemperatureMeasurement?
     fun findAllByOrganizationIdAndIdIn(organizationId: Long, ids: List<Long>): List<TemperatureMeasurement>
     fun countByOrganizationIdAndStatus(organizationId: Long, status: TemperatureMeasurementStatus): Long
+    fun findAllByOrganizationIdAndMeasuredAtBetween(organizationId: Long, from: java.time.Instant, to: java.time.Instant): List<TemperatureMeasurement>
 }
