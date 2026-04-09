@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { provide, ref, inject } from "vue"
+import {provide, ref, inject} from "vue"
 
-const providerCtx = inject("tooltip-provider", { delayDuration: 700 }) as { delayDuration: number }
+const providerCtx = inject("tooltip-provider", {delayDuration: 700}) as { delayDuration: number }
 
 const isOpen = ref(false)
 let openTimeout: ReturnType<typeof setTimeout> | null = null
@@ -20,12 +20,12 @@ function hide() {
   isOpen.value = false
 }
 
-provide("tooltip", { isOpen, show, hide })
+provide("tooltip", {isOpen, show, hide})
 </script>
 
 <template>
   <div class="tooltip-root">
-    <slot />
+    <slot/>
   </div>
 </template>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { inject, onMounted, onBeforeUnmount } from "vue"
-import { X } from "lucide-vue-next"
+import {inject, onMounted, onBeforeUnmount} from "vue"
+import {X} from "lucide-vue-next"
 
 type SheetSide = "top" | "bottom" | "left" | "right"
 
@@ -11,9 +11,9 @@ const props = withDefaults(defineProps<{
   side: "right",
 })
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { isOpen, close } = inject("sheet") as { isOpen: Ref<boolean>; close: () => void }
+const {isOpen, close} = inject("sheet") as { isOpen: Ref<boolean>; close: () => void }
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === "Escape") close()
@@ -26,7 +26,7 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKeydown))
 <template>
   <Teleport to="body">
     <Transition name="sheet-overlay">
-      <div v-if="isOpen" class="sheet-overlay" @click="close" />
+      <div v-if="isOpen" class="sheet-overlay" @click="close"/>
     </Transition>
     <Transition :name="`sheet-slide-${side}`">
       <div
@@ -35,9 +35,9 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKeydown))
         aria-modal="true"
         :class="['sheet-content', `sheet-content--${side}`, props.class]"
       >
-        <slot />
+        <slot/>
         <button class="sheet-close" @click="close">
-          <X class="sheet-close__icon" />
+          <X class="sheet-close__icon"/>
         </button>
       </div>
     </Transition>
@@ -116,32 +116,72 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKeydown))
 }
 
 /* Overlay transitions */
-.sheet-overlay-enter-active { transition: opacity 300ms ease; }
-.sheet-overlay-leave-active { transition: opacity 200ms ease; }
+.sheet-overlay-enter-active {
+  transition: opacity 300ms ease;
+}
+
+.sheet-overlay-leave-active {
+  transition: opacity 200ms ease;
+}
+
 .sheet-overlay-enter-from,
-.sheet-overlay-leave-to { opacity: 0; }
+.sheet-overlay-leave-to {
+  opacity: 0;
+}
 
 /* Slide from right */
-.sheet-slide-right-enter-active { transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1); }
-.sheet-slide-right-leave-active { transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1); }
+.sheet-slide-right-enter-active {
+  transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.sheet-slide-right-leave-active {
+  transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 .sheet-slide-right-enter-from,
-.sheet-slide-right-leave-to { transform: translateX(100%); }
+.sheet-slide-right-leave-to {
+  transform: translateX(100%);
+}
 
 /* Slide from left */
-.sheet-slide-left-enter-active { transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1); }
-.sheet-slide-left-leave-active { transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1); }
+.sheet-slide-left-enter-active {
+  transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.sheet-slide-left-leave-active {
+  transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 .sheet-slide-left-enter-from,
-.sheet-slide-left-leave-to { transform: translateX(-100%); }
+.sheet-slide-left-leave-to {
+  transform: translateX(-100%);
+}
 
 /* Slide from top */
-.sheet-slide-top-enter-active { transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1); }
-.sheet-slide-top-leave-active { transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1); }
+.sheet-slide-top-enter-active {
+  transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.sheet-slide-top-leave-active {
+  transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 .sheet-slide-top-enter-from,
-.sheet-slide-top-leave-to { transform: translateY(-100%); }
+.sheet-slide-top-leave-to {
+  transform: translateY(-100%);
+}
 
 /* Slide from bottom */
-.sheet-slide-bottom-enter-active { transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1); }
-.sheet-slide-bottom-leave-active { transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1); }
+.sheet-slide-bottom-enter-active {
+  transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.sheet-slide-bottom-leave-active {
+  transition: transform 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 .sheet-slide-bottom-enter-from,
-.sheet-slide-bottom-leave-to { transform: translateY(100%); }
+.sheet-slide-bottom-leave-to {
+  transform: translateY(100%);
+}
 </style>

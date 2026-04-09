@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { provide } from "vue"
+import {provide} from "vue"
 
 const props = defineProps<{
   modelValue?: string
@@ -17,6 +17,6 @@ provide("dropdown-radio-group", {
 
 <template>
   <div role="group">
-    <slot />
+    <slot/>
   </div>
 </template>

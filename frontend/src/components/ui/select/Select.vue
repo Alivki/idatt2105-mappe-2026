@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { provide, ref, reactive, computed, watch, onMounted, onBeforeUnmount } from "vue"
+import {provide, ref, reactive, computed, watch, onMounted, onBeforeUnmount} from "vue"
 
 const props = defineProps<{
   modelValue?: string
@@ -56,7 +56,7 @@ provide("select", {
 
 <template>
   <div class="select-root" v-bind="$attrs">
-    <slot />
+    <slot/>
   </div>
 </template>
 

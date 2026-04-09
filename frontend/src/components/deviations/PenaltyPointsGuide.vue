@@ -4,7 +4,8 @@
 <template>
   <div class="guide-card">
     <h3 class="guide-title">Prikkguide — kjenn risikoen</h3>
-    <p class="guide-subtitle">Alkoholforskriften §10-3. Vis dette til ansatte slik at alle forstår konsekvensene.</p>
+    <p class="guide-subtitle">Alkoholforskriften §10-3. Vis dette til ansatte slik at alle forstår
+      konsekvensene.</p>
 
     <div class="tier tier--8p">
       <span class="tier-badge">8p</span>
@@ -74,19 +75,51 @@
   line-height: 1.4;
 }
 
-.tier--8p { background: var(--red-soft); }
-.tier--8p .tier-badge { color: var(--red); }
-.tier--8p .tier-text { color: var(--red); }
+.tier--8p {
+  background: var(--red-soft);
+}
 
-.tier--4p { background: var(--amber-soft); }
-.tier--4p .tier-badge { color: var(--amber); }
-.tier--4p .tier-text { color: var(--amber); }
+.tier--8p .tier-badge {
+  color: var(--red);
+}
 
-.tier--2p { background: var(--amber-soft); }
-.tier--2p .tier-badge { color: var(--amber); }
-.tier--2p .tier-text { color: var(--amber); }
+.tier--8p .tier-text {
+  color: var(--red);
+}
 
-.tier--1p { background: var(--amber-soft); }
-.tier--1p .tier-badge { color: var(--amber); }
-.tier--1p .tier-text { color: var(--amber); }
+.tier--4p {
+  background: var(--amber-soft);
+}
+
+.tier--4p .tier-badge {
+  color: var(--amber);
+}
+
+.tier--4p .tier-text {
+  color: var(--amber);
+}
+
+.tier--2p {
+  background: var(--amber-soft);
+}
+
+.tier--2p .tier-badge {
+  color: var(--amber);
+}
+
+.tier--2p .tier-text {
+  color: var(--amber);
+}
+
+.tier--1p {
+  background: var(--amber-soft);
+}
+
+.tier--1p .tier-badge {
+  color: var(--amber);
+}
+
+.tier--1p .tier-text {
+  color: var(--amber);
+}
 </style>

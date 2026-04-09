@@ -3,6 +3,7 @@ package com.iksystem.common.checklist.controller
 import com.iksystem.common.checklist.dto.ChecklistItemResponse
 import com.iksystem.common.checklist.dto.ChecklistResponse
 import com.iksystem.common.checklist.dto.ChecklistStatsResponse
+import com.iksystem.common.checklist.dto.CompletionHistoryEntry
 import com.iksystem.common.checklist.dto.CreateChecklistItemRequest
 import com.iksystem.common.checklist.dto.CreateChecklistRequest
 import com.iksystem.common.checklist.dto.SetChecklistCompletionRequest
@@ -20,6 +21,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -48,6 +50,15 @@ class ChecklistController(
     @GetMapping("/stats")
     fun stats(@AuthenticationPrincipal auth: AuthenticatedUser): ResponseEntity<ChecklistStatsResponse> =
         ResponseEntity.ok(checklistService.stats(auth))
+
+    @Operation(summary = "Completion history", description = "Returns checklist completion events for the given period.")
+    @ApiResponse(responseCode = "200", description = "Completion history returned")
+    @GetMapping("/completion-history")
+    fun completionHistory(
+        @RequestParam(defaultValue = "30") days: Int,
+        @AuthenticationPrincipal auth: AuthenticatedUser,
+    ): ResponseEntity<List<CompletionHistoryEntry>> =
+        ResponseEntity.ok(checklistService.completionHistory(days, auth))
 
     @Operation(summary = "Create checklist", description = "Creates a new checklist template.")
     @ApiResponses(

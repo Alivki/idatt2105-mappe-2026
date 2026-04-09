@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useEventListener, useMediaQuery } from "@vueuse/core"
-import { computed, ref, watch } from "vue"
+import {useEventListener, useMediaQuery} from "@vueuse/core"
+import {computed, ref, watch} from "vue"
 import {
   provideSidebarContext,
   SIDEBAR_COOKIE_MAX_AGE,
@@ -84,7 +84,7 @@ provideSidebarContext({
     }"
     :class="props.class"
   >
-    <slot />
+    <slot/>
   </div>
 </template>
 

@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount, flushPromises } from '@vue/test-utils'
-import { ref } from 'vue'
+import {describe, it, expect, vi, beforeEach} from 'vitest'
+import {mount, flushPromises} from '@vue/test-utils'
+import {ref} from 'vue'
 
 // ── Mock composables ─────────────────────────────────────────────────────────
 
@@ -14,15 +14,15 @@ vi.mock('@/composables/useTrainingLogs', () => ({
   }),
   useOrganizationMembersQuery: () => ({
     data: ref([
-      { userId: 1, userFullName: 'Ola Nordmann' },
-      { userId: 2, userFullName: 'Kari Hansen' },
+      {userId: 1, userFullName: 'Ola Nordmann'},
+      {userId: 2, userFullName: 'Kari Hansen'},
     ]),
   }),
 }))
 
-vi.mock('vue-sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
+vi.mock('vue-sonner', () => ({toast: {success: vi.fn(), error: vi.fn()}}))
 vi.mock('axios', () => ({
-  default: { isAxiosError: vi.fn().mockReturnValue(false) },
+  default: {isAxiosError: vi.fn().mockReturnValue(false)},
 }))
 
 // ── Stubs ────────────────────────────────────────────────────────────────────
@@ -34,11 +34,11 @@ const globalStubs = {
     props: ['open'],
     emits: ['update:open'],
   },
-  DialogContent: { template: '<div class="dialog-content"><slot /></div>' },
-  DialogHeader: { template: '<div><slot /></div>' },
-  DialogTitle: { template: '<div class="dialog-title"><slot /></div>' },
-  DialogDescription: { template: '<div><slot /></div>' },
-  DialogFooter: { template: '<div class="dialog-footer"><slot /></div>' },
+  DialogContent: {template: '<div class="dialog-content"><slot /></div>'},
+  DialogHeader: {template: '<div><slot /></div>'},
+  DialogTitle: {template: '<div class="dialog-title"><slot /></div>'},
+  DialogDescription: {template: '<div><slot /></div>'},
+  DialogFooter: {template: '<div class="dialog-footer"><slot /></div>'},
   Button: {
     name: 'Button',
     template: '<button :type="type" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
@@ -69,14 +69,14 @@ const globalStubs = {
     props: ['modelValue'],
     emits: ['update:modelValue'],
   },
-  SelectTrigger: { template: '<div><slot /></div>' },
-  SelectValue: { template: '<div><slot /></div>' },
-  SelectContent: { template: '<div><slot /></div>' },
-  SelectItem: { template: '<div><slot /></div>' },
+  SelectTrigger: {template: '<div><slot /></div>'},
+  SelectValue: {template: '<div><slot /></div>'},
+  SelectContent: {template: '<div><slot /></div>'},
+  SelectItem: {template: '<div><slot /></div>'},
 }
 
 import RegisterTrainingModal from '../RegisterTrainingModal.vue'
-import { toast } from 'vue-sonner'
+import {toast} from 'vue-sonner'
 import axios from 'axios'
 
 describe('RegisterTrainingModal', () => {
@@ -90,8 +90,8 @@ describe('RegisterTrainingModal', () => {
 
   const mountModal = (props = {}) =>
     mount(RegisterTrainingModal, {
-      props: { open: true, ...props },
-      global: { stubs: globalStubs },
+      props: {open: true, ...props},
+      global: {stubs: globalStubs},
     })
 
   describe('rendering', () => {
@@ -101,7 +101,7 @@ describe('RegisterTrainingModal', () => {
     })
 
     it('does not render when open is false', () => {
-      const wrapper = mountModal({ open: false })
+      const wrapper = mountModal({open: false})
       expect(wrapper.find('.dialog-stub').exists()).toBe(false)
     })
 
@@ -252,9 +252,9 @@ describe('RegisterTrainingModal', () => {
 
   describe('form reset on open', () => {
     it('resets form fields when modal is re-opened', async () => {
-      const wrapper = mountModal({ open: false })
+      const wrapper = mountModal({open: false})
       // Change input
-      await wrapper.setProps({ open: true })
+      await wrapper.setProps({open: true})
       await wrapper.vm.$nextTick()
       // After opening, input should be empty
       const input = wrapper.find('.input-stub')

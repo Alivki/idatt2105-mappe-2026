@@ -6,7 +6,7 @@ defineProps<{
 
 <template>
   <caption :class="['table-caption', $props.class]">
-    <slot />
+    <slot/>
   </caption>
 </template>
 

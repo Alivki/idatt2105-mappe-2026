@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { inject, onMounted, onBeforeUnmount } from "vue"
-import { X } from "lucide-vue-next"
+import {inject, onMounted, onBeforeUnmount} from "vue"
+import {X} from "lucide-vue-next"
 
 const props = defineProps<{
   class?: string
 }>()
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { isOpen, close } = inject("dialog") as { isOpen: Ref<boolean>; close: () => void }
+const {isOpen, close} = inject("dialog") as { isOpen: Ref<boolean>; close: () => void }
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === "Escape") close()
@@ -33,9 +33,9 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKeydown))
             aria-modal="true"
             :class="['dialog-scroll-content', props.class]"
           >
-            <slot />
+            <slot/>
             <button class="dialog-scroll-close" @click="close">
-              <X class="dialog-scroll-close__icon" />
+              <X class="dialog-scroll-close__icon"/>
               <span class="sr-only">Close</span>
             </button>
           </div>
@@ -105,13 +105,27 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKeydown))
   border-width: 0;
 }
 
-.dialog-scroll-overlay-enter-active { transition: opacity 200ms ease; }
-.dialog-scroll-overlay-leave-active { transition: opacity 150ms ease; }
-.dialog-scroll-overlay-enter-from,
-.dialog-scroll-overlay-leave-to { opacity: 0; }
+.dialog-scroll-overlay-enter-active {
+  transition: opacity 200ms ease;
+}
 
-.dialog-scroll-content-enter-active { transition: all 200ms ease; }
-.dialog-scroll-content-leave-active { transition: all 150ms ease; }
+.dialog-scroll-overlay-leave-active {
+  transition: opacity 150ms ease;
+}
+
+.dialog-scroll-overlay-enter-from,
+.dialog-scroll-overlay-leave-to {
+  opacity: 0;
+}
+
+.dialog-scroll-content-enter-active {
+  transition: all 200ms ease;
+}
+
+.dialog-scroll-content-leave-active {
+  transition: all 150ms ease;
+}
+
 .dialog-scroll-content-enter-from,
 .dialog-scroll-content-leave-to {
   opacity: 0;

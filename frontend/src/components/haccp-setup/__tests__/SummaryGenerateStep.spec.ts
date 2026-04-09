@@ -1,6 +1,6 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h} from 'vue'
+import {describe, expect, it, vi} from 'vitest'
 import SummaryGenerateStep from '../Step5Summary.vue'
 
 
@@ -8,7 +8,7 @@ vi.mock('lucide-vue-next', () => {
   const icon = (name: string) => defineComponent({
     name,
     setup() {
-      return () => h('svg', { 'data-icon': name })
+      return () => h('svg', {'data-icon': name})
     },
   })
   return {
@@ -52,13 +52,13 @@ describe('SummaryGenerateStep', () => {
       businessType: 'RESTAURANT',
       businessSize: 'SMALL',
       prerequisites: [
-        { id: '1', status: 'OK' },
-        { id: '2', status: 'MISSING' },
+        {id: '1', status: 'OK'},
+        {id: '2', status: 'MISSING'},
       ],
-      processSteps: [{ id: 'a' }, { id: 'b' }],
+      processSteps: [{id: 'a'}, {id: 'b'}],
       hazardEntries: [
-        { id: '1', likelihood: 3, severity: 2 },
-        { id: '2', likelihood: 1, severity: 1 },
+        {id: '1', likelihood: 3, severity: 2},
+        {id: '2', likelihood: 1, severity: 1},
       ],
       temperatureEquipment: ['REFRIGERATORS', 'HOT_HOLDING'],
       foodTypes: ['ALLERGEN_CONTAINING'],
@@ -70,7 +70,7 @@ describe('SummaryGenerateStep', () => {
     const wrapper = mount(SummaryGenerateStep, {
       props: {
         wizard,
-        haccpTrinn: { label: 'Trinn 3' },
+        haccpTrinn: {label: 'Trinn 3'},
         isGenerating: false,
       },
     })
@@ -93,7 +93,7 @@ describe('SummaryGenerateStep', () => {
       businessType: 'RESTAURANT',
       businessSize: 'SMALL',
       prerequisites: [
-        { id: '1', status: 'OK' },
+        {id: '1', status: 'OK'},
       ],
       processSteps: [],
       hazardEntries: [],
@@ -107,7 +107,7 @@ describe('SummaryGenerateStep', () => {
     const wrapper = mount(SummaryGenerateStep, {
       props: {
         wizard,
-        haccpTrinn: { label: 'Trinn 1' },
+        haccpTrinn: {label: 'Trinn 1'},
         isGenerating: true,
       },
     })

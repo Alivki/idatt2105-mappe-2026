@@ -12,6 +12,7 @@ import com.iksystem.common.checklist.model.ChecklistItem
 import com.iksystem.common.checklist.repository.ChecklistCompletionRepository
 import com.iksystem.common.checklist.repository.ChecklistItemRepository
 import com.iksystem.common.checklist.repository.ChecklistRepository
+import com.iksystem.common.user.repository.UserRepository
 import com.iksystem.common.exception.BadRequestException
 import com.iksystem.common.exception.ForbiddenException
 import com.iksystem.common.exception.NotFoundException

@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { inject } from "vue"
+import {inject} from "vue"
 
 const props = defineProps<{
   class?: string
 }>()
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { isOpen } = inject("alert-dialog") as { isOpen: Ref<boolean> }
+const {isOpen} = inject("alert-dialog") as { isOpen: Ref<boolean> }
 </script>
 
 <template>
   <Teleport to="body">
     <Transition name="alert-overlay">
-      <div v-if="isOpen" class="alert-overlay" />
+      <div v-if="isOpen" class="alert-overlay"/>
     </Transition>
     <Transition name="alert-content">
       <div
@@ -22,7 +22,7 @@ const { isOpen } = inject("alert-dialog") as { isOpen: Ref<boolean> }
         aria-modal="true"
         :class="['alert-content', props.class]"
       >
-        <slot />
+        <slot/>
       </div>
     </Transition>
   </Teleport>
@@ -54,14 +54,28 @@ const { isOpen } = inject("alert-dialog") as { isOpen: Ref<boolean> }
 }
 
 /* Overlay transitions */
-.alert-overlay-enter-active { transition: opacity 200ms ease; }
-.alert-overlay-leave-active { transition: opacity 150ms ease; }
+.alert-overlay-enter-active {
+  transition: opacity 200ms ease;
+}
+
+.alert-overlay-leave-active {
+  transition: opacity 150ms ease;
+}
+
 .alert-overlay-enter-from,
-.alert-overlay-leave-to { opacity: 0; }
+.alert-overlay-leave-to {
+  opacity: 0;
+}
 
 /* Content transitions */
-.alert-content-enter-active { transition: all 200ms ease; }
-.alert-content-leave-active { transition: all 150ms ease; }
+.alert-content-enter-active {
+  transition: all 200ms ease;
+}
+
+.alert-content-leave-active {
+  transition: all 150ms ease;
+}
+
 .alert-content-enter-from,
 .alert-content-leave-to {
   opacity: 0;

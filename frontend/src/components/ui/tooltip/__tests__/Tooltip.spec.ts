@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick } from 'vue'
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, nextTick} from 'vue'
 
 import Tooltip from '../Tooltip.vue'
 import TooltipTrigger from '../TooltipTrigger.vue'
@@ -31,7 +31,7 @@ describe('Tooltip behavior', () => {
 
   it('TooltipContent is hidden by default', () => {
     const Host = defineComponent({
-      components: { Tooltip, TooltipContent },
+      components: {Tooltip, TooltipContent},
       template: `
         <Tooltip>
           <TooltipContent>
@@ -42,7 +42,7 @@ describe('Tooltip behavior', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     expect(wrapper.find('[data-test="content"]').exists()).toBe(false)
@@ -51,7 +51,7 @@ describe('Tooltip behavior', () => {
 
   it('TooltipTrigger uses display: contents wrapper', () => {
     const Host = defineComponent({
-      components: { Tooltip, TooltipTrigger },
+      components: {Tooltip, TooltipTrigger},
       template: `
         <Tooltip>
           <TooltipTrigger>
@@ -69,7 +69,7 @@ describe('Tooltip behavior', () => {
 
   it('shows tooltip on mouseenter after default delay', async () => {
     const Host = defineComponent({
-      components: { Tooltip, TooltipTrigger, TooltipContent },
+      components: {Tooltip, TooltipTrigger, TooltipContent},
       template: `
         <Tooltip>
           <TooltipTrigger>
@@ -83,7 +83,7 @@ describe('Tooltip behavior', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const trigger = wrapper.findComponent(TooltipTrigger)
@@ -104,7 +104,7 @@ describe('Tooltip behavior', () => {
 
   it('shows tooltip on focus after default delay', async () => {
     const Host = defineComponent({
-      components: { Tooltip, TooltipTrigger, TooltipContent },
+      components: {Tooltip, TooltipTrigger, TooltipContent},
       template: `
         <Tooltip>
           <TooltipTrigger>
@@ -118,7 +118,7 @@ describe('Tooltip behavior', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const trigger = wrapper.findComponent(TooltipTrigger)
@@ -132,7 +132,7 @@ describe('Tooltip behavior', () => {
 
   it('hides tooltip on mouseleave and clears pending timeout', async () => {
     const Host = defineComponent({
-      components: { Tooltip, TooltipTrigger, TooltipContent },
+      components: {Tooltip, TooltipTrigger, TooltipContent},
       template: `
         <Tooltip>
           <TooltipTrigger>
@@ -146,7 +146,7 @@ describe('Tooltip behavior', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const trigger = wrapper.findComponent(TooltipTrigger)
@@ -165,7 +165,7 @@ describe('Tooltip behavior', () => {
 
   it('hides tooltip on blur', async () => {
     const Host = defineComponent({
-      components: { Tooltip, TooltipTrigger, TooltipContent },
+      components: {Tooltip, TooltipTrigger, TooltipContent},
       template: `
         <Tooltip>
           <TooltipTrigger>
@@ -179,7 +179,7 @@ describe('Tooltip behavior', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const trigger = wrapper.findComponent(TooltipTrigger)
@@ -198,7 +198,7 @@ describe('Tooltip behavior', () => {
 
   it('TooltipProvider overrides delayDuration', async () => {
     const Host = defineComponent({
-      components: { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent },
+      components: {TooltipProvider, Tooltip, TooltipTrigger, TooltipContent},
       template: `
         <TooltipProvider :delayDuration="200">
           <Tooltip>
@@ -214,7 +214,7 @@ describe('Tooltip behavior', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const trigger = wrapper.findComponent(TooltipTrigger)

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { z } from 'zod'
+import {computed, ref, watch} from 'vue'
+import {z} from 'zod'
 import type {
   Checklist,
   ChecklistItem,
@@ -34,7 +34,11 @@ const props = withDefaults(
 const emits = defineEmits<{
   (e: 'update:open', value: boolean): void
   (e: 'create', payload: { checklistId: number; data: CreateChecklistItemRequest }): void
-  (e: 'update', payload: { checklistId: number; itemId: number; data: UpdateChecklistItemRequest }): void
+  (e: 'update', payload: {
+    checklistId: number;
+    itemId: number;
+    data: UpdateChecklistItemRequest
+  }): void
 }>()
 
 const formTitle = ref('')
@@ -70,7 +74,7 @@ watch(
 
     errors.value = {}
   },
-  { immediate: true },
+  {immediate: true},
 )
 
 function closeDialog() {
@@ -132,13 +136,13 @@ function handleSubmit() {
       <form class="form" @submit.prevent="handleSubmit">
         <label :class="['field', { 'field--error': errors.title }]">
           <span>Tittel</span>
-          <Input v-model="formTitle" placeholder="For eksempel: Sjekk temperatur i kjøleskap" />
+          <Input v-model="formTitle" placeholder="For eksempel: Sjekk temperatur i kjøleskap"/>
           <p v-if="errors.title" class="error-message">{{ errors.title }}</p>
         </label>
 
         <label class="field">
           <span>Beskrivelse (valgfritt)</span>
-          <Textarea v-model="formDescription" rows="3" placeholder="Detaljerte instrukser" />
+          <Textarea v-model="formDescription" rows="3" placeholder="Detaljerte instrukser"/>
         </label>
 
         <DialogFooter>

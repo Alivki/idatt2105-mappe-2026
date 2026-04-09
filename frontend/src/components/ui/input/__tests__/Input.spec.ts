@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick, ref } from 'vue'
+import {describe, expect, it} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, nextTick, ref} from 'vue'
 
 import InputComponent from '../Input.vue'
 
@@ -114,7 +114,7 @@ describe('Input', () => {
 
     expect((wrapper.element as HTMLInputElement).value).toBe('first')
 
-    await wrapper.setProps({ modelValue: 'second' })
+    await wrapper.setProps({modelValue: 'second'})
     await nextTick()
 
     expect((wrapper.element as HTMLInputElement).value).toBe('second')
@@ -122,10 +122,10 @@ describe('Input', () => {
 
   it('works with v-model in a parent component', async () => {
     const Host = defineComponent({
-      components: { AppInput: InputComponent },
+      components: {AppInput: InputComponent},
       setup() {
         const value = ref('start')
-        return { value }
+        return {value}
       },
       template: `
         <AppInput v-model="value" data-test="input" />
@@ -154,7 +154,7 @@ describe('Input', () => {
 
     expect((wrapper.element as HTMLInputElement).value).toBe('123')
 
-    await wrapper.setProps({ modelValue: 456 })
+    await wrapper.setProps({modelValue: 456})
     await nextTick()
 
     expect((wrapper.element as HTMLInputElement).value).toBe('456')

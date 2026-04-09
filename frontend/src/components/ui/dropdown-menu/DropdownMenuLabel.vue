@@ -7,7 +7,7 @@ defineProps<{
 
 <template>
   <div :class="['dropdown-label', inset && 'dropdown-label--inset', $props.class]">
-    <slot />
+    <slot/>
   </div>
 </template>
 

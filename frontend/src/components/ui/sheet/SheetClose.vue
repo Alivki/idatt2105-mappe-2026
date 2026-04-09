@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { inject } from "vue"
+import {inject} from "vue"
 
-const { close } = inject("sheet") as { close: () => void }
+const {close} = inject("sheet") as { close: () => void }
 </script>
 
 <template>
   <button type="button" @click="close">
-    <slot />
+    <slot/>
   </button>
 </template>

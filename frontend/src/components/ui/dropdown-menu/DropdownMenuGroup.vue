@@ -6,6 +6,6 @@ defineProps<{
 
 <template>
   <div :class="$props.class" role="group">
-    <slot />
+    <slot/>
   </div>
 </template>

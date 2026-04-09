@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SignUpForm from '@/components/SignUpForm.vue'
-import { ref } from 'vue'
+import {ref} from 'vue'
 import veraLogo from '@/assets/vera.png'
 
 const signUpFormRef = ref<InstanceType<typeof SignUpForm> | null>(null)
@@ -29,7 +29,7 @@ const signUpFormRef = ref<InstanceType<typeof SignUpForm> | null>(null)
             <p class="subtitle">Opprett en konto for å komme i gang</p>
           </div>
 
-          <SignUpForm ref="signUpFormRef" />
+          <SignUpForm ref="signUpFormRef"/>
         </div>
 
         <div class="card card--dim">

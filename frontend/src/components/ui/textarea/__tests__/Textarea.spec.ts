@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick, ref } from 'vue'
+import {describe, expect, it} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, nextTick, ref} from 'vue'
 
 import TextareaComponent from '../Textarea.vue'
 
@@ -114,7 +114,7 @@ describe('Textarea', () => {
 
     expect((wrapper.element as HTMLTextAreaElement).value).toBe('first')
 
-    await wrapper.setProps({ modelValue: 'second' })
+    await wrapper.setProps({modelValue: 'second'})
     await nextTick()
 
     expect((wrapper.element as HTMLTextAreaElement).value).toBe('second')
@@ -122,10 +122,10 @@ describe('Textarea', () => {
 
   it('works with v-model in a parent component', async () => {
     const Host = defineComponent({
-      components: { AppTextarea: TextareaComponent },
+      components: {AppTextarea: TextareaComponent},
       setup() {
         const value = ref('start')
-        return { value }
+        return {value}
       },
       template: `
         <AppTextarea v-model="value" data-test="textarea" />
@@ -154,7 +154,7 @@ describe('Textarea', () => {
 
     expect((wrapper.element as HTMLTextAreaElement).value).toBe(10 as unknown as string)
 
-    await wrapper.setProps({ modelValue: 20 })
+    await wrapper.setProps({modelValue: 20})
     await nextTick()
 
     expect((wrapper.element as HTMLTextAreaElement).value).toBe(20 as unknown as string)

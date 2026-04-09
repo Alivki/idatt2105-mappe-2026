@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { inject } from "vue"
+import {inject} from "vue"
 
 defineProps<{
   asChild?: boolean
 }>()
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { setOpen, isOpen } = inject("alert-dialog") as { setOpen: (v: boolean) => void; isOpen: Ref<boolean> }
+const {setOpen, isOpen} = inject("alert-dialog") as {
+  setOpen: (v: boolean) => void;
+  isOpen: Ref<boolean>
+}
 
 function toggle() {
   setOpen(!isOpen.value)
@@ -16,6 +19,6 @@ function toggle() {
 
 <template>
   <div style="display: contents" @click="toggle">
-    <slot />
+    <slot/>
   </div>
 </template>

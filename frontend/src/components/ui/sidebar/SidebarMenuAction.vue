@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSidebar } from "./utils"
+import {useSidebar} from "./utils"
 
 const props = withDefaults(defineProps<{
   showOnHover?: boolean
@@ -9,7 +9,7 @@ const props = withDefaults(defineProps<{
   as: "button",
 })
 
-const { state, collapsible } = useSidebar()
+const {state, collapsible} = useSidebar()
 </script>
 
 <template>
@@ -25,7 +25,7 @@ const { state, collapsible } = useSidebar()
       display: state === 'collapsed' && collapsible === 'icon' ? 'none' : undefined,
     }"
   >
-    <slot />
+    <slot/>
   </component>
 </template>
 

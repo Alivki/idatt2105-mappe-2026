@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { inject, ref, onBeforeUnmount, nextTick, watch } from "vue"
-import type { Ref } from "vue"
+import {inject, ref, onBeforeUnmount, nextTick, watch} from "vue"
+import type {Ref} from "vue"
 
 const props = defineProps<{
   class?: string
@@ -8,7 +8,7 @@ const props = defineProps<{
   alignEnd?: boolean
 }>()
 
-const { isOpen, close } = inject("select") as { isOpen: Ref<boolean>; close: () => void }
+const {isOpen, close} = inject("select") as { isOpen: Ref<boolean>; close: () => void }
 
 const contentRef = ref<HTMLElement | null>(null)
 
@@ -46,7 +46,7 @@ onBeforeUnmount(() => {
       @click.stop
     >
       <div class="select-viewport">
-        <slot />
+        <slot/>
       </div>
     </div>
   </Transition>

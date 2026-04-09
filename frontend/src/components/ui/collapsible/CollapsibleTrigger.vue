@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { inject } from "vue"
+import {inject} from "vue"
 
 defineProps<{
   asChild?: boolean
 }>()
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { toggle, isOpen } = inject("collapsible") as { toggle: () => void; isOpen: Ref<boolean> }
+const {toggle, isOpen} = inject("collapsible") as { toggle: () => void; isOpen: Ref<boolean> }
 </script>
 
 <template>
@@ -16,6 +16,6 @@ const { toggle, isOpen } = inject("collapsible") as { toggle: () => void; isOpen
     :data-state="isOpen ? 'open' : 'closed'"
     @click="toggle"
   >
-    <slot />
+    <slot/>
   </div>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { useSidebar } from "./utils"
+import {Sheet, SheetContent} from "@/components/ui/sheet"
+import {useSidebar} from "./utils"
 
 defineOptions({
   inheritAttrs: false,
@@ -23,7 +23,7 @@ ctx.variant = props.variant
 ctx.collapsible = props.collapsible
 ctx.side = props.side
 
-const { isMobile, state, openMobile, setOpenMobile } = ctx
+const {isMobile, state, openMobile, setOpenMobile} = ctx
 </script>
 
 <template>
@@ -34,7 +34,7 @@ const { isMobile, state, openMobile, setOpenMobile } = ctx
     :class="props.class"
     v-bind="$attrs"
   >
-    <slot />
+    <slot/>
   </div>
 
   <!-- Mobile sheet -->
@@ -52,7 +52,7 @@ const { isMobile, state, openMobile, setOpenMobile } = ctx
       :style="{ '--sidebar-width': 'min(90vw, 20rem)' }"
     >
       <div class="sidebar-mobile-inner">
-        <slot />
+        <slot/>
       </div>
     </SheetContent>
   </Sheet>
@@ -99,7 +99,7 @@ const { isMobile, state, openMobile, setOpenMobile } = ctx
           'sidebar-inner--floating': variant === 'floating',
         }"
       >
-        <slot />
+        <slot/>
       </div>
     </div>
   </div>

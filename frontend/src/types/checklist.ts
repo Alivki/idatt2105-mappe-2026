@@ -25,6 +25,11 @@ export interface Checklist {
   items: ChecklistItem[]
 }
 
+export interface CompletionHistoryEntry {
+  checklistId: number
+  completedAt: string
+}
+
 export interface ChecklistStats {
   activeChecklists: number
   totalChecklistItems: number

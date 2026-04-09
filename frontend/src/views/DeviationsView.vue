@@ -1,9 +1,19 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { AlertTriangle, Plus, Trash2, RefreshCw, ChefHat, Beer, TriangleAlert, Clock3, CircleCheckBig } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
+import {computed, ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {
+  AlertTriangle,
+  Plus,
+  Trash2,
+  RefreshCw,
+  ChefHat,
+  Beer,
+  TriangleAlert,
+  Clock3,
+  CircleCheckBig
+} from 'lucide-vue-next'
+import {toast} from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/button/Button.vue'
 import AlertDialog from '@/components/ui/alert-dialog/AlertDialog.vue'
@@ -15,22 +25,22 @@ import AlertDialogFooter from '@/components/ui/alert-dialog/AlertDialogFooter.vu
 import AlertDialogHeader from '@/components/ui/alert-dialog/AlertDialogHeader.vue'
 import AlertDialogTitle from '@/components/ui/alert-dialog/AlertDialogTitle.vue'
 import AlertDialogTrigger from '@/components/ui/alert-dialog/AlertDialogTrigger.vue'
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
+import {Separator} from '@/components/ui/separator'
+import {SidebarTrigger} from '@/components/ui/sidebar'
 import Select from '@/components/ui/select/Select.vue'
 import SelectContent from '@/components/ui/select/SelectContent.vue'
 import SelectItem from '@/components/ui/select/SelectItem.vue'
 import SelectTrigger from '@/components/ui/select/SelectTrigger.vue'
 import SelectValue from '@/components/ui/select/SelectValue.vue'
-import FoodDeviationListCard from '@/components/deviations/FoodDeviationListCard.vue'
-import AlcoholDeviationListCard from '@/components/deviations/AlcoholDeviationListCard.vue'
+import DeviationListCard from '@/components/deviations/DeviationListCard.vue'
+import {FOOD_DEVIATION_TYPE_LABELS, ALCOHOL_DEVIATION_TYPE_LABELS} from '@/constants/deviations'
 import FoodDeviationFormDialog from '@/components/deviations/FoodDeviationFormDialog.vue'
 import AlcoholDeviationFormDialog from '@/components/deviations/AlcoholDeviationFormDialog.vue'
 import PenaltyPointsStatus from '@/components/deviations/PenaltyPointsStatus.vue'
 import PenaltyPointsGuide from '@/components/deviations/PenaltyPointsGuide.vue'
 import OverviewCard from '@/components/common/OverviewCard.vue'
-import { useAuthStore } from '@/stores/auth'
-import { useMemberNamesQuery } from '@/composables/useMembers'
+import {useCanManage} from '@/composables/useCanManage'
+import {useMemberNamesQuery} from '@/composables/useMembers'
 import {
   useFoodDeviationsQuery,
   useCreateFoodDeviationMutation,
@@ -43,7 +53,7 @@ import {
   useUpdateAlcoholDeviationMutation,
   useDeleteAlcoholDeviationMutation,
 } from '@/composables/useAlcoholDeviations'
-import { usePenaltyPointsQuery } from '@/composables/usePenaltyPoints'
+import {usePenaltyPointsQuery} from '@/composables/usePenaltyPoints'
 import Dialog from '@/components/ui/dialog/Dialog.vue'
 import DialogContent from '@/components/ui/dialog/DialogContent.vue'
 import type {
@@ -64,8 +74,7 @@ type StatusFilter = 'OPEN' | 'UNDER_TREATMENT' | 'CLOSED'
 type SortOrder = 'NEWEST_FIRST' | 'OLDEST_FIRST'
 
 const router = useRouter()
-const auth = useAuthStore()
-const canManage = computed(() => auth.role === 'ADMIN' || auth.role === 'MANAGER')
+const canManage = useCanManage()
 const memberNamesQuery = useMemberNamesQuery()
 
 const foodQuery = useFoodDeviationsQuery()
@@ -101,8 +110,14 @@ const isLoading = computed(() => foodQuery.isLoading.value || alcoholQuery.isLoa
 const isError = computed(() => foodQuery.isError.value || alcoholQuery.isError.value)
 
 const combinedDeviations = computed<CombinedDeviation[]>(() => {
-  const food: CombinedDeviation[] = (foodQuery.data.value ?? []).map((d) => ({ _type: 'food' as const, data: d }))
-  const alcohol: CombinedDeviation[] = (alcoholQuery.data.value ?? []).map((d) => ({ _type: 'alcohol' as const, data: d }))
+  const food: CombinedDeviation[] = (foodQuery.data.value ?? []).map((d) => ({
+    _type: 'food' as const,
+    data: d
+  }))
+  const alcohol: CombinedDeviation[] = (alcoholQuery.data.value ?? []).map((d) => ({
+    _type: 'alcohol' as const,
+    data: d
+  }))
   return [...food, ...alcohol]
 })
 
@@ -131,26 +146,56 @@ const underTreatmentCount = computed(() => combinedDeviations.value.filter((i) =
 const closedCount = computed(() => combinedDeviations.value.filter((i) => i.data.status === 'CLOSED').length)
 
 const moduleCards = computed(() => [
-  { key: 'IK_MAT', label: 'IK-Mat', count: foodCount.value, variant: 'neutral' as const, icon: ChefHat },
-  { key: 'IK_ALKOHOL', label: 'IK-Alkohol', count: alcoholCount.value, variant: 'neutral' as const, icon: Beer },
+  {
+    key: 'IK_MAT',
+    label: 'IK-Mat',
+    count: foodCount.value,
+    variant: 'neutral' as const,
+    icon: ChefHat
+  },
+  {
+    key: 'IK_ALKOHOL',
+    label: 'IK-Alkohol',
+    count: alcoholCount.value,
+    variant: 'neutral' as const,
+    icon: Beer
+  },
 ])
 
 const statusCards = computed(() => [
-  { key: 'OPEN', label: 'Åpne', count: openCount.value, variant: 'open' as const, icon: TriangleAlert },
-  { key: 'UNDER_TREATMENT', label: 'Under behandling', count: underTreatmentCount.value, variant: 'in-progress' as const, icon: Clock3 },
-  { key: 'CLOSED', label: 'Lukket', count: closedCount.value, variant: 'resolved' as const, icon: CircleCheckBig },
+  {
+    key: 'OPEN',
+    label: 'Åpne',
+    count: openCount.value,
+    variant: 'open' as const,
+    icon: TriangleAlert
+  },
+  {
+    key: 'UNDER_TREATMENT',
+    label: 'Under behandling',
+    count: underTreatmentCount.value,
+    variant: 'in-progress' as const,
+    icon: Clock3
+  },
+  {
+    key: 'CLOSED',
+    label: 'Lukket',
+    count: closedCount.value,
+    variant: 'resolved' as const,
+    icon: CircleCheckBig
+  },
 ])
 
 const statusFilters: Array<{ label: string; value: StatusFilter }> = [
-  { label: 'Åpne', value: 'OPEN' },
-  { label: 'Under behandling', value: 'UNDER_TREATMENT' },
-  { label: 'Lukket', value: 'CLOSED' },
+  {label: 'Åpne', value: 'OPEN'},
+  {label: 'Under behandling', value: 'UNDER_TREATMENT'},
+  {label: 'Lukket', value: 'CLOSED'},
 ]
 
 const moduleFilters: Array<{ label: string; value: ModuleFilter }> = [
-  { label: 'Alle', value: 'ALL' },
-  { label: 'IK-Mat', value: 'IK_MAT' },
-  { label: 'IK-Alkohol', value: 'IK_ALKOHOL' },
+  {label: 'Alle', value: 'ALL'},
+  {label: 'IK-Mat', value: 'IK_MAT'},
+  {label: 'IK-Alkohol', value: 'IK_ALKOHOL'},
 ]
 
 function openCreateDialog() {
@@ -163,7 +208,9 @@ async function handleCreateFood(payload: CreateFoodDeviationRequest) {
     await createFood.mutateAsync(payload)
     createDialogOpen.value = false
     toast.success('Matavvik registrert')
-  } catch (err) { handleError(err, 'Kunne ikke registrere matavvik') }
+  } catch (err) {
+    handleError(err, 'Kunne ikke registrere matavvik')
+  }
 }
 
 async function handleCreateAlcohol(payload: CreateAlcoholDeviationRequest) {
@@ -171,7 +218,9 @@ async function handleCreateAlcohol(payload: CreateAlcoholDeviationRequest) {
     await createAlcohol.mutateAsync(payload)
     createDialogOpen.value = false
     toast.success('Alkoholavvik registrert')
-  } catch (err) { handleError(err, 'Kunne ikke registrere alkoholavvik') }
+  } catch (err) {
+    handleError(err, 'Kunne ikke registrere alkoholavvik')
+  }
 }
 
 function handleEditFood(d: FoodDeviation) {
@@ -186,34 +235,42 @@ function handleEditAlcohol(d: AlcoholDeviation) {
 
 async function handleUpdateFood(p: { id: number; data: UpdateFoodDeviationRequest }) {
   try {
-    await updateFood.mutateAsync({ id: p.id, payload: p.data })
+    await updateFood.mutateAsync({id: p.id, payload: p.data})
     editFoodOpen.value = false
     activeFoodDeviation.value = null
     toast.success('Matavvik oppdatert')
-  } catch (err) { handleError(err, 'Kunne ikke oppdatere matavvik') }
+  } catch (err) {
+    handleError(err, 'Kunne ikke oppdatere matavvik')
+  }
 }
 
 async function handleUpdateAlcohol(p: { id: number; data: UpdateAlcoholDeviationRequest }) {
   try {
-    await updateAlcohol.mutateAsync({ id: p.id, payload: p.data })
+    await updateAlcohol.mutateAsync({id: p.id, payload: p.data})
     editAlcoholOpen.value = false
     activeAlcoholDeviation.value = null
     toast.success('Alkoholavvik oppdatert')
-  } catch (err) { handleError(err, 'Kunne ikke oppdatere alkoholavvik') }
+  } catch (err) {
+    handleError(err, 'Kunne ikke oppdatere alkoholavvik')
+  }
 }
 
 async function handleDeleteFood(id: number) {
   try {
     await deleteFood.mutateAsync(id)
     toast.success('Matavvik slettet')
-  } catch (err) { handleError(err, 'Kunne ikke slette matavvik') }
+  } catch (err) {
+    handleError(err, 'Kunne ikke slette matavvik')
+  }
 }
 
 async function handleDeleteAlcohol(id: number) {
   try {
     await deleteAlcohol.mutateAsync(id)
     toast.success('Alkoholavvik slettet')
-  } catch (err) { handleError(err, 'Kunne ikke slette alkoholavvik') }
+  } catch (err) {
+    handleError(err, 'Kunne ikke slette alkoholavvik')
+  }
 }
 
 async function handleDeleteAllClosed() {
@@ -225,21 +282,30 @@ async function handleDeleteAllClosed() {
       else await deleteAlcohol.mutateAsync(item.data.id)
     }
     toast.success(`Slettet ${items.length} lukkede avvik`)
-  } catch (err) { handleError(err, 'Kunne ikke slette alle lukkede avvik') }
+  } catch (err) {
+    handleError(err, 'Kunne ikke slette alle lukkede avvik')
+  }
 }
 
 async function handleFoodStatusChange(id: number, newStatus: FoodDeviationStatus) {
   try {
-    await updateFood.mutateAsync({ id, payload: { status: newStatus } as UpdateFoodDeviationRequest })
+    await updateFood.mutateAsync({id, payload: {status: newStatus} as UpdateFoodDeviationRequest})
     toast.success('Status oppdatert')
-  } catch (err) { handleError(err, 'Kunne ikke oppdatere status') }
+  } catch (err) {
+    handleError(err, 'Kunne ikke oppdatere status')
+  }
 }
 
 async function handleAlcoholStatusChange(id: number, newStatus: AlcoholDeviationStatus) {
   try {
-    await updateAlcohol.mutateAsync({ id, payload: { status: newStatus } as UpdateAlcoholDeviationRequest })
+    await updateAlcohol.mutateAsync({
+      id,
+      payload: {status: newStatus} as UpdateAlcoholDeviationRequest
+    })
     toast.success('Status oppdatert')
-  } catch (err) { handleError(err, 'Kunne ikke oppdatere status') }
+  } catch (err) {
+    handleError(err, 'Kunne ikke oppdatere status')
+  }
 }
 
 function handleOpenFood(d: FoodDeviation) {
@@ -250,12 +316,17 @@ function handleOpenAlcohol(d: AlcoholDeviation) {
   router.push(`/avvik/alkohol/${d.id}`)
 }
 
-function onSortChange(value: string) { sortOrder.value = value as SortOrder }
+function onSortChange(value: string) {
+  sortOrder.value = value as SortOrder
+}
 
 function handleError(error: unknown, fallback: string) {
   if (axios.isAxiosError(error)) {
     const msg = error.response?.data?.error?.message
-    if (typeof msg === 'string' && msg.trim().length > 0) { toast.error(msg); return }
+    if (typeof msg === 'string' && msg.trim().length > 0) {
+      toast.error(msg);
+      return
+    }
   }
   toast.error(fallback)
 }
@@ -265,8 +336,8 @@ function handleError(error: unknown, fallback: string) {
   <AppLayout>
     <header class="page-header">
       <div class="page-header-inner">
-        <SidebarTrigger />
-        <Separator orientation="vertical" class="header-separator" />
+        <SidebarTrigger/>
+        <Separator orientation="vertical" class="header-separator"/>
         <span class="page-title">Avvik</span>
       </div>
     </header>
@@ -279,19 +350,21 @@ function handleError(error: unknown, fallback: string) {
         </div>
 
         <Button @click="openCreateDialog">
-          <Plus :size="16" aria-hidden="true" />
+          <Plus :size="16" aria-hidden="true"/>
           Registrer avvik
         </Button>
       </section>
 
       <section class="cards-section" aria-label="Statusoversikt">
-        <OverviewCard v-for="card in moduleCards" :key="card.key" :label="card.label" :value="card.count" :variant="card.variant" :icon="card.icon" />
-        <OverviewCard v-for="card in statusCards" :key="card.key" :label="card.label" :value="card.count" :variant="card.variant" :icon="card.icon" />
+        <OverviewCard v-for="card in moduleCards" :key="card.key" :label="card.label"
+                      :value="card.count" :variant="card.variant" :icon="card.icon"/>
+        <OverviewCard v-for="card in statusCards" :key="card.key" :label="card.label"
+                      :value="card.count" :variant="card.variant" :icon="card.icon"/>
       </section>
 
       <section class="penalty-section">
-        <PenaltyPointsStatus :summary="penaltyQuery.data.value ?? null" />
-        <PenaltyPointsGuide />
+        <PenaltyPointsStatus :summary="penaltyQuery.data.value ?? null"/>
+        <PenaltyPointsGuide/>
       </section>
 
       <section class="filters-row" aria-label="Filtre">
@@ -325,9 +398,10 @@ function handleError(error: unknown, fallback: string) {
         </div>
 
         <div class="filters-right">
-          <Select :model-value="sortOrder" default-value="NEWEST_FIRST" @update:model-value="onSortChange">
+          <Select :model-value="sortOrder" default-value="NEWEST_FIRST"
+                  @update:model-value="onSortChange">
             <SelectTrigger class="sort-trigger" aria-label="Sortering">
-              <SelectValue placeholder="Nyeste først" />
+              <SelectValue placeholder="Nyeste først"/>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="NEWEST_FIRST">Nyeste først</SelectItem>
@@ -337,8 +411,9 @@ function handleError(error: unknown, fallback: string) {
 
           <AlertDialog v-if="activeStatusFilter === 'CLOSED'">
             <AlertDialogTrigger>
-              <Button variant="destructive" class="delete-all-btn" :disabled="filteredAndSorted.length === 0">
-                <Trash2 aria-hidden="true" />
+              <Button variant="destructive" class="delete-all-btn"
+                      :disabled="filteredAndSorted.length === 0">
+                <Trash2 aria-hidden="true"/>
                 Slett alle lukkede
               </Button>
             </AlertDialogTrigger>
@@ -367,20 +442,26 @@ function handleError(error: unknown, fallback: string) {
 
         <div v-else-if="isError" class="empty-state">
           <div class="empty-state-inner">
-            <div class="empty-state-icon"><AlertTriangle :stroke-width="1.5" aria-hidden="true" /></div>
+            <div class="empty-state-icon">
+              <AlertTriangle :stroke-width="1.5" aria-hidden="true"/>
+            </div>
             <div class="empty-state-text">
               <h2>Kunne ikke hente avvik</h2>
               <p>Noe gikk galt under lasting av avvik. Prøv igjen senere.</p>
             </div>
-            <Button variant="outline" size="sm" @click="() => { foodQuery.refetch(); alcoholQuery.refetch() }">
-              <RefreshCw :size="14" aria-hidden="true" /> Prøv igjen
+            <Button variant="outline" size="sm"
+                    @click="() => { foodQuery.refetch(); alcoholQuery.refetch() }">
+              <RefreshCw :size="14" aria-hidden="true"/>
+              Prøv igjen
             </Button>
           </div>
         </div>
 
         <div v-else-if="filteredAndSorted.length === 0" class="empty-state">
           <div class="empty-state-inner">
-            <div class="empty-state-icon"><AlertTriangle :stroke-width="1.5" aria-hidden="true" /></div>
+            <div class="empty-state-icon">
+              <AlertTriangle :stroke-width="1.5" aria-hidden="true"/>
+            </div>
             <div class="empty-state-text">
               <h2>Ingen avvik i valgt liste</h2>
               <p>Det finnes ingen registrerte avvik med valgte filtre.</p>
@@ -390,23 +471,29 @@ function handleError(error: unknown, fallback: string) {
 
         <div v-else class="list-wrap">
           <template v-for="item in filteredAndSorted" :key="`${item._type}-${item.data.id}`">
-            <FoodDeviationListCard
+            <DeviationListCard
               v-if="item._type === 'food'"
               :deviation="item.data"
               :can-manage="canManage"
-              @edit="handleEditFood"
+              :type-label="FOOD_DEVIATION_TYPE_LABELS[item.data.deviationType]"
+              module-label="IK-Mat"
+              delete-title="Slette matavvik?"
+              @edit="handleEditFood(item.data)"
               @delete="handleDeleteFood"
               @update-status="handleFoodStatusChange"
-              @open="handleOpenFood"
+              @open="handleOpenFood(item.data)"
             />
-            <AlcoholDeviationListCard
+            <DeviationListCard
               v-else
               :deviation="item.data"
               :can-manage="canManage"
-              @edit="handleEditAlcohol"
+              :type-label="ALCOHOL_DEVIATION_TYPE_LABELS[item.data.deviationType]"
+              module-label="IK-Alkohol"
+              delete-title="Slette alkoholavvik?"
+              @edit="handleEditAlcohol(item.data)"
               @delete="handleDeleteAlcohol"
               @update-status="handleAlcoholStatusChange"
-              @open="handleOpenAlcohol"
+              @open="handleOpenAlcohol(item.data)"
             />
           </template>
         </div>
@@ -486,11 +573,38 @@ function handleError(error: unknown, fallback: string) {
 </template>
 
 <style scoped>
-.page-header { display: flex; height: 4rem; flex-shrink: 0; align-items: center; }
-.page-header-inner { display: flex; align-items: center; gap: 0.5rem; padding: 0 1rem; }
-.header-separator { height: 1rem !important; width: 1px !important; margin-right: 0.5rem; }
-.page-title { font-weight: 500; color: hsl(var(--sidebar-primary, 245 43% 52%)); }
-.page-content { display: flex; flex: 1; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; }
+.page-header {
+  display: flex;
+  height: 4rem;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.page-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.header-separator {
+  height: 1rem !important;
+  width: 1px !important;
+  margin-right: 0.5rem;
+}
+
+.page-title {
+  font-weight: 500;
+  color: hsl(var(--sidebar-primary, 245 43% 52%));
+}
+
+.page-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1rem 1rem;
+}
 
 .header-row {
   display: flex;
@@ -499,8 +613,18 @@ function handleError(error: unknown, fallback: string) {
   gap: 12px;
 }
 
-h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
-.header-row p { margin-top: 4px; color: var(--text-secondary); font-size: 0.88rem; }
+h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.header-row p {
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
 
 .create-dialog {
   max-width: 48rem;
@@ -570,8 +694,20 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   gap: 12px;
   flex-wrap: wrap;
 }
-.filters-left { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
-.filter-group { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.filters-left {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
 .filter-button {
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius-pill);
@@ -581,20 +717,47 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   font-size: 0.95rem;
   color: hsl(var(--foreground));
 }
+
 .filter-button--active {
   border-color: var(--brand);
   background: var(--brand-soft);
   color: var(--brand);
   font-weight: 600;
 }
-.filters-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
-.sort-trigger { min-width: 10rem; }
 
-.delete-all-btn { background-color: var(--red-soft); color: var(--red); border: none; box-shadow: none; }
-.delete-all-btn:hover { background-color: color-mix(in srgb, var(--red-soft) 70%, var(--red) 10%); }
+.filters-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
 
-.list-section { display: flex; flex-direction: column; gap: 10px; }
-.list-wrap { display: flex; flex-direction: column; gap: 10px; }
+.sort-trigger {
+  min-width: 10rem;
+}
+
+.delete-all-btn {
+  background-color: var(--red-soft);
+  color: var(--red);
+  border: none;
+  box-shadow: none;
+}
+
+.delete-all-btn:hover {
+  background-color: color-mix(in srgb, var(--red-soft) 70%, var(--red) 10%);
+}
+
+.list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.list-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
 .loading-state {
   display: flex;
@@ -611,39 +774,102 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .empty-state {
-  display: flex; min-height: 220px;
-  flex-direction: column; align-items: center; justify-content: center;
+  display: flex;
+  min-height: 220px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   border-radius: 1rem;
   border: 2px dashed hsl(var(--muted-foreground) / 0.2);
   background: hsl(var(--muted) / 0.3);
   padding: 2rem;
 }
-.empty-state-inner { display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
-.empty-state-icon {
-  display: flex; height: 4rem; width: 4rem; align-items: center; justify-content: center;
-  border-radius: var(--radius-lg); background-color: hsl(var(--muted));
+
+.empty-state-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
 }
-.empty-state-icon :deep(svg) { width: 2rem; height: 2rem; color: hsl(var(--muted-foreground)); }
-.empty-state-text h2 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; }
-.empty-state-text p { max-width: 24rem; font-size: 0.875rem; color: hsl(var(--muted-foreground)); margin-top: 0.25rem; }
+
+.empty-state-icon {
+  display: flex;
+  height: 4rem;
+  width: 4rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  background-color: hsl(var(--muted));
+}
+
+.empty-state-icon :deep(svg) {
+  width: 2rem;
+  height: 2rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.empty-state-text h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.empty-state-text p {
+  max-width: 24rem;
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+  margin-top: 0.25rem;
+}
 
 @media (max-width: 1100px) {
-  .cards-section { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .penalty-section { grid-template-columns: 1fr; }
+  .cards-section {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .penalty-section {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 760px) {
-  h1 { font-size: 1.5rem; }
-  .header-row { flex-direction: column; align-items: stretch; }
-  .header-row > :last-child { align-self: flex-end; }
-  .cards-section { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .filters-row { align-items: stretch; }
-  .filters-left { flex-direction: column; }
-  .filters-right { width: 100%; justify-content: flex-end; }
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-row > :last-child {
+    align-self: flex-end;
+  }
+
+  .cards-section {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filters-row {
+    align-items: stretch;
+  }
+
+  .filters-left {
+    flex-direction: column;
+  }
+
+  .filters-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 </style>

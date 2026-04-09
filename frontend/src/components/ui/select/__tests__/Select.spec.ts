@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick, ref } from 'vue'
+import {afterEach, describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, nextTick, ref} from 'vue'
 
 import SelectComponent from '../Select.vue'
 import SelectTrigger from '../SelectTrigger.vue'
@@ -94,7 +94,7 @@ describe('Select core behavior', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await nextTick()
@@ -127,7 +127,7 @@ describe('Select core behavior', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await nextTick()
@@ -165,15 +165,15 @@ describe('Select core behavior', () => {
     })
 
     const wrapper = mount(Host, {
-      props: { modelValue: 'a' },
-      global: { stubs: { transition: true } },
+      props: {modelValue: 'a'},
+      global: {stubs: {transition: true}},
     })
 
     await nextTick()
     await nextTick()
     expect(wrapper.get('.select-value').text()).toContain('Apple')
 
-    await wrapper.setProps({ modelValue: 'b' })
+    await wrapper.setProps({modelValue: 'b'})
     await nextTick()
 
     expect(wrapper.get('.select-value').text()).toContain('Banana')
@@ -198,7 +198,7 @@ describe('Select core behavior', () => {
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const trigger = wrapper.get('[data-test="trigger"]')
@@ -263,7 +263,7 @@ describe('Select core behavior', () => {
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await wrapper.get('[data-test="trigger"]').trigger('click')
@@ -272,7 +272,7 @@ describe('Select core behavior', () => {
     expect(wrapper.get('.select-content').classes()).toContain('extra-content')
     expect(wrapper.find('[data-test="content"]').exists()).toBe(true)
 
-    document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    document.dispatchEvent(new MouseEvent('mousedown', {bubbles: true}))
     await nextTick()
 
     expect(wrapper.find('[data-test="content"]').exists()).toBe(true)
@@ -299,7 +299,7 @@ describe('Select core behavior', () => {
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await wrapper.get('[data-test="trigger"]').trigger('click')
@@ -334,7 +334,7 @@ describe('Select core behavior', () => {
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await wrapper.get('[data-test="trigger"]').trigger('click')
@@ -342,7 +342,7 @@ describe('Select core behavior', () => {
 
     expect(wrapper.find('[data-test="content"]').exists()).toBe(true)
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}))
     await nextTick()
 
     expect(wrapper.find('[data-test="content"]').exists()).toBe(true)
@@ -374,7 +374,7 @@ describe('Select core behavior', () => {
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const select = wrapper.findComponent(SelectComponent)
@@ -413,7 +413,7 @@ describe('Select core behavior', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await nextTick()
@@ -454,7 +454,7 @@ describe('Select core behavior', () => {
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const select = wrapper.findComponent(SelectComponent)
@@ -485,7 +485,7 @@ describe('Select core behavior', () => {
       },
       setup() {
         const value = ref('')
-        return { value }
+        return {value}
       },
       template: `
         <AppSelect v-model="value">
@@ -502,7 +502,7 @@ describe('Select core behavior', () => {
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     expect((wrapper.vm as { value: string }).value).toBe('')

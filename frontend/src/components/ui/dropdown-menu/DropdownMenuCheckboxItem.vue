@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Check } from "lucide-vue-next"
+import {Check} from "lucide-vue-next"
 
 const props = defineProps<{
   class?: string
@@ -26,9 +26,9 @@ function handleClick() {
     @click="handleClick"
   >
     <span class="dropdown-checkbox-indicator">
-      <Check v-if="checked" class="dropdown-checkbox-icon" />
+      <Check v-if="checked" class="dropdown-checkbox-icon"/>
     </span>
-    <slot />
+    <slot/>
   </div>
 </template>
 

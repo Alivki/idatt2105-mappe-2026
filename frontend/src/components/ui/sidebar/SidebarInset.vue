@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { useSidebar } from "./utils"
+import {useSidebar} from "./utils"
 
 const props = defineProps<{
   class?: string
 }>()
 
-const { variant } = useSidebar()
+const {variant} = useSidebar()
 </script>
 
 <template>
   <main
     :class="['sidebar-inset', variant === 'inset' && 'sidebar-inset--inset', props.class]"
   >
-    <slot />
+    <slot/>
   </main>
 </template>
 

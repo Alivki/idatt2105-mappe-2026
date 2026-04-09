@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { useForm } from '@tanstack/vue-form'
-import { z } from 'zod'
-import { Building2, Mail, Phone, Hash } from 'lucide-vue-next'
-import { useRouter } from 'vue-router'
-import { toast } from 'vue-sonner'
-import { useCreateOrg } from '@/composables/useCreateOrg'
-import { useSelectOrg } from '@/composables/useAuth'
+import {useForm} from '@tanstack/vue-form'
+import {z} from 'zod'
+import {Building2, Mail, Phone, Hash} from 'lucide-vue-next'
+import {useRouter} from 'vue-router'
+import {toast} from 'vue-sonner'
+import {useCreateOrg} from '@/composables/useCreateOrg'
+import {useSelectOrg} from '@/composables/useAuth'
 import Button from '@/components/ui/button/Button.vue'
 import InputGroup from '@/components/ui/input-group/InputGroup.vue'
 import InputGroupAddon from '@/components/ui/input-group/InputGroupAddon.vue'
@@ -36,13 +36,13 @@ const form = useForm({
     orgNumber: '',
     businessType: '',
   },
-  onSubmit: async ({ value }) => {
+  onSubmit: async ({value}) => {
     try {
       const org = await createOrg.mutateAsync({
         name: value.businessName,
         orgNumber: value.orgNumber || undefined,
       })
-      await selectOrg.mutateAsync({ organizationId: org.id })
+      await selectOrg.mutateAsync({organizationId: org.id})
       router.push('/')
     } catch (e: unknown) {
       if (axios.isAxiosError(e) && e.response?.status === 409) {
@@ -54,7 +54,7 @@ const form = useForm({
   },
 })
 
-defineExpose({ createOrgError: createOrg.error })
+defineExpose({createOrgError: createOrg.error})
 </script>
 
 <template>
@@ -72,7 +72,7 @@ defineExpose({ createOrgError: createOrg.error })
             <label>Virksomhetsnavn</label>
             <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
               <InputGroupAddon>
-                <Building2 />
+                <Building2/>
               </InputGroupAddon>
               <InputGroupInput
                 type="text"
@@ -99,7 +99,7 @@ defineExpose({ createOrgError: createOrg.error })
             <label>Virksomhetsmail</label>
             <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
               <InputGroupAddon>
-                <Mail />
+                <Mail/>
               </InputGroupAddon>
               <InputGroupInput
                 type="email"
@@ -126,7 +126,7 @@ defineExpose({ createOrgError: createOrg.error })
             <label>Telefonnummer</label>
             <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
               <InputGroupAddon>
-                <Phone />
+                <Phone/>
               </InputGroupAddon>
               <InputGroupInput
                 type="tel"
@@ -153,7 +153,7 @@ defineExpose({ createOrgError: createOrg.error })
             <label>Org nr / id</label>
             <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
               <InputGroupAddon>
-                <Hash />
+                <Hash/>
               </InputGroupAddon>
               <InputGroupInput
                 type="text"
@@ -174,9 +174,10 @@ defineExpose({ createOrgError: createOrg.error })
         }">
           <template v-slot="{ field, state }">
             <label>Type virksomhet</label>
-            <Select :model-value="field.state.value" @update:model-value="field.handleChange($event)">
+            <Select :model-value="field.state.value"
+                    @update:model-value="field.handleChange($event)">
               <SelectTrigger :class="state.meta.errors.length ? 'select-trigger--error' : ''">
-                <SelectValue placeholder="Velg type" />
+                <SelectValue placeholder="Velg type"/>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="restaurant">Restaurant</SelectItem>

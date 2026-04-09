@@ -241,11 +241,13 @@ class AuthControllerTest {
         membershipId: Long,
         organizationId: Long,
         organizationName: String,
-        role: String
+        role: String,
+        orgNumber: String? = null
     ) = MembershipSummary(
         membershipId = membershipId,
         organizationId = organizationId,
         organizationName = organizationName,
+        orgNumber = orgNumber,
         role = role
     )
 
