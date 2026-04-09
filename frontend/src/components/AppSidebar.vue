@@ -59,12 +59,27 @@ const navMain = computed(() => [
     ],
   },
   {
+    label: 'FELLES',
+    items: [
+      {title: 'Sjekklister', url: '/sjekklister', icon: ClipboardCheck},
+      ...(isManagerOrAdmin.value
+        ? [{title: 'Opplæring', url: '/opplaering', icon: GraduationCap}]
+        : []),
+      {title: 'Avvik', url: '/avvik', icon: AlertTriangle},
+      ...(isManagerOrAdmin.value
+        ? [
+          {title: 'Rapporter', url: '/rapporter', icon: FileText},
+          {title: 'Ansatte', url: '/ansatte', icon: Users},
+        ]
+        : []),
+    ],
+  },
+  {
     label: 'IK-MAT',
     items: [
       ...(isManagerOrAdmin.value
         ? [{title: 'HACCP-oppsett', url: '/haccp-oppsett', icon: ListChecks}]
         : []),
-      {title: 'Sjekklister', url: '/sjekklister', icon: ClipboardCheck},
       {title: 'Temperaturlogg', url: '/temperatur', icon: Thermometer},
       ...(isManagerOrAdmin.value
         ? [{title: 'Hvitevarer', url: '/temperatur/hvitevarer', icon: Refrigerator}]
@@ -74,24 +89,9 @@ const navMain = computed(() => [
   {
     label: 'IK-ALKOHOL',
     items: [
-      ...(isManagerOrAdmin.value
-        ? [{title: 'Opplæring', url: '/opplaering', icon: GraduationCap}]
-        : []),
       {title: 'Bevilling', url: '/bevilling', icon: ScrollText},
       ...(isManagerOrAdmin.value
         ? [{title: 'Skjenkepolicy', url: '/skjenkepolicy', icon: ShieldCheck}]
-        : []),
-    ],
-  },
-  {
-    label: 'FELLES',
-    items: [
-      {title: 'Avvik', url: '/avvik', icon: AlertTriangle},
-      ...(isManagerOrAdmin.value
-        ? [
-          {title: 'Rapporter', url: '/rapporter', icon: FileText},
-          {title: 'Ansatte', url: '/ansatte', icon: Users},
-        ]
         : []),
     ],
   },
