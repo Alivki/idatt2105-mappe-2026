@@ -41,7 +41,6 @@ class AlcoholDeviationServiceTest {
     private val orgId = 1L
     private val userId = 10L
 
-    // Create the mock first, then stub in @BeforeEach to avoid eager evaluation issues
     private val auth = mockk<AuthenticatedUser>()
 
     private val reporter = mockk<User>()
@@ -73,8 +72,6 @@ class AlcoholDeviationServiceTest {
         every { userRepository.findById(userId) } returns Optional.of(reporter)
     }
 
-    // ── list ──────────────────────────────────────────────────────────────────
-
     @Test
     fun `list returns mapped responses ordered by reportedAt desc`() {
         val deviations = listOf(makeDeviation(1L), makeDeviation(2L))
@@ -92,8 +89,6 @@ class AlcoholDeviationServiceTest {
 
         assertThat(service.list(auth)).isEmpty()
     }
-
-    // ── getById ───────────────────────────────────────────────────────────────
 
     @Test
     fun `getById returns response when found`() {
@@ -113,8 +108,6 @@ class AlcoholDeviationServiceTest {
         assertThatThrownBy { service.getById(99L, auth) }
             .isInstanceOf(NotFoundException::class.java)
     }
-
-    // ── create ────────────────────────────────────────────────────────────────
 
     @Test
     fun `create saves deviation and returns response`() {
@@ -286,8 +279,6 @@ class AlcoholDeviationServiceTest {
             .isInstanceOf(BadRequestException::class.java)
     }
 
-    // ── update ────────────────────────────────────────────────────────────────
-
     @Test
     fun `update patches only provided fields`() {
         val existing = makeDeviation()
@@ -336,8 +327,6 @@ class AlcoholDeviationServiceTest {
 
         assertThat(savedSlot.captured.updatedAt).isAfterOrEqualTo(before)
     }
-
-    // ── delete ────────────────────────────────────────────────────────────────
 
     @Test
     fun `delete removes deviation`() {

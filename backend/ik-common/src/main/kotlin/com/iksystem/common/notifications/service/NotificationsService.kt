@@ -8,8 +8,8 @@ import com.iksystem.common.notifications.repository.NotificationsRepository
 import com.iksystem.common.resend.service.ResendService
 import com.iksystem.common.user.model.Role
 import com.iksystem.common.user.repository.UserRepository
-import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 
 /**
@@ -74,7 +74,7 @@ class NotificationsService(
                     notification.emailSent = true
                     notificationsRepository.save(notification)
                 } catch (e: Exception) {
-                    log.error("Failed to send notification email to user {}: {}", recipientUserId, e.message)
+                    log.error("Failed to send notification email to {}: {}", user.email, e.message)
                 }
             }
         }

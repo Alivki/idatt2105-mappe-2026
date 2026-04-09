@@ -55,6 +55,7 @@ class ReportPdfGenerator {
      * @throws RuntimeException if HTML rendering or PDF conversion fails
      */
     fun generatePdf(data: ReportPreviewResponse): ByteArray {
+        log.info("Generating PDF report: org={}, period={} to {}", data.header.organizationName, data.header.periodFrom, data.header.periodTo)
         val context = Context().apply {
             setVariable("report", data)
             setVariable("header", data.header)
@@ -71,31 +72,18 @@ class ReportPdfGenerator {
             setVariable("signOff", data.signOff)
         }
 
-        log.info("Rendering report HTML template...")
-        val html: String
-        try {
-            html = templateEngine.process("report", context)
-        } catch (e: Exception) {
-            log.error("Failed to render Thymeleaf template: {}", e.message, e)
-            throw RuntimeException("Feil ved generering av rapport-HTML: ${e.message}", e)
-        }
+        val html = templateEngine.process("report", context)
 
-        log.info("Converting HTML to PDF ({} chars)...", html.length)
-        try {
-            val outputStream = ByteArrayOutputStream()
-            val baseUri = ReportPdfGenerator::class.java.getResource("/templates/")?.toExternalForm() ?: ""
-            PdfRendererBuilder()
-                .useFastMode()
-                .withHtmlContent(html, baseUri)
-                .toStream(outputStream)
-                .run()
+        val outputStream = ByteArrayOutputStream()
+        val baseUri = ReportPdfGenerator::class.java.getResource("/templates/")?.toExternalForm() ?: ""
+        PdfRendererBuilder()
+            .useFastMode()
+            .withHtmlContent(html, baseUri)
+            .toStream(outputStream)
+            .run()
 
-            val bytes = outputStream.toByteArray()
-            log.info("PDF generated successfully ({} bytes)", bytes.size)
-            return bytes
-        } catch (e: Exception) {
-            log.error("Failed to convert HTML to PDF: {}", e.message, e)
-            throw RuntimeException("Feil ved PDF-konvertering: ${e.message}", e)
-        }
+        val bytes = outputStream.toByteArray()
+        log.info("PDF generated successfully: {} bytes", bytes.size)
+        return bytes
     }
 }

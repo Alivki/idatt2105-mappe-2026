@@ -56,7 +56,15 @@ class SecurityConfig(private val jwtAuthFilter: JwtAuthFilter) {
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .anyRequest().authenticated()
             }
-            .headers { it.frameOptions { fo -> fo.sameOrigin() } }
+            .headers { headers ->
+                headers.frameOptions { it.sameOrigin() }
+                headers.contentTypeOptions { }
+                headers.httpStrictTransportSecurity { hsts ->
+                    hsts.includeSubDomains(true)
+                    hsts.maxAgeInSeconds(31536000)
+                }
+                headers.contentSecurityPolicy { it.policyDirectives("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'") }
+            }
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
             .build()
 

@@ -22,6 +22,7 @@ import com.iksystem.common.token.repository.RefreshTokenRepository
 import com.iksystem.common.user.model.User
 import com.iksystem.common.user.repository.UserRepository
 import com.iksystem.common.user.service.toResponse
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -48,6 +49,7 @@ class AuthService(
     @Value("\${jwt.access-token-expiration}") private val accessTokenExpiration: Long,
     @Value("\${jwt.refresh-token-expiration}") private val refreshTokenExpiration: Long,
 ) {
+    private val log = LoggerFactory.getLogger(AuthService::class.java)
 
     /**
      * Registers a new user identity (no organization membership yet).
@@ -56,6 +58,7 @@ class AuthService(
     @Transactional
     fun register(request: RegisterRequest): LoginResponse {
         if (userRepository.existsByEmail(request.email)) {
+            log.warn("Registration attempt with existing email: {}", request.email)
             throw ConflictException("Email already registered")
         }
 
@@ -70,6 +73,7 @@ class AuthService(
 
         val preAuthToken = jwtService.generatePreAuthToken(user)
 
+        log.info("New user registered: id={}, email={}", user.id, user.email)
         emailService.sendRegistrationEmail(user.email, user.fullName)
 
         return LoginResponse(
@@ -85,18 +89,24 @@ class AuthService(
     @Transactional(readOnly = true)
     fun login(request: LoginRequest): LoginResponse {
         val user = userRepository.findByEmail(request.email)
-            ?: throw UnauthorizedException("Invalid email or password")
+        if (user == null) {
+            log.warn("Login failed: unknown email={}", request.email)
+            throw UnauthorizedException("Invalid email or password")
+        }
 
         if (!user.active) {
+            log.warn("Login failed: deactivated account userId={}", user.id)
             throw UnauthorizedException("Account is deactivated")
         }
 
         if (!passwordEncoder.matches(request.password, user.password)) {
+            log.warn("Login failed: wrong password for userId={}", user.id)
             throw UnauthorizedException("Invalid email or password")
         }
 
         val memberships = membershipRepository.findAllByUserId(user.id)
         val preAuthToken = jwtService.generatePreAuthToken(user)
+        log.info("Login successful: userId={}, memberships={}", user.id, memberships.size)
 
         return LoginResponse(
             preAuthToken = preAuthToken,
@@ -137,6 +147,7 @@ class AuthService(
             ?: throw UnauthorizedException("Invalid refresh token")
 
         if (storedToken.revoked || storedToken.expiresAt.isBefore(Instant.now())) {
+            log.warn("Token refresh failed: token revoked or expired for userId={}", storedToken.user.id)
             throw UnauthorizedException("Refresh token expired or revoked")
         }
 
@@ -148,7 +159,6 @@ class AuthService(
         val membership = membershipRepository.findByUserIdAndOrganizationId(user.id, storedToken.organizationId)
             ?: throw ForbiddenException("Membership no longer exists")
 
-        // Revoke old refresh token (rotation)
         refreshTokenRepository.save(storedToken.copy(revoked = true))
 
         return createAuthResponse(user, membership, null, null)
@@ -184,7 +194,6 @@ class AuthService(
         val membership = membershipRepository.findByUserIdAndOrganizationId(userId, request.organizationId)
             ?: throw ForbiddenException("You are not a member of this organization")
 
-        // Revoke tokens/sessions for the previous org
         refreshTokenRepository.revokeAllByUserIdAndOrganizationId(userId, currentOrgId)
         sessionRepository.deactivateAllByUserIdAndOrganizationId(userId, currentOrgId)
 
@@ -196,6 +205,7 @@ class AuthService(
      */
     @Transactional
     fun logout(userId: Long) {
+        log.info("User logged out: userId={}", userId)
         refreshTokenRepository.revokeAllByUserId(userId)
         sessionRepository.deactivateAllByUserId(userId)
     }

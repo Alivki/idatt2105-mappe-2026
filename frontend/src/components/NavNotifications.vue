@@ -73,7 +73,6 @@ function updatePosition() {
   const isMobile = window.innerWidth < 640
 
   if (isMobile) {
-    // On mobile, position above the trigger, centered horizontally
     panelStyle.value = {
       position: 'fixed',
       zIndex: '999',
@@ -83,7 +82,6 @@ function updatePosition() {
       bottom: `${window.innerHeight - rect.top + 8}px`,
     }
   } else if (rect.right + 4 + panelWidth > window.innerWidth) {
-    // Not enough space to the right, open to the left
     panelStyle.value = {
       position: 'fixed',
       zIndex: '999',

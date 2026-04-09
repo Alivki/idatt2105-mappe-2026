@@ -185,14 +185,14 @@ class AgeVerificationController(
      * Retrieves detailed information for a specific day,
      * including all shifts performed that day.
      *
-     * Only accessible to users with ADMIN or MANAGER roles.
+     * Accessible to all authenticated users within the organization,
+     * so employees can view today's summary on the dashboard.
      *
      * @param date The date to retrieve details for
      * @param auth The authenticated user
      * @return HTTP 200 with detailed day data
      */
     @GetMapping("/daily-summary/{date}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     fun getDayDetail(
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate,
         @AuthenticationPrincipal auth: AuthenticatedUser,

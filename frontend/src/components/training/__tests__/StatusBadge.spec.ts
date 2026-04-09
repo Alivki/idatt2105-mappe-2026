@@ -2,7 +2,6 @@ import {describe, it, expect} from 'vitest'
 import {mount} from '@vue/test-utils'
 import StatusBadge from '../StatusBadge.vue'
 
-// Mock the Badge UI component
 const BadgeStub = {
   name: 'Badge',
   template: '<span :data-tone="tone" class="badge"><slot /></span>',

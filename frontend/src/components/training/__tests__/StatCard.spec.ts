@@ -49,7 +49,6 @@ describe('StatCard', () => {
     const wrapper = mount(StatCard, {
       props: {label: 'Label', value: 5},
     })
-    // Only .stat-value class should be present (no additional custom class)
     const classes = wrapper.find('.stat-value').classes()
     expect(classes).toContain('stat-value')
   })

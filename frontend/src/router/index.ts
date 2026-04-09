@@ -133,19 +133,15 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  // Wait for auth initialization (token refresh) to complete before checking
   const promise = getInitPromise()
   if (promise) await promise
 
   const auth = useAuthStore()
 
-  // Allow public routes
   if (to.meta.public) return true
 
-  // Not authenticated → redirect to login
   if (!auth.isAuthenticated) return '/login'
 
-  // Role-based route guard
   if (to.meta.role && auth.role !== to.meta.role) return '/unauthorized'
 
   return true

@@ -218,7 +218,6 @@ class ChecklistService(
             )
         )
 
-        // Record completion if this was the last item to be checked off
         if (request.completed == true) {
             val checklist = requireChecklist(checklistId, orgId)
             val allItems = checklistItemRepository.findAllByChecklistIdOrderByIdAsc(checklistId)
@@ -273,7 +272,6 @@ class ChecklistService(
             updatedAt = now,
         )
 
-        // Record completion when all items are marked complete
         if (request.completed) {
             recordCompletion(checklist, auth)
         }

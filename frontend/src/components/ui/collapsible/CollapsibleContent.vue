@@ -16,14 +16,11 @@ watch(isOpen, async (open: boolean) => {
   if (contentRef.value) {
     if (open) {
       height.value = contentRef.value.scrollHeight + "px"
-      // After transition, set to auto for dynamic content
       setTimeout(() => {
         if (isOpen.value) height.value = "auto"
       }, 200)
     } else {
-      // Set explicit height first for transition
       height.value = contentRef.value.scrollHeight + "px"
-      // Force reflow
       void contentRef.value.offsetHeight
       requestAnimationFrame(() => {
         height.value = "0px"

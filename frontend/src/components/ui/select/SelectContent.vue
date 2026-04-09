@@ -15,7 +15,6 @@ const contentRef = ref<HTMLElement | null>(null)
 function onClickOutside(e: MouseEvent) {
   if (!contentRef.value) return
   const target = e.target as Node
-  // Check if click is inside the content or the trigger
   const root = contentRef.value.closest(".select-root") ?? contentRef.value.parentElement
   if (root && root.contains(target)) return
   if (!contentRef.value.contains(target)) {

@@ -135,7 +135,6 @@ provide("calendar", {
   disabled: computed(() => props.disabled),
 })
 
-// Month/year select data
 const months = [
   {value: '1', short: 'jan'},
   {value: '2', short: 'feb'},

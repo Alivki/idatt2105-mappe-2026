@@ -37,8 +37,7 @@ class BevillingExpiryScheduler(
      */
     @Scheduled(cron = "0 0 8 * * *")
     fun checkExpiringBevillinger() {
-        log.info("Running bevilling expiry check")
-
+        log.info("Checking for alcohol licenses expiring in 90 days")
         val expiryDate = LocalDate.now().plusDays(90)
 
         val expiringPolicies = jdbcTemplate.queryForList(
@@ -51,12 +50,11 @@ class BevillingExpiryScheduler(
         )
 
         if (expiringPolicies.isEmpty()) {
-            log.info("No expiring bevillinger found")
+            log.info("No licenses expiring on {}", expiryDate)
             return
         }
 
-        log.info("Found {} expiring bevillinger", expiringPolicies.size)
-
+        log.info("Found {} licenses expiring on {}", expiringPolicies.size, expiryDate)
         expiringPolicies.forEach { row ->
             val id = row["id"] as Long
             val organizationId = row["organization_id"] as Long

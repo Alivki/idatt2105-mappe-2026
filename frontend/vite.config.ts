@@ -15,6 +15,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
+    exclude: ['e2e/**', 'node_modules/**'],
   },
   server: {
     proxy: {

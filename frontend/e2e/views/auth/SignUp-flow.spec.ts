@@ -30,10 +30,8 @@ test.describe('signup flow', () => {
     await expect(submitButton).toBeEnabled()
     await submitButton.click()
 
-    // Ikke forvent redirect til /select-org her
     await expect(page).toHaveURL(/\/signup$/)
 
-    // Bekreft at steg 2 fortsatt er synlig som neste del av flowen
     await expect(page.getByText('STEG 2: BEKREFTELSE')).toBeVisible()
     await expect(page.getByText(/bekreft e-post/i)).toBeVisible()
   })
