@@ -10,6 +10,14 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+/**
+ * Scheduler responsible for checking upcoming alcohol license (bevilling) expirations.
+ *
+ * Runs daily and:
+ * - Identifies licenses expiring in 90 days
+ * - Sends notifications to organization admins and managers
+ * - Marks licenses as notified to prevent duplicate alerts
+ */
 @Component
 class BevillingExpiryScheduler(
     private val jdbcTemplate: JdbcTemplate,
@@ -18,6 +26,15 @@ class BevillingExpiryScheduler(
     private val log = LoggerFactory.getLogger(BevillingExpiryScheduler::class.java)
     private val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 
+    /**
+     * Scheduled task that runs every day at 08:00.
+     *
+     * Performs the following steps:
+     * 1. Calculates the target expiry date (90 days from today)
+     * 2. Queries for alcohol policies expiring on that date and not yet notified
+     * 3. Sends notifications to admins/managers of each organization
+     * 4. Updates records to mark them as notified
+     */
     @Scheduled(cron = "0 0 8 * * *")
     fun checkExpiringBevillinger() {
         log.info("Running bevilling expiry check")

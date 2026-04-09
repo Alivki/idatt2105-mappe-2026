@@ -20,6 +20,15 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 
+/**
+ * Service responsible for managing alcohol deviations.
+ *
+ * Handles retrieval, creation, update, and deletion of deviations,
+ * as well as related validation, notifications, and automatic
+ * penalty point creation for certain report sources.
+ *
+ * All operations are scoped to the authenticated user's organization.
+ */
 @Service
 class AlcoholDeviationService(
     private val repository: AlcoholDeviationRepository,
@@ -29,18 +38,46 @@ class AlcoholDeviationService(
     private val notificationsService: NotificationsService,
 ) {
 
+    /**
+     * Retrieves all alcohol deviations for the authenticated user's organization.
+     *
+     * Results are ordered by reported time descending.
+     *
+     * @param auth The authenticated user
+     * @return List of deviation responses
+     */
     @Transactional(readOnly = true)
     fun list(auth: AuthenticatedUser): List<AlcoholDeviationResponse> {
         val orgId = auth.requireOrganizationId()
         return repository.findAllByOrganizationIdOrderByReportedAtDesc(orgId).map { it.toResponse() }
     }
 
+    /**
+     * Retrieves a specific alcohol deviation by ID.
+     *
+     * @param id The deviation ID
+     * @param auth The authenticated user
+     * @return The matching deviation response
+     * @throws NotFoundException If the deviation does not exist in the organization
+     */
     @Transactional(readOnly = true)
     fun getById(id: Long, auth: AuthenticatedUser): AlcoholDeviationResponse {
         val orgId = auth.requireOrganizationId()
         return requireDeviation(id, orgId).toResponse()
     }
 
+    /**
+     * Creates a new alcohol deviation.
+     *
+     * If the report source is SJENKEKONTROLL or POLITIRAPPORT,
+     * penalty points are automatically created for the deviation.
+     *
+     * Notifications are also sent to relevant users after creation.
+     *
+     * @param request Request containing deviation details
+     * @param auth The authenticated user
+     * @return The created deviation response
+     */
     @Transactional
     fun create(request: CreateAlcoholDeviationRequest, auth: AuthenticatedUser): AlcoholDeviationResponse {
         val orgId = auth.requireOrganizationId()
@@ -76,6 +113,17 @@ class AlcoholDeviationService(
         return deviation.toResponse()
     }
 
+    /**
+     * Updates an existing alcohol deviation.
+     *
+     * Only fields provided in the request are updated.
+     * Other fields retain their current values.
+     *
+     * @param id The deviation ID
+     * @param request Request containing updated values
+     * @param auth The authenticated user
+     * @return The updated deviation response
+     */
     @Transactional
     fun update(id: Long, request: UpdateAlcoholDeviationRequest, auth: AuthenticatedUser): AlcoholDeviationResponse {
         val orgId = auth.requireOrganizationId()
@@ -103,6 +151,13 @@ class AlcoholDeviationService(
         return updated.toResponse()
     }
 
+    /**
+     * Deletes an alcohol deviation.
+     *
+     * @param id The deviation ID
+     * @param auth The authenticated user
+     * @throws NotFoundException If the deviation does not exist in the organization
+     */
     @Transactional
     fun delete(id: Long, auth: AuthenticatedUser) {
         val orgId = auth.requireOrganizationId()
@@ -110,6 +165,14 @@ class AlcoholDeviationService(
         repository.delete(deviation)
     }
 
+    /**
+     * Sends notifications when a new deviation is created.
+     *
+     * Administrators and managers in the organization are notified,
+     * and the responsible user is also notified if one is assigned.
+     *
+     * @param deviation The created deviation
+     */
     private fun notifyDeviationCreated(deviation: AlcoholDeviation) {
         val message = "Alcohol deviation '${deviation.deviationType}' reported by ${deviation.reportedByUser.fullName}: ${deviation.description.take(100)}"
 
@@ -136,16 +199,41 @@ class AlcoholDeviationService(
         }
     }
 
+    /**
+     * Retrieves a deviation by ID within the given organization.
+     *
+     * @param id The deviation ID
+     * @param organizationId The organization ID
+     * @return The matching deviation entity
+     * @throws NotFoundException If no matching deviation exists
+     */
     private fun requireDeviation(id: Long, organizationId: Long): AlcoholDeviation {
         return repository.findByIdAndOrganizationId(id, organizationId)
             ?: throw NotFoundException("Alcohol deviation not found")
     }
 
+    /**
+     * Retrieves a user by ID.
+     *
+     * @param userId The user ID
+     * @return The matching user entity
+     * @throws NotFoundException If the user does not exist
+     */
     private fun requireUser(userId: Long): User {
         return userRepository.findById(userId)
             .orElseThrow { NotFoundException("User not found") }
     }
 
+    /**
+     * Resolves a user as a valid member of the organization.
+     *
+     * Returns null if no user ID is provided.
+     *
+     * @param userId The user ID, if provided
+     * @param organizationId The organization ID
+     * @return The user if valid, otherwise null
+     * @throws BadRequestException If the user is not a member of the organization
+     */
     private fun resolveOrgMember(userId: Long?, organizationId: Long): User? {
         if (userId == null) return null
         val user = requireUser(userId)
@@ -156,6 +244,11 @@ class AlcoholDeviationService(
     }
 }
 
+/**
+ * Maps an [AlcoholDeviation] entity to an [AlcoholDeviationResponse].
+ *
+ * @return The mapped response DTO
+ */
 private fun AlcoholDeviation.toResponse() = AlcoholDeviationResponse(
     id = id,
     organizationId = organizationId,

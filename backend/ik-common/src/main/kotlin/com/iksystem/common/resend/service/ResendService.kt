@@ -5,12 +5,18 @@ import com.iksystem.common.resend.EmailTemplateBuilder
 import com.iksystem.common.resend.ResendClient
 import org.springframework.stereotype.Service
 
+/**
+ * Service responsible for sending different types of emails using Resend.
+ */
 @Service
 class ResendService(
     private val resendClient: ResendClient,
     private val tempBuilder: EmailTemplateBuilder,
     private val props: ResendConfig,
 ) {
+    /**
+     * Sends a welcome email after user registration.
+     */
     fun sendRegistrationEmail(email: String, fullName: String) {
         val html = tempBuilder.registrationEmail(
             title = "Welcome to IK-system",
@@ -19,6 +25,9 @@ class ResendService(
         resendClient.sendEmail(email, "Welcome to IK-system", html)
     }
 
+    /**
+     * Sends an email with a verification link.
+     */
     fun sendVerificationEmail(email: String, token: String) {
         val url = "test/verify?token=$token"
 
@@ -32,6 +41,9 @@ class ResendService(
         resendClient.sendEmail(email, "Verify your account", html)
     }
 
+    /**
+     * Sends a generic notification email.
+     */
     fun sendNotificationEmail(email: String, title: String, message: String) {
         val html = tempBuilder.actionEmail(
             title = title,
@@ -42,6 +54,9 @@ class ResendService(
         resendClient.sendEmail(email, title, html)
     }
 
+    /**
+     * Sends an invitation email to join an organization.
+     */
     fun sendInviteEmail(email: String, orgName: String, token: String) {
         val inviteUrl = "http://localhost:80/invite?token=$token"
 
@@ -54,6 +69,9 @@ class ResendService(
         resendClient.sendEmail(email, "Invitasjon til $orgName", html)
     }
 
+    /**
+     * Sends an alert when a checklist is about to expire.
+     */
     fun sendChecklistAlert(
         email: String,
         checklistName: String,
@@ -73,6 +91,9 @@ class ResendService(
         resendClient.sendEmail(email, "Checklist expiring soon", html)
     }
 
+    /**
+     * Sends an email when training is expiring soon.
+     */
     fun sendTrainingExpiringSoon(
         email: String,
         employee: String,
@@ -90,6 +111,9 @@ class ResendService(
         resendClient.sendEmail(email, "Training Missing", html)
     }
 
+    /**
+     * Sends an email when a deviation is reported.
+     */
     fun sendDeviationEmail(
         email: String,
         deviationType: String,
@@ -111,6 +135,9 @@ class ResendService(
         resendClient.sendEmail(email, "New Deviation: $deviationType", html)
     }
 
+    /**
+     * Sends an email when a checklist is overdue.
+     */
     fun sendChecklistOverdueEmail(
         email: String,
         checklistName: String,
@@ -130,6 +157,9 @@ class ResendService(
         resendClient.sendEmail(email, "Checklist Overdue: $checklistName", html)
     }
 
+    /**
+     * Sends an email when training is missing.
+     */
     fun sendTrainingMissing(
         email: String,
         employee: String

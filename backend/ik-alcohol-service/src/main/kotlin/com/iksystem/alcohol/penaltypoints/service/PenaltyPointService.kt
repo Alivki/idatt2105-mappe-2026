@@ -11,11 +11,32 @@ import com.iksystem.common.security.AuthenticatedUser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
+/**
+ * Service responsible for managing penalty points related to alcohol deviations.
+ *
+ * Provides functionality for:
+ * - Retrieving penalty point summaries
+ * - Creating penalty point entries manually
+ * - Deleting entries
+ * - Automatically generating penalty points from deviations
+ *
+ * All operations are scoped to the authenticated user's organization.
+ */
 @Service
 class PenaltyPointService(
     private val repository: PenaltyPointRepository,
 ) {
 
+    /**
+     * Retrieves a summary of penalty points for the authenticated user's organization.
+     *
+     * Includes:
+     * - Total accumulated points
+     * - All penalty point entries
+     *
+     * @param auth The authenticated user
+     * @return A summary containing total points and all entries
+     */
     @Transactional(readOnly = true)
     fun getSummary(auth: AuthenticatedUser): PenaltyPointSummaryResponse {
         val orgId = auth.requireOrganizationId()
@@ -28,6 +49,15 @@ class PenaltyPointService(
         )
     }
 
+    /**
+     * Creates a new penalty point entry manually.
+     *
+     * The number of points is derived from the selected violation type.
+     *
+     * @param request Request containing violation details
+     * @param auth The authenticated user
+     * @return The created penalty point entry
+     */
     @Transactional
     fun add(request: CreatePenaltyPointRequest, auth: AuthenticatedUser): PenaltyPointResponse {
         val orgId = auth.requireOrganizationId()
@@ -42,6 +72,13 @@ class PenaltyPointService(
         return entry.toResponse()
     }
 
+    /**
+     * Deletes a penalty point entry within the authenticated user's organization.
+     *
+     * @param id The ID of the penalty point entry
+     * @param auth The authenticated user
+     * @throws NotFoundException If the entry does not exist
+     */
     @Transactional
     fun delete(id: Long, auth: AuthenticatedUser) {
         val orgId = auth.requireOrganizationId()
@@ -53,6 +90,8 @@ class PenaltyPointService(
     /**
      * Auto-creates a penalty point entry linked to an alcohol deviation.
      * Called internally when a deviation with source SJENKEKONTROLL or POLITIRAPPORT is created.
+     *
+     * @param deviation The deviation that triggered the penalty point
      */
     @Transactional
     fun addForDeviation(deviation: AlcoholDeviation) {
@@ -68,6 +107,11 @@ class PenaltyPointService(
     }
 }
 
+/**
+ * Maps a [PenaltyPoint] entity to a [PenaltyPointResponse].
+ *
+ * @return The mapped response DTO
+ */
 private fun PenaltyPoint.toResponse() = PenaltyPointResponse(
     id = id,
     organizationId = organizationId,

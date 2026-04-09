@@ -25,6 +25,12 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
+/**
+ * Service responsible for previewing, generating, exporting, and managing reports.
+ *
+ * Aggregates data from multiple domains such as checklists, deviations,
+ * temperature logs, training, age verification, and license information.
+ */
 @Service
 class ReportService(
     private val generatedReportRepository: GeneratedReportRepository,
@@ -43,6 +49,11 @@ class ReportService(
     private val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
     private val zone = ZoneId.of("Europe/Oslo")
 
+    /**
+     * Builds a report preview based on the selected period and section configuration.
+     *
+     * Returns structured report data without generating or storing a PDF.
+     */
     @Transactional(readOnly = true)
     fun preview(request: GenerateReportRequest, auth: AuthenticatedUser): ReportPreviewResponse {
         val orgId = auth.requireOrganizationId()
@@ -85,6 +96,10 @@ class ReportService(
         )
     }
 
+    /**
+     * Generates a PDF report, uploads it as a document, stores report metadata,
+     * and returns the generated report response with a download URL.
+     */
     @Transactional
     fun generate(request: GenerateReportRequest, auth: AuthenticatedUser): GeneratedReportResponse {
         val orgId = auth.requireOrganizationId()
@@ -126,6 +141,9 @@ class ReportService(
         return report.toResponse(downloadUrl)
     }
 
+    /**
+     * Retrieves all generated reports for the authenticated user's organization.
+     */
     @Transactional(readOnly = true)
     fun list(auth: AuthenticatedUser): List<GeneratedReportResponse> {
         val orgId = auth.requireOrganizationId()
@@ -133,6 +151,9 @@ class ReportService(
             .map { it.toResponse(null) }
     }
 
+    /**
+     * Retrieves a single generated report by ID, including a download URL if a document exists.
+     */
     @Transactional(readOnly = true)
     fun getReport(id: Long, auth: AuthenticatedUser): GeneratedReportResponse {
         val orgId = auth.requireOrganizationId()
@@ -146,6 +167,9 @@ class ReportService(
         return report.toResponse(downloadUrl)
     }
 
+    /**
+     * Returns a download URL for the document associated with the given report.
+     */
     @Transactional(readOnly = true)
     fun getDownloadUrl(id: Long, auth: AuthenticatedUser): String {
         val orgId = auth.requireOrganizationId()
@@ -156,6 +180,9 @@ class ReportService(
         return documentsService.getFileUrl(doc.id, orgId)
     }
 
+    /**
+     * Deletes a generated report and its associated document, if present.
+     */
     @Transactional
     fun delete(id: Long, auth: AuthenticatedUser) {
         val orgId = auth.requireOrganizationId()
@@ -169,11 +196,17 @@ class ReportService(
         generatedReportRepository.delete(report)
     }
 
+    /**
+     * Exports report data as JSON by returning the same structured data used for preview.
+     */
     @Transactional(readOnly = true)
     fun exportJson(request: GenerateReportRequest, auth: AuthenticatedUser): ReportPreviewResponse {
         return preview(request, auth)
     }
 
+    /**
+     * Builds the report header containing organization, period, and generator information.
+     */
     private fun buildHeader(
         orgId: Long,
         periodFrom: LocalDate,
@@ -197,6 +230,9 @@ class ReportService(
         )
     }
 
+    /**
+     * Builds aggregated compliance statistics for the selected period.
+     */
     private fun buildComplianceSummary(orgId: Long, from: Instant, to: Instant): ComplianceSummary {
         val totalItems = checklistItemRepository.countAllByOrganizationId(orgId)
         val completedItems = checklistItemRepository.countCompletedByOrganizationId(orgId)
@@ -223,6 +259,9 @@ class ReportService(
         )
     }
 
+    /**
+     * Builds summarized temperature log entries for all active appliances in the organization.
+     */
     private fun buildTemperatureLogs(orgId: Long, from: Instant, to: Instant): List<TemperatureLogEntry> {
         val appliances = reportDataRepo.findActiveAppliances(orgId)
         val measurements = reportDataRepo.findMeasurements(orgId, from, to)
@@ -250,6 +289,9 @@ class ReportService(
         }
     }
 
+    /**
+     * Builds checklist completion statistics for selected or all relevant checklists.
+     */
     private fun buildChecklists(
         orgId: Long,
         selectedIds: List<Long>?,
@@ -283,6 +325,9 @@ class ReportService(
         }
     }
 
+    /**
+     * Builds the HACCP checklist section including checklist items and completion rates.
+     */
     private fun buildHaccpChecklists(
         orgId: Long,
         from: Instant,
@@ -320,6 +365,10 @@ class ReportService(
         return HaccpSection(checklists = entries)
     }
 
+    /**
+     * Calculates the expected number of checklist completions within the selected period
+     * based on checklist frequency.
+     */
     private fun calculateExpectedCompletions(frequency: ChecklistFrequency, from: LocalDate, to: LocalDate): Long {
         val days = ChronoUnit.DAYS.between(from, to.plusDays(1))
         return when (frequency) {
@@ -347,6 +396,9 @@ class ReportService(
         }
     }
 
+    /**
+     * Builds corrective action entries derived from food deviations with immediate actions.
+     */
     private fun buildCorrectiveActions(orgId: Long, from: Instant, to: Instant): List<CorrectiveActionEntry> {
         val deviations = reportDataRepo.findFoodDeviations(orgId, from, to)
             .filter { it.immediateAction != null }
@@ -362,6 +414,9 @@ class ReportService(
         }
     }
 
+    /**
+     * Builds the food deviations section for the selected period.
+     */
     private fun buildFoodDeviations(orgId: Long, from: Instant, to: Instant): List<DeviationEntry> {
         return reportDataRepo.findFoodDeviations(orgId, from, to).map { dev ->
             DeviationEntry(
@@ -377,6 +432,9 @@ class ReportService(
         }
     }
 
+    /**
+     * Builds the alcohol deviations section for the selected period.
+     */
     private fun buildAlcoholDeviations(orgId: Long, from: Instant, to: Instant): List<DeviationEntry> {
         return reportDataRepo.findAlcoholDeviations(orgId, from, to).map { dev ->
             DeviationEntry(
@@ -392,6 +450,9 @@ class ReportService(
         }
     }
 
+    /**
+     * Builds age verification entries by grouping shifts per day and aggregating totals.
+     */
     private fun buildAgeVerification(orgId: Long, from: LocalDate, to: LocalDate): List<AgeVerificationEntry> {
         val shifts = reportDataRepo.findAgeVerificationShifts(orgId, from, to)
 
@@ -409,6 +470,9 @@ class ReportService(
         }
     }
 
+    /**
+     * Builds the training overview section for the organization.
+     */
     private fun buildTrainingOverview(orgId: Long): List<TrainingEntry> {
         val logs = trainingRepository.findAllByOrganizationIdOrderByCreatedAtDesc(orgId)
         val memberships = membershipRepository.findAllByOrganizationId(orgId)
@@ -425,6 +489,9 @@ class ReportService(
         }
     }
 
+    /**
+     * Builds the license information section based on alcohol policy and organization data.
+     */
     private fun buildLicenseInfo(orgId: Long): LicenseInfoSection {
         val policy = reportDataRepo.findAlcoholPolicy(orgId)
         val org = organizationRepository.findById(orgId).orElse(null)
@@ -443,8 +510,9 @@ class ReportService(
         )
     }
 
-    // ── Helpers ──
-
+    /**
+     * Formats internal deviation status values into user-friendly labels.
+     */
     private fun formatStatus(status: String): String = when (status) {
         "OPEN" -> "Åpen"
         "UNDER_TREATMENT" -> "Under behandling"
@@ -452,6 +520,9 @@ class ReportService(
         else -> status
     }
 
+    /**
+     * Formats internal training status values into user-friendly labels.
+     */
     private fun formatTrainingStatus(status: String): String = when (status) {
         "COMPLETED" -> "Gyldig"
         "EXPIRES_SOON" -> "Utløper snart"
@@ -460,6 +531,9 @@ class ReportService(
         else -> status
     }
 
+    /**
+     * Maps a generated report entity to a response DTO, optionally including a download URL.
+     */
     private fun GeneratedReport.toResponse(downloadUrl: String?): GeneratedReportResponse {
         return GeneratedReportResponse(
             id = id,

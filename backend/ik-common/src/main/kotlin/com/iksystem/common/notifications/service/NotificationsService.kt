@@ -12,6 +12,14 @@ import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
+/**
+ * Service responsible for creating and dispatching notifications.
+ *
+ * Handles:
+ * - Persisting notifications to the database
+ * - Sending optional email notifications
+ * - Broadcasting notifications to users based on roles within an organization
+ */
 @Service
 class NotificationsService(
     private val notificationsRepository: NotificationsRepository,
@@ -21,6 +29,20 @@ class NotificationsService(
 ) {
     private val log = LoggerFactory.getLogger(NotificationsService::class.java)
 
+    /**
+     * Sends a notification to a specific user.
+     *
+     * Saves the notification and optionally sends an email.
+     *
+     * @param organizationId Organization ID
+     * @param recipientUserId Recipient user ID
+     * @param type Notification type
+     * @param title Notification title
+     * @param message Notification message
+     * @param referenceType Optional reference type
+     * @param referenceId Optional reference ID
+     * @param sendEmail Whether to send an email notification
+     */
     @Transactional
     fun send(
         organizationId: Long,
@@ -58,6 +80,17 @@ class NotificationsService(
         }
     }
 
+    /**
+     * Sends a notification to all admins and managers in an organization.
+     *
+     * @param organizationId Organization ID
+     * @param type Notification type
+     * @param title Notification title
+     * @param message Notification message
+     * @param referenceType Optional reference type
+     * @param referenceId Optional reference ID
+     * @param sendEmail Whether to send email notifications
+     */
     @Transactional
     fun sendToOrgAdminsAndManagers(
         organizationId: Long,
@@ -71,6 +104,17 @@ class NotificationsService(
         sendToRoles(organizationId, setOf(Role.ADMIN, Role.MANAGER), type, title, message, referenceType, referenceId, sendEmail)
     }
 
+    /**
+     * Sends a notification to all admins in an organization.
+     *
+     * @param organizationId Organization ID
+     * @param type Notification type
+     * @param title Notification title
+     * @param message Notification message
+     * @param referenceType Optional reference type
+     * @param referenceId Optional reference ID
+     * @param sendEmail Whether to send email notifications
+     */
     @Transactional
     fun sendToOrgAdmins(
         organizationId: Long,
@@ -84,6 +128,17 @@ class NotificationsService(
         sendToRoles(organizationId, setOf(Role.ADMIN), type, title, message, referenceType, referenceId, sendEmail)
     }
 
+    /**
+     * Sends a notification to all managers in an organization.
+     *
+     * @param organizationId Organization ID
+     * @param type Notification type
+     * @param title Notification title
+     * @param message Notification message
+     * @param referenceType Optional reference type
+     * @param referenceId Optional reference ID
+     * @param sendEmail Whether to send email notifications
+     */
     @Transactional
     fun sendToOrgManagers(
         organizationId: Long,
@@ -97,6 +152,20 @@ class NotificationsService(
         sendToRoles(organizationId, setOf(Role.MANAGER), type, title, message, referenceType, referenceId, sendEmail)
     }
 
+    /**
+     * Internal helper method to send notifications to users with specific roles.
+     *
+     * Filters members by role and sends notifications individually.
+     *
+     * @param organizationId Organization ID
+     * @param roles Set of roles to target
+     * @param type Notification type
+     * @param title Notification title
+     * @param message Notification message
+     * @param referenceType Optional reference type
+     * @param referenceId Optional reference ID
+     * @param sendEmail Whether to send email notifications
+     */
     private fun sendToRoles(
         organizationId: Long,
         roles: Set<Role>,

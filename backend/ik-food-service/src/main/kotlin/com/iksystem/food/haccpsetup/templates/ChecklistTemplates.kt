@@ -6,11 +6,17 @@ import com.iksystem.food.haccpsetup.dto.FoodType
 import com.iksystem.food.haccpsetup.dto.HaccpSetupRequest
 import com.iksystem.food.haccpsetup.dto.TempEquipment
 
+/**
+ * Represents a single checklist item template.
+ */
 data class TemplateItem(
     val title: String,
     val description: String? = null,
 )
 
+/**
+ * Template definition for generating a checklist.
+ */
 data class ChecklistTemplate(
     val id: String,
     val name: String,
@@ -20,8 +26,14 @@ data class ChecklistTemplate(
     val condition: (HaccpSetupRequest) -> Boolean,
 )
 
+/**
+ * Collection of predefined HACCP checklist templates.
+ */
 object ChecklistTemplates {
 
+    /**
+     * All available checklist templates.
+     */
     val all: List<ChecklistTemplate> = listOf(
         ChecklistTemplate(
             id = "daily-cleaning",

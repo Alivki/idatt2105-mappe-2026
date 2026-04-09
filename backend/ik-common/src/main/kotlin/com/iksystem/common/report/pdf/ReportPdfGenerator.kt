@@ -10,11 +10,29 @@ import org.thymeleaf.templatemode.TemplateMode
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import java.io.ByteArrayOutputStream
 
+/**
+ * Component responsible for generating PDF reports from report preview data.
+ *
+ * This class:
+ * - Uses Thymeleaf to render an HTML template
+ * - Converts the generated HTML into a PDF using OpenHTMLToPDF
+ *
+ * The HTML template is expected to be located in the `templates/` directory
+ * and named `report.html`.
+ */
 @Component
 class ReportPdfGenerator {
 
     private val log = LoggerFactory.getLogger(ReportPdfGenerator::class.java)
 
+    /**
+     * Internal Thymeleaf template engine used to render the report HTML.
+     *
+     * Configured to:
+     * - Load templates from classpath `templates/`
+     * - Use HTML mode
+     * - Encode content in UTF-8
+     */
     private val templateEngine: TemplateEngine = TemplateEngine().apply {
         setTemplateResolver(ClassLoaderTemplateResolver().apply {
             prefix = "templates/"
@@ -24,6 +42,18 @@ class ReportPdfGenerator {
         })
     }
 
+    /**
+     * Generates a PDF from report preview data.
+     *
+     * Steps:
+     * 1. Populate Thymeleaf context with report data
+     * 2. Render HTML template
+     * 3. Convert HTML to PDF using OpenHTMLToPDF
+     *
+     * @param data Structured report preview data
+     * @return Byte array representing the generated PDF file
+     * @throws RuntimeException if HTML rendering or PDF conversion fails
+     */
     fun generatePdf(data: ReportPreviewResponse): ByteArray {
         val context = Context().apply {
             setVariable("report", data)

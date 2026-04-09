@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
+/**
+ * Request payload for creating a food deviation.
+ */
 data class CreateFoodDeviationRequest(
     val reportedAt: String? = null,
 
@@ -36,6 +39,9 @@ data class CreateFoodDeviationRequest(
     val preventiveDeadline: String? = null,
 )
 
+/**
+ * Request payload for updating a food deviation.
+ */
 data class UpdateFoodDeviationRequest(
     val reportedAt: String? = null,
     val deviationType: FoodDeviationType? = null,
@@ -61,6 +67,9 @@ data class UpdateFoodDeviationRequest(
     val status: FoodDeviationStatus? = null,
 )
 
+/**
+ * Response model representing a food deviation.
+ */
 data class FoodDeviationResponse(
     val id: Long,
     val organizationId: Long,

@@ -10,6 +10,20 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
+/**
+ * Scheduler responsible for monitoring incomplete checklists and sending overdue notifications.
+ *
+ * Handles different checklist frequencies:
+ * - Daily
+ * - Weekly
+ * - Monthly
+ * - Yearly
+ *
+ * For each frequency, it:
+ * - Finds incomplete checklists
+ * - Counts incomplete items
+ * - Sends notifications to organization admins and managers
+ */
 @Component
 class ChecklistScheduler(
     private val checklistRepository: ChecklistRepository,
@@ -18,34 +32,59 @@ class ChecklistScheduler(
 ) {
     private val log = LoggerFactory.getLogger(ChecklistScheduler::class.java)
 
-    // Daily checklists — check every day at 22:00 (end of business day)
+    /**
+     * Checks daily checklists for incomplete items.
+     *
+     * Runs every day at 22:00 (end of business day).
+     */
     @Scheduled(cron = "0 0 22 * * *")
     fun checkDailyChecklists() {
         log.info("Running daily checklist overdue check")
         notifyIncompleteChecklists(ChecklistFrequency.DAILY)
     }
 
-    // Weekly checklists — check every Sunday at 22:00
+    /**
+     * Checks weekly checklists for incomplete items.
+     *
+     * Runs every Sunday at 22:00.
+     */
     @Scheduled(cron = "0 0 22 * * SUN")
     fun checkWeeklyChecklists() {
         log.info("Running weekly checklist overdue check")
         notifyIncompleteChecklists(ChecklistFrequency.WEEKLY)
     }
 
-    // Monthly checklists — check last day of month at 22:00
+    /**
+     * Checks monthly checklists for incomplete items.
+     *
+     * Runs on the last day of each month at 22:00.
+     */
     @Scheduled(cron = "0 0 22 L * *")
     fun checkMonthlyChecklists() {
         log.info("Running monthly checklist overdue check")
         notifyIncompleteChecklists(ChecklistFrequency.MONTHLY)
     }
 
-    // Yearly checklists — check December 31st at 22:00
+    /**
+     * Checks yearly checklists for incomplete items.
+     *
+     * Runs on December 31st at 22:00.
+     */
     @Scheduled(cron = "0 0 22 31 12 *")
     fun checkYearlyChecklists() {
         log.info("Running yearly checklist overdue check")
         notifyIncompleteChecklists(ChecklistFrequency.YEARLY)
     }
 
+    /**
+     * Finds incomplete checklists for a given frequency and sends notifications.
+     *
+     * For each checklist:
+     * - Counts incomplete items
+     * - Sends a notification to admins and managers
+     *
+     * @param frequency The checklist frequency to evaluate
+     */
     private fun notifyIncompleteChecklists(frequency: ChecklistFrequency) {
         val incompleteChecklists = checklistRepository.findIncompleteByFrequency(frequency)
 

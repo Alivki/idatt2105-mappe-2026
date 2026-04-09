@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * REST controller for generating HACCP checklists.
+ */
 @Tag(name = "HACCP Setup", description = "Generate HACCP checklists based on business profile")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
@@ -27,6 +30,9 @@ class HaccpSetupController(
     private val haccpSetupService: HaccpSetupService,
 ) {
 
+    /**
+     * Generates HACCP checklists based on input data.
+     */
     @Operation(
         summary = "Generate HACCP checklists",
         description = "Generates checklists based on the business profile answers. Replaces any previously generated wizard checklists.",

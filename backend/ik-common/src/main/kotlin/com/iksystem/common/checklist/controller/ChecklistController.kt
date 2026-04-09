@@ -31,6 +31,21 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * REST controller for managing checklists and checklist items.
+ *
+ * Provides endpoints for:
+ * - Listing checklists and checklist statistics
+ * - Retrieving completion history
+ * - Creating, updating, and deleting checklists
+ * - Marking checklist completion
+ * - Creating, updating, and deleting checklist items
+ *
+ * All operations are scoped to the authenticated user's active organization.
+ * Write operations are restricted where specified.
+ *
+ * @property checklistService Service layer handling checklist business logic
+ */
 @Tag(name = "Checklists", description = "Checklist templates and checklist items")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
@@ -39,18 +54,39 @@ class ChecklistController(
     private val checklistService: ChecklistService,
 ) {
 
+    /**
+     * Retrieves all checklists for the authenticated user's active organization.
+     *
+     * @param auth The authenticated user
+     * @return HTTP 200 with the list of checklists
+     */
     @Operation(summary = "List checklists", description = "Returns all checklists for the active organization.")
     @ApiResponse(responseCode = "200", description = "Checklist list returned")
     @GetMapping
     fun list(@AuthenticationPrincipal auth: AuthenticatedUser): ResponseEntity<List<ChecklistResponse>> =
         ResponseEntity.ok(checklistService.list(auth))
 
+    /**
+     * Retrieves aggregated checklist statistics for the authenticated user's organization.
+     *
+     * Typically used for dashboard counters and summary views.
+     *
+     * @param auth The authenticated user
+     * @return HTTP 200 with checklist statistics
+     */
     @Operation(summary = "Checklist stats", description = "Returns summary stats for dashboard counters.")
     @ApiResponse(responseCode = "200", description = "Checklist stats returned")
     @GetMapping("/stats")
     fun stats(@AuthenticationPrincipal auth: AuthenticatedUser): ResponseEntity<ChecklistStatsResponse> =
         ResponseEntity.ok(checklistService.stats(auth))
 
+    /**
+     * Retrieves checklist completion events for a given number of past days.
+     *
+     * @param days Number of days to include in the history
+     * @param auth The authenticated user
+     * @return HTTP 200 with checklist completion history entries
+     */
     @Operation(summary = "Completion history", description = "Returns checklist completion events for the given period.")
     @ApiResponse(responseCode = "200", description = "Completion history returned")
     @GetMapping("/completion-history")
@@ -60,6 +96,15 @@ class ChecklistController(
     ): ResponseEntity<List<CompletionHistoryEntry>> =
         ResponseEntity.ok(checklistService.completionHistory(days, auth))
 
+    /**
+     * Creates a new checklist template.
+     *
+     * Access is restricted to users with ADMIN or MANAGER roles.
+     *
+     * @param request Request containing checklist details
+     * @param auth The authenticated user
+     * @return HTTP 201 with the created checklist
+     */
     @Operation(summary = "Create checklist", description = "Creates a new checklist template.")
     @ApiResponses(
         ApiResponse(responseCode = "201", description = "Checklist created"),
@@ -73,6 +118,16 @@ class ChecklistController(
     ): ResponseEntity<ChecklistResponse> =
         ResponseEntity.status(HttpStatus.CREATED).body(checklistService.createChecklist(request, auth))
 
+    /**
+     * Updates checklist metadata and status.
+     *
+     * Access is restricted to users with ADMIN or MANAGER roles.
+     *
+     * @param checklistId The checklist ID
+     * @param request Request containing updated checklist values
+     * @param auth The authenticated user
+     * @return HTTP 200 with the updated checklist
+     */
     @Operation(summary = "Update checklist", description = "Updates checklist metadata and status.")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Checklist updated"),
@@ -88,6 +143,15 @@ class ChecklistController(
     ): ResponseEntity<ChecklistResponse> =
         ResponseEntity.ok(checklistService.updateChecklist(checklistId, request, auth))
 
+    /**
+     * Deletes a checklist and all of its items.
+     *
+     * Access is restricted to users with ADMIN or MANAGER roles.
+     *
+     * @param checklistId The checklist ID
+     * @param auth The authenticated user
+     * @return HTTP 204 if the checklist was deleted
+     */
     @Operation(summary = "Delete checklist", description = "Deletes a checklist and all of its items.")
     @ApiResponses(
         ApiResponse(responseCode = "204", description = "Checklist deleted"),
@@ -103,6 +167,14 @@ class ChecklistController(
         return ResponseEntity.noContent().build()
     }
 
+    /**
+     * Marks all items in a checklist as completed or not completed.
+     *
+     * @param checklistId The checklist ID
+     * @param request Request containing the completion state
+     * @param auth The authenticated user
+     * @return HTTP 200 with the updated checklist
+     */
     @Operation(summary = "Set checklist completion", description = "Marks all items in a checklist as completed or not completed.")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Checklist completion updated"),
@@ -116,6 +188,16 @@ class ChecklistController(
     ): ResponseEntity<ChecklistResponse> =
         ResponseEntity.ok(checklistService.setChecklistCompletion(checklistId, request, auth))
 
+    /**
+     * Creates a new item in a checklist.
+     *
+     * Access is restricted to users with ADMIN or MANAGER roles.
+     *
+     * @param checklistId The checklist ID
+     * @param request Request containing item details
+     * @param auth The authenticated user
+     * @return HTTP 201 with the created checklist item
+     */
     @Operation(summary = "Create checklist item", description = "Adds an item to a checklist.")
     @ApiResponses(
         ApiResponse(responseCode = "201", description = "Checklist item created"),
@@ -130,6 +212,15 @@ class ChecklistController(
     ): ResponseEntity<ChecklistItemResponse> =
         ResponseEntity.status(HttpStatus.CREATED).body(checklistService.createItem(checklistId, request, auth))
 
+    /**
+     * Updates an existing checklist item.
+     *
+     * @param checklistId The checklist ID
+     * @param itemId The checklist item ID
+     * @param request Request containing updated item values
+     * @param auth The authenticated user
+     * @return HTTP 200 with the updated checklist item
+     */
     @Operation(summary = "Update checklist item", description = "Updates a checklist item.")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Checklist item updated"),
@@ -144,6 +235,16 @@ class ChecklistController(
     ): ResponseEntity<ChecklistItemResponse> =
         ResponseEntity.ok(checklistService.updateItem(checklistId, itemId, request, auth))
 
+    /**
+     * Deletes an item from a checklist.
+     *
+     * Access is restricted to users with ADMIN or MANAGER roles.
+     *
+     * @param checklistId The checklist ID
+     * @param itemId The checklist item ID
+     * @param auth The authenticated user
+     * @return HTTP 204 if the item was deleted
+     */
     @Operation(summary = "Delete checklist item", description = "Removes an item from a checklist.")
     @ApiResponses(
         ApiResponse(responseCode = "204", description = "Checklist item deleted"),

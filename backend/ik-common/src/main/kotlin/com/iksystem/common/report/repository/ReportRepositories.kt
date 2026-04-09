@@ -7,6 +7,9 @@ import java.sql.ResultSet
 import java.time.Instant
 import java.time.LocalDate
 
+/**
+ * Represents temperature appliance configuration data.
+ */
 data class TempApplianceData(
     val id: Long,
     val name: String,
@@ -15,6 +18,9 @@ data class TempApplianceData(
     val maxTemperature: BigDecimal,
 )
 
+/**
+ * Represents a recorded temperature measurement.
+ */
 data class TempMeasurementData(
     val id: Long,
     val applianceId: Long,
@@ -23,6 +29,9 @@ data class TempMeasurementData(
     val status: String,
 )
 
+/**
+ * Represents a food-related deviation entry.
+ */
 data class FoodDeviationData(
     val id: Long,
     val reportedAt: Instant,
@@ -34,6 +43,9 @@ data class FoodDeviationData(
     val status: String,
 )
 
+/**
+ * Represents an alcohol-related deviation entry.
+ */
 data class AlcoholDeviationData(
     val id: Long,
     val reportedAt: Instant,
@@ -44,6 +56,9 @@ data class AlcoholDeviationData(
     val status: String,
 )
 
+/**
+ * Represents an age verification shift summary.
+ */
 data class AgeVerificationShiftData(
     val id: Long,
     val shiftDate: LocalDate,
@@ -52,6 +67,9 @@ data class AgeVerificationShiftData(
     val status: String,
 )
 
+/**
+ * Represents alcohol policy data for an organization.
+ */
 data class AlcoholPolicyData(
     val bevillingNumber: String?,
     val bevillingValidUntil: LocalDate?,
@@ -64,9 +82,18 @@ data class AlcoholPolicyData(
     val kunnskapsproveMunicipality: String?,
 )
 
+/**
+ * Repository responsible for fetching report-related data using raw SQL queries.
+ *
+ * Uses [JdbcTemplate] for efficient data aggregation across multiple domains
+ * such as temperature logs, deviations, age verification, and policy data.
+ */
 @Repository
 class ReportDataRepository(private val jdbc: JdbcTemplate) {
 
+    /**
+     * Retrieves all active temperature appliances for an organization.
+     */
     fun findActiveAppliances(orgId: Long): List<TempApplianceData> {
         return jdbc.query(
             """
@@ -88,6 +115,9 @@ class ReportDataRepository(private val jdbc: JdbcTemplate) {
         )
     }
 
+    /**
+     * Retrieves temperature measurements within a time range.
+     */
     fun findMeasurements(orgId: Long, from: Instant, to: Instant): List<TempMeasurementData> {
         return jdbc.query(
             """
@@ -111,6 +141,9 @@ class ReportDataRepository(private val jdbc: JdbcTemplate) {
         )
     }
 
+    /**
+     * Retrieves food deviations within a time range.
+     */
     fun findFoodDeviations(orgId: Long, from: Instant, to: Instant): List<FoodDeviationData> {
         return jdbc.query(
             """
@@ -140,6 +173,9 @@ class ReportDataRepository(private val jdbc: JdbcTemplate) {
         )
     }
 
+    /**
+     * Counts food deviations by status within a time range.
+     */
     fun countFoodDeviationsByStatus(orgId: Long, from: Instant, to: Instant, status: String): Long {
         return jdbc.queryForObject(
             """
@@ -154,6 +190,9 @@ class ReportDataRepository(private val jdbc: JdbcTemplate) {
         ) ?: 0L
     }
 
+    /**
+     * Retrieves alcohol deviations within a time range.
+     */
     fun findAlcoholDeviations(orgId: Long, from: Instant, to: Instant): List<AlcoholDeviationData> {
         return jdbc.query(
             """
@@ -182,6 +221,9 @@ class ReportDataRepository(private val jdbc: JdbcTemplate) {
         )
     }
 
+    /**
+     * Counts alcohol deviations by status within a time range.
+     */
     fun countAlcoholDeviationsByStatus(orgId: Long, from: Instant, to: Instant, status: String): Long {
         return jdbc.queryForObject(
             """
@@ -196,6 +238,9 @@ class ReportDataRepository(private val jdbc: JdbcTemplate) {
         ) ?: 0L
     }
 
+    /**
+     * Retrieves age verification shifts within a date range.
+     */
     fun findAgeVerificationShifts(orgId: Long, from: LocalDate, to: LocalDate): List<AgeVerificationShiftData> {
         return jdbc.query(
             """
@@ -221,6 +266,9 @@ class ReportDataRepository(private val jdbc: JdbcTemplate) {
         )
     }
 
+    /**
+     * Counts alcohol deviations for a specific date.
+     */
     fun countAlcoholDeviationsByDate(orgId: Long, date: LocalDate): Long {
         val from = java.sql.Timestamp.valueOf(date.atStartOfDay())
         val to = java.sql.Timestamp.valueOf(date.plusDays(1).atStartOfDay())
@@ -234,6 +282,9 @@ class ReportDataRepository(private val jdbc: JdbcTemplate) {
         ) ?: 0L
     }
 
+    /**
+     * Retrieves alcohol policy data for an organization.
+     */
     fun findAlcoholPolicy(orgId: Long): AlcoholPolicyData? {
         val results = jdbc.query(
             """
@@ -261,6 +312,9 @@ class ReportDataRepository(private val jdbc: JdbcTemplate) {
         return results.firstOrNull()
     }
 
+    /**
+     * Counts temperature deviations within a time range.
+     */
     fun countTempDeviations(orgId: Long, from: Instant, to: Instant): Long {
         return jdbc.queryForObject(
             """

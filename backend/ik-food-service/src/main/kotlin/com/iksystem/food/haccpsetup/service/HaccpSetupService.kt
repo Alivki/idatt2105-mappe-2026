@@ -15,12 +15,18 @@ import com.iksystem.food.haccpsetup.templates.ChecklistTemplates
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
+/**
+ * Service for generating HACCP checklists based on setup input.
+ */
 @Service
 class HaccpSetupService(
     private val checklistRepository: ChecklistRepository,
     private val checklistItemRepository: ChecklistItemRepository,
 ) {
 
+    /**
+     * Generates checklists from matching templates and replaces previous wizard data.
+     */
     @Transactional
     fun generateChecklists(request: HaccpSetupRequest, auth: AuthenticatedUser): HaccpSetupResponse {
         val orgId = auth.requireOrganizationId()
@@ -66,10 +72,16 @@ class HaccpSetupService(
     }
 
     companion object {
+        /**
+         * Source identifier for HACCP wizard-generated checklists.
+         */
         const val HACCP_WIZARD_SOURCE = "HACCP_WIZARD"
     }
 }
 
+/**
+ * Maps a Checklist entity and its items to a response DTO.
+ */
 private fun Checklist.toResponse(items: List<ChecklistItem>): ChecklistResponse = ChecklistResponse(
     id = id,
     name = name,

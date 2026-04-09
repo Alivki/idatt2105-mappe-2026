@@ -5,6 +5,12 @@ import com.iksystem.alcohol.alcoholpolicy.model.IdType
 import com.iksystem.alcohol.alcoholpolicy.model.KnowledgeTestType
 import java.time.LocalDate
 
+/**
+ * Response DTO representing an organization's alcohol policy.
+ *
+ * Contains licensing information, responsible personnel,
+ * knowledge test details, and operational procedures.
+ */
 data class AlcoholPolicyResponse(
     val id: Long,
     val bevillingNumber: String?,
@@ -25,6 +31,11 @@ data class AlcoholPolicyResponse(
     val refusalProcedure: String?
 )
 
+/**
+ * Request DTO for creating or updating an alcohol policy.
+ *
+ * All fields are optional to support flexible creation and partial updates.
+ */
 data class CreateAlcoholPolicyRequest(
     val bevillingNumber: String?,
     val bevillingValidUntil: LocalDate?,
@@ -44,4 +55,9 @@ data class CreateAlcoholPolicyRequest(
     val refusalProcedure: String?
 )
 
+/**
+ * Alias for partial updates of an alcohol policy.
+ *
+ * Shares the same structure as [CreateAlcoholPolicyRequest].
+ */
 typealias UpdateAlcoholPolicyRequest = CreateAlcoholPolicyRequest

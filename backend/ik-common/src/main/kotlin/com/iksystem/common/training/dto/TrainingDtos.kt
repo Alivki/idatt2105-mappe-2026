@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
+/**
+ * Request payload for creating a training log.
+ */
 data class CreateTrainingLogRequest(
     @field:NotNull(message = "Employee user ID is required")
     val employeeUserId: Long,
@@ -24,6 +27,9 @@ data class CreateTrainingLogRequest(
     val status: TrainingStatus,
 )
 
+/**
+ * Request payload for updating a training log.
+ */
 data class UpdateTrainingLogRequest(
     val employeeUserId: Long? = null,
 
@@ -40,6 +46,9 @@ data class UpdateTrainingLogRequest(
     val status: TrainingStatus? = null,
 )
 
+/**
+ * Response model representing a training log.
+ */
 data class TrainingLogResponse(
     val id: Long,
     val organizationId: Long,

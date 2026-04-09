@@ -3,17 +3,40 @@ package com.iksystem.common.report.dto
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 
-
+/**
+ * Request object for generating or previewing a report.
+ *
+ * Defines the reporting period, selected sections, and optional metadata
+ * such as title and sign-off details.
+ */
 data class GenerateReportRequest(
+    /** Start date of the reporting period (ISO string). */
     @field:NotBlank val periodFrom: String,
+
+    /** End date of the reporting period (ISO string). */
     @field:NotBlank val periodTo: String,
+
+    /** Optional custom title for the report. */
     val title: String? = null,
+
+    /** Configuration specifying which sections to include in the report. */
     @field:NotNull val sections: ReportSectionsConfig,
+
+    /** Optional name used for report sign-off. */
     val signOffName: String? = null,
+
+    /** Optional title/role of the sign-off person. */
     val signOffTitle: String? = null,
+
+    /** Optional comments included in the sign-off section. */
     val signOffComments: String? = null,
 )
 
+/**
+ * Configuration object defining which sections should be included in a report.
+ *
+ * Each flag toggles inclusion of a specific data section.
+ */
 data class ReportSectionsConfig(
     val includeComplianceSummary: Boolean = true,
     val includeTemperatureLogs: Boolean = false,
@@ -29,7 +52,11 @@ data class ReportSectionsConfig(
     val includeSignOff: Boolean = false,
 )
 
-
+/**
+ * Response used for previewing a report before generation.
+ *
+ * Contains structured data for all selected sections.
+ */
 data class ReportPreviewResponse(
     val header: ReportHeader,
     val complianceSummary: ComplianceSummary? = null,
@@ -45,6 +72,9 @@ data class ReportPreviewResponse(
     val signOff: SignOffEntry? = null,
 )
 
+/**
+ * Metadata header for a report.
+ */
 data class ReportHeader(
     val organizationName: String,
     val orgNumber: String?,
@@ -55,6 +85,9 @@ data class ReportHeader(
     val generatedByRole: String?,
 )
 
+/**
+ * Aggregated compliance statistics for the reporting period.
+ */
 data class ComplianceSummary(
     val complianceRate: Double,
     val totalTasks: Long,
@@ -66,6 +99,9 @@ data class ComplianceSummary(
     val alcoholIncidents: Long,
 )
 
+/**
+ * Represents a summarized temperature log entry.
+ */
 data class TemperatureLogEntry(
     val location: String,
     val avgTemp: Double,
@@ -75,6 +111,9 @@ data class TemperatureLogEntry(
     val status: String,
 )
 
+/**
+ * Represents completion statistics for a checklist.
+ */
 data class ChecklistCompletion(
     val id: Long,
     val name: String,
@@ -84,10 +123,16 @@ data class ChecklistCompletion(
     val expectedCount: Long,
 )
 
+/**
+ * HACCP section containing multiple checklist summaries.
+ */
 data class HaccpSection(
     val checklists: List<HaccpChecklistEntry>,
 )
 
+/**
+ * Represents a HACCP checklist with completion data.
+ */
 data class HaccpChecklistEntry(
     val name: String,
     val description: String?,
@@ -96,6 +141,9 @@ data class HaccpChecklistEntry(
     val items: List<HaccpChecklistItemEntry>,
 )
 
+/**
+ * Represents an individual HACCP checklist item.
+ */
 data class HaccpChecklistItemEntry(
     val title: String,
     val description: String?,
@@ -103,6 +151,9 @@ data class HaccpChecklistItemEntry(
     val completedAt: String?,
 )
 
+/**
+ * Represents a corrective action taken in response to an issue.
+ */
 data class CorrectiveActionEntry(
     val id: String,
     val date: String,
@@ -111,6 +162,9 @@ data class CorrectiveActionEntry(
     val status: String,
 )
 
+/**
+ * Represents a deviation entry (food or alcohol).
+ */
 data class DeviationEntry(
     val id: Long,
     val date: String,
@@ -122,6 +176,9 @@ data class DeviationEntry(
     val reportedBy: String,
 )
 
+/**
+ * Represents age verification activity within a shift.
+ */
 data class AgeVerificationEntry(
     val date: String,
     val shift: String,
@@ -130,6 +187,9 @@ data class AgeVerificationEntry(
     val refusals: Long,
 )
 
+/**
+ * Represents training or certification information for a user.
+ */
 data class TrainingEntry(
     val name: String,
     val role: String?,
@@ -138,6 +198,9 @@ data class TrainingEntry(
     val status: String,
 )
 
+/**
+ * Section containing license and regulatory information.
+ */
 data class LicenseInfoSection(
     val bevillingNumber: String?,
     val bevillingValidTo: String?,
@@ -151,6 +214,9 @@ data class LicenseInfoSection(
     val kunnskapsproveMunicipality: String?,
 )
 
+/**
+ * Represents sign-off information for a report.
+ */
 data class SignOffEntry(
     val name: String?,
     val title: String?,
@@ -158,6 +224,11 @@ data class SignOffEntry(
     val comments: String?,
 )
 
+/**
+ * Response returned after generating or retrieving a report.
+ *
+ * Contains metadata and optional download information.
+ */
 data class GeneratedReportResponse(
     val id: Long,
     val title: String,

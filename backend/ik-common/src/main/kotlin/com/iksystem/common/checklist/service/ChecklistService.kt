@@ -25,6 +25,17 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 
+/**
+ * Service responsible for managing checklists and checklist items.
+ *
+ * Handles:
+ * - Retrieval of checklists and statistics
+ * - Creation, updating, and deletion of checklists
+ * - Creation, updating, and deletion of checklist items
+ * - Completion tracking and history
+ *
+ * All operations are scoped to the authenticated user's organization.
+ */
 @Service
 class ChecklistService(
     private val checklistRepository: ChecklistRepository,
@@ -33,6 +44,12 @@ class ChecklistService(
     private val userRepository: UserRepository,
 ) {
 
+    /**
+     * Retrieves all checklists for the authenticated user's organization.
+     *
+     * @param auth The authenticated user
+     * @return List of checklist responses
+     */
     @Transactional(readOnly = true)
     fun list(auth: AuthenticatedUser): List<ChecklistResponse> {
         val orgId = auth.requireOrganizationId()
@@ -44,6 +61,12 @@ class ChecklistService(
         }
     }
 
+    /**
+     * Retrieves checklist statistics for the organization.
+     *
+     * @param auth The authenticated user
+     * @return Checklist statistics
+     */
     @Transactional(readOnly = true)
     fun stats(auth: AuthenticatedUser): ChecklistStatsResponse {
         val orgId = auth.requireOrganizationId()
@@ -53,6 +76,13 @@ class ChecklistService(
         )
     }
 
+    /**
+     * Creates a new checklist.
+     *
+     * @param request Request containing checklist data
+     * @param auth The authenticated user
+     * @return Created checklist
+     */
     @Transactional
     fun createChecklist(request: CreateChecklistRequest, auth: AuthenticatedUser): ChecklistResponse {
         val orgId = auth.requireOrganizationId()
@@ -67,6 +97,14 @@ class ChecklistService(
         return checklist.toResponse(emptyList())
     }
 
+    /**
+     * Updates an existing checklist.
+     *
+     * @param checklistId The checklist ID
+     * @param request Request containing updated fields
+     * @param auth The authenticated user
+     * @return Updated checklist
+     */
     @Transactional
     fun updateChecklist(checklistId: Long, request: UpdateChecklistRequest, auth: AuthenticatedUser): ChecklistResponse {
         val orgId = auth.requireOrganizationId()
@@ -95,6 +133,12 @@ class ChecklistService(
         return updated.toResponse(items)
     }
 
+    /**
+     * Deletes a checklist.
+     *
+     * @param checklistId The checklist ID
+     * @param auth The authenticated user
+     */
     @Transactional
     fun deleteChecklist(checklistId: Long, auth: AuthenticatedUser) {
         val orgId = auth.requireOrganizationId()
@@ -102,6 +146,14 @@ class ChecklistService(
         checklistRepository.delete(checklist)
     }
 
+    /**
+     * Creates a new checklist item.
+     *
+     * @param checklistId The checklist ID
+     * @param request Request containing item data
+     * @param auth The authenticated user
+     * @return Created checklist item
+     */
     @Transactional
     fun createItem(checklistId: Long, request: CreateChecklistItemRequest, auth: AuthenticatedUser): ChecklistItemResponse {
         val orgId = auth.requireOrganizationId()
@@ -120,6 +172,15 @@ class ChecklistService(
         return item.toResponse()
     }
 
+    /**
+     * Updates a checklist item.
+     *
+     * @param checklistId The checklist ID
+     * @param itemId The item ID
+     * @param request Request containing updated fields
+     * @param auth The authenticated user
+     * @return Updated checklist item
+     */
     @Transactional
     fun updateItem(
         checklistId: Long,
@@ -169,6 +230,13 @@ class ChecklistService(
         return updated.toResponse()
     }
 
+    /**
+     * Deletes a checklist item.
+     *
+     * @param checklistId The checklist ID
+     * @param itemId The item ID
+     * @param auth The authenticated user
+     */
     @Transactional
     fun deleteItem(checklistId: Long, itemId: Long, auth: AuthenticatedUser) {
         val orgId = auth.requireOrganizationId()
@@ -180,6 +248,14 @@ class ChecklistService(
         checklistItemRepository.delete(item)
     }
 
+    /**
+     * Sets completion status for all items in a checklist.
+     *
+     * @param checklistId The checklist ID
+     * @param request Completion request
+     * @param auth The authenticated user
+     * @return Updated checklist
+     */
     @Transactional
     fun setChecklistCompletion(
         checklistId: Long,
@@ -206,6 +282,13 @@ class ChecklistService(
         return checklist.toResponse(items)
     }
 
+    /**
+     * Retrieves checklist completion history for a given time period.
+     *
+     * @param days Number of days to look back
+     * @param auth The authenticated user
+     * @return List of completion history entries
+     */
     @Transactional(readOnly = true)
     fun completionHistory(days: Int, auth: AuthenticatedUser): List<CompletionHistoryEntry> {
         val orgId = auth.requireOrganizationId()
@@ -215,6 +298,12 @@ class ChecklistService(
             .map { CompletionHistoryEntry(checklistId = it.checklist.id, completedAt = it.completedAt) }
     }
 
+    /**
+     * Records a checklist completion event.
+     *
+     * @param checklist The checklist
+     * @param auth The authenticated user
+     */
     private fun recordCompletion(checklist: Checklist, auth: AuthenticatedUser) {
         val user = userRepository.findById(auth.userId).orElse(null) ?: return
         checklistCompletionRepository.save(
@@ -226,12 +315,23 @@ class ChecklistService(
         )
     }
 
+    /**
+     * Retrieves a checklist by ID within the organization.
+     *
+     * @param checklistId The checklist ID
+     * @param organizationId The organization ID
+     * @return The checklist
+     * @throws NotFoundException If not found
+     */
     private fun requireChecklist(checklistId: Long, organizationId: Long): Checklist {
         return checklistRepository.findByIdAndOrganizationId(checklistId, organizationId)
             ?: throw NotFoundException("Checklist not found")
     }
 }
 
+/**
+ * Maps a [Checklist] and its items to a [ChecklistResponse].
+ */
 private fun Checklist.toResponse(items: List<ChecklistItem>): ChecklistResponse = ChecklistResponse(
     id = id,
     name = name,
@@ -245,6 +345,9 @@ private fun Checklist.toResponse(items: List<ChecklistItem>): ChecklistResponse 
     items = items.map { it.toResponse() },
 )
 
+/**
+ * Maps a [ChecklistItem] to a [ChecklistItemResponse].
+ */
 private fun ChecklistItem.toResponse(): ChecklistItemResponse = ChecklistItemResponse(
     id = id,
     title = title,
@@ -253,6 +356,11 @@ private fun ChecklistItem.toResponse(): ChecklistItemResponse = ChecklistItemRes
     completedAt = completedAt,
 )
 
+/**
+ * Determines the overall status of a checklist based on its items.
+ *
+ * @return Checklist status
+ */
 private fun List<ChecklistItem>.toChecklistStatus(): ChecklistStatus {
     if (isEmpty()) {
         return ChecklistStatus.NOT_STARTED

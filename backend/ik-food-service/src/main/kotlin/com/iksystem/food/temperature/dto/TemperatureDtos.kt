@@ -9,6 +9,9 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import java.math.BigDecimal
 
+/**
+ * Request to create a temperature appliance.
+ */
 data class CreateTemperatureApplianceRequest(
     @field:NotBlank(message = "Name is required")
     @field:Size(max = 120)
@@ -28,6 +31,9 @@ data class CreateTemperatureApplianceRequest(
     val maxTemperature: BigDecimal,
 )
 
+/**
+ * Request to update a temperature appliance.
+ */
 data class UpdateTemperatureApplianceRequest(
     @field:Size(max = 120)
     val name: String? = null,
@@ -37,6 +43,9 @@ data class UpdateTemperatureApplianceRequest(
     val isActive: Boolean? = null,
 )
 
+/**
+ * Request to register a temperature measurement.
+ */
 data class RegisterTemperatureMeasurementRequest(
     @field:NotNull(message = "Appliance is required")
     val applianceId: Long,
@@ -52,11 +61,17 @@ data class RegisterTemperatureMeasurementRequest(
     val measuredAt: String? = null,
 )
 
+/**
+ * Request to delete temperature measurements by IDs.
+ */
 data class DeleteTemperatureMeasurementsRequest(
     @field:NotNull
     val ids: List<Long>,
 )
 
+/**
+ * Response representing a temperature measurement.
+ */
 data class TemperatureMeasurementResponse(
     val id: Long,
     val organizationId: Long,
@@ -72,6 +87,9 @@ data class TemperatureMeasurementResponse(
     val createdAt: String,
 )
 
+/**
+ * Response representing a temperature appliance.
+ */
 data class TemperatureApplianceResponse(
     val id: Long,
     val organizationId: Long,
