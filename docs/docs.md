@@ -1,12 +1,15 @@
 # Dokumentasjon
 
-| <img src="bilder/vera.png" width="1900" />   |  <img src="bilder/ntnu.png" width="1900" />  |
-|------|-------|
+<img src="bilder/vera.png" width="400" />   
 
 > [!IMPORTANT]
-> **Målet med dette dokumentet** er å gjøre det enkelt for sensorer, medstudenter og nye utviklere å forstå systemet, kjøre det lokalt, teste det og videreutvikle det.
+> **Målet med dette dokumentet** er å gjøre det enkelt for nye utviklere å forstå systemet, kjøre det lokalt, teste det og videreutvikle det.
 >
 > **Sist oppdatert:** 2026-04-09
+
+> [!TIP]
+> **For å sjekke og teste nettsiden med en gang:**
+> Gå til **https://idatt2105-mappe-2026-production.up.railway.app/login**
 
 ---
 
@@ -24,7 +27,7 @@
     - [4.1 Forutsetninger](#41-forutsetninger)
     - [4.2 Start alt](#42-start-alt)
     - [4.3 Stoppe / reset](#43-stoppe--reset)
-  - [5. Kjøring lokalt uten Docker (utvikling)](#5-kjøring-lokalt-uten-docker-utvikling)
+  - [5. Kjøring lokalt uten docker (utvikling)](#5-kjøring-lokalt-uten-docker-utvikling)
     - [5.1 Backend](#51-backend)
     - [5.2 Frontend](#52-frontend)
   - [6. API-dokumentasjon (Swagger/OpenAPI)](#6-api-dokumentasjon-swaggeropenapi)
@@ -44,6 +47,7 @@
   - [9. Testing og code coverage](#9-testing-og-code-coverage)
     - [9.1 Backend (JUnit/Kotest + JaCoCo)](#91-backend-junitkotest--jacoco)
     - [9.2 Frontend (Vitest)](#92-frontend-vitest)
+    - [9.3 Coverage](#93-coverage)
   - [10. CI/CD](#10-cicd)
   - [11. OWASP og universell utforming](#11-owasp-og-universell-utforming)
     - [11.1 OWASP (hva som er implementert)](#111-owasp-hva-som-er-implementert)
@@ -74,15 +78,15 @@ Tabellen under speiler dokumentasjonskravene fra oppgaveteksten (pkt. 5–6) og 
 
 | Krav fra oppgave | Hvordan vi oppfyller | Hvor i repo | Status |
 |---|---|---|---|
-| API-endepunkt dokumentasjon (Swagger + forklaring) | OpenAPI JSON + samlet Swagger UI-side | `frontend/swagger.html` + OpenAPI på backend | ikke ferdig |
-| Kode dokumentert (javadoc/kdoc) | KDoc/Javadoc på sentrale klasser og konfig | `backend/**/src/main/**` | ikke ferdig |
+| API-endepunkt dokumentasjon (Swagger + forklaring) | OpenAPI JSON + samlet Swagger UI-side | `frontend/swagger.html` + OpenAPI på backend | ok |
+| Kode dokumentert (javadoc/kdoc) | KDoc/Javadoc på sentrale klasser og konfig | `backend/**/src/main/**` | ok |
 | Systemdokumentasjon (ny utvikler kan komme i gang) | Kjøring, arkitektur, moduler, dataflyt, testing | **Dette dokumentet** | ok |
 | Testdata (testbrukere, DB creds) | Seed-data via Flyway + tabell her | `backend/ik-common/src/main/resources/db/migration/` | ok |
 | Avhengigheter/prereqs dokumentert | Docker, Java/Node, secrets, S3/Resend | Seksjon 4–5 + `.env.example` | ok |
 | Kjøring av system og tester “enkelt” | `docker compose up --build`, `./mvnw …`, `npm run …` | Rot-README + denne | ok |
 | DB scripts (Flyway) + testdata | Flyway migreringer med seed | `backend/ik-common/src/main/resources/db/migration/` | ok |
 | CI/CD brukt underveis | GitHub Actions workflow | `.github/workflows/ci.yml` | ok |
-| OWASP + universell utforming | Sikkerhetstiltak + TODO-liste | Seksjon 11 | ikke ferdig |
+| OWASP + universell utforming | Sikkerhetstiltak + TODO-liste | Seksjon 11 | ok |
 
 ---
 
@@ -100,14 +104,14 @@ Tabellen under speiler dokumentasjonskravene fra oppgaveteksten (pkt. 5–6) og 
 
 ### 3.2 Arkitekturdiagrammer
 
-**Container-arkitektur arkitektur:**
-
-<img src="diagrammer/container-arkitektur.png" width="500" />
-
-
 **Klassediagram:**
 
 <img src="diagrammer/classdiagram.png" width="500" />
+
+
+**Container-arkitektur arkitektur:**
+
+<img src="diagrammer/container-arkitektur.png" width="500" />
 
 
 **Sekvensdiagram: innlogging + organisasjonsvalg:**
@@ -136,8 +140,92 @@ Frontend kjører bak Nginx og **proxyer API-kall** til riktig backend-tjeneste.
 
 ### 4.1 Forutsetninger
 
-- Docker Desktop (inkludert Docker Compose)
-- Git
+Prosjektet er avhengig av følgende for at det skal kunne kjøres, testes og bygges lokalt. Listen er samlet fra alle `pom.xml`-filene i backend og `frontend/package.json`.
+
+| Grunnleggende forutsetning | Hvorfor den trengs | Kommentar |
+|---|---|---|
+| Docker Desktop | Starter database, backend og frontend via containere | Anbefalt måte å kjøre hele systemet på |
+| Docker Compose | Orkestrerer alle tjenestene i `docker-compose.yml` | Inngår i Docker Desktop |
+| Git | For å klone, oppdatere og jobbe med repoet | Nødvendig for utviklingsflyt |
+| Java 21 | Backend er bygget med Spring Boot/Kotlin på Java 21 | Brukes ved lokal backend-kjøring uten Docker |
+| Maven Wrapper (`./mvnw`) | Bygger og tester backend uten egen Maven-installasjon | Ligger i `backend/` |
+| Node.js 20.19+ eller 22.12+ | Kjører frontend med Vite | Brukes ved lokal frontend-kjøring uten Docker |
+| npm | Installerer og starter frontend-avhengigheter | Kommer med Node.js |
+| MySQL 8.4 | Database for applikasjonen | Starter automatisk via Docker Compose |
+| `.env` / `.env.example` | Inneholder nødvendige secrets og integrasjonsvariabler | Særlig viktig for S3 og Resend |
+| AWS S3-konfigurasjon | Brukes til dokumentlagring | Kreves hvis du tester filopplasting mot ekte lagring |
+| Resend-konfigurasjon | Brukes til e-postutsendelser | Kan ofte settes i dev-modus lokalt |
+
+| Backend-avhengighet | Bruk / ansvar | Hvor det brukes |
+|---|---|---|
+| `org.springframework.boot:spring-boot-starter-parent` 3.5.12 | Parent for alle backend-moduler | `backend/pom.xml` |
+| Kotlin 2.1.10 (`kotlin-stdlib`, `kotlin-reflect`, `kotlin-maven-plugin`) | Språk og bygg av Kotlin-koden | `backend/pom.xml`, alle backend-moduler |
+| `com.iksystem:ik-common` | Felles backend-lag mellom mat og alkohol | `backend/ik-food-service/pom.xml`, `backend/ik-alcohol-service/pom.xml` |
+| `org.springframework.boot:spring-boot-starter-data-jpa` | Database- og repository-lag | `backend/ik-common/pom.xml` |
+| `org.springframework.boot:spring-boot-starter-security` | Autentisering og autorisasjon | `backend/ik-common/pom.xml` |
+| `org.springframework.boot:spring-boot-starter-validation` | DTO- og inputvalidering | `backend/ik-common/pom.xml` |
+| `org.springframework.boot:spring-boot-starter-web` | REST API og web-endepunkter | `backend/ik-common/pom.xml` |
+| `org.flywaydb:flyway-core` | Database-migreringer | `backend/ik-common/pom.xml` |
+| `org.flywaydb:flyway-mysql` | Flyway-støtte for MySQL | `backend/ik-common/pom.xml` |
+| `com.mysql:mysql-connector-j` | JDBC-driver mot MySQL | `backend/ik-common/pom.xml` |
+| `com.h2database:h2` | In-memory database for test og lokal bruk | `backend/ik-common/pom.xml` |
+| `io.jsonwebtoken:jjwt-api` | JWT-kontrakter | `backend/pom.xml`, `backend/ik-common/pom.xml` |
+| `io.jsonwebtoken:jjwt-impl` | JWT-implementasjon | `backend/pom.xml`, `backend/ik-common/pom.xml` |
+| `io.jsonwebtoken:jjwt-jackson` | JWT + Jackson serialisering | `backend/pom.xml`, `backend/ik-common/pom.xml` |
+| `org.springdoc:springdoc-openapi-starter-webmvc-ui` | OpenAPI/Swagger-dokumentasjon | `backend/pom.xml`, `backend/ik-common/pom.xml` |
+| `software.amazon.awssdk:s3` | Dokumentlagring i AWS S3 | `backend/pom.xml`, `backend/ik-common/pom.xml` |
+| `com.resend:resend-java` | E-postutsendelser | `backend/pom.xml`, `backend/ik-common/pom.xml` |
+| `com.openhtmltopdf:openhtmltopdf-pdfbox` | PDF-generering | `backend/ik-common/pom.xml` |
+| `org.thymeleaf:thymeleaf` | HTML-templating for PDF-generering | `backend/ik-common/pom.xml` |
+| `org.springframework.boot:spring-boot-starter-test` | Backendtester | `backend/ik-common/pom.xml`, modul-pomene |
+| `org.springframework.security:spring-security-test` | Testing av sikkerhet og autorisasjon | `backend/ik-common/pom.xml`, modul-pomene |
+| `io.kotest:kotest-runner-junit5-jvm` | Kotest test-runner | `backend/pom.xml`, `backend/ik-common/pom.xml` |
+| `io.kotest:kotest-assertions-core-jvm` | Kotest assertions | `backend/pom.xml`, `backend/ik-common/pom.xml` |
+| `io.mockk:mockk-jvm` | Mocking i tester | `backend/pom.xml`, `backend/ik-common/pom.xml`, modul-pomene |
+| `com.ninja-squad:springmockk` | Spring + MockK-integrasjon | `backend/ik-food-service/pom.xml`, `backend/ik-alcohol-service/pom.xml` |
+
+| Frontend-avhengighet | Bruk / ansvar | Hvor det brukes |
+|---|---|---|
+| `vue` | UI-rammeverk | `frontend/package.json` |
+| `vue-router` | Routing mellom sider | `frontend/package.json` |
+| `pinia` | Global state management | `frontend/package.json` |
+| `axios` | HTTP-klient mot backend | `frontend/package.json` |
+| `@tanstack/vue-query` | Server state og caching | `frontend/package.json` |
+| `@tanstack/vue-form` | Skjema og validering | `frontend/package.json` |
+| `zod` | Valideringsschema og feilhåndtering | `frontend/package.json` |
+| `@vueuse/core` | Gjenbrukbare Vue-komposables | `frontend/package.json` |
+| `@internationalized/date` | Dato- og tidsverktøy | `frontend/package.json` |
+| `chart.js` | Diagrammer og visualiseringer | `frontend/package.json` |
+| `vue-chartjs` | Vue-tilpasning for Chart.js | `frontend/package.json` |
+| `lucide-vue-next` | Ikoner i UI | `frontend/package.json` |
+| `vue-sonner` | Toast-varsler | `frontend/package.json` |
+| `@vitejs/plugin-vue` | Vite-plugin for Vue SFC-er | `frontend/package.json` |
+| `vite` | Utviklingsserver og build | `frontend/package.json` |
+| `vue-tsc` | Type-sjekk av Vue/TypeScript | `frontend/package.json` |
+| `typescript` | Språkstøtte og typing | `frontend/package.json` |
+| `eslint` | Linting av frontend-kode | `frontend/package.json` |
+| `eslint-plugin-vue` | Vue-spesifikk linting | `frontend/package.json` |
+| `eslint-plugin-oxlint` | Ekstra linting-regler | `frontend/package.json` |
+| `oxlint` | Rask statisk kodeanalyse | `frontend/package.json` |
+| `npm-run-all2` | Samler flere scripts i én kommando | `frontend/package.json` |
+| `vitest` | Tester i frontend | `frontend/package.json` |
+| `@vitest/coverage-v8` | Coverage for frontendtester | `frontend/package.json` |
+| `@testing-library/vue` | Komponenttesting | `frontend/package.json` |
+| `happy-dom` | DOM-miljø for tester | `frontend/package.json` |
+| `vite-plugin-vue-devtools` | Utviklerverktøy for Vue | `frontend/package.json` |
+| `@vue/eslint-config-typescript` | ESLint-oppsett for Vue + TypeScript | `frontend/package.json` |
+| `@vue/tsconfig` | TypeScript-konfigurasjon for Vue | `frontend/package.json` |
+| `@tsconfig/node24` | Node-spesifikk TypeScript-konfig | `frontend/package.json` |
+| `@types/node` | Type-definisjoner for Node | `frontend/package.json` |
+| `jiti` | Runtime-laster brukt av tooling | `frontend/package.json` |
+
+| Bygg-/testplugin | Bruk / ansvar | Hvor det brukes |
+|---|---|---|
+| `kotlin-maven-plugin` | Kompilerer Kotlin-koden | `backend/pom.xml`, modul-pomene |
+| `kotlin-maven-allopen` | Gjør Spring-annoterte Kotlin-klasser åpne | `backend/pom.xml` |
+| `kotlin-maven-noarg` | Genererer no-arg konstruktører for JPA | `backend/pom.xml` |
+| `spring-boot-maven-plugin` | Pakker og starter Spring Boot-modulene | `backend/ik-food-service/pom.xml`, `backend/ik-alcohol-service/pom.xml` |
+| `jacoco-maven-plugin` | Måler testdekning | `backend/ik-common/pom.xml`, modul-pomene |
 
 ### 4.2 Start alt
 
@@ -170,13 +258,13 @@ docker compose down -v
 
 ---
 
-## 5. Kjøring lokalt uten Docker (utvikling)
+## 5. Kjøring lokalt uten docker (utvikling)
 
 ### 5.1 Backend
 
 Vi har et samlet dev-script som starter **alt** du trenger i utvikling:
 
-- MySQL (Docker Compose)
+- MySQL (Docker Compose, men kun for denne modulen)
 - IK-Mat (port `8081`)
 - IK-Alkohol (port `8082`)
 - Frontend (Vite, port `5173`)
@@ -366,11 +454,6 @@ coverage kan man se når man klikker på target - sites, og åpner index.html i 
 
 Coverage rapporter (JaCoCo) genereres per modul under `target/site/jacoco/`.
 
-> [!IMPORTANT]
-> Oppgaveteksten krever **minst 50% code coverage**.
-> 
-> TODO: Legg inn faktisk coverage-tall per modul før innlevering (mat/alkohol/common).
-
 ### 9.2 Frontend (Vitest)
 
 Kjør tester:
@@ -387,8 +470,47 @@ cd frontend
 npm run test:coverage
 ```
 
+Kjøre vitest komponenter:
+```bash
+cd frontend
+npx run vitest
+```
+
+kommandoen for å kjøre E2E testene:
+```bash
+cd frontend
+npx playwright run
+```
+
 > [!NOTE]
 > Frontend CI kjører lint + build i GitHub Actions. Tester kan legges til som ekstra steg hvis ønskelig.
+
+### 9.3 Coverage
+> [!IMPORTANT]
+> Oppgaveteksten krever **minst 50% code coverage**.
+
+Basert på JaCoCo-rapportene per backend-modul:
+
+| Modul | Instruction coverage | Branch coverage | Oppfyller 50%-kravet |
+|---|---:|---:|---:|
+| IK-Mat (`ik-food-service`) | 81% | 43% | Ja (instruction) |
+| IK-Alkohol (`ik-alcohol-service`) | 85% | 58% | Ja |
+| IK-Common (`ik-common`) | 77% | 60% | Ja |
+
+> [!NOTE]
+> Oppgavekravet tolkes her som generell code coverage (instruction/line), der alle modulene er over 50%.
+
+**IK-Alkohol (JaCoCo):**
+
+<img src="bilder/IKAlkoholTest.png" width="900" />
+
+**IK-Common (JaCoCo):**
+
+<img src="bilder/IKCommonTest.png" width="900" />
+
+**IK-Mat (JaCoCo):**
+
+<img src="bilder/IKFoodtest.png" width="900" />
 
 ---
 

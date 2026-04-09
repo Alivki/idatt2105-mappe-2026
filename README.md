@@ -31,7 +31,7 @@ Fjern alle data (inkludert databasen):
 docker compose down -v
 ```
 
-### Kjøre program i utvikling (uten Docker): ###
+### Kjøre program for utvikling: ###
 **Start:**
 ```bash
 chmod +x dev-up.sh

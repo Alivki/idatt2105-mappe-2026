@@ -1,0 +1,387 @@
+@startuml databasetabelldiagram
+!pragma layout smetana
+hide methods
+hide stereotypes
+skinparam linetype ortho
+skinparam roundcorner 8
+
+left to right direction
+
+title IK System - Databasetabell Diagram (kun skjema, ingen seed/testdata)
+
+package "Kjerne: Organisasjon og Auth" {
+  entity "organizations" as organizations {
+    * id : BIGINT <<PK>>
+    --
+    name : VARCHAR(255)
+    org_number : VARCHAR(255)
+    created_at : TIMESTAMP
+  }
+
+  entity "users" as users {
+    * id : BIGINT <<PK>>
+    --
+    email : VARCHAR(150)
+    password : VARCHAR(255)
+    full_name : VARCHAR(100)
+    phone_number : VARCHAR(30)
+    active : BOOLEAN
+    created_at : TIMESTAMP
+  }
+
+  entity "memberships" as memberships {
+    * id : BIGINT <<PK>>
+    --
+    user_id : BIGINT <<FK>>
+    organization_id : BIGINT <<FK>>
+    role : VARCHAR(50)
+    created_at : TIMESTAMP
+  }
+
+  entity "refresh_tokens" as refresh_tokens {
+    * id : BIGINT <<PK>>
+    --
+    token : VARCHAR(255)
+    user_id : BIGINT <<FK>>
+    organization_id : BIGINT
+    expires_at : TIMESTAMP
+    revoked : BOOLEAN
+    created_at : TIMESTAMP
+  }
+
+  entity "sessions" as sessions {
+    * id : BIGINT <<PK>>
+    --
+    session_id : VARCHAR(255)
+    user_id : BIGINT <<FK>>
+    organization_id : BIGINT
+    ip_address : VARCHAR(255)
+    user_agent : VARCHAR(255)
+    expires_at : TIMESTAMP
+    active : BOOLEAN
+    created_at : TIMESTAMP
+  }
+}
+
+package "Sjekklister og Rapporter" {
+  entity "checklists" as checklists {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    name : VARCHAR(255)
+    description : TEXT
+    frequency : VARCHAR(20)
+    source : VARCHAR(20)
+    active : BOOLEAN
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+  }
+
+  entity "checklist_items" as checklist_items {
+    * id : BIGINT <<PK>>
+    --
+    checklist_id : BIGINT <<FK>>
+    title : VARCHAR(255)
+    description : TEXT
+    sort_order : INT
+    completed : BOOLEAN
+    completed_at : TIMESTAMP
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+  }
+
+  entity "checklist_completions" as checklist_completions {
+    * id : BIGINT <<PK>>
+    --
+    checklist_id : BIGINT <<FK>>
+    organization_id : BIGINT <<FK>>
+    completed_by_user_id : BIGINT <<FK>>
+    completed_at : TIMESTAMP
+  }
+
+  entity "generated_reports" as generated_reports {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    title : VARCHAR(255)
+    period_from : DATE
+    period_to : DATE
+    generated_by_user_id : BIGINT <<FK>>
+    document_id : BIGINT <<FK>>
+    config : JSON
+    generated_at : TIMESTAMP
+  }
+}
+
+package "Avvik og Opplaering" {
+  entity "deviations" as deviations {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    module : VARCHAR(20)
+    title : VARCHAR(255)
+    description : TEXT
+    immediate_action : TEXT
+    severity : VARCHAR(20)
+    status : VARCHAR(20)
+    reported_by_user_id : BIGINT <<FK>>
+    assigned_to_user_id : BIGINT <<FK>>
+    reported_at : TIMESTAMP
+    resolved_at : TIMESTAMP
+    closed_at : TIMESTAMP
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+  }
+
+  entity "training_logs" as training_logs {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    employee_user_id : BIGINT <<FK>>
+    logged_by_user_id : BIGINT <<FK>>
+    title : VARCHAR(255)
+    description : TEXT
+    completed_at : TIMESTAMP
+    expires_at : TIMESTAMP
+    status : VARCHAR(20)
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+  }
+
+  entity "food_deviations" as food_deviations {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    reported_at : TIMESTAMP
+    reported_by_user_id : BIGINT <<FK>>
+    deviation_type : VARCHAR(30)
+    severity : VARCHAR(10)
+    description : TEXT
+    immediate_action : TEXT
+    immediate_action_by_user_id : BIGINT <<FK>>
+    immediate_action_at : TIMESTAMP
+    cause : TEXT
+    preventive_measures : TEXT
+    preventive_responsible_user_id : BIGINT <<FK>>
+    preventive_deadline : TIMESTAMP
+    status : VARCHAR(20)
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+  }
+
+  entity "age_verification_shifts" as age_verification_shifts {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    user_id : BIGINT <<FK>>
+    shift_date : DATE
+    started_at : TIMESTAMP
+    ended_at : TIMESTAMP
+    ids_checked_count : INT
+    signed_off : BOOLEAN
+    signed_off_at : TIMESTAMP
+    status : VARCHAR(20)
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+  }
+
+  entity "alcohol_deviations" as alcohol_deviations {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    reported_at : TIMESTAMP
+    reported_by_user_id : BIGINT <<FK>>
+    report_source : VARCHAR(30)
+    deviation_type : VARCHAR(50)
+    description : TEXT
+    immediate_action : TEXT
+    causal_analysis : VARCHAR(30)
+    causal_explanation : TEXT
+    preventive_measures : TEXT
+    preventive_deadline : TIMESTAMP
+    preventive_responsible_user_id : BIGINT <<FK>>
+    age_verification_shift_id : BIGINT <<FK>>
+    status : VARCHAR(20)
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+  }
+
+  entity "penalty_points" as penalty_points {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    alcohol_deviation_id : BIGINT <<FK>>
+    points : INT
+    violation_type : VARCHAR(50)
+    description : VARCHAR(500)
+    created_at : TIMESTAMP
+  }
+}
+
+package "Dokumenter, Varsler og Invitasjoner" {
+  entity "documents" as documents {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    s3_key : VARCHAR(500)
+    file_name : VARCHAR(255)
+    content_type : VARCHAR(100)
+    uploaded_by_user_id : BIGINT <<FK>>
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+  }
+
+  entity "notifications" as notifications {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    recipient_id : BIGINT <<FK>>
+    title : VARCHAR(255)
+    message : TEXT
+    type : VARCHAR(50)
+    reference_type : VARCHAR(50)
+    reference_id : BIGINT
+    is_read : BOOLEAN
+    read_at : TIMESTAMP
+    email_sent : BOOLEAN
+    created_at : TIMESTAMP
+  }
+
+  entity "invitations" as invitations {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    email : VARCHAR(255)
+    role : VARCHAR(50)
+    token : VARCHAR(100)
+    invited_by_id : BIGINT <<FK>>
+    expires_at : TIMESTAMP
+    accepted_at : TIMESTAMP
+    created_at : TIMESTAMP
+  }
+}
+
+package "Temperatur" {
+  entity "temperature_appliances" as temperature_appliances {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    name : VARCHAR(120)
+    appliance_type : VARCHAR(20)
+    min_temperature : DECIMAL(6,2)
+    max_temperature : DECIMAL(6,2)
+    is_active : BOOLEAN
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+  }
+
+  entity "temperature_measurements" as temperature_measurements {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    appliance_id : BIGINT <<FK>>
+    measured_by_user_id : BIGINT <<FK>>
+    measured_at : TIMESTAMP
+    temperature : DECIMAL(6,2)
+    note : TEXT
+    status : VARCHAR(20)
+    created_at : TIMESTAMP
+  }
+}
+
+package "Alkoholpolicy" {
+  entity "alcohol_policies" as alcohol_policies {
+    * id : BIGINT <<PK>>
+    --
+    organization_id : BIGINT <<FK>>
+    bevilling_number : VARCHAR(50)
+    bevilling_valid_until : DATE
+    styrer_name : VARCHAR(255)
+    stedfortreder_name : VARCHAR(255)
+    bevilling_document_id : BIGINT <<FK>>
+    kunnskapsprove_candidate_name : VARCHAR(255)
+    kunnskapsprove_birth_date : DATE
+    kunnskapsprove_type : VARCHAR(20)
+    kunnskapsprove_municipality : VARCHAR(255)
+    kunnskapsprove_passed_date : DATE
+    kunnskapsprove_document_id : BIGINT <<FK>>
+    age_check_limit : VARCHAR(10)
+    accepted_id_types : VARCHAR(255)
+    doubt_routine : TEXT
+    intoxication_signs : TEXT
+    refusal_procedure : TEXT
+    expiry_notified : BOOLEAN
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+  }
+}
+
+organizations ||--o{ memberships
+users ||--o{ memberships
+
+users ||--o{ refresh_tokens
+users ||--o{ sessions
+
+organizations ||--o{ checklists
+checklists ||--o{ checklist_items
+checklists ||--o{ checklist_completions
+organizations ||--o{ checklist_completions
+users ||--o{ checklist_completions
+
+organizations ||--o{ deviations
+users ||--o{ deviations : reported_by
+users ||--o{ deviations : assigned_to
+
+organizations ||--o{ training_logs
+users ||--o{ training_logs : employee
+users ||--o{ training_logs : logged_by
+
+organizations ||--o{ food_deviations
+users ||--o{ food_deviations : reported_by
+users ||--o{ food_deviations : action_by
+users ||--o{ food_deviations : preventive_resp
+
+organizations ||--o{ alcohol_deviations
+users ||--o{ alcohol_deviations : reported_by
+users ||--o{ alcohol_deviations : preventive_resp
+age_verification_shifts ||--o{ alcohol_deviations
+
+organizations ||--o{ penalty_points
+alcohol_deviations ||--o{ penalty_points
+
+organizations ||--o{ documents
+users ||--o{ documents : uploaded_by
+
+organizations ||--o{ notifications
+users ||--o{ notifications : recipient
+
+organizations ||--o{ temperature_appliances
+organizations ||--o{ temperature_measurements
+temperature_appliances ||--o{ temperature_measurements
+users ||--o{ temperature_measurements : measured_by
+
+organizations ||--o{ invitations
+users ||--o{ invitations : invited_by
+
+organizations ||--|| alcohol_policies
+documents ||--o{ alcohol_policies : bevilling_doc
+documents ||--o{ alcohol_policies : kunnskap_doc
+
+organizations ||--o{ age_verification_shifts
+users ||--o{ age_verification_shifts
+
+organizations ||--o{ generated_reports
+users ||--o{ generated_reports : generated_by
+documents ||--o{ generated_reports
+
+note right of refresh_tokens
+  organization_id finnes i tabellen,
+  men har ingen FK-constraint i migreringene.
+end note
+
+note right of sessions
+  organization_id finnes i tabellen,
+  men har ingen FK-constraint i migreringene.
+end note
+
+@enduml
