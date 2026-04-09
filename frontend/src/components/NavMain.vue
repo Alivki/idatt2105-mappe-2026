@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import type {Component} from 'vue'
+import {RouterLink, useRoute} from 'vue-router'
 
 import {
   SidebarGroup,
@@ -35,7 +35,7 @@ const route = useRoute()
           :tooltip="item.title"
           :is-active="route.path === item.url"
         >
-          <component :is="item.icon" />
+          <component :is="item.icon"/>
           <span>{{ item.title }}</span>
         </SidebarMenuButton>
       </SidebarMenuItem>

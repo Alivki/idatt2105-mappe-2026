@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { ChevronDown, ChevronUp, MoreVertical, Pencil, Trash2 } from 'lucide-vue-next'
-import type { TrainingRow } from '@/stores/training.ts'
+import {ref, onMounted, onUnmounted} from 'vue'
+import {ChevronDown, ChevronUp, MoreVertical, Pencil, Trash2} from 'lucide-vue-next'
+import type {TrainingRow} from '@/stores/training.ts'
 import EmployeeAvatar from './EmployeeAvatar.vue'
 import StatusBadge from './StatusBadge.vue'
 
@@ -10,14 +10,16 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  edit:   [row: TrainingRow]
+  edit: [row: TrainingRow]
   delete: [row: TrainingRow]
 }>()
 
-const collapsed  = ref<Record<string, boolean>>({})
+const collapsed = ref<Record<string, boolean>>({})
 const openMenuId = ref<number | null>(null)
 
-const toggle = (type: string): void => { collapsed.value[type] = !collapsed.value[type] }
+const toggle = (type: string): void => {
+  collapsed.value[type] = !collapsed.value[type]
+}
 
 function toggleMenu(id: number): void {
   openMenuId.value = openMenuId.value === id ? null : id
@@ -37,14 +39,15 @@ function onOutsideClick(e: MouseEvent): void {
   if (!(e.target as HTMLElement).closest('.ctx-wrap')) openMenuId.value = null
 }
 
-onMounted(()   => document.addEventListener('click', onOutsideClick))
+onMounted(() => document.addEventListener('click', onOutsideClick))
 onUnmounted(() => document.removeEventListener('click', onOutsideClick))
 </script>
 
 <template>
   <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden">
 
-    <div v-if="!Object.keys(groupedTrainings).length" class="py-16 text-center text-sm text-gray-400">
+    <div v-if="!Object.keys(groupedTrainings).length"
+         class="py-16 text-center text-sm text-gray-400">
       Ingen resultater matcher filteret.
     </div>
 
@@ -59,8 +62,11 @@ onUnmounted(() => document.removeEventListener('click', onOutsideClick))
         @click="toggle(type)"
       >
         <span class="flex-1 text-sm font-semibold text-gray-700">{{ type }}</span>
-        <span class="text-xs bg-stone-200 text-gray-500 rounded-full px-2.5 py-0.5">{{ rows.length }} ansatte</span>
-        <component :is="collapsed[type] ? ChevronDown : ChevronUp" :size="15" class="text-gray-400" />
+        <span class="text-xs bg-stone-200 text-gray-500 rounded-full px-2.5 py-0.5">{{
+            rows.length
+          }} ansatte</span>
+        <component :is="collapsed[type] ? ChevronDown : ChevronUp" :size="15"
+                   class="text-gray-400"/>
       </button>
 
       <!-- Table -->
@@ -69,8 +75,14 @@ onUnmounted(() => document.removeEventListener('click', onOutsideClick))
           <thead>
           <tr class="border-b border-stone-100">
             <th class="text-left text-xs font-semibold text-gray-400 px-5 py-2.5">Ansatt</th>
-            <th class="text-left text-xs font-semibold text-gray-400 px-5 py-2.5 hidden md:table-cell">Opplæringstype</th>
-            <th class="text-left text-xs font-semibold text-gray-400 px-5 py-2.5 hidden md:table-cell">Fullført</th>
+            <th
+              class="text-left text-xs font-semibold text-gray-400 px-5 py-2.5 hidden md:table-cell">
+              Opplæringstype
+            </th>
+            <th
+              class="text-left text-xs font-semibold text-gray-400 px-5 py-2.5 hidden md:table-cell">
+              Fullført
+            </th>
             <th class="text-left text-xs font-semibold text-gray-400 px-5 py-2.5">Utløper</th>
             <th class="text-left text-xs font-semibold text-gray-400 px-5 py-2.5">Status</th>
             <th class="w-10 px-3 py-2.5"></th>
@@ -84,7 +96,8 @@ onUnmounted(() => document.removeEventListener('click', onOutsideClick))
           >
             <td class="px-5 py-3.5">
               <div class="flex items-center gap-2.5">
-                <EmployeeAvatar :initials="row.employee.initials" :color="row.employee.color" size="sm" />
+                <EmployeeAvatar :initials="row.employee.initials" :color="row.employee.color"
+                                size="sm"/>
                 <div>
                   <p class="text-sm font-semibold text-gray-900">{{ row.employee.name }}</p>
                   <p class="text-xs text-gray-400">{{ row.employee.role }}</p>
@@ -92,14 +105,18 @@ onUnmounted(() => document.removeEventListener('click', onOutsideClick))
               </div>
             </td>
             <td class="px-5 py-3.5 text-sm text-gray-600 hidden md:table-cell">{{ row.type }}</td>
-            <td class="px-5 py-3.5 text-sm text-gray-600 hidden md:table-cell">{{ row.completed ?? '—' }}</td>
+            <td class="px-5 py-3.5 text-sm text-gray-600 hidden md:table-cell">
+              {{ row.completed ?? '—' }}
+            </td>
             <td
               class="px-5 py-3.5 text-sm"
               :class="row.status === 'Utløper snart' ? 'text-amber-600 font-semibold' : 'text-gray-600'"
             >
               {{ row.expires ?? '—' }}
             </td>
-            <td class="px-5 py-3.5"><StatusBadge :status="row.status" /></td>
+            <td class="px-5 py-3.5">
+              <StatusBadge :status="row.status"/>
+            </td>
 
             <!-- ⋮ context menu -->
             <td class="px-3 py-3.5">
@@ -114,7 +131,7 @@ onUnmounted(() => document.removeEventListener('click', onOutsideClick))
                   @click.stop="toggleMenu(row.id)"
                   aria-label="Alternativer"
                 >
-                  <MoreVertical :size="16" />
+                  <MoreVertical :size="16"/>
                 </button>
 
                 <Transition
@@ -133,15 +150,15 @@ onUnmounted(() => document.removeEventListener('click', onOutsideClick))
                       class="w-full flex items-center gap-2.5 px-3.5 py-2 text-sm text-gray-700 hover:bg-stone-50 transition-colors"
                       @click="handleEdit(row)"
                     >
-                      <Pencil :size="14" class="text-gray-400" />
+                      <Pencil :size="14" class="text-gray-400"/>
                       Rediger
                     </button>
-                    <div class="my-1 border-t border-stone-100" />
+                    <div class="my-1 border-t border-stone-100"/>
                     <button
                       class="w-full flex items-center gap-2.5 px-3.5 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                       @click="handleDelete(row)"
                     >
-                      <Trash2 :size="14" class="text-red-400" />
+                      <Trash2 :size="14" class="text-red-400"/>
                       Slett
                     </button>
                   </div>

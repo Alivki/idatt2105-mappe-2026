@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Award, Clock, AlertTriangle } from 'lucide-vue-next'
-import { useAuthStore } from '@/stores/auth'
-import { useTrainingStore } from '@/stores/training'
+import {computed} from 'vue'
+import {Award, Clock, AlertTriangle} from 'lucide-vue-next'
+import {useAuthStore} from '@/stores/auth'
+import {useTrainingStore} from '@/stores/training'
 import EmployeeAvatar from '@/components/training/EmployeeAvatar.vue'
 import StatusBadge from '@/components/training/StatusBadge.vue'
 import OverviewCard from '@/components/common/OverviewCard.vue'
 
-const auth  = useAuthStore()
+const auth = useAuthStore()
 const store = useTrainingStore()
 
-const me        = computed(() => store.employees.find(e => e.id === auth.user?.id) ?? store.employees[4])
+const me = computed(() => store.employees.find(e => e.id === auth.user?.id) ?? store.employees[4])
 const trainings = computed(() => me.value?.trainings ?? [])
-const valid     = computed(() => trainings.value.filter(t => t.status === 'Gyldig'))
-const expiring  = computed(() => trainings.value.filter(t => t.status === 'Utløper snart'))
-const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangler'))
+const valid = computed(() => trainings.value.filter(t => t.status === 'Gyldig'))
+const expiring = computed(() => trainings.value.filter(t => t.status === 'Utløper snart'))
+const missing = computed(() => trainings.value.filter(t => t.status === 'Mangler'))
 </script>
 
 <template>
@@ -25,7 +25,7 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
     </div>
 
     <div v-if="me" class="profile-card">
-      <EmployeeAvatar :initials="me.initials" :color="me.color" size="lg" />
+      <EmployeeAvatar :initials="me.initials" :color="me.color" size="lg"/>
       <div>
         <p class="profile-name">{{ me.name }}</p>
         <p class="profile-role">{{ me.role }}</p>
@@ -33,9 +33,11 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
     </div>
 
     <div class="stat-grid">
-      <OverviewCard label="Gyldige" :value="valid.length" :icon="Award" value-class="val-green" />
-      <OverviewCard label="Utløper snart" :value="expiring.length" :icon="Clock" value-class="val-amber" />
-      <OverviewCard label="Mangler" :value="missing.length" :icon="AlertTriangle" value-class="val-red" />
+      <OverviewCard label="Gyldige" :value="valid.length" :icon="Award" value-class="val-green"/>
+      <OverviewCard label="Utløper snart" :value="expiring.length" :icon="Clock"
+                    value-class="val-amber"/>
+      <OverviewCard label="Mangler" :value="missing.length" :icon="AlertTriangle"
+                    value-class="val-red"/>
     </div>
 
     <div class="table-card">
@@ -60,7 +62,9 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
             <td :class="['cell-text', t.status === 'Utløper snart' ? 'expires-soon' : '']">
               {{ t.expires ?? '—' }}
             </td>
-            <td><StatusBadge :status="t.status" /></td>
+            <td>
+              <StatusBadge :status="t.status"/>
+            </td>
           </tr>
           </tbody>
         </table>
@@ -78,7 +82,9 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
   font-family: inherit;
 }
 
-.header { margin-bottom: 28px; }
+.header {
+  margin-bottom: 28px;
+}
 
 .page-title {
   font-size: 1.6rem;
@@ -125,10 +131,21 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
   margin-bottom: 24px;
 }
 
-.stat-icon { margin-top: 4px; }
-.icon-green { color: #10b981; }
-.icon-amber { color: #f59e0b; }
-.icon-red   { color: #f87171; }
+.stat-icon {
+  margin-top: 4px;
+}
+
+.icon-green {
+  color: #10b981;
+}
+
+.icon-amber {
+  color: #f59e0b;
+}
+
+.icon-red {
+  color: #f87171;
+}
 
 .table-card {
   background: #fff;
@@ -137,7 +154,9 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
   overflow: hidden;
 }
 
-.table-scroll { overflow-x: auto; }
+.table-scroll {
+  overflow-x: auto;
+}
 
 .empty-state {
   padding: 56px 0;
@@ -168,19 +187,39 @@ const missing   = computed(() => trainings.value.filter(t => t.status === 'Mangl
   border-bottom: 1px solid #fafaf9;
   transition: background 0.12s;
 }
-.data-table tbody tr:last-child { border-bottom: none; }
-.data-table tbody tr:hover { background: #fafaf9; }
+
+.data-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+  background: #fafaf9;
+}
 
 .data-table td {
   padding: 14px 20px;
   vertical-align: middle;
 }
 
-.cell-bold { font-size: 0.875rem; font-weight: 600; color: #111827; }
-.cell-text { font-size: 0.875rem; color: #4b5563; }
-.expires-soon { color: #d97706; font-weight: 600; }
+.cell-bold {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.cell-text {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.expires-soon {
+  color: #d97706;
+  font-weight: 600;
+}
 
 @media (max-width: 640px) {
-  .hide-mobile { display: none; }
+  .hide-mobile {
+    display: none;
+  }
 }
 </style>

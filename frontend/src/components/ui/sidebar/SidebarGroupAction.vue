@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useSidebar } from "./utils"
+import {useSidebar} from "./utils"
 
 const props = defineProps<{
   class?: string
   as?: string
 }>()
 
-const { state, collapsible } = useSidebar()
+const {state, collapsible} = useSidebar()
 </script>
 
 <template>
@@ -18,7 +18,7 @@ const { state, collapsible } = useSidebar()
       display: state === 'collapsed' && collapsible === 'icon' ? 'none' : undefined,
     }"
   >
-    <slot />
+    <slot/>
   </component>
 </template>
 

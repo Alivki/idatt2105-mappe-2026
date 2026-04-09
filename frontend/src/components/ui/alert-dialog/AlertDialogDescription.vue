@@ -4,7 +4,7 @@ const props = defineProps<{ class?: string }>()
 
 <template>
   <p :class="['alert-description', props.class]">
-    <slot />
+    <slot/>
   </p>
 </template>
 

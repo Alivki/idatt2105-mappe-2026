@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -86,6 +87,7 @@ class OrganizationController(private val organizationService: OrganizationServic
         ApiResponse(responseCode = "404", description = "Organization not found"),
     )
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     fun delete(@Parameter(description = "Organization ID") @PathVariable id: Long): ResponseEntity<Void> {
         organizationService.delete(id)
         return ResponseEntity.noContent().build()

@@ -7,6 +7,9 @@ import com.iksystem.common.invite.dto.InviteUserRequest
 import com.iksystem.common.invite.service.InvitationService
 import com.iksystem.common.security.AuthenticatedUser
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -26,6 +29,13 @@ import org.springframework.web.bind.annotation.RestController
 class InvitationController(private val invitationService: InvitationService) {
 
     @Operation(summary = "Send invitation", description = "Sends an invite email to the given address. Requires ADMIN or MANAGER role.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(
+        ApiResponse(responseCode = "201", description = "Invitation sent"),
+        ApiResponse(responseCode = "400", description = "Validation error"),
+        ApiResponse(responseCode = "403", description = "Insufficient permissions"),
+        ApiResponse(responseCode = "409", description = "User already invited or already a member"),
+    )
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     fun invite(
@@ -37,12 +47,21 @@ class InvitationController(private val invitationService: InvitationService) {
     }
 
     @Operation(summary = "Get invitation details", description = "Returns public details for a pending invite (no auth required).")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Invitation details returned"),
+        ApiResponse(responseCode = "404", description = "Invalid or expired invitation token"),
+    )
     @GetMapping("/{token}")
     fun getInviteDetails(@PathVariable token: String): ResponseEntity<InviteDetailsResponse> {
         return ResponseEntity.ok(invitationService.getValidInvite(token))
     }
 
     @Operation(summary = "Accept invitation", description = "Accepts an invite and returns auth tokens (no auth required).")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Invitation accepted, auth tokens returned"),
+        ApiResponse(responseCode = "400", description = "Validation error"),
+        ApiResponse(responseCode = "404", description = "Invalid or expired invitation token"),
+    )
     @PostMapping("/{token}/accept")
     fun accept(
         @PathVariable token: String,

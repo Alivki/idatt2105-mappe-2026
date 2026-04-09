@@ -17,7 +17,7 @@ const props = defineProps<{
     stroke-linecap="round"
     stroke-linejoin="round"
   >
-    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
   </svg>
 </template>
 
@@ -29,7 +29,11 @@ const props = defineProps<{
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

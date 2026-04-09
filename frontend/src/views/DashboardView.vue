@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import {computed, ref} from 'vue'
 import {
   ClipboardCheck,
   Thermometer,
@@ -16,16 +16,16 @@ import TodayIdChecksCard from '@/components/dashboard/TodayIdChecksCard.vue'
 import SetupCtaCard from '@/components/dashboard/SetupCtaCard.vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import PageHeader from '@/components/common/PageHeader.vue'
-import { useChecklistsQuery, useCompletionHistoryQuery } from '@/composables/useChecklists'
-import { useFoodDeviationsQuery } from '@/composables/useFoodDeviations'
-import { useAlcoholDeviationsQuery } from '@/composables/useAlcoholDeviations'
-import { usePenaltyPointsQuery } from '@/composables/usePenaltyPoints'
-import { useTemperatureMonitoring } from '@/composables/useTemperatureMonitoring'
-import { useTrainingLogsQuery } from '@/composables/useTrainingLogs'
-import { useAlcoholPolicyExistsQuery } from '@/composables/useAlcoholPolicy'
-import { useActiveShiftQuery, useDayDetailQuery } from '@/composables/useAgeVerification'
-import { useAuthStore } from '@/stores/auth'
-import type { Checklist } from '@/types/checklist'
+import {useChecklistsQuery, useCompletionHistoryQuery} from '@/composables/useChecklists'
+import {useFoodDeviationsQuery} from '@/composables/useFoodDeviations'
+import {useAlcoholDeviationsQuery} from '@/composables/useAlcoholDeviations'
+import {usePenaltyPointsQuery} from '@/composables/usePenaltyPoints'
+import {useTemperatureMonitoring} from '@/composables/useTemperatureMonitoring'
+import {useTrainingLogsQuery} from '@/composables/useTrainingLogs'
+import {useAlcoholPolicyExistsQuery} from '@/composables/useAlcoholPolicy'
+import {useActiveShiftQuery, useDayDetailQuery} from '@/composables/useAgeVerification'
+import {useAuthStore} from '@/stores/auth'
+import type {Checklist} from '@/types/checklist'
 
 const auth = useAuthStore()
 const isManagerOrAdmin = computed(() => ['ADMIN', 'MANAGER'].includes(auth.role ?? ''))
@@ -41,8 +41,6 @@ const alcoholPolicyQuery = useAlcoholPolicyExistsQuery()
 const todayDate = ref(new Date().toISOString().slice(0, 10))
 const todayDetailQuery = useDayDetailQuery(todayDate, isManagerOrAdmin)
 const activeShiftQuery = useActiveShiftQuery()
-
-// ── KPI helpers ──
 
 function getDailyChecklistStats(checklists: Checklist[]): { total: number; completed: number } {
   const daily = checklists.filter((item) => item.frequency === 'DAILY' && item.active)
@@ -62,7 +60,7 @@ const weeklyRemaining = computed(() => getFrequencyStats(checklistsQuery.data.va
 const monthlyRemaining = computed(() => getFrequencyStats(checklistsQuery.data.value ?? [], 'MONTHLY'))
 
 const checklistProgress = computed(() => {
-  const { completed, total } = dailyStats.value
+  const {completed, total} = dailyStats.value
   if (total <= 0) return 0
   return Math.round((completed / total) * 100)
 })
@@ -98,7 +96,7 @@ const trainingStats = computed(() => {
   const logs = trainingQuery.data.value ?? []
   const completed = logs.filter((l) => l.status === 'COMPLETED').length
   const expiringSoon = logs.filter((l) => l.status === 'EXPIRES_SOON').length
-  return { completed, total: logs.length, expiringSoon }
+  return {completed, total: logs.length, expiringSoon}
 })
 
 const todayShiftsCount = computed(() => {
@@ -133,18 +131,16 @@ const todayFormatted = computed(() => {
 
 <template>
   <AppLayout>
-    <PageHeader title="Oversikt" />
+    <PageHeader title="Oversikt"/>
 
     <div class="page-content">
       <p class="dashboard-date">{{ todayFormatted }}</p>
 
-      <!-- Setup CTAs — top if either is missing -->
       <SetupCtaCard
         :show-haccp="showHaccpSetup"
         :show-alcohol-policy="showAlcoholPolicySetup"
       />
 
-      <!-- KPI cards -->
       <section class="kpi-grid">
         <router-link to="/sjekklister" class="kpi-link">
           <OverviewCard
@@ -209,9 +205,7 @@ const todayFormatted = computed(() => {
         </router-link>
       </section>
 
-      <!-- Bento grid -->
       <section class="bento-grid">
-        <!-- Row 1: Bar chart (wide) + ID card (narrow) + Donut -->
         <div class="bento-col-wide">
           <DeviationBarChart
             :food-deviations="foodQuery.data.value ?? []"
@@ -230,9 +224,8 @@ const todayFormatted = computed(() => {
           :alcohol-deviations="alcoholQuery.data.value ?? []"
         />
 
-        <!-- Row 2: Penalty points + Checklist chart -->
         <div class="bento-span-full">
-          <PenaltyPointsStatus :summary="penaltyQuery.data.value ?? null" />
+          <PenaltyPointsStatus :summary="penaltyQuery.data.value ?? null"/>
           <div class="bento-flex-child">
             <ChecklistCompletionChart
               :checklists="checklistsQuery.data.value ?? []"
@@ -260,8 +253,6 @@ const todayFormatted = computed(() => {
   font-size: 0.84rem;
   text-transform: capitalize;
 }
-
-/* ── KPI grid ── */
 
 .kpi-grid {
   display: grid;
@@ -309,8 +300,6 @@ const todayFormatted = computed(() => {
   margin: 0;
 }
 
-/* ── Bento grid ── */
-
 .bento-grid {
   display: grid;
   grid-template-columns: 5fr 2fr 3fr;
@@ -340,8 +329,6 @@ const todayFormatted = computed(() => {
 .bento-flex-child > * {
   flex: 1;
 }
-
-/* ── Responsive ── */
 
 @media (max-width: 1120px) {
   .kpi-grid {

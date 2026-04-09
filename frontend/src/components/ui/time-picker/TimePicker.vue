@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onBeforeUnmount } from "vue"
-import { Clock, ChevronDown } from "lucide-vue-next"
+import {ref, computed, watch, nextTick, onBeforeUnmount} from "vue"
+import {Clock, ChevronDown} from "lucide-vue-next"
 
 const props = withDefaults(defineProps<{
   hours?: number
@@ -19,10 +19,10 @@ const emits = defineEmits<{
 
 const isOpen = ref(false)
 
-const hourOptions = Array.from({ length: 24 }, (_, i) => i)
+const hourOptions = Array.from({length: 24}, (_, i) => i)
 const minuteOptions = computed(() => {
   const step = props.minuteStep
-  return Array.from({ length: Math.floor(60 / step) }, (_, i) => i * step)
+  return Array.from({length: Math.floor(60 / step)}, (_, i) => i * step)
 })
 
 function pad(n: number | undefined): string {
@@ -110,7 +110,7 @@ onBeforeUnmount(() => {
   <div ref="rootRef" class="time-picker">
     <div class="time-picker__field">
       <span class="time-picker__icon">
-        <Clock />
+        <Clock/>
       </span>
       <input
         type="text"
@@ -120,7 +120,7 @@ onBeforeUnmount(() => {
         @change="onInputChange"
       >
       <button type="button" class="time-picker__toggle" @click="isOpen = !isOpen">
-        <ChevronDown />
+        <ChevronDown/>
       </button>
     </div>
 
@@ -176,6 +176,7 @@ onBeforeUnmount(() => {
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   transition: border-color 150ms, box-shadow 150ms;
 }
+
 .time-picker__field:focus-within {
   box-shadow: 0 0 0 2px hsl(var(--ring, 245 43% 52%) / 0.2);
   border-color: hsl(var(--primary, 245 43% 52%) / 0.5);
@@ -188,6 +189,7 @@ onBeforeUnmount(() => {
   padding-left: 0.75rem;
   color: hsl(var(--muted-foreground, 24 5% 46%));
 }
+
 .time-picker__icon :deep(svg) {
   width: 1rem;
   height: 1rem;
@@ -206,6 +208,7 @@ onBeforeUnmount(() => {
   font-family: inherit;
   outline: none;
 }
+
 .time-picker__input::placeholder {
   color: hsl(var(--muted-foreground, 24 5% 46%));
 }
@@ -224,10 +227,12 @@ onBeforeUnmount(() => {
   cursor: pointer;
   transition: background-color 150ms, color 150ms;
 }
+
 .time-picker__toggle:hover {
   background-color: hsl(var(--accent, 250 40% 95%));
   color: hsl(var(--accent-foreground, 245 43% 42%));
 }
+
 .time-picker__toggle :deep(svg) {
   width: 1rem;
   height: 1rem;
@@ -257,9 +262,11 @@ onBeforeUnmount(() => {
   min-width: 3rem;
   scrollbar-width: none;
 }
+
 .time-picker__col::-webkit-scrollbar {
   display: none;
 }
+
 .time-picker__col + .time-picker__col {
   border-left: 1px solid hsl(var(--border, 35 15% 90%));
 }
@@ -294,14 +301,17 @@ onBeforeUnmount(() => {
   outline: none;
   transition: background-color 100ms;
 }
+
 .time-picker__item:hover {
   background-color: hsl(var(--accent, 250 40% 95%));
   color: hsl(var(--accent-foreground, 245 43% 42%));
 }
+
 .time-picker__item--active {
   background-color: hsl(var(--primary, 245 43% 52%));
   color: hsl(var(--primary-foreground, 0 0% 100%));
 }
+
 .time-picker__item--active:hover {
   background-color: hsl(var(--primary, 245 43% 52%) / 0.85);
   color: hsl(var(--primary-foreground, 0 0% 100%));
@@ -310,16 +320,30 @@ onBeforeUnmount(() => {
 .time-picker-panel-enter-active {
   animation: tp-in 150ms ease-out;
 }
+
 .time-picker-panel-leave-active {
   animation: tp-out 100ms ease-in;
 }
 
 @keyframes tp-in {
-  from { opacity: 0; transform: scale(0.95) translateY(-4px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
+
 @keyframes tp-out {
-  from { opacity: 1; transform: scale(1) translateY(0); }
-  to { opacity: 0; transform: scale(0.95) translateY(-4px); }
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
 }
 </style>

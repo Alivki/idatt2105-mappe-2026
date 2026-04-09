@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { mount } from '@vue/test-utils'
+import {describe, expect, it} from 'vitest'
+import {mount} from '@vue/test-utils'
 import Checkbox from '../Checkbox.vue'
 
 describe('Checkbox', () => {
@@ -120,7 +120,7 @@ describe('Checkbox', () => {
     expect(wrapper.attributes('aria-checked')).toBe('false')
     expect(wrapper.attributes('data-state')).toBe('unchecked')
 
-    await wrapper.setProps({ checked: true })
+    await wrapper.setProps({checked: true})
 
     expect(wrapper.attributes('aria-checked')).toBe('true')
     expect(wrapper.attributes('data-state')).toBe('checked')

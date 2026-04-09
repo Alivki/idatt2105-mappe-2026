@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import {ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {useAuthStore} from '@/stores/auth'
 import AppLayout from '@/components/layout/AppLayout.vue'
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
+import {Separator} from '@/components/ui/separator'
+import {SidebarTrigger} from '@/components/ui/sidebar'
 import Button from '@/components/ui/button/Button.vue'
 import Switch from '@/components/ui/switch/Switch.vue'
 import AlertDialog from '@/components/ui/alert-dialog/AlertDialog.vue'
@@ -43,7 +43,7 @@ async function handleDeleteOrganization() {
   try {
     await fetch(`/api/v1/organizations/${auth.organizationId}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${auth.accessToken}` },
+      headers: {Authorization: `Bearer ${auth.accessToken}`},
     })
     auth.clearAuth()
     router.push('/login')
@@ -57,8 +57,8 @@ async function handleDeleteOrganization() {
   <AppLayout>
     <header class="page-header">
       <div class="page-header-inner">
-        <SidebarTrigger />
-        <Separator orientation="vertical" class="header-separator" />
+        <SidebarTrigger/>
+        <Separator orientation="vertical" class="header-separator"/>
         <span class="page-title">Innstillinger</span>
       </div>
     </header>
@@ -70,13 +70,14 @@ async function handleDeleteOrganization() {
         <div class="setting-row">
           <div class="setting-info">
             <span class="setting-label">Aktiver ulest melding-merke</span>
-            <span class="setting-desc">Viser et rødt merke i appikonet når du har uleste meldinger.</span>
+            <span
+              class="setting-desc">Viser et rødt merke i appikonet når du har uleste meldinger.</span>
           </div>
-          <Switch :checked="unreadBadge" @update:checked="unreadBadge = $event" />
+          <Switch :checked="unreadBadge" @update:checked="unreadBadge = $event"/>
         </div>
       </section>
 
-      <Separator />
+      <Separator/>
 
       <section class="settings-section">
         <h2 class="section-title">E-postadresse</h2>
@@ -86,7 +87,7 @@ async function handleDeleteOrganization() {
             <span class="setting-label">Kommunikasjons-e-poster</span>
             <span class="setting-desc">Motta e-poster om ubesvarte anrop, meldinger og sammendrag av meldinger.</span>
           </div>
-          <Switch :checked="commEmails" @update:checked="commEmails = $event" />
+          <Switch :checked="commEmails" @update:checked="commEmails = $event"/>
         </div>
 
         <div class="setting-row">
@@ -94,7 +95,7 @@ async function handleDeleteOrganization() {
             <span class="setting-label">Sosiale e-poster</span>
             <span class="setting-desc">Motta e-poster om venneforespørsler, forslag til venner og eventer på serveren din.</span>
           </div>
-          <Switch :checked="socialEmails" @update:checked="socialEmails = $event" />
+          <Switch :checked="socialEmails" @update:checked="socialEmails = $event"/>
         </div>
 
         <div class="setting-row">
@@ -102,7 +103,7 @@ async function handleDeleteOrganization() {
             <span class="setting-label">E-poster med kunngjøringer og oppdateringer</span>
             <span class="setting-desc">Motta e-poster om produktoppdateringer, nytt innhold, forbedringer og feilretting.</span>
           </div>
-          <Switch :checked="announcementEmails" @update:checked="announcementEmails = $event" />
+          <Switch :checked="announcementEmails" @update:checked="announcementEmails = $event"/>
         </div>
 
         <div class="setting-row">
@@ -110,15 +111,16 @@ async function handleDeleteOrganization() {
             <span class="setting-label">E-poster med tips</span>
             <span class="setting-desc">Motta e-poster med nyttige råd om hvordan du bruker Discord, og med informasjon om mindre kjente funksjoner.</span>
           </div>
-          <Switch :checked="tipsEmails" @update:checked="tipsEmails = $event" />
+          <Switch :checked="tipsEmails" @update:checked="tipsEmails = $event"/>
         </div>
       </section>
 
-      <Separator />
+      <Separator/>
 
       <section class="settings-section">
         <h2 class="section-title">Fjerning av konto</h2>
-        <p class="section-desc">Hvis du deaktiverer kontoen din, kan du når som helst hente den frem igjen.</p>
+        <p class="section-desc">Hvis du deaktiverer kontoen din, kan du når som helst hente den frem
+          igjen.</p>
         <div class="button-row">
 
           <AlertDialog>
@@ -129,7 +131,8 @@ async function handleDeleteOrganization() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Deaktiver kontoen?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Er du sikker på at du vil deaktivere kontoen din? Du kan aktivere den igjen når som helst.
+                  Er du sikker på at du vil deaktivere kontoen din? Du kan aktivere den igjen når
+                  som helst.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -149,7 +152,8 @@ async function handleDeleteOrganization() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Slett kontoen?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Er du sikker på at du vil slette kontoen din? Dette kan ikke angres og all data vil gå tapt permanent.
+                  Er du sikker på at du vil slette kontoen din? Dette kan ikke angres og all data
+                  vil gå tapt permanent.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -165,12 +169,13 @@ async function handleDeleteOrganization() {
       </section>
 
       <template v-if="isAdmin">
-        <Separator />
+        <Separator/>
 
         <section class="settings-section">
           <h2 class="section-title">Organisasjon</h2>
           <p class="section-desc">
-            Hvis du sletter organisasjonen, vil alle medlemmer og tilhørende data bli permanent fjernet.
+            Hvis du sletter organisasjonen, vil alle medlemmer og tilhørende data bli permanent
+            fjernet.
             Dette kan ikke angres.
           </p>
           <div class="button-row">
@@ -182,7 +187,8 @@ async function handleDeleteOrganization() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Slett organisasjon?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Er du sikker på at du vil slette organisasjonen? Alle medlemmer og all tilhørende data vil bli
+                    Er du sikker på at du vil slette organisasjonen? Alle medlemmer og all
+                    tilhørende data vil bli
                     permanent slettet. Dette kan ikke angres.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
@@ -209,21 +215,25 @@ async function handleDeleteOrganization() {
   flex-shrink: 0;
   align-items: center;
 }
+
 .page-header-inner {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0 1rem;
 }
+
 .header-separator {
   height: 1rem !important;
   width: 1px !important;
   margin-right: 0.5rem;
 }
+
 .page-title {
   font-weight: 500;
   color: hsl(var(--sidebar-primary, 245 43% 52%));
 }
+
 .page-content {
   display: flex;
   flex: 1;
@@ -237,12 +247,14 @@ async function handleDeleteOrganization() {
 .settings-section {
   padding: 1.75rem 0;
 }
+
 .section-title {
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
   color: hsl(var(--foreground));
 }
+
 .section-desc {
   font-size: 0.9rem;
   color: hsl(var(--muted-foreground));
@@ -258,14 +270,17 @@ async function handleDeleteOrganization() {
   padding: 1rem 0;
   border-bottom: 1px solid hsl(var(--border) / 0.5);
 }
+
 .setting-row:last-child {
   border-bottom: none;
 }
+
 .setting-info {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
 }
+
 .setting-label {
   font-size: 0.9375rem;
   font-weight: 600;
@@ -282,6 +297,7 @@ async function handleDeleteOrganization() {
 :deep(.btn--danger-outline) {
   color: hsl(var(--destructive, 0 55% 48%));
 }
+
 :deep(.btn--danger-outline:hover) {
   color: hsl(var(--destructive, 0 55% 42%));
   background-color: hsl(var(--destructive, 0 55% 48%) / 0.05);

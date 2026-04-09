@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent } from 'vue'
+import {describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent} from 'vue'
 
 import DropdownMenuCheckboxItem from '../DropdownMenuCheckboxItem.vue'
 import DropdownMenuRadioGroup from '../DropdownMenuRadioGroup.vue'
@@ -20,7 +20,7 @@ vi.mock('lucide-vue-next', () => ({
 describe('DropdownMenuCheckboxItem', () => {
   it('renders unchecked state by default', () => {
     const wrapper = mount(DropdownMenuCheckboxItem, {
-      slots: { default: 'Option' },
+      slots: {default: 'Option'},
     })
 
     expect(wrapper.attributes('role')).toBe('menuitemcheckbox')
@@ -32,8 +32,8 @@ describe('DropdownMenuCheckboxItem', () => {
 
   it('renders checked state with icon', () => {
     const wrapper = mount(DropdownMenuCheckboxItem, {
-      props: { checked: true, class: 'extra-checkbox' },
-      slots: { default: 'Option' },
+      props: {checked: true, class: 'extra-checkbox'},
+      slots: {default: 'Option'},
     })
 
     expect(wrapper.attributes('aria-checked')).toBe('true')
@@ -43,7 +43,7 @@ describe('DropdownMenuCheckboxItem', () => {
 
   it('emits toggled checked value on click', async () => {
     const wrapper = mount(DropdownMenuCheckboxItem, {
-      props: { checked: false },
+      props: {checked: false},
     })
 
     await wrapper.trigger('click')
@@ -52,7 +52,7 @@ describe('DropdownMenuCheckboxItem', () => {
 
   it('does not emit when disabled and applies disabled state', async () => {
     const wrapper = mount(DropdownMenuCheckboxItem, {
-      props: { checked: true, disabled: true, class: 'disabled-extra' },
+      props: {checked: true, disabled: true, class: 'disabled-extra'},
     })
 
     expect(wrapper.attributes('tabindex')).toBe('-1')
@@ -67,7 +67,7 @@ describe('DropdownMenuCheckboxItem', () => {
 describe('DropdownMenuRadioGroup and DropdownMenuRadioItem', () => {
   it('renders group and items with correct checked state', () => {
     const Host = defineComponent({
-      components: { DropdownMenuRadioGroup, DropdownMenuRadioItem },
+      components: {DropdownMenuRadioGroup, DropdownMenuRadioItem},
       template: `
         <DropdownMenuRadioGroup modelValue="b">
           <DropdownMenuRadioItem value="a" data-test="a">A</DropdownMenuRadioItem>
@@ -89,7 +89,7 @@ describe('DropdownMenuRadioGroup and DropdownMenuRadioItem', () => {
 
   it('emits selected value when non-disabled item is clicked', async () => {
     const Host = defineComponent({
-      components: { DropdownMenuRadioGroup, DropdownMenuRadioItem },
+      components: {DropdownMenuRadioGroup, DropdownMenuRadioItem},
       template: `
         <DropdownMenuRadioGroup modelValue="a">
           <DropdownMenuRadioItem value="b" data-test="b">B</DropdownMenuRadioItem>
@@ -106,7 +106,7 @@ describe('DropdownMenuRadioGroup and DropdownMenuRadioItem', () => {
 
   it('does not emit when disabled and applies disabled state', async () => {
     const Host = defineComponent({
-      components: { DropdownMenuRadioGroup, DropdownMenuRadioItem },
+      components: {DropdownMenuRadioGroup, DropdownMenuRadioItem},
       template: `
         <DropdownMenuRadioGroup modelValue="a">
           <DropdownMenuRadioItem value="b" disabled class="extra-disabled" data-test="b">B</DropdownMenuRadioItem>

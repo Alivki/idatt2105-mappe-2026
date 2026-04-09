@@ -1,13 +1,13 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h} from 'vue'
+import {beforeEach, describe, expect, it, vi} from 'vitest'
 import ChecklistCard from '../ChecklistCard.vue'
 
 function makePassThrough(name: string, tag = 'div') {
   return defineComponent({
     name,
     inheritAttrs: false,
-    setup(_, { attrs, slots }) {
+    setup(_, {attrs, slots}) {
       return () => h(tag, attrs, slots.default?.())
     },
   })
@@ -17,7 +17,7 @@ vi.mock('lucide-vue-next', () => {
   const icon = (name: string) => defineComponent({
     name,
     setup() {
-      return () => h('svg', { 'data-icon': name })
+      return () => h('svg', {'data-icon': name})
     },
   })
 
@@ -33,9 +33,9 @@ vi.mock('lucide-vue-next', () => {
 vi.mock('@/components/ui/badge/Badge.vue', () => ({
   default: defineComponent({
     name: 'BadgeStub',
-    props: { tone: { type: String, default: '' } },
-    setup(props, { slots }) {
-      return () => h('span', { 'data-testid': 'badge', 'data-tone': props.tone }, slots.default?.())
+    props: {tone: {type: String, default: ''}},
+    setup(props, {slots}) {
+      return () => h('span', {'data-testid': 'badge', 'data-tone': props.tone}, slots.default?.())
     },
   }),
 }))
@@ -44,7 +44,7 @@ vi.mock('@/components/ui/button/Button.vue', () => ({
   default: defineComponent({
     name: 'ButtonStub',
     inheritAttrs: false,
-    setup(_, { attrs, slots }) {
+    setup(_, {attrs, slots}) {
       return () => h('button', attrs, slots.default?.())
     },
   }),
@@ -54,7 +54,7 @@ vi.mock('@/components/ui/dropdown-menu', () => {
   const passThrough = (name: string, tag = 'div') => defineComponent({
     name,
     inheritAttrs: false,
-    setup(_, { attrs, slots }) {
+    setup(_, {attrs, slots}) {
       return () => h(tag, attrs, slots.default?.())
     },
   })
@@ -71,21 +71,21 @@ vi.mock('@/components/ui/dropdown-menu', () => {
 vi.mock('@/components/ui/alert-dialog/AlertDialog.vue', () => ({
   default: defineComponent({
     name: 'AlertDialogStub',
-    props: { open: { type: Boolean, default: false } },
+    props: {open: {type: Boolean, default: false}},
     emits: ['update:open'],
-    setup(props, { slots }) {
-      return () => props.open ? h('div', { 'data-testid': 'alert-dialog' }, slots.default?.()) : null
+    setup(props, {slots}) {
+      return () => props.open ? h('div', {'data-testid': 'alert-dialog'}, slots.default?.()) : null
     },
   }),
 }))
 
-vi.mock('@/components/ui/alert-dialog/AlertDialogAction.vue', () => ({ default: makePassThrough('AlertDialogAction', 'button') }))
-vi.mock('@/components/ui/alert-dialog/AlertDialogCancel.vue', () => ({ default: makePassThrough('AlertDialogCancel', 'button') }))
-vi.mock('@/components/ui/alert-dialog/AlertDialogContent.vue', () => ({ default: makePassThrough('AlertDialogContent') }))
-vi.mock('@/components/ui/alert-dialog/AlertDialogDescription.vue', () => ({ default: makePassThrough('AlertDialogDescription', 'p') }))
-vi.mock('@/components/ui/alert-dialog/AlertDialogFooter.vue', () => ({ default: makePassThrough('AlertDialogFooter') }))
-vi.mock('@/components/ui/alert-dialog/AlertDialogHeader.vue', () => ({ default: makePassThrough('AlertDialogHeader') }))
-vi.mock('@/components/ui/alert-dialog/AlertDialogTitle.vue', () => ({ default: makePassThrough('AlertDialogTitle', 'h2') }))
+vi.mock('@/components/ui/alert-dialog/AlertDialogAction.vue', () => ({default: makePassThrough('AlertDialogAction', 'button')}))
+vi.mock('@/components/ui/alert-dialog/AlertDialogCancel.vue', () => ({default: makePassThrough('AlertDialogCancel', 'button')}))
+vi.mock('@/components/ui/alert-dialog/AlertDialogContent.vue', () => ({default: makePassThrough('AlertDialogContent')}))
+vi.mock('@/components/ui/alert-dialog/AlertDialogDescription.vue', () => ({default: makePassThrough('AlertDialogDescription', 'p')}))
+vi.mock('@/components/ui/alert-dialog/AlertDialogFooter.vue', () => ({default: makePassThrough('AlertDialogFooter')}))
+vi.mock('@/components/ui/alert-dialog/AlertDialogHeader.vue', () => ({default: makePassThrough('AlertDialogHeader')}))
+vi.mock('@/components/ui/alert-dialog/AlertDialogTitle.vue', () => ({default: makePassThrough('AlertDialogTitle', 'h2')}))
 
 const baseChecklist = {
   id: 7,
@@ -146,8 +146,8 @@ describe('ChecklistCard', () => {
       completedItemCount: 2,
       status: 'COMPLETED',
       items: [
-        { id: 1, completedAt: '2026-04-08T08:15:00Z' },
-        { id: 2, completedAt: '2026-04-08T09:45:00Z' },
+        {id: 1, completedAt: '2026-04-08T08:15:00Z'},
+        {id: 2, completedAt: '2026-04-08T09:45:00Z'},
       ],
     }
 
@@ -176,7 +176,12 @@ describe('ChecklistCard', () => {
   it('falls back to raw frequency and neutral styling for unknown frequency', () => {
     const wrapper = mount(ChecklistCard, {
       props: {
-        checklist: { ...baseChecklist, frequency: 'CUSTOM', status: 'NOT_STARTED', completedItemCount: 0 },
+        checklist: {
+          ...baseChecklist,
+          frequency: 'CUSTOM',
+          status: 'NOT_STARTED',
+          completedItemCount: 0
+        },
         canManage: false,
         canComplete: false,
       },
@@ -202,7 +207,7 @@ describe('ChecklistCard', () => {
 
     await completeButton!.trigger('click')
     expect(wrapper.emitted('toggle-checklist-completed')).toEqual([
-      [{ checklistId: 7, completed: true }],
+      [{checklistId: 7, completed: true}],
     ])
   })
 
@@ -225,7 +230,7 @@ describe('ChecklistCard', () => {
 
     await undoButton!.trigger('click')
     expect(wrapper.emitted('toggle-checklist-completed')).toEqual([
-      [{ checklistId: 7, completed: false }],
+      [{checklistId: 7, completed: false}],
     ])
   })
 
@@ -284,7 +289,7 @@ describe('ChecklistCard', () => {
   it('does not show completion action when checklist has no items', () => {
     const wrapper = mount(ChecklistCard, {
       props: {
-        checklist: { ...baseChecklist, itemCount: 0, completedItemCount: 0 },
+        checklist: {...baseChecklist, itemCount: 0, completedItemCount: 0},
         canManage: false,
         canComplete: true,
       },

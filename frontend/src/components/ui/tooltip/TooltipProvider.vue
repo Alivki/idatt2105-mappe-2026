@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { provide } from "vue"
+import {provide} from "vue"
 
 const props = withDefaults(defineProps<{
   delayDuration?: number
@@ -7,9 +7,9 @@ const props = withDefaults(defineProps<{
   delayDuration: 700,
 })
 
-provide("tooltip-provider", { delayDuration: props.delayDuration })
+provide("tooltip-provider", {delayDuration: props.delayDuration})
 </script>
 
 <template>
-  <slot />
+  <slot/>
 </template>

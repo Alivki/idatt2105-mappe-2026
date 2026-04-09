@@ -1,11 +1,11 @@
-import { describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, h, ref } from 'vue'
+import {describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h, ref} from 'vue'
 
 import SidebarMenuSub from '../SidebarMenuSub.vue'
 import SidebarMenuSubButton from '../SidebarMenuSubButton.vue'
 import SidebarMenuSubItem from '../SidebarMenuSubItem.vue'
-import { provideSidebarContext } from '../utils'
+import {provideSidebarContext} from '../utils'
 
 function mountWithSidebar(component: unknown, options: Record<string, unknown> = {}) {
   const Provider = defineComponent({
@@ -51,7 +51,7 @@ describe('SidebarMenuSub components', () => {
         class: 'sub-extra',
       },
       slots: {
-        default: () => h('li', { 'data-test': 'sub-child' }, 'Sub item'),
+        default: () => h('li', {'data-test': 'sub-child'}, 'Sub item'),
       },
     })
 

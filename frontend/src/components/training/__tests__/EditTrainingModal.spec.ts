@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount, flushPromises } from '@vue/test-utils'
-import { ref } from 'vue'
+import {describe, it, expect, vi, beforeEach} from 'vitest'
+import {mount, flushPromises} from '@vue/test-utils'
+import {ref} from 'vue'
 
 // ── Helpers extracted from EditTrainingModal (tested in isolation) ──────────
 
@@ -12,10 +12,14 @@ function isoToDateInput(iso: string | null): string {
 function stringToCalendarDate(str: string) {
   if (!str) return undefined
   const [y, m, d] = str.split('-').map(Number)
-  return { year: y, month: m, day: d }
+  return {year: y, month: m, day: d}
 }
 
-function dateValueToIso(dv: { year: number; month: number; day: number } | undefined): string | undefined {
+function dateValueToIso(dv: {
+  year: number;
+  month: number;
+  day: number
+} | undefined): string | undefined {
   if (!dv) return undefined
   return new Date(dv.year, dv.month - 1, dv.day).toISOString()
 }
@@ -32,15 +36,15 @@ vi.mock('@/composables/useTrainingLogs', () => ({
   }),
   useOrganizationMembersQuery: () => ({
     data: ref([
-      { userId: 1, userFullName: 'Ola Nordmann' },
-      { userId: 2, userFullName: 'Kari Hansen' },
+      {userId: 1, userFullName: 'Ola Nordmann'},
+      {userId: 2, userFullName: 'Kari Hansen'},
     ]),
   }),
 }))
 
-vi.mock('vue-sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
+vi.mock('vue-sonner', () => ({toast: {success: vi.fn(), error: vi.fn()}}))
 vi.mock('axios', () => ({
-  default: { isAxiosError: vi.fn().mockReturnValue(false) },
+  default: {isAxiosError: vi.fn().mockReturnValue(false)},
 }))
 
 // ── Stubs ────────────────────────────────────────────────────────────────────
@@ -99,7 +103,7 @@ const globalStubs = {
 }
 
 import EditTrainingModal from '../EditTrainingModal.vue'
-import { toast } from 'vue-sonner'
+import {toast} from 'vue-sonner'
 import axios from 'axios'
 
 const makeTraining = (overrides = {}) => ({
@@ -135,12 +139,12 @@ describe('EditTrainingModal – helper functions', () => {
 
     it('parses a date string into year/month/day', () => {
       const result = stringToCalendarDate('2024-03-15')
-      expect(result).toEqual({ year: 2024, month: 3, day: 15 })
+      expect(result).toEqual({year: 2024, month: 3, day: 15})
     })
 
     it('parses single-digit month and day', () => {
       const result = stringToCalendarDate('2023-01-05')
-      expect(result).toEqual({ year: 2023, month: 1, day: 5 })
+      expect(result).toEqual({year: 2023, month: 1, day: 5})
     })
   })
 
@@ -150,13 +154,13 @@ describe('EditTrainingModal – helper functions', () => {
     })
 
     it('converts a date value object to an ISO string', () => {
-      const result = dateValueToIso({ year: 2024, month: 6, day: 15 })
+      const result = dateValueToIso({year: 2024, month: 6, day: 15})
       expect(result).toBeTruthy()
       expect(result).toContain('2024')
     })
 
     it('produces a valid Date ISO string', () => {
-      const result = dateValueToIso({ year: 2024, month: 1, day: 1 })
+      const result = dateValueToIso({year: 2024, month: 1, day: 1})
       expect(new Date(result!).getFullYear()).toBe(2024)
     })
   })
@@ -174,10 +178,10 @@ describe('EditTrainingModal – helper functions', () => {
 /** Mount closed, then open so watch([open, training]) fires */
 async function mountAndOpen(extraProps: Record<string, unknown> = {}) {
   const wrapper = mount(EditTrainingModal, {
-    props: { open: false, training: makeTraining(), ...extraProps },
-    global: { stubs: globalStubs },
+    props: {open: false, training: makeTraining(), ...extraProps},
+    global: {stubs: globalStubs},
   })
-  await wrapper.setProps({ open: true })
+  await wrapper.setProps({open: true})
   await flushPromises()
   return wrapper
 }
@@ -185,8 +189,8 @@ async function mountAndOpen(extraProps: Record<string, unknown> = {}) {
 /** Write date values into existing reactive refs without extending the Proxy */
 function setDates(wrapper: ReturnType<typeof mount>) {
   const vm = wrapper.vm as Record<string, unknown>
-  vm['completedAt'] = { year: 2024, month: 3, day: 1 }
-  vm['expiresAt']   = { year: 2025, month: 3, day: 1 }
+  vm['completedAt'] = {year: 2024, month: 3, day: 1}
+  vm['expiresAt'] = {year: 2025, month: 3, day: 1}
 }
 
 describe('EditTrainingModal – component', () => {
@@ -199,8 +203,8 @@ describe('EditTrainingModal – component', () => {
 
   const mountModal = (props = {}) =>
     mount(EditTrainingModal, {
-      props: { open: true, training: makeTraining(), ...props },
-      global: { stubs: globalStubs },
+      props: {open: true, training: makeTraining(), ...props},
+      global: {stubs: globalStubs},
     })
 
   it('renders when open is true', () => {
@@ -209,7 +213,7 @@ describe('EditTrainingModal – component', () => {
   })
 
   it('does not render dialog content when open is false', () => {
-    const wrapper = mountModal({ open: false })
+    const wrapper = mountModal({open: false})
     expect(wrapper.find('.dialog-stub').exists()).toBe(false)
   })
 
@@ -244,7 +248,7 @@ describe('EditTrainingModal – component', () => {
   })
 
   it('shows validation errors when submitted with empty title', async () => {
-    const wrapper = await mountAndOpen({ training: makeTraining({ title: '' }) })
+    const wrapper = await mountAndOpen({training: makeTraining({title: ''})})
     await wrapper.find('.input-stub').setValue('')
     await wrapper.find('form').trigger('submit')
     await flushPromises()
@@ -280,7 +284,7 @@ describe('EditTrainingModal – component', () => {
   })
 
   it('shows error toast from axios error response message', async () => {
-    const axiosError = { response: { data: { error: { message: 'Tilgang nektet' } } } }
+    const axiosError = {response: {data: {error: {message: 'Tilgang nektet'}}}}
     vi.mocked(axios.isAxiosError).mockReturnValue(true)
     mockMutateAsync.mockRejectedValue(axiosError)
     const wrapper = await mountAndOpen()

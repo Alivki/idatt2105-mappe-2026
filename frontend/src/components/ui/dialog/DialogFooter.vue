@@ -4,7 +4,7 @@ const props = defineProps<{ class?: string }>()
 
 <template>
   <div :class="['dialog-footer', props.class]">
-    <slot />
+    <slot/>
   </div>
 </template>
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { ClipboardCheck, ListChecks, Clock3, CircleCheckBig, CircleDashed } from 'lucide-vue-next'
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { toast } from 'vue-sonner'
+import {ClipboardCheck, ListChecks, Clock3, CircleCheckBig, CircleDashed} from 'lucide-vue-next'
+import {computed, ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {toast} from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import PageHeader from '@/components/common/PageHeader.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
@@ -19,7 +19,8 @@ import {
   useSetChecklistCompletionMutation,
   useUpdateChecklistMutation,
 } from '@/composables/useChecklists'
-import { useAuthStore } from '@/stores/auth'
+import {useAuthStore} from '@/stores/auth'
+import {useCanManage} from '@/composables/useCanManage'
 import type {
   Checklist,
   ChecklistFrequency,
@@ -44,7 +45,7 @@ const checklistDialogOpen = ref(false)
 const checklistDialogMode = ref<'create' | 'edit'>('create')
 const activeChecklist = ref<Checklist | null>(null)
 
-const canManage = computed(() => auth.role === 'ADMIN' || auth.role === 'MANAGER')
+const canManage = useCanManage()
 const canComplete = computed(() => !!auth.role)
 
 const checklists = computed(() => checklistQuery.data.value ?? [])
@@ -62,11 +63,11 @@ const stats = computed(() => {
 const frequencyOrder: ChecklistFrequency[] = ['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']
 
 const filters: Array<{ label: string; value: FrequencyFilter }> = [
-  { label: 'Alle', value: 'ALL' },
-  { label: 'Daglig', value: 'DAILY' },
-  { label: 'Ukentlig', value: 'WEEKLY' },
-  { label: 'Månedlig', value: 'MONTHLY' },
-  { label: 'Årlig', value: 'YEARLY' },
+  {label: 'Alle', value: 'ALL'},
+  {label: 'Daglig', value: 'DAILY'},
+  {label: 'Ukentlig', value: 'WEEKLY'},
+  {label: 'Månedlig', value: 'MONTHLY'},
+  {label: 'Årlig', value: 'YEARLY'},
 ]
 
 const groupedChecklists = computed(() => {
@@ -143,7 +144,10 @@ async function handleCreateChecklist(payload: CreateChecklistRequest) {
   }
 }
 
-async function handleUpdateChecklist(payload: { checklistId: number; data: UpdateChecklistRequest }) {
+async function handleUpdateChecklist(payload: {
+  checklistId: number;
+  data: UpdateChecklistRequest
+}) {
   try {
     await updateChecklist.mutateAsync({
       checklistId: payload.checklistId,
@@ -169,7 +173,10 @@ function handleOpenChecklist(checklist: Checklist) {
   router.push(`/sjekklister/${checklist.id}`)
 }
 
-async function handleToggleChecklistCompleted(payload: { checklistId: number; completed: boolean }) {
+async function handleToggleChecklistCompleted(payload: {
+  checklistId: number;
+  completed: boolean
+}) {
   try {
     await setChecklistCompletion.mutateAsync(payload)
   } catch (error) {
@@ -192,7 +199,7 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 
 <template>
   <AppLayout active-menu-item="Sjekklister">
-    <PageHeader title="Sjekklister" />
+    <PageHeader title="Sjekklister"/>
 
     <div class="page-content">
       <section class="header-row">
@@ -207,10 +214,13 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
       </section>
 
       <section class="cards-section" aria-label="Sjekklisteoversikt">
-        <OverviewCard label="Totalt sjekklister" :value="stats.total" :icon="ClipboardCheck" />
-        <OverviewCard label="Fullført" :value="stats.completed" :icon="CircleCheckBig" variant="resolved" />
-        <OverviewCard label="Under arbeid" :value="stats.inProgress" :icon="Clock3" variant="in-progress" />
-        <OverviewCard label="Ikke startet" :value="stats.notStarted" :icon="CircleDashed" variant="open" />
+        <OverviewCard label="Totalt sjekklister" :value="stats.total" :icon="ClipboardCheck"/>
+        <OverviewCard label="Fullført" :value="stats.completed" :icon="CircleCheckBig"
+                      variant="resolved"/>
+        <OverviewCard label="Under arbeid" :value="stats.inProgress" :icon="Clock3"
+                      variant="in-progress"/>
+        <OverviewCard label="Ikke startet" :value="stats.notStarted" :icon="CircleDashed"
+                      variant="open"/>
       </section>
 
       <section class="filters-row" aria-label="Filtrer frekvens">
@@ -266,7 +276,8 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
         />
 
         <div v-else class="sections-wrap">
-          <section v-for="section in groupedChecklists" :key="section.frequency" class="frequency-section">
+          <section v-for="section in groupedChecklists" :key="section.frequency"
+                   class="frequency-section">
             <div class="section-divider">
               <span>{{ section.label }}</span>
             </div>
@@ -302,7 +313,13 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 </template>
 
 <style scoped>
-.page-content { display: flex; flex: 1; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; }
+.page-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1rem 1rem;
+}
 
 .header-row {
   display: flex;
@@ -437,10 +454,41 @@ h1 {
   }
 }
 
-.skeleton-list { display: flex; flex-direction: column; gap: 12px; }
-.skeleton-card { padding: 16px; border-radius: var(--radius-lg); border: 1px solid hsl(var(--border)); background: var(--card-bg); }
-.skeleton-line { height: 14px; border-radius: 6px; background: hsl(var(--muted)); animation: shimmer 1.4s ease-in-out infinite; }
-.skeleton-line--title { width: 55%; margin-bottom: 10px; }
-.skeleton-line--short { width: 35%; }
-@keyframes shimmer { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-card {
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid hsl(var(--border));
+  background: var(--card-bg);
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 6px;
+  background: hsl(var(--muted));
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-line--title {
+  width: 55%;
+  margin-bottom: 10px;
+}
+
+.skeleton-line--short {
+  width: 35%;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
 </style>

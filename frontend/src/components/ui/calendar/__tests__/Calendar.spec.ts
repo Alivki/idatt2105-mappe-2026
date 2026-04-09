@@ -1,7 +1,7 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent, h, nextTick } from 'vue'
-import { describe, it, expect } from 'vitest'
-import { CalendarDate } from '@internationalized/date'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h, nextTick} from 'vue'
+import {describe, it, expect} from 'vitest'
+import {CalendarDate} from '@internationalized/date'
 import Calendar from '../Calendar.vue'
 
 const SelectStub = defineComponent({
@@ -9,22 +9,22 @@ const SelectStub = defineComponent({
     modelValue: String,
   },
   emits: ['update:modelValue'],
-  setup(_, { slots }) {
-    return () => h('div', { class: 'select-stub' }, slots.default?.())
+  setup(_, {slots}) {
+    return () => h('div', {class: 'select-stub'}, slots.default?.())
   },
 })
 
 const SelectTriggerStub = defineComponent({
   name: 'SelectTrigger',
-  setup(_, { slots }) {
-    return () => h('button', { class: 'select-trigger-stub' }, slots.default?.())
+  setup(_, {slots}) {
+    return () => h('button', {class: 'select-trigger-stub'}, slots.default?.())
   },
 })
 
 const SelectContentStub = defineComponent({
   name: 'SelectContent',
-  setup(_, { slots }) {
-    return () => h('div', { class: 'select-content-stub' }, slots.default?.())
+  setup(_, {slots}) {
+    return () => h('div', {class: 'select-content-stub'}, slots.default?.())
   },
 })
 
@@ -33,8 +33,8 @@ const SelectItemStub = defineComponent({
   props: {
     value: String,
   },
-  setup(_, { slots }) {
-    return () => h('div', { class: 'select-item-stub' }, slots.default?.())
+  setup(_, {slots}) {
+    return () => h('div', {class: 'select-item-stub'}, slots.default?.())
   },
 })
 

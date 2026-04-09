@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { provide, ref } from "vue"
+import {provide, ref} from "vue"
 
 const isSubOpen = ref(false)
 
@@ -11,12 +11,12 @@ function closeSub() {
   isSubOpen.value = false
 }
 
-provide("dropdown-sub", { isSubOpen, openSub, closeSub })
+provide("dropdown-sub", {isSubOpen, openSub, closeSub})
 </script>
 
 <template>
   <div class="dropdown-sub">
-    <slot />
+    <slot/>
   </div>
 </template>
 

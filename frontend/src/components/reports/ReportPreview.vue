@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReportPreviewResponse } from '@/types/report'
+import type {ReportPreviewResponse} from '@/types/report'
 
 defineProps<{
   data: ReportPreviewResponse
@@ -25,12 +25,15 @@ function getRefusalClass(val: number): string {
         <div class="pv-header-left">
           <span class="pv-header-label">INTERNKONTROLL RAPPORT</span>
           <h2 class="pv-header-org">{{ data.header.organizationName }}</h2>
-          <span v-if="data.header.orgNumber" class="pv-header-orgnr">Org.nr: {{ data.header.orgNumber }}</span>
+          <span v-if="data.header.orgNumber"
+                class="pv-header-orgnr">Org.nr: {{ data.header.orgNumber }}</span>
         </div>
         <div class="pv-header-right">
           <span>Periode: <strong>{{ data.header.periodFrom }} – {{ data.header.periodTo }}</strong></span>
           <span>Generert: {{ data.header.generatedDate }}</span>
-          <span>Av: {{ data.header.generatedByName }}<template v-if="data.header.generatedByRole"> ({{ data.header.generatedByRole }})</template></span>
+          <span>Av: {{ data.header.generatedByName }}<template v-if="data.header.generatedByRole"> ({{
+              data.header.generatedByRole
+            }})</template></span>
         </div>
       </div>
 
@@ -39,25 +42,39 @@ function getRefusalClass(val: number): string {
         <div class="pv-kpi-row">
           <div class="pv-kpi-card pv-kpi-card--green">
             <span class="pv-kpi-label">SAMSVARSRATE</span>
-            <span class="pv-kpi-value pv-kpi-value--green">{{ data.complianceSummary.complianceRate.toFixed(1) }}%</span>
+            <span class="pv-kpi-value pv-kpi-value--green">{{
+                data.complianceSummary.complianceRate.toFixed(1)
+              }}%</span>
           </div>
           <div class="pv-kpi-card pv-kpi-card--olive">
             <span class="pv-kpi-label">FORFALTE OPPGAVER</span>
-            <span class="pv-kpi-value pv-kpi-value--olive">{{ data.complianceSummary.overdueTasks }}</span>
+            <span class="pv-kpi-value pv-kpi-value--olive">{{
+                data.complianceSummary.overdueTasks
+              }}</span>
           </div>
           <div class="pv-kpi-card pv-kpi-card--gold">
             <span class="pv-kpi-label">ÅPNE AVVIK</span>
-            <span class="pv-kpi-value pv-kpi-value--gold">{{ data.complianceSummary.openDeviations }}</span>
+            <span class="pv-kpi-value pv-kpi-value--gold">{{
+                data.complianceSummary.openDeviations
+              }}</span>
           </div>
           <div class="pv-kpi-card pv-kpi-card--red">
             <span class="pv-kpi-label">TEMP.AVVIK</span>
-            <span class="pv-kpi-value pv-kpi-value--red">{{ data.complianceSummary.temperatureDeviations }}</span>
+            <span class="pv-kpi-value pv-kpi-value--red">{{
+                data.complianceSummary.temperatureDeviations
+              }}</span>
           </div>
         </div>
         <div class="pv-kpi-bottom">
-          <div class="pv-kpi-stat"><span>Totalt oppgaver</span><strong>{{ data.complianceSummary.totalTasks }}</strong></div>
-          <div class="pv-kpi-stat"><span>Lukkede avvik</span><strong>{{ data.complianceSummary.closedDeviations }}</strong></div>
-          <div class="pv-kpi-stat"><span>Alkoholhendelser</span><strong>{{ data.complianceSummary.alcoholIncidents }}</strong></div>
+          <div class="pv-kpi-stat">
+            <span>Totalt oppgaver</span><strong>{{ data.complianceSummary.totalTasks }}</strong>
+          </div>
+          <div class="pv-kpi-stat">
+            <span>Lukkede avvik</span><strong>{{ data.complianceSummary.closedDeviations }}</strong>
+          </div>
+          <div class="pv-kpi-stat"><span>Alkoholhendelser</span><strong>{{
+              data.complianceSummary.alcoholIncidents
+            }}</strong></div>
         </div>
       </div>
 
@@ -82,7 +99,9 @@ function getRefusalClass(val: number): string {
             <td>{{ t.minTemp.toFixed(1) }}</td>
             <td>{{ t.maxTemp.toFixed(1) }}</td>
             <td>{{ t.deviationCount }}</td>
-            <td><span :class="['pv-badge', getStatusClass(t.status)]">{{ t.status.toUpperCase() }}</span></td>
+            <td><span :class="['pv-badge', getStatusClass(t.status)]">{{
+                t.status.toUpperCase()
+              }}</span></td>
           </tr>
           </tbody>
         </table>
@@ -104,7 +123,8 @@ function getRefusalClass(val: number): string {
         </div>
       </div>
 
-      <div v-if="data.haccpChecklists && data.haccpChecklists.checklists.length > 0" class="pv-section">
+      <div v-if="data.haccpChecklists && data.haccpChecklists.checklists.length > 0"
+           class="pv-section">
         <h3 class="pv-section-title">HACCP-SJEKKLISTER</h3>
         <div v-for="(hc, hi) in data.haccpChecklists.checklists" :key="hi" class="pv-haccp-group">
           <div class="pv-haccp-header">
@@ -137,7 +157,9 @@ function getRefusalClass(val: number): string {
             <td>{{ ca.date }}</td>
             <td>{{ ca.issue }}</td>
             <td>{{ ca.actionTaken ?? '—' }}</td>
-            <td><span :class="['pv-badge', getStatusClass(ca.status)]">{{ ca.status.toUpperCase() }}</span></td>
+            <td><span :class="['pv-badge', getStatusClass(ca.status)]">{{
+                ca.status.toUpperCase()
+              }}</span></td>
           </tr>
           </tbody>
         </table>
@@ -163,7 +185,9 @@ function getRefusalClass(val: number): string {
             <td>{{ fd.type }}</td>
             <td>{{ fd.severity }}</td>
             <td>{{ fd.description }}</td>
-            <td><span :class="['pv-badge', getStatusClass(fd.status)]">{{ fd.status.toUpperCase() }}</span></td>
+            <td><span :class="['pv-badge', getStatusClass(fd.status)]">{{
+                fd.status.toUpperCase()
+              }}</span></td>
           </tr>
           </tbody>
         </table>
@@ -188,13 +212,17 @@ function getRefusalClass(val: number): string {
             <td>{{ ad.date }}</td>
             <td>{{ ad.description }}</td>
             <td>{{ ad.immediateAction ?? '—' }}</td>
-            <td><span :class="['pv-badge', ad.status === 'Lukket' ? 'badge-green' : 'badge-yellow']">{{ ad.status === 'Lukket' ? 'JA' : 'NEI' }}</span></td>
+            <td><span
+              :class="['pv-badge', ad.status === 'Lukket' ? 'badge-green' : 'badge-yellow']">{{
+                ad.status === 'Lukket' ? 'JA' : 'NEI'
+              }}</span></td>
           </tr>
           </tbody>
         </table>
       </div>
 
-      <div v-if="data.ageVerificationLogs && data.ageVerificationLogs.length > 0" class="pv-section">
+      <div v-if="data.ageVerificationLogs && data.ageVerificationLogs.length > 0"
+           class="pv-section">
         <h3 class="pv-section-title">ALDERSKONTROLL</h3>
         <table class="pv-table">
           <thead>
@@ -236,7 +264,9 @@ function getRefusalClass(val: number): string {
             <td>{{ t.role ?? '—' }}</td>
             <td>{{ t.certification }}</td>
             <td>{{ t.expires ?? '—' }}</td>
-            <td><span :class="['pv-badge', getStatusClass(t.status)]">{{ t.status.toUpperCase() }}</span></td>
+            <td><span :class="['pv-badge', getStatusClass(t.status)]">{{
+                t.status.toUpperCase()
+              }}</span></td>
           </tr>
           </tbody>
         </table>
@@ -244,8 +274,9 @@ function getRefusalClass(val: number): string {
 
       <div v-if="data.licenseInfo" class="pv-section">
         <h3 class="pv-section-title">LISENSINFORMASJON</h3>
-        <div v-if="data.licenseInfo.bevillingNumber || data.licenseInfo.holder || data.licenseInfo.styrerName"
-             class="pv-license-card" style="margin-bottom: 0.75rem;">
+        <div
+          v-if="data.licenseInfo.bevillingNumber || data.licenseInfo.holder || data.licenseInfo.styrerName"
+          class="pv-license-card" style="margin-bottom: 0.75rem;">
           <div class="pv-license-subtitle">SKJENKEBEVILLING</div>
           <div class="pv-license-grid">
             <div v-if="data.licenseInfo.bevillingNumber" class="pv-license-item">
@@ -270,8 +301,9 @@ function getRefusalClass(val: number): string {
             </div>
           </div>
         </div>
-        <div v-if="data.licenseInfo.kunnskapsproveType || data.licenseInfo.kunnskapsproveCandidateName"
-             class="pv-license-card">
+        <div
+          v-if="data.licenseInfo.kunnskapsproveType || data.licenseInfo.kunnskapsproveCandidateName"
+          class="pv-license-card">
           <div class="pv-license-subtitle">KUNNSKAPSPRØVE</div>
           <div class="pv-license-grid">
             <div v-if="data.licenseInfo.kunnskapsproveType" class="pv-license-item">
@@ -306,7 +338,9 @@ function getRefusalClass(val: number): string {
               <span class="pv-signoff-label">LEDERS SIGNATUR</span>
               <div class="pv-signoff-name">{{ data.signOff.name }}</div>
               <div class="pv-signoff-line"></div>
-              <span v-if="data.signOff.title" class="pv-signoff-role">{{ data.signOff.name }} &#8212; {{ data.signOff.title }}</span>
+              <span v-if="data.signOff.title" class="pv-signoff-role">{{ data.signOff.name }} &#8212; {{
+                  data.signOff.title
+                }}</span>
             </div>
             <div class="pv-signoff-col">
               <span class="pv-signoff-label">DATO</span>
@@ -429,10 +463,21 @@ function getRefusalClass(val: number): string {
   border-left: 4px solid transparent;
 }
 
-.pv-kpi-card--green { border-left-color: var(--green); }
-.pv-kpi-card--olive { border-left-color: var(--amber); }
-.pv-kpi-card--gold { border-left-color: var(--amber); }
-.pv-kpi-card--red { border-left-color: var(--red); }
+.pv-kpi-card--green {
+  border-left-color: var(--green);
+}
+
+.pv-kpi-card--olive {
+  border-left-color: var(--amber);
+}
+
+.pv-kpi-card--gold {
+  border-left-color: var(--amber);
+}
+
+.pv-kpi-card--red {
+  border-left-color: var(--red);
+}
 
 .pv-kpi-label {
   font-size: 0.65rem;
@@ -448,10 +493,21 @@ function getRefusalClass(val: number): string {
   font-variant-numeric: tabular-nums;
 }
 
-.pv-kpi-value--green { color: var(--green); }
-.pv-kpi-value--olive { color: var(--amber); }
-.pv-kpi-value--gold { color: var(--amber); }
-.pv-kpi-value--red { color: var(--red); }
+.pv-kpi-value--green {
+  color: var(--green);
+}
+
+.pv-kpi-value--olive {
+  color: var(--amber);
+}
+
+.pv-kpi-value--gold {
+  color: var(--amber);
+}
+
+.pv-kpi-value--red {
+  color: var(--red);
+}
 
 .pv-kpi-bottom {
   display: grid;
@@ -469,8 +525,14 @@ function getRefusalClass(val: number): string {
   font-size: 0.82rem;
 }
 
-.pv-kpi-stat span { color: hsl(var(--muted-foreground)); }
-.pv-kpi-stat strong { font-size: 1rem; color: hsl(var(--foreground)); }
+.pv-kpi-stat span {
+  color: hsl(var(--muted-foreground));
+}
+
+.pv-kpi-stat strong {
+  font-size: 1rem;
+  color: hsl(var(--foreground));
+}
 
 .pv-table {
   width: 100%;
@@ -495,8 +557,13 @@ function getRefusalClass(val: number): string {
   vertical-align: top;
 }
 
-.pv-table tbody tr:last-child td { border-bottom: none; }
-.pv-td-bold { font-weight: 600; }
+.pv-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pv-td-bold {
+  font-weight: 600;
+}
 
 .pv-badge {
   display: inline-block;
@@ -507,12 +574,30 @@ function getRefusalClass(val: number): string {
   letter-spacing: 0.03em;
 }
 
-.badge-green { background: var(--green-soft); color: var(--green); }
-.badge-yellow { background: var(--amber-soft); color: var(--amber); }
-.badge-red { background: var(--red-soft); color: var(--red); }
-.badge-gray { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+.badge-green {
+  background: var(--green-soft);
+  color: var(--green);
+}
 
-.refusal-highlight { color: var(--red); font-weight: 700; }
+.badge-yellow {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.badge-red {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+.badge-gray {
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+}
+
+.refusal-highlight {
+  color: var(--red);
+  font-weight: 700;
+}
 
 .pv-progress-row {
   display: flex;
@@ -548,8 +633,13 @@ function getRefusalClass(val: number): string {
   transition: width 300ms ease;
 }
 
-.pv-fill--green { background: var(--green); }
-.pv-fill--gold { background: var(--amber); }
+.pv-fill--green {
+  background: var(--green);
+}
+
+.pv-fill--gold {
+  background: var(--amber);
+}
 
 .pv-progress-pct {
   flex-shrink: 0;
@@ -559,13 +649,33 @@ function getRefusalClass(val: number): string {
   text-align: right;
 }
 
-.pv-pct--green { color: var(--green); }
-.pv-pct--gold { color: var(--amber); }
+.pv-pct--green {
+  color: var(--green);
+}
 
-.pv-haccp-group { margin-bottom: 0.5rem; }
-.pv-haccp-header { font-size: 0.88rem; }
-.pv-haccp-freq { color: hsl(var(--muted-foreground)); font-size: 0.78rem; font-weight: 400; }
-.pv-haccp-pct { float: right; font-weight: 700; color: var(--green); }
+.pv-pct--gold {
+  color: var(--amber);
+}
+
+.pv-haccp-group {
+  margin-bottom: 0.5rem;
+}
+
+.pv-haccp-header {
+  font-size: 0.88rem;
+}
+
+.pv-haccp-freq {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.78rem;
+  font-weight: 400;
+}
+
+.pv-haccp-pct {
+  float: right;
+  font-weight: 700;
+  color: var(--green);
+}
 
 .pv-license-card {
   background: hsl(var(--muted));
@@ -660,7 +770,9 @@ function getRefusalClass(val: number): string {
   margin-top: 0.25rem;
 }
 
-.pv-signoff-comments { margin-top: 1rem; }
+.pv-signoff-comments {
+  margin-top: 1rem;
+}
 
 .pv-signoff-comments p {
   margin: 0.35rem 0 0;
@@ -678,11 +790,30 @@ function getRefusalClass(val: number): string {
     gap: 0.5rem;
   }
 
-  .pv-header-right { text-align: left; }
-  .pv-kpi-row { grid-template-columns: repeat(2, 1fr); }
-  .pv-kpi-bottom { grid-template-columns: 1fr; }
-  .pv-license-grid { grid-template-columns: 1fr; }
-  .pv-signoff-row { grid-template-columns: 1fr; gap: 1rem; }
-  .pv-progress-name { width: 7rem; font-size: 0.8rem; }
+  .pv-header-right {
+    text-align: left;
+  }
+
+  .pv-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pv-kpi-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .pv-license-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pv-signoff-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .pv-progress-name {
+    width: 7rem;
+    font-size: 0.8rem;
+  }
 }
 </style>

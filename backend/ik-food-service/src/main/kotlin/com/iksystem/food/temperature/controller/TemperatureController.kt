@@ -10,6 +10,7 @@ import com.iksystem.food.temperature.dto.UpdateTemperatureApplianceRequest
 import com.iksystem.food.temperature.service.TemperatureService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -35,7 +36,8 @@ class TemperatureController(
     private val service: TemperatureService,
 ) {
 
-    @Operation(summary = "List temperature appliances")
+    @Operation(summary = "List temperature appliances", description = "Returns all temperature appliances for the active organization.")
+    @ApiResponse(responseCode = "200", description = "Appliance list returned")
     @GetMapping("/appliances")
     fun listAppliances(
         @AuthenticationPrincipal auth: AuthenticatedUser,
@@ -53,6 +55,10 @@ class TemperatureController(
         ResponseEntity.status(HttpStatus.CREATED).body(service.createAppliance(request, auth))
 
     @Operation(summary = "Update temperature appliance")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Appliance updated"),
+        ApiResponse(responseCode = "404", description = "Appliance not found"),
+    )
     @PatchMapping("/appliances/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     fun updateAppliance(
@@ -63,6 +69,10 @@ class TemperatureController(
         ResponseEntity.ok(service.updateAppliance(id, request, auth))
 
     @Operation(summary = "Delete temperature appliance")
+    @ApiResponses(
+        ApiResponse(responseCode = "204", description = "Appliance deleted"),
+        ApiResponse(responseCode = "404", description = "Appliance not found"),
+    )
     @DeleteMapping("/appliances/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     fun deleteAppliance(
@@ -73,7 +83,8 @@ class TemperatureController(
         return ResponseEntity.noContent().build()
     }
 
-    @Operation(summary = "List temperature measurements")
+    @Operation(summary = "List temperature measurements", description = "Returns temperature measurements, optionally filtered by appliance.")
+    @ApiResponse(responseCode = "200", description = "Measurement list returned")
     @GetMapping("/measurements")
     fun listMeasurements(
         @RequestParam(required = false) applianceId: Long?,
@@ -91,6 +102,10 @@ class TemperatureController(
         ResponseEntity.status(HttpStatus.CREATED).body(service.registerMeasurement(request, auth))
 
     @Operation(summary = "Delete selected measurements")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Measurements deleted"),
+        ApiResponse(responseCode = "403", description = "Insufficient permissions"),
+    )
     @DeleteMapping("/measurements")
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     fun deleteMeasurements(

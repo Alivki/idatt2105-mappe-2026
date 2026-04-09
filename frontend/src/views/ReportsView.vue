@@ -1,45 +1,25 @@
 <script setup lang="ts">
-import {computed, ref, reactive} from 'vue'
+import {computed, ref} from 'vue'
 import {useMediaQuery} from '@vueuse/core'
 import axios from 'axios'
 import {
-  MoreVertical,
-  ArrowUpDown,
-  Search,
-  FileText,
-  Download,
-  Trash2,
-  AlertTriangle,
-  Eye,
-  Save,
-  Plus,
+  MoreVertical, ArrowUpDown, Search, FileText, Download, Trash2, AlertTriangle, Eye, Save, Plus,
 } from 'lucide-vue-next'
 import {toast} from 'vue-sonner'
-import {CalendarDate} from '@internationalized/date'
+import {useTableSort} from '@/composables/useTableSort'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import PageHeader from '@/components/common/PageHeader.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import ReportPreview from '@/components/reports/ReportPreview.vue'
+import GenerateReportDialog from '@/components/reports/GenerateReportDialog.vue'
 import Button from '@/components/ui/button/Button.vue'
 import Input from '@/components/ui/input/Input.vue'
-import Checkbox from '@/components/ui/checkbox/Checkbox.vue'
-import DatePicker from '@/components/ui/date-picker/DatePicker.vue'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableEmpty,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table'
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import Dialog from '@/components/ui/dialog/Dialog.vue'
 import DialogScrollContent from '@/components/ui/dialog/DialogScrollContent.vue'
@@ -56,18 +36,12 @@ import AlertDialogFooter from '@/components/ui/alert-dialog/AlertDialogFooter.vu
 import AlertDialogHeader from '@/components/ui/alert-dialog/AlertDialogHeader.vue'
 import AlertDialogTitle from '@/components/ui/alert-dialog/AlertDialogTitle.vue'
 import {
-  useReportsQuery,
-  usePreviewReportMutation,
-  useGenerateReportMutation,
-  useDeleteReportMutation,
-  useDownloadReport,
+  useReportsQuery, usePreviewReportMutation, useGenerateReportMutation,
+  useDeleteReportMutation, useDownloadReport,
 } from '@/composables/useReports'
 import {useChecklistsQuery} from '@/composables/useChecklists'
 import type {
-  GenerateReportRequest,
-  ReportPreviewResponse,
-  GeneratedReportResponse,
-  ReportSectionsConfig,
+  GenerateReportRequest, ReportPreviewResponse, GeneratedReportResponse,
 } from '@/types/report'
 
 const reportsQuery = useReportsQuery()
@@ -84,18 +58,7 @@ const checklists = computed(() => (checklistsQuery.data.value ?? []).filter((c) 
 const search = ref('')
 
 type SortField = 'title' | 'period' | 'generatedBy' | 'generatedAt'
-type SortDir = 'asc' | 'desc'
-const sortField = ref<SortField>('generatedAt')
-const sortDir = ref<SortDir>('desc')
-
-function toggleSort(field: SortField) {
-  if (sortField.value === field) {
-    sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
-  } else {
-    sortField.value = field
-    sortDir.value = 'asc'
-  }
-}
+const {sortField, sortDir, toggleSort} = useTableSort<SortField>('generatedAt', 'desc')
 
 function formatPeriod(from: string, to: string): string {
   return `${from} – ${to}`
@@ -112,9 +75,7 @@ const filteredAndSorted = computed(() => {
   let list = reports.value.slice()
   if (q) {
     list = list.filter((r) =>
-      [r.title, r.generatedByUserName, formatPeriod(r.periodFrom, r.periodTo)].some((v) =>
-        v.toLowerCase().includes(q),
-      ),
+      [r.title, r.generatedByUserName, formatPeriod(r.periodFrom, r.periodTo)].some((v) => v.toLowerCase().includes(q)),
     )
   }
   list.sort((a, b) => {
@@ -129,96 +90,11 @@ const filteredAndSorted = computed(() => {
 })
 
 const createDialogOpen = ref(false)
-const periodFrom = ref<InstanceType<typeof CalendarDate> | undefined>()
-const periodTo = ref<InstanceType<typeof CalendarDate> | undefined>()
-
-const sections = reactive<ReportSectionsConfig>({
-  includeComplianceSummary: true,
-  includeTemperatureLogs: false,
-  includeChecklists: false,
-  selectedChecklistIds: undefined,
-  includeHaccpChecklists: false,
-  includeCorrectiveActions: false,
-  includeFoodDeviations: false,
-  includeAlcoholDeviations: false,
-  includeAgeVerification: false,
-  includeTrainingOverview: false,
-  includeLicenseInfo: false,
-  includeSignOff: false,
-})
-
-const signOffName = ref('')
-const signOffTitle = ref('')
-const signOffComments = ref('')
-const reportTitle = ref('')
-
-const showChecklistPicker = ref(false)
-const selectedChecklistIds = ref<Set<number>>(new Set())
-
-function toggleChecklistId(id: number) {
-  const s = new Set(selectedChecklistIds.value)
-  if (s.has(id)) s.delete(id)
-  else s.add(id)
-  selectedChecklistIds.value = s
-}
-
-function openCreateDialog() {
-  periodFrom.value = undefined
-  periodTo.value = undefined
-  reportTitle.value = ''
-  signOffName.value = ''
-  signOffTitle.value = ''
-  signOffComments.value = ''
-  selectedChecklistIds.value = new Set()
-  showChecklistPicker.value = false
-  Object.assign(sections, {
-    includeComplianceSummary: true,
-    includeTemperatureLogs: false,
-    includeChecklists: false,
-    selectedChecklistIds: undefined,
-    includeHaccpChecklists: false,
-    includeCorrectiveActions: false,
-    includeFoodDeviations: false,
-    includeAlcoholDeviations: false,
-    includeAgeVerification: false,
-    includeTrainingOverview: false,
-    includeLicenseInfo: false,
-    includeSignOff: false,
-  })
-  createDialogOpen.value = true
-}
-
-function buildRequest(): GenerateReportRequest | null {
-  if (!periodFrom.value || !periodTo.value) {
-    toast.error('Velg både fra- og til-dato')
-    return null
-  }
-  const from = `${periodFrom.value.year}-${String(periodFrom.value.month).padStart(2, '0')}-${String(periodFrom.value.day).padStart(2, '0')}`
-  const to = `${periodTo.value.year}-${String(periodTo.value.month).padStart(2, '0')}-${String(periodTo.value.day).padStart(2, '0')}`
-
-  return {
-    periodFrom: from,
-    periodTo: to,
-    title: reportTitle.value.trim() || undefined,
-    sections: {
-      ...sections,
-      selectedChecklistIds: sections.includeChecklists && selectedChecklistIds.value.size > 0
-        ? [...selectedChecklistIds.value]
-        : undefined,
-    },
-    signOffName: sections.includeSignOff ? signOffName.value || undefined : undefined,
-    signOffTitle: sections.includeSignOff ? signOffTitle.value || undefined : undefined,
-    signOffComments: sections.includeSignOff ? signOffComments.value || undefined : undefined,
-  }
-}
-
 const previewOpen = ref(false)
 const previewData = ref<ReportPreviewResponse | null>(null)
 const lastRequest = ref<GenerateReportRequest | null>(null)
 
-async function handlePreview() {
-  const req = buildRequest()
-  if (!req) return
+async function handlePreviewFromDialog(req: GenerateReportRequest) {
   lastRequest.value = req
   try {
     previewData.value = await previewMutation.mutateAsync(req)
@@ -246,9 +122,7 @@ async function handleDownloadFromPreview() {
   if (!req) return
   try {
     const report = await generateMutation.mutateAsync(req)
-    if (report.downloadUrl) {
-      window.open(report.downloadUrl, '_blank')
-    }
+    if (report.downloadUrl) window.open(report.downloadUrl, '_blank')
     toast.success('Rapporten er lastet ned og lagret automatisk')
     previewOpen.value = false
   } catch (error) {
@@ -272,17 +146,10 @@ async function handlePreviewExisting(report: GeneratedReportResponse) {
     periodTo: toIsoDate(report.periodTo),
     title: report.title,
     sections: {
-      includeComplianceSummary: true,
-      includeTemperatureLogs: true,
-      includeChecklists: true,
-      includeHaccpChecklists: true,
-      includeCorrectiveActions: true,
-      includeFoodDeviations: true,
-      includeAlcoholDeviations: true,
-      includeAgeVerification: true,
-      includeTrainingOverview: true,
-      includeLicenseInfo: true,
-      includeSignOff: true,
+      includeComplianceSummary: true, includeTemperatureLogs: true, includeChecklists: true,
+      includeHaccpChecklists: true, includeCorrectiveActions: true, includeFoodDeviations: true,
+      includeAlcoholDeviations: true, includeAgeVerification: true, includeTrainingOverview: true,
+      includeLicenseInfo: true, includeSignOff: true,
     },
   }
   lastRequest.value = req
@@ -319,52 +186,17 @@ function handleError(error: unknown, fallback: string) {
   if (axios.isAxiosError(error)) {
     const message = error.response?.data?.error?.message
     if (typeof message === 'string' && message.trim().length > 0) {
-      toast.error(message)
+      toast.error(message);
       return
     }
   }
   toast.error(fallback)
 }
-
-const sectionGroups = [
-  {
-    label: 'Generelt',
-    options: [
-      {key: 'includeComplianceSummary' as keyof ReportSectionsConfig, label: 'Samsvarssammendrag'},
-    ],
-  },
-  {
-    label: 'IK-Mat',
-    options: [
-      {key: 'includeTemperatureLogs' as keyof ReportSectionsConfig, label: 'Temperaturlogg'},
-      {key: 'includeChecklists' as keyof ReportSectionsConfig, label: 'Sjekklister'},
-      {key: 'includeHaccpChecklists' as keyof ReportSectionsConfig, label: 'HACCP-sjekklister'},
-      {key: 'includeCorrectiveActions' as keyof ReportSectionsConfig, label: 'Korrigerende tiltak'},
-      {key: 'includeFoodDeviations' as keyof ReportSectionsConfig, label: 'Matavvik'},
-    ],
-  },
-  {
-    label: 'IK-Alkohol',
-    options: [
-      {key: 'includeAlcoholDeviations' as keyof ReportSectionsConfig, label: 'Alkoholavvik'},
-      {key: 'includeAgeVerification' as keyof ReportSectionsConfig, label: 'Alderskontroll'},
-      {key: 'includeLicenseInfo' as keyof ReportSectionsConfig, label: 'Lisensinformasjon'},
-    ],
-  },
-  {
-    label: 'Felles',
-    options: [
-      {key: 'includeTrainingOverview' as keyof ReportSectionsConfig, label: 'Opplæringsoversikt'},
-      {key: 'includeSignOff' as keyof ReportSectionsConfig, label: 'Signering'},
-    ],
-  },
-]
-
 </script>
 
 <template>
   <AppLayout>
-    <PageHeader title="Rapporter" />
+    <PageHeader title="Rapporter"/>
 
     <div class="page-content">
       <section class="header-row">
@@ -372,7 +204,7 @@ const sectionGroups = [
           <h1>Rapporter</h1>
           <p>Generer og administrer internkontrollrapporter</p>
         </div>
-        <Button @click="openCreateDialog">
+        <Button @click="createDialogOpen = true">
           <Plus :size="16"/>
           Ny rapport
         </Button>
@@ -382,7 +214,7 @@ const sectionGroups = [
         <div class="search-row">
           <div class="search-wrapper">
             <Search :size="16" class="search-icon"/>
-            <Input v-model="search" class="search-input" placeholder="Søk etter rapport..." />
+            <Input v-model="search" class="search-input" placeholder="Søk etter rapport..."/>
           </div>
         </div>
 
@@ -529,102 +361,22 @@ const sectionGroups = [
         </div>
       </section>
 
-      <Dialog :open="createDialogOpen" @update:open="(v: boolean) => { createDialogOpen = v }">
-        <DialogScrollContent class="create-dialog">
-          <DialogHeader>
-            <DialogTitle>Ny rapport</DialogTitle>
-            <DialogDescription>Velg periode og innhold for rapporten.</DialogDescription>
-          </DialogHeader>
-
-          <div class="create-form">
-            <div class="form-field">
-              <label class="form-label">Tittel (valgfritt)</label>
-              <Input v-model="reportTitle" placeholder="F.eks. Internkontroll Mars 2026"/>
-            </div>
-
-            <div class="form-dates">
-              <div class="form-field form-date-field">
-                <label class="form-label">Fra dato</label>
-                <DatePicker v-model="periodFrom" placeholder="Velg fra-dato"/>
-              </div>
-              <div class="form-field form-date-field">
-                <label class="form-label">Til dato</label>
-                <DatePicker v-model="periodTo" placeholder="Velg til-dato"/>
-              </div>
-            </div>
-
-            <div class="form-field">
-              <label class="form-label">Seksjoner</label>
-              <div class="section-groups">
-                <div v-for="group in sectionGroups" :key="group.label" class="section-group">
-                  <span class="section-group-label">{{ group.label }}</span>
-                  <div class="section-group-items">
-                    <label v-for="opt in group.options" :key="opt.key" class="section-option">
-                      <Checkbox
-                        :checked="!!sections[opt.key]"
-                        @update:checked="(v: boolean) => { (sections as any)[opt.key] = v }"
-                      />
-                      <span>{{ opt.label }}</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div v-if="sections.includeChecklists && checklists.length > 0" class="form-field">
-              <label class="form-label">Velg sjekklister</label>
-              <button class="checklist-picker-toggle"
-                      @click="showChecklistPicker = !showChecklistPicker">
-                {{
-                  selectedChecklistIds.size === 0 ? 'Alle sjekklister' : `${selectedChecklistIds.size} sjekkliste(r) valgt`
-                }}
-                <ArrowUpDown :size="14"/>
-              </button>
-              <div v-if="showChecklistPicker" class="checklist-picker">
-                <label v-for="cl in checklists" :key="cl.id" class="checklist-option">
-                  <Checkbox :checked="selectedChecklistIds.has(cl.id)"
-                            @update:checked="() => toggleChecklistId(cl.id)"/>
-                  <span>{{ cl.name }}</span>
-                </label>
-              </div>
-            </div>
-
-            <div v-if="sections.includeSignOff" class="signoff-fields">
-              <div class="form-field">
-                <label class="form-label">Signert av (navn)</label>
-                <Input v-model="signOffName" placeholder="Fullt navn"/>
-              </div>
-              <div class="form-field">
-                <label class="form-label">Tittel/rolle</label>
-                <Input v-model="signOffTitle" placeholder="F.eks. Daglig leder"/>
-              </div>
-              <div class="form-field">
-                <label class="form-label">Kommentarer</label>
-                <textarea v-model="signOffComments" class="form-textarea"
-                          placeholder="Eventuelle kommentarer..." rows="2"/>
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" @click="createDialogOpen = false">Avbryt</Button>
-            <Button @click="handlePreview" :disabled="previewMutation.isPending.value">
-              <Eye :size="16"/>
-              {{ previewMutation.isPending.value ? 'Genererer...' : 'Forhåndsvis' }}
-            </Button>
-          </DialogFooter>
-        </DialogScrollContent>
-      </Dialog>
+      <GenerateReportDialog
+        :open="createDialogOpen"
+        :checklists="checklists"
+        :is-previewing="previewMutation.isPending.value"
+        @update:open="createDialogOpen = $event"
+        @preview="handlePreviewFromDialog"
+      />
 
       <Dialog :open="previewOpen" @update:open="(v: boolean) => { previewOpen = v }">
         <DialogScrollContent class="preview-dialog">
           <DialogHeader>
             <DialogTitle>Forhåndsvisning av rapport</DialogTitle>
-            <DialogDescription>Kontroller innholdet før du lagrer eller laster ned.</DialogDescription>
+            <DialogDescription>Kontroller innholdet før du lagrer eller laster ned.
+            </DialogDescription>
           </DialogHeader>
-
-          <ReportPreview v-if="previewData" :data="previewData" />
-
+          <ReportPreview v-if="previewData" :data="previewData"/>
           <DialogFooter>
             <Button variant="outline" @click="previewOpen = false">Lukk</Button>
             <Button variant="outline" @click="handleSave"
@@ -688,139 +440,11 @@ h1 {
   font-size: 0.88rem;
 }
 
-.create-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: hsl(var(--muted-foreground, 24 5% 46%));
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.form-dates {
-  display: flex;
-  gap: 1rem;
-}
-
-.form-date-field {
-  flex: 1;
-  position: relative;
-}
-
-.form-date-field:first-child { z-index: 21; }
-.form-date-field:last-child { z-index: 20; }
-
-.form-textarea {
-  width: 100%;
-  border: 1px solid hsl(var(--input, 35 15% 85%));
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  font: inherit;
-  font-size: 0.875rem;
-  background: hsl(var(--card));
-  resize: vertical;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  transition: all 150ms ease;
-  outline: none;
-}
-
-.form-textarea:focus {
-  box-shadow: 0 0 0 2px hsl(var(--ring, 245 43% 52%) / 0.2);
-  border-color: hsl(var(--primary, 245 43% 52%) / 0.5);
-}
-
-.section-groups { display: flex; flex-direction: column; gap: 0.75rem; }
-.section-group { display: flex; flex-direction: column; gap: 0.35rem; }
-
-.section-group-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: hsl(var(--muted-foreground));
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding-bottom: 0.15rem;
-  border-bottom: 1px solid hsl(var(--border) / 0.5);
-}
-
-.section-group-items { display: flex; flex-wrap: wrap; gap: 0.25rem 0.75rem; }
-
-.section-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-size: 0.85rem;
-  padding: 0.3rem 0.4rem;
-  border-radius: 0.375rem;
-  transition: background 150ms;
-}
-
-.section-option:hover { background: hsl(var(--accent, 250 40% 95%)); }
-
-.checklist-picker-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  border: 1px solid hsl(var(--input, 35 15% 85%));
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  font: inherit;
-  font-size: 0.875rem;
-  background: hsl(var(--card));
-  cursor: pointer;
-  color: hsl(var(--muted-foreground));
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  transition: all 150ms;
-}
-
-.checklist-picker-toggle:hover { border-color: hsl(var(--primary, 245 43% 52%) / 0.5); }
-
-.checklist-picker {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.5rem;
-  border: 1px solid hsl(var(--border));
-  border-radius: 0.5rem;
-  max-height: 12rem;
-  overflow-y: auto;
-  margin-top: 0.25rem;
-}
-
-.checklist-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-size: 0.84rem;
-  padding: 0.25rem 0.35rem;
-  border-radius: 0.25rem;
-}
-
-.checklist-option:hover { background: hsl(var(--accent, 250 40% 95%)); }
-
-.signoff-fields {
+.table-section {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  padding: 0.75rem;
-  border: 1px solid hsl(var(--border));
-  border-radius: 0.5rem;
-  background: hsl(var(--muted, 40 18% 93%) / 0.3);
 }
-
-.table-section { display: flex; flex-direction: column; gap: 0.75rem; }
 
 .search-row {
   display: flex;
@@ -829,7 +453,10 @@ h1 {
   gap: 0.75rem;
 }
 
-.search-wrapper { position: relative; width: 20rem; }
+.search-wrapper {
+  position: relative;
+  width: 20rem;
+}
 
 .search-icon {
   position: absolute;
@@ -841,7 +468,9 @@ h1 {
   z-index: 1;
 }
 
-.search-input { padding-left: 2.1rem; }
+.search-input {
+  padding-left: 2.1rem;
+}
 
 .table-card {
   border: 1px solid hsl(var(--border));
@@ -860,24 +489,48 @@ h1 {
   color: hsl(var(--muted-foreground));
   cursor: pointer;
   padding: 0.25rem 0.4rem;
-  border-radius: var(--radius-md, 0.375rem);
+  border-radius: var(--radius-md);
   margin: -0.25rem -0.4rem;
   transition: background 150ms, color 150ms;
 }
 
 .sort-btn:hover {
-  background: hsl(var(--accent, 250 40% 95%));
+  background: hsl(var(--accent));
   color: hsl(var(--foreground));
 }
 
-.sort-icon { opacity: 0.4; transition: opacity 150ms; }
-.sort-icon--active { opacity: 1; }
+.sort-icon {
+  opacity: 0.4;
+  transition: opacity 150ms;
+}
 
-.cell-title { display: flex; align-items: center; gap: 0.5rem; }
-.cell-title-icon { flex-shrink: 0; color: hsl(var(--primary, 245 43% 52%)); }
-.cell-title-text { font-weight: 500; }
-.cell-text { color: hsl(var(--muted-foreground)); }
-.cell-actions { width: 3rem; text-align: right; }
+.sort-icon--active {
+  opacity: 1;
+}
+
+.cell-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cell-title-icon {
+  flex-shrink: 0;
+  color: hsl(var(--primary));
+}
+
+.cell-title-text {
+  font-weight: 500;
+}
+
+.cell-text {
+  color: hsl(var(--muted-foreground));
+}
+
+.cell-actions {
+  width: 3rem;
+  text-align: right;
+}
 
 .actions-trigger {
   display: flex;
@@ -885,7 +538,7 @@ h1 {
   justify-content: center;
   width: 2rem;
   height: 2rem;
-  border-radius: var(--radius-md, 0.375rem);
+  border-radius: var(--radius-md);
   border: none;
   background: none;
   color: hsl(var(--muted-foreground));
@@ -894,19 +547,39 @@ h1 {
 }
 
 .actions-trigger:hover {
-  background: hsl(var(--accent, 250 40% 95%));
+  background: hsl(var(--accent));
   color: hsl(var(--foreground));
 }
 
-.menu-item--danger { color: var(--red); }
+.menu-item--danger {
+  color: var(--red);
+}
 
-.th-title { min-width: 10rem; }
-.th-period { min-width: 10rem; }
-.th-user { min-width: 8rem; }
-.th-date { min-width: 6rem; }
-.th-actions { width: 3rem; }
+.th-title {
+  min-width: 10rem;
+}
 
-.mobile-report-list { display: flex; flex-direction: column; gap: 0.65rem; }
+.th-period {
+  min-width: 10rem;
+}
+
+.th-user {
+  min-width: 8rem;
+}
+
+.th-date {
+  min-width: 6rem;
+}
+
+.th-actions {
+  width: 3rem;
+}
+
+.mobile-report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
 
 .mobile-report-card {
   border: 1px solid hsl(var(--border));
@@ -922,7 +595,9 @@ h1 {
   margin-bottom: 0.25rem;
 }
 
-.mobile-report-title { font-size: 0.9rem; }
+.mobile-report-title {
+  font-size: 0.9rem;
+}
 
 .mobile-report-row {
   display: flex;
@@ -940,9 +615,15 @@ h1 {
   letter-spacing: 0.02em;
 }
 
-.mobile-report-row > :last-child { text-align: right; }
+.mobile-report-row > :last-child {
+  text-align: right;
+}
 
-.loading-state { display: flex; flex-direction: column; gap: 10px; }
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
 .skeleton-item {
   height: 56px;
@@ -953,20 +634,38 @@ h1 {
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 @media (max-width: 768px) {
-  .hide-mobile { display: none !important; }
-  .header-row { flex-direction: column; }
-  .search-row { flex-direction: column; align-items: stretch; }
-  .search-wrapper { width: 100%; }
-  .form-dates { flex-direction: column; }
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .header-row {
+    flex-direction: column;
+  }
+
+  .search-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-wrapper {
+    width: 100%;
+  }
 }
 
 @media (max-width: 760px) {
-  .page-content { padding: 0 0.75rem 0.75rem; gap: 0.75rem; }
+  .page-content {
+    padding: 0 0.75rem 0.75rem;
+    gap: 0.75rem;
+  }
 }
 </style>
 
@@ -974,9 +673,5 @@ h1 {
 .dialog-scroll-content.preview-dialog {
   --dialog-max-width: 64rem;
   width: 95vw;
-}
-
-.dialog-scroll-content.create-dialog {
-  --dialog-max-width: 36rem;
 }
 </style>

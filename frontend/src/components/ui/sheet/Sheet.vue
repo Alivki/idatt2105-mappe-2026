@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { provide, ref, watch } from "vue"
+import {provide, ref, watch} from "vue"
 
 const props = withDefaults(defineProps<{
   open?: boolean
@@ -28,9 +28,9 @@ function close() {
   setOpen(false)
 }
 
-provide("sheet", { isOpen, setOpen, close })
+provide("sheet", {isOpen, setOpen, close})
 </script>
 
 <template>
-  <slot />
+  <slot/>
 </template>

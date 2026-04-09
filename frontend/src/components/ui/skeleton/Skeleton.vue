@@ -5,7 +5,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div :class="['skeleton', props.class]" />
+  <div :class="['skeleton', props.class]"/>
 </template>
 
 <style scoped>
@@ -16,7 +16,11 @@ const props = defineProps<{
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 </style>

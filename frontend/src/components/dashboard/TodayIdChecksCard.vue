@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { IdCard, AlertTriangle, ShieldCheck, ShieldX, Clock, CalendarCheck } from 'lucide-vue-next'
+import {computed} from 'vue'
+import {IdCard, AlertTriangle, ShieldCheck, ShieldX, Clock, CalendarCheck} from 'lucide-vue-next'
 
 const props = defineProps<{
   shiftsToday: number
@@ -10,10 +10,28 @@ const props = defineProps<{
 
 const complianceInfo = computed(() => {
   if (props.deviationsToday === 0 && props.idsChecked > 0)
-    return { title: 'Full kontroll', desc: 'Ingen avvik registrert i dag', icon: ShieldCheck, color: 'var(--green)', bg: 'var(--green-soft)' }
+    return {
+      title: 'Full kontroll',
+      desc: 'Ingen avvik registrert i dag',
+      icon: ShieldCheck,
+      color: 'var(--green)',
+      bg: 'var(--green-soft)'
+    }
   if (props.deviationsToday > 0)
-    return { title: 'Krever tiltak', desc: `${props.deviationsToday} avvik trenger oppfølging`, icon: ShieldX, color: 'var(--red)', bg: 'var(--red-soft)' }
-  return { title: 'Venter på data', desc: 'Ingen kontroller registrert enda', icon: Clock, color: 'hsl(var(--muted-foreground))', bg: 'hsl(var(--secondary))' }
+    return {
+      title: 'Krever tiltak',
+      desc: `${props.deviationsToday} avvik trenger oppfølging`,
+      icon: ShieldX,
+      color: 'var(--red)',
+      bg: 'var(--red-soft)'
+    }
+  return {
+    title: 'Venter på data',
+    desc: 'Ingen kontroller registrert enda',
+    icon: Clock,
+    color: 'hsl(var(--muted-foreground))',
+    bg: 'hsl(var(--secondary))'
+  }
 })
 </script>
 
@@ -24,35 +42,41 @@ const complianceInfo = computed(() => {
     <div class="stats">
       <div class="stat-block">
         <div class="stat-header">
-          <CalendarCheck :size="16" class="stat-icon" style="color: var(--brand)" aria-hidden="true" />
+          <CalendarCheck :size="16" class="stat-icon" style="color: var(--brand)"
+                         aria-hidden="true"/>
           <span class="stat-label">Skift i dag</span>
         </div>
         <strong class="stat-value">{{ shiftsToday }}</strong>
       </div>
 
-      <div class="stat-divider" />
+      <div class="stat-divider"/>
 
       <div class="stat-block">
         <div class="stat-header">
-          <IdCard :size="16" class="stat-icon" style="color: var(--brand)" aria-hidden="true" />
+          <IdCard :size="16" class="stat-icon" style="color: var(--brand)" aria-hidden="true"/>
           <span class="stat-label">ID-kontroller</span>
         </div>
         <strong class="stat-value">{{ idsChecked }}</strong>
       </div>
 
-      <div class="stat-divider" />
+      <div class="stat-divider"/>
 
       <div class="stat-block">
         <div class="stat-header">
-          <AlertTriangle :size="16" class="stat-icon" :style="{ color: deviationsToday > 0 ? 'var(--red)' : 'var(--green)' }" aria-hidden="true" />
+          <AlertTriangle :size="16" class="stat-icon"
+                         :style="{ color: deviationsToday > 0 ? 'var(--red)' : 'var(--green)' }"
+                         aria-hidden="true"/>
           <span class="stat-label">Avvik i dag</span>
         </div>
-        <strong class="stat-value" :class="{ danger: deviationsToday > 0 }">{{ deviationsToday }}</strong>
+        <strong class="stat-value" :class="{ danger: deviationsToday > 0 }">{{
+            deviationsToday
+          }}</strong>
       </div>
     </div>
 
     <div class="card-status">
-      <component :is="complianceInfo.icon" :size="14" :style="{ color: complianceInfo.color, flexShrink: 0 }" />
+      <component :is="complianceInfo.icon" :size="14"
+                 :style="{ color: complianceInfo.color, flexShrink: 0 }"/>
       <span class="status-text">{{ complianceInfo.title }} — {{ complianceInfo.desc }}</span>
     </div>
   </div>

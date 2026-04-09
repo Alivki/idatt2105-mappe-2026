@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick } from 'vue'
+import {afterEach, describe, expect, it} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, nextTick} from 'vue'
 
 import Popover from '../Popover.vue'
 import PopoverTrigger from '../PopoverTrigger.vue'
@@ -13,7 +13,7 @@ afterEach(() => {
 describe('PopoverContent', () => {
   it('renders slot content', async () => {
     const Host = defineComponent({
-      components: { Popover, PopoverContent },
+      components: {Popover, PopoverContent},
       template: `
         <Popover :defaultOpen="true">
           <PopoverContent>
@@ -24,7 +24,7 @@ describe('PopoverContent', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await nextTick()
@@ -35,7 +35,7 @@ describe('PopoverContent', () => {
 
   it('applies base class and default center alignment', async () => {
     const Host = defineComponent({
-      components: { Popover, PopoverContent },
+      components: {Popover, PopoverContent},
       template: `
         <Popover :defaultOpen="true">
           <PopoverContent class="extra-content">
@@ -46,7 +46,7 @@ describe('PopoverContent', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await nextTick()
@@ -59,7 +59,7 @@ describe('PopoverContent', () => {
 
   it('applies start alignment class', async () => {
     const Host = defineComponent({
-      components: { Popover, PopoverContent },
+      components: {Popover, PopoverContent},
       template: `
         <Popover :defaultOpen="true">
           <PopoverContent align="start">
@@ -70,7 +70,7 @@ describe('PopoverContent', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await nextTick()
@@ -80,7 +80,7 @@ describe('PopoverContent', () => {
 
   it('applies end alignment class', async () => {
     const Host = defineComponent({
-      components: { Popover, PopoverContent },
+      components: {Popover, PopoverContent},
       template: `
         <Popover :defaultOpen="true">
           <PopoverContent align="end">
@@ -91,7 +91,7 @@ describe('PopoverContent', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await nextTick()
@@ -101,7 +101,7 @@ describe('PopoverContent', () => {
 
   it('does not close on Escape in this implementation', async () => {
     const Host = defineComponent({
-      components: { Popover, PopoverContent },
+      components: {Popover, PopoverContent},
       template: `
         <Popover :defaultOpen="true">
           <PopoverContent>
@@ -113,13 +113,13 @@ describe('PopoverContent', () => {
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await nextTick()
     expect(wrapper.find('[data-test="content"]').exists()).toBe(true)
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}))
     await nextTick()
 
     expect(wrapper.find('[data-test="content"]').exists()).toBe(true)
@@ -129,7 +129,7 @@ describe('PopoverContent', () => {
 
   it('does not close on non-Escape key', async () => {
     const Host = defineComponent({
-      components: { Popover, PopoverContent },
+      components: {Popover, PopoverContent},
       template: `
         <Popover :defaultOpen="true">
           <PopoverContent>
@@ -141,13 +141,13 @@ describe('PopoverContent', () => {
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await nextTick()
     expect(wrapper.find('[data-test="content"]').exists()).toBe(true)
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', bubbles: true}))
     await nextTick()
 
     expect(wrapper.find('[data-test="content"]').exists()).toBe(true)
@@ -157,7 +157,7 @@ describe('PopoverContent', () => {
 
   it('does not close on outside click in this implementation', async () => {
     const Host = defineComponent({
-      components: { Popover, PopoverTrigger, PopoverContent },
+      components: {Popover, PopoverTrigger, PopoverContent},
       template: `
         <Popover :defaultOpen="true">
           <PopoverTrigger>
@@ -172,13 +172,13 @@ describe('PopoverContent', () => {
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await nextTick()
     expect(wrapper.find('[data-test="content"]').exists()).toBe(true)
 
-    document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    document.body.dispatchEvent(new MouseEvent('mousedown', {bubbles: true}))
     await nextTick()
 
     expect(wrapper.find('[data-test="content"]').exists()).toBe(true)
@@ -188,7 +188,7 @@ describe('PopoverContent', () => {
 
   it('does not close when clicking inside popover content', async () => {
     const Host = defineComponent({
-      components: { Popover, PopoverContent },
+      components: {Popover, PopoverContent},
       template: `
         <Popover :defaultOpen="true">
           <PopoverContent>
@@ -200,7 +200,7 @@ describe('PopoverContent', () => {
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await nextTick()
@@ -215,7 +215,7 @@ describe('PopoverContent', () => {
 
   it('does not close when clicking inside the popover root', async () => {
     const Host = defineComponent({
-      components: { Popover, PopoverTrigger, PopoverContent },
+      components: {Popover, PopoverTrigger, PopoverContent},
       template: `
         <Popover :defaultOpen="true">
           <PopoverTrigger>
@@ -230,7 +230,7 @@ describe('PopoverContent', () => {
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await nextTick()
@@ -246,7 +246,7 @@ describe('PopoverContent', () => {
 
   it('removes content when popover closes through trigger toggle', async () => {
     const Host = defineComponent({
-      components: { Popover, PopoverTrigger, PopoverContent },
+      components: {Popover, PopoverTrigger, PopoverContent},
       template: `
         <Popover>
           <PopoverTrigger>
@@ -260,7 +260,7 @@ describe('PopoverContent', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await wrapper.get('[data-test="trigger"]').trigger('click')

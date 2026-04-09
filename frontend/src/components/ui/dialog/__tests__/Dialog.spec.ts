@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, h, nextTick, ref } from 'vue'
+import {afterEach, describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h, nextTick, ref} from 'vue'
 
 import DialogComponent from '../Dialog.vue'
 import DialogTrigger from '../DialogTrigger.vue'
@@ -12,10 +12,10 @@ vi.mock('lucide-vue-next', () => ({
   X: defineComponent({
     name: 'XIconStub',
     props: {
-      class: { type: String, default: '' },
+      class: {type: String, default: ''},
     },
     setup(props) {
-      return () => h('svg', { class: props.class, 'data-test': 'x-icon' })
+      return () => h('svg', {class: props.class, 'data-test': 'x-icon'})
     },
   }),
 }))
@@ -47,8 +47,8 @@ describe('Dialog behavior', () => {
         `,
       },
       global: {
-        components: { DialogContent },
-        stubs: { teleport: false, transition: true },
+        components: {DialogContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -61,7 +61,7 @@ describe('Dialog behavior', () => {
 
   it('respects defaultOpen', async () => {
     const wrapper = mount(DialogComponent, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -71,8 +71,8 @@ describe('Dialog behavior', () => {
         `,
       },
       global: {
-        components: { DialogContent },
-        stubs: { teleport: false, transition: true },
+        components: {DialogContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -92,7 +92,7 @@ describe('Dialog behavior', () => {
 
   it('syncs internal state when controlled open prop changes', async () => {
     const wrapper = mount(DialogComponent, {
-      props: { open: false },
+      props: {open: false},
       attachTo: document.body,
       slots: {
         default: `
@@ -102,19 +102,19 @@ describe('Dialog behavior', () => {
         `,
       },
       global: {
-        components: { DialogContent },
-        stubs: { teleport: false, transition: true },
+        components: {DialogContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
     await nextTick()
     expect(document.body.querySelector('[role="dialog"]')).toBeNull()
 
-    await wrapper.setProps({ open: true })
+    await wrapper.setProps({open: true})
     await nextTick()
     expect(document.body.querySelector('[role="dialog"]')).not.toBeNull()
 
-    await wrapper.setProps({ open: false })
+    await wrapper.setProps({open: false})
     await nextTick()
     expect(document.body.querySelector('[role="dialog"]')).toBeNull()
 
@@ -135,8 +135,8 @@ describe('Dialog behavior', () => {
         `,
       },
       global: {
-        components: { DialogTrigger, DialogContent },
-        stubs: { teleport: false, transition: true },
+        components: {DialogTrigger, DialogContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -157,7 +157,7 @@ describe('Dialog behavior', () => {
 
   it('close component closes dialog and emits update:open=false', async () => {
     const wrapper = mount(DialogComponent, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -169,8 +169,8 @@ describe('Dialog behavior', () => {
         `,
       },
       global: {
-        components: { DialogContent, DialogClose },
-        stubs: { teleport: false, transition: true },
+        components: {DialogContent, DialogClose},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -192,7 +192,7 @@ describe('Dialog behavior', () => {
 
   it('content overlay click closes dialog', async () => {
     const wrapper = mount(DialogComponent, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -202,8 +202,8 @@ describe('Dialog behavior', () => {
         `,
       },
       global: {
-        components: { DialogContent },
-        stubs: { teleport: false, transition: true },
+        components: {DialogContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -223,7 +223,7 @@ describe('Dialog behavior', () => {
 
   it('content close button closes dialog and renders icon + sr text', async () => {
     const wrapper = mount(DialogComponent, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -233,8 +233,8 @@ describe('Dialog behavior', () => {
         `,
       },
       global: {
-        components: { DialogContent },
-        stubs: { teleport: false, transition: true },
+        components: {DialogContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -256,7 +256,7 @@ describe('Dialog behavior', () => {
 
   it('pressing Escape closes DialogContent', async () => {
     const wrapper = mount(DialogComponent, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -266,14 +266,14 @@ describe('Dialog behavior', () => {
         `,
       },
       global: {
-        components: { DialogContent },
-        stubs: { teleport: false, transition: true },
+        components: {DialogContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
     await nextTick()
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}))
     await nextTick()
 
     expect(document.body.querySelector('[role="dialog"]')).toBeNull()
@@ -284,7 +284,7 @@ describe('Dialog behavior', () => {
 
   it('non-Escape key does not close DialogContent', async () => {
     const wrapper = mount(DialogComponent, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -294,14 +294,14 @@ describe('Dialog behavior', () => {
         `,
       },
       global: {
-        components: { DialogContent },
-        stubs: { teleport: false, transition: true },
+        components: {DialogContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
     await nextTick()
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}))
     await nextTick()
 
     expect(document.body.querySelector('[role="dialog"]')).not.toBeNull()
@@ -311,7 +311,7 @@ describe('Dialog behavior', () => {
 
   it('DialogScrollContent renders when open and respects custom class', async () => {
     const wrapper = mount(DialogComponent, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -321,8 +321,8 @@ describe('Dialog behavior', () => {
         `,
       },
       global: {
-        components: { DialogScrollContent },
-        stubs: { teleport: false, transition: true },
+        components: {DialogScrollContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -342,7 +342,7 @@ describe('Dialog behavior', () => {
 
   it('DialogScrollContent closes on overlay self click but not inner content click', async () => {
     const wrapper = mount(DialogComponent, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -352,8 +352,8 @@ describe('Dialog behavior', () => {
         `,
       },
       global: {
-        components: { DialogScrollContent },
-        stubs: { teleport: false, transition: true },
+        components: {DialogScrollContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -368,7 +368,7 @@ describe('Dialog behavior', () => {
     expect(document.body.querySelector('[role="dialog"]')).not.toBeNull()
 
     const overlay = document.body.querySelector('.dialog-scroll-overlay') as HTMLDivElement | null
-    overlay?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    overlay?.dispatchEvent(new MouseEvent('click', {bubbles: true}))
     await nextTick()
 
     expect(document.body.querySelector('[role="dialog"]')).toBeNull()
@@ -379,7 +379,7 @@ describe('Dialog behavior', () => {
 
   it('DialogScrollContent close button closes dialog', async () => {
     const wrapper = mount(DialogComponent, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -389,8 +389,8 @@ describe('Dialog behavior', () => {
         `,
       },
       global: {
-        components: { DialogScrollContent },
-        stubs: { teleport: false, transition: true },
+        components: {DialogScrollContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -411,7 +411,7 @@ describe('Dialog behavior', () => {
 
   it('pressing Escape closes DialogScrollContent', async () => {
     const wrapper = mount(DialogComponent, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -421,14 +421,14 @@ describe('Dialog behavior', () => {
         `,
       },
       global: {
-        components: { DialogScrollContent },
-        stubs: { teleport: false, transition: true },
+        components: {DialogScrollContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
     await nextTick()
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}))
     await nextTick()
 
     expect(document.body.querySelector('[role="dialog"]')).toBeNull()
@@ -446,7 +446,7 @@ describe('Dialog behavior', () => {
       },
       setup() {
         const open = ref(false)
-        return { open }
+        return {open}
       },
       template: `
         <AppDialog v-model:open="open">
@@ -463,7 +463,7 @@ describe('Dialog behavior', () => {
     const wrapper = mount(ControlledHost, {
       attachTo: document.body,
       global: {
-        stubs: { teleport: false, transition: true },
+        stubs: {teleport: false, transition: true},
       },
     })
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import {computed} from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -34,8 +34,9 @@ const progressPercent = computed(() => {
     <p class="kpi-title">{{ title }}</p>
     <p class="kpi-value" :class="`kpi-value--${highlight}`">{{ value }}</p>
     <p v-if="subtitle" class="kpi-subtitle" :class="`kpi-subtitle--${highlight}`">{{ subtitle }}</p>
-    <div v-if="progress" class="progress-track" role="progressbar" :aria-valuenow="progress.current" :aria-valuemax="progress.total">
-      <div class="progress-fill" :style="{ width: `${progressPercent}%` }" />
+    <div v-if="progress" class="progress-track" role="progressbar" :aria-valuenow="progress.current"
+         :aria-valuemax="progress.total">
+      <div class="progress-fill" :style="{ width: `${progressPercent}%` }"/>
     </div>
   </article>
 </template>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useSidebar } from "./utils"
+import {useSidebar} from "./utils"
 
 const props = defineProps<{
   class?: string
 }>()
 
-const { state, collapsible } = useSidebar()
+const {state, collapsible} = useSidebar()
 </script>
 
 <template>
@@ -16,7 +16,7 @@ const { state, collapsible } = useSidebar()
       overflow: state === 'collapsed' && collapsible === 'icon' ? 'hidden' : undefined,
     }"
   >
-    <slot />
+    <slot/>
   </div>
 </template>
 

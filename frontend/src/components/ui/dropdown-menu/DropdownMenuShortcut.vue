@@ -6,7 +6,7 @@ defineProps<{
 
 <template>
   <span :class="['dropdown-shortcut', $props.class]">
-    <slot />
+    <slot/>
   </span>
 </template>
 

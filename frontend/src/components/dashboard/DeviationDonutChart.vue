@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Doughnut } from 'vue-chartjs'
-import { CircleSlash } from 'lucide-vue-next'
-import type { FoodDeviation } from '@/types/deviation'
-import type { AlcoholDeviation } from '@/types/deviation'
+import {computed} from 'vue'
+import {Doughnut} from 'vue-chartjs'
+import {CircleSlash} from 'lucide-vue-next'
+import type {FoodDeviation} from '@/types/deviation'
+import type {AlcoholDeviation} from '@/types/deviation'
 
 const props = defineProps<{
   foodDeviations: FoodDeviation[]
@@ -11,7 +11,7 @@ const props = defineProps<{
 }>()
 
 const statusCounts = computed(() => {
-  const counts = { open: 0, underTreatment: 0, closed: 0 }
+  const counts = {open: 0, underTreatment: 0, closed: 0}
   for (const d of props.foodDeviations) {
     if (d.status === 'OPEN') counts.open++
     else if (d.status === 'UNDER_TREATMENT') counts.underTreatment++
@@ -37,9 +37,24 @@ const closedPercent = computed(() => {
 
 const footerInfo = computed(() => {
   const pct = closedPercent.value
-  if (pct >= 80) return { label: `${pct}% lukket`, desc: 'God oppfølging av avvik', color: 'var(--green)', bg: 'var(--green-soft)' }
-  if (pct >= 50) return { label: `${pct}% lukket`, desc: 'Noen avvik gjenstår', color: 'var(--brand)', bg: 'var(--brand-soft)' }
-  return { label: `${pct}% lukket`, desc: 'Flere åpne avvik krever oppfølging', color: 'var(--red)', bg: 'var(--red-soft)' }
+  if (pct >= 80) return {
+    label: `${pct}% lukket`,
+    desc: 'God oppfølging av avvik',
+    color: 'var(--green)',
+    bg: 'var(--green-soft)'
+  }
+  if (pct >= 50) return {
+    label: `${pct}% lukket`,
+    desc: 'Noen avvik gjenstår',
+    color: 'var(--brand)',
+    bg: 'var(--brand-soft)'
+  }
+  return {
+    label: `${pct}% lukket`,
+    desc: 'Flere åpne avvik krever oppfølging',
+    color: 'var(--red)',
+    bg: 'var(--red-soft)'
+  }
 })
 
 const chartData = computed(() => ({
@@ -65,7 +80,7 @@ const chartOptions = {
   maintainAspectRatio: false,
   cutout: '68%',
   plugins: {
-    legend: { display: false },
+    legend: {display: false},
     tooltip: {
       backgroundColor: 'hsl(40, 25%, 98%)',
       titleColor: 'hsl(24, 10%, 15%)',
@@ -74,8 +89,8 @@ const chartOptions = {
       borderWidth: 1,
       padding: 12,
       cornerRadius: 8,
-      titleFont: { weight: 'bold' as const, size: 13 },
-      bodyFont: { size: 12 },
+      titleFont: {weight: 'bold' as const, size: 13},
+      bodyFont: {size: 12},
     },
   },
 }
@@ -90,7 +105,7 @@ const chartOptions = {
     <template v-if="total === 0">
       <div class="empty-state">
         <div class="empty-icon">
-          <CircleSlash :size="32" />
+          <CircleSlash :size="32"/>
         </div>
         <p class="empty-heading">Ingen avvik registrert</p>
         <p class="empty-body">Når avvik registreres vil fordelingen vises her.</p>
@@ -101,7 +116,7 @@ const chartOptions = {
     <template v-else>
       <div class="donut-wrapper">
         <div class="donut-container">
-          <Doughnut :data="chartData" :options="chartOptions" />
+          <Doughnut :data="chartData" :options="chartOptions"/>
           <div class="donut-center">
             <strong class="donut-total">{{ total }}</strong>
             <span class="donut-label">Avvik</span>
@@ -111,24 +126,24 @@ const chartOptions = {
 
       <div class="legend">
         <div class="legend-item">
-          <span class="legend-dot" style="background: #2d2a6e" />
+          <span class="legend-dot" style="background: #2d2a6e"/>
           <span class="legend-text">Åpne</span>
           <strong class="legend-value">{{ statusCounts.open }}</strong>
         </div>
         <div class="legend-item">
-          <span class="legend-dot" style="background: #5753b5" />
+          <span class="legend-dot" style="background: #5753b5"/>
           <span class="legend-text">Under behandling</span>
           <strong class="legend-value">{{ statusCounts.underTreatment }}</strong>
         </div>
         <div class="legend-item">
-          <span class="legend-dot" style="background: #bcbae6" />
+          <span class="legend-dot" style="background: #bcbae6"/>
           <span class="legend-text">Lukket</span>
           <strong class="legend-value">{{ statusCounts.closed }}</strong>
         </div>
       </div>
 
       <div class="chart-status">
-        <span class="status-dot" :style="{ background: footerInfo.color }" />
+        <span class="status-dot" :style="{ background: footerInfo.color }"/>
         <span class="status-text">{{ footerInfo.label }} — {{ footerInfo.desc }}</span>
       </div>
     </template>

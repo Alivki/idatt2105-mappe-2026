@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick, ref } from 'vue'
+import {afterEach, describe, expect, it} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, nextTick, ref} from 'vue'
 
 import DropdownMenu from '../DropdownMenu.vue'
 import DropdownMenuTrigger from '../DropdownMenuTrigger.vue'
@@ -34,8 +34,8 @@ describe('DropdownMenu core behavior', () => {
         `,
       },
       global: {
-        components: { DropdownMenuContent },
-        stubs: { teleport: false, transition: true },
+        components: {DropdownMenuContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -47,7 +47,7 @@ describe('DropdownMenu core behavior', () => {
 
   it('respects defaultOpen', async () => {
     const wrapper = mount(DropdownMenu, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -57,8 +57,8 @@ describe('DropdownMenu core behavior', () => {
         `,
       },
       global: {
-        components: { DropdownMenuContent },
-        stubs: { teleport: false, transition: true },
+        components: {DropdownMenuContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -76,7 +76,7 @@ describe('DropdownMenu core behavior', () => {
 
   it('syncs internal state when controlled open prop changes', async () => {
     const wrapper = mount(DropdownMenu, {
-      props: { open: false },
+      props: {open: false},
       attachTo: document.body,
       slots: {
         default: `
@@ -85,8 +85,8 @@ describe('DropdownMenu core behavior', () => {
         `,
       },
       global: {
-        components: { DropdownMenuTrigger, DropdownMenuContent },
-        stubs: { teleport: false, transition: true },
+        components: {DropdownMenuTrigger, DropdownMenuContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -105,11 +105,11 @@ describe('DropdownMenu core behavior', () => {
     await nextTick()
     expect(document.body.querySelector('[role="menu"]')).toBeNull()
 
-    await wrapper.setProps({ open: true })
+    await wrapper.setProps({open: true})
     await nextTick()
     expect(document.body.querySelector('[role="menu"]')).not.toBeNull()
 
-    await wrapper.setProps({ open: false })
+    await wrapper.setProps({open: false})
     await nextTick()
     expect(document.body.querySelector('[role="menu"]')).toBeNull()
 
@@ -130,8 +130,8 @@ describe('DropdownMenu core behavior', () => {
         `,
       },
       global: {
-        components: { DropdownMenuTrigger, DropdownMenuContent },
-        stubs: { teleport: false, transition: true },
+        components: {DropdownMenuTrigger, DropdownMenuContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -176,8 +176,8 @@ describe('DropdownMenu core behavior', () => {
         `,
       },
       global: {
-        components: { DropdownMenuTrigger, DropdownMenuContent },
-        stubs: { teleport: false, transition: true },
+        components: {DropdownMenuTrigger, DropdownMenuContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -204,7 +204,7 @@ describe('DropdownMenu core behavior', () => {
 
   it('renders content for bottom/center alignment', async () => {
     const wrapper = mount(DropdownMenu, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -217,8 +217,8 @@ describe('DropdownMenu core behavior', () => {
         `,
       },
       global: {
-        components: { DropdownMenuTrigger, DropdownMenuContent },
-        stubs: { teleport: false, transition: true },
+        components: {DropdownMenuTrigger, DropdownMenuContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -234,7 +234,7 @@ describe('DropdownMenu core behavior', () => {
       }),
     })
 
-    await wrapper.setProps({ open: true })
+    await wrapper.setProps({open: true})
     await nextTick()
 
     const content = document.body.querySelector('[role="menu"]') as HTMLDivElement | null
@@ -247,11 +247,11 @@ describe('DropdownMenu core behavior', () => {
   })
 
   it('renders content for top/end alignment', async () => {
-    Object.defineProperty(window, 'innerHeight', { value: 900, configurable: true })
-    Object.defineProperty(window, 'innerWidth', { value: 1200, configurable: true })
+    Object.defineProperty(window, 'innerHeight', {value: 900, configurable: true})
+    Object.defineProperty(window, 'innerWidth', {value: 1200, configurable: true})
 
     const wrapper = mount(DropdownMenu, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -264,8 +264,8 @@ describe('DropdownMenu core behavior', () => {
         `,
       },
       global: {
-        components: { DropdownMenuTrigger, DropdownMenuContent },
-        stubs: { teleport: false, transition: true },
+        components: {DropdownMenuTrigger, DropdownMenuContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -281,7 +281,7 @@ describe('DropdownMenu core behavior', () => {
       }),
     })
 
-    await wrapper.setProps({ open: true })
+    await wrapper.setProps({open: true})
     await nextTick()
 
     const content = document.body.querySelector('[role="menu"]') as HTMLDivElement | null
@@ -295,7 +295,7 @@ describe('DropdownMenu core behavior', () => {
 
   it('renders content for right/center alignment', async () => {
     const wrapper = mount(DropdownMenu, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -308,8 +308,8 @@ describe('DropdownMenu core behavior', () => {
         `,
       },
       global: {
-        components: { DropdownMenuTrigger, DropdownMenuContent },
-        stubs: { teleport: false, transition: true },
+        components: {DropdownMenuTrigger, DropdownMenuContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -325,7 +325,7 @@ describe('DropdownMenu core behavior', () => {
       }),
     })
 
-    await wrapper.setProps({ open: true })
+    await wrapper.setProps({open: true})
     await nextTick()
 
     const content = document.body.querySelector('[role="menu"]') as HTMLDivElement | null
@@ -338,10 +338,10 @@ describe('DropdownMenu core behavior', () => {
   })
 
   it('renders content for left/start alignment', async () => {
-    Object.defineProperty(window, 'innerWidth', { value: 1000, configurable: true })
+    Object.defineProperty(window, 'innerWidth', {value: 1000, configurable: true})
 
     const wrapper = mount(DropdownMenu, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -354,8 +354,8 @@ describe('DropdownMenu core behavior', () => {
         `,
       },
       global: {
-        components: { DropdownMenuTrigger, DropdownMenuContent },
-        stubs: { teleport: false, transition: true },
+        components: {DropdownMenuTrigger, DropdownMenuContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -371,7 +371,7 @@ describe('DropdownMenu core behavior', () => {
       }),
     })
 
-    await wrapper.setProps({ open: true })
+    await wrapper.setProps({open: true})
     await nextTick()
 
     const content = document.body.querySelector('[role="menu"]') as HTMLDivElement | null
@@ -397,8 +397,8 @@ describe('DropdownMenu core behavior', () => {
         `,
       },
       global: {
-        components: { DropdownMenuTrigger, DropdownMenuContent },
-        stubs: { teleport: false, transition: true },
+        components: {DropdownMenuTrigger, DropdownMenuContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -418,7 +418,7 @@ describe('DropdownMenu core behavior', () => {
     await nextTick()
     expect(document.body.querySelector('[role="menu"]')).not.toBeNull()
 
-    document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    document.dispatchEvent(new MouseEvent('mousedown', {bubbles: true}))
     await nextTick()
     expect(document.body.querySelector('[role="menu"]')).toBeNull()
 
@@ -426,7 +426,7 @@ describe('DropdownMenu core behavior', () => {
     await nextTick()
     expect(document.body.querySelector('[role="menu"]')).not.toBeNull()
 
-    btn.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    btn.dispatchEvent(new MouseEvent('mousedown', {bubbles: true}))
     await nextTick()
     expect(document.body.querySelector('[role="menu"]')).not.toBeNull()
 
@@ -447,8 +447,8 @@ describe('DropdownMenu core behavior', () => {
         `,
       },
       global: {
-        components: { DropdownMenuTrigger, DropdownMenuContent },
-        stubs: { teleport: false, transition: true },
+        components: {DropdownMenuTrigger, DropdownMenuContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -467,11 +467,11 @@ describe('DropdownMenu core behavior', () => {
     await wrapper.get('[data-test="trigger"]').trigger('click')
     await nextTick()
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', bubbles: true}))
     await nextTick()
     expect(document.body.querySelector('[role="menu"]')).not.toBeNull()
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}))
     await nextTick()
     expect(document.body.querySelector('[role="menu"]')).toBeNull()
 
@@ -492,8 +492,8 @@ describe('DropdownMenu core behavior', () => {
         `,
       },
       global: {
-        components: { DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem },
-        stubs: { teleport: false, transition: true },
+        components: {DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -525,7 +525,7 @@ describe('DropdownMenu core behavior', () => {
 
   it('disabled menu item prevents default and does not close', async () => {
     const wrapper = mount(DropdownMenu, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -538,8 +538,8 @@ describe('DropdownMenu core behavior', () => {
         `,
       },
       global: {
-        components: { DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem },
-        stubs: { teleport: false, transition: true },
+        components: {DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -555,7 +555,7 @@ describe('DropdownMenu core behavior', () => {
       }),
     })
 
-    await wrapper.setProps({ open: true })
+    await wrapper.setProps({open: true})
     await nextTick()
 
     const item = document.body.querySelector('[data-test="item"]') as HTMLDivElement | null
@@ -564,7 +564,7 @@ describe('DropdownMenu core behavior', () => {
     expect(item?.className).toContain('extra-item')
     expect(item?.getAttribute('tabindex')).toBe('-1')
 
-    const event = new MouseEvent('click', { bubbles: true, cancelable: true })
+    const event = new MouseEvent('click', {bubbles: true, cancelable: true})
     item?.dispatchEvent(event)
     await nextTick()
 
@@ -576,10 +576,10 @@ describe('DropdownMenu core behavior', () => {
 
   it('can be used as a controlled component from the parent', async () => {
     const ControlledHost = defineComponent({
-      components: { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent },
+      components: {DropdownMenu, DropdownMenuTrigger, DropdownMenuContent},
       setup() {
         const open = ref(false)
-        return { open }
+        return {open}
       },
       template: `
         <DropdownMenu v-model:open="open">
@@ -596,7 +596,7 @@ describe('DropdownMenu core behavior', () => {
     const wrapper = mount(ControlledHost, {
       attachTo: document.body,
       global: {
-        stubs: { teleport: false, transition: true },
+        stubs: {teleport: false, transition: true},
       },
     })
 

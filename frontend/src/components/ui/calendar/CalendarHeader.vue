@@ -3,7 +3,7 @@
 
 <template>
   <div class="calendar-header">
-    <slot />
+    <slot/>
   </div>
 </template>
 

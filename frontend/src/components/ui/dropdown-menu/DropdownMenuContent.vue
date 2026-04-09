@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, ref, onBeforeUnmount, watch, nextTick } from "vue"
+import {inject, ref, onBeforeUnmount, watch, nextTick} from "vue"
 
 const props = withDefaults(defineProps<{
   class?: string
@@ -12,9 +12,9 @@ const props = withDefaults(defineProps<{
   sideOffset: 4,
 })
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { isOpen, triggerRef, close } = inject("dropdown-menu") as {
+const {isOpen, triggerRef, close} = inject("dropdown-menu") as {
   isOpen: Ref<boolean>
   triggerRef: Ref<HTMLElement | null>
   close: () => void
@@ -33,7 +33,7 @@ function updatePosition() {
 
   const content = contentRef.value
   const rect = trigger.getBoundingClientRect()
-  const s: Record<string, string> = { position: "fixed", zIndex: "999" }
+  const s: Record<string, string> = {position: "fixed", zIndex: "999"}
   const menuWidth = content?.offsetWidth ?? 0
   const menuHeight = content?.offsetHeight ?? 0
   const isVertical = props.side === "bottom" || props.side === "top"
@@ -165,7 +165,7 @@ onBeforeUnmount(() => {
         :style="posStyle"
         role="menu"
       >
-        <slot />
+        <slot/>
       </div>
     </Transition>
   </Teleport>

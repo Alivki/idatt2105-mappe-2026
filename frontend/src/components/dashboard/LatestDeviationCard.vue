@@ -31,10 +31,13 @@ const severityRailClass: Record<'Lav' | 'Middels' | 'Høy' | 'Kritisk', string> 
   <section class="panel">
     <h2>Siste avvik</h2>
 
-    <article v-for="item in deviations" :key="item.id" class="entry" :class="severityRailClass[item.severityLabel]">
+    <article v-for="item in deviations" :key="item.id" class="entry"
+             :class="severityRailClass[item.severityLabel]">
       <div>
         <h3>{{ item.title }}</h3>
-        <p>{{ item.moduleLabel }} · Rapportert av {{ item.reportedBy }} · {{ item.relativeTime }}</p>
+        <p>{{ item.moduleLabel }} · Rapportert av {{ item.reportedBy }} · {{
+            item.relativeTime
+          }}</p>
       </div>
       <Badge :tone="severityTone[item.severityLabel]">{{ item.severityLabel }}</Badge>
     </article>

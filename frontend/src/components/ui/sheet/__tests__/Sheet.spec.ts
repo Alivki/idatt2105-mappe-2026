@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, h, nextTick, ref } from 'vue'
+import {afterEach, describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h, nextTick, ref} from 'vue'
 
 import Sheet from '../Sheet.vue'
 import SheetTrigger from '../SheetTrigger.vue'
@@ -11,10 +11,10 @@ vi.mock('lucide-vue-next', () => ({
   X: defineComponent({
     name: 'XIconStub',
     props: {
-      class: { type: String, default: '' },
+      class: {type: String, default: ''},
     },
     setup(props) {
-      return () => h('svg', { class: props.class, 'data-test': 'x-icon' })
+      return () => h('svg', {class: props.class, 'data-test': 'x-icon'})
     },
   }),
 }))
@@ -46,8 +46,8 @@ describe('Sheet behavior', () => {
         `,
       },
       global: {
-        components: { SheetContent },
-        stubs: { teleport: false, transition: true },
+        components: {SheetContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -61,7 +61,7 @@ describe('Sheet behavior', () => {
 
   it('respects defaultOpen', async () => {
     const wrapper = mount(Sheet, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -71,8 +71,8 @@ describe('Sheet behavior', () => {
         `,
       },
       global: {
-        components: { SheetContent },
-        stubs: { teleport: false, transition: true },
+        components: {SheetContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -92,7 +92,7 @@ describe('Sheet behavior', () => {
 
   it('syncs internal state when controlled open prop changes', async () => {
     const wrapper = mount(Sheet, {
-      props: { open: false },
+      props: {open: false},
       attachTo: document.body,
       slots: {
         default: `
@@ -102,19 +102,19 @@ describe('Sheet behavior', () => {
         `,
       },
       global: {
-        components: { SheetContent },
-        stubs: { teleport: false, transition: true },
+        components: {SheetContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
     await nextTick()
     expect(document.body.querySelector('[role="dialog"]')).toBeNull()
 
-    await wrapper.setProps({ open: true })
+    await wrapper.setProps({open: true})
     await nextTick()
     expect(document.body.querySelector('[role="dialog"]')).not.toBeNull()
 
-    await wrapper.setProps({ open: false })
+    await wrapper.setProps({open: false})
     await nextTick()
     expect(document.body.querySelector('[role="dialog"]')).toBeNull()
 
@@ -135,8 +135,8 @@ describe('Sheet behavior', () => {
         `,
       },
       global: {
-        components: { SheetTrigger, SheetContent },
-        stubs: { teleport: false, transition: true },
+        components: {SheetTrigger, SheetContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -157,7 +157,7 @@ describe('Sheet behavior', () => {
 
   it('SheetClose closes the sheet and emits update:open=false', async () => {
     const wrapper = mount(Sheet, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -169,8 +169,8 @@ describe('Sheet behavior', () => {
         `,
       },
       global: {
-        components: { SheetContent, SheetClose },
-        stubs: { teleport: false, transition: true },
+        components: {SheetContent, SheetClose},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -193,7 +193,7 @@ describe('Sheet behavior', () => {
 
   it('overlay click closes the sheet', async () => {
     const wrapper = mount(Sheet, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -203,8 +203,8 @@ describe('Sheet behavior', () => {
         `,
       },
       global: {
-        components: { SheetContent },
-        stubs: { teleport: false, transition: true },
+        components: {SheetContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -224,7 +224,7 @@ describe('Sheet behavior', () => {
 
   it('content close button closes sheet and renders icon', async () => {
     const wrapper = mount(Sheet, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -234,8 +234,8 @@ describe('Sheet behavior', () => {
       `,
       },
       global: {
-        components: { SheetContent },
-        stubs: { teleport: false, transition: true },
+        components: {SheetContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -256,7 +256,7 @@ describe('Sheet behavior', () => {
 
   it('pressing Escape closes the sheet', async () => {
     const wrapper = mount(Sheet, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -266,14 +266,14 @@ describe('Sheet behavior', () => {
         `,
       },
       global: {
-        components: { SheetContent },
-        stubs: { teleport: false, transition: true },
+        components: {SheetContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
     await nextTick()
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}))
     await nextTick()
 
     expect(document.body.querySelector('[role="dialog"]')).toBeNull()
@@ -284,7 +284,7 @@ describe('Sheet behavior', () => {
 
   it('non-Escape key does not close the sheet', async () => {
     const wrapper = mount(Sheet, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -294,14 +294,14 @@ describe('Sheet behavior', () => {
         `,
       },
       global: {
-        components: { SheetContent },
-        stubs: { teleport: false, transition: true },
+        components: {SheetContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
     await nextTick()
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}))
     await nextTick()
 
     expect(document.body.querySelector('[role="dialog"]')).not.toBeNull()
@@ -311,7 +311,7 @@ describe('Sheet behavior', () => {
 
   it('supports side="right" by default', async () => {
     const wrapper = mount(Sheet, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -321,8 +321,8 @@ describe('Sheet behavior', () => {
         `,
       },
       global: {
-        components: { SheetContent },
-        stubs: { teleport: false, transition: true },
+        components: {SheetContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -337,7 +337,7 @@ describe('Sheet behavior', () => {
 
   it('supports side="left"', async () => {
     const wrapper = mount(Sheet, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -347,8 +347,8 @@ describe('Sheet behavior', () => {
         `,
       },
       global: {
-        components: { SheetContent },
-        stubs: { teleport: false, transition: true },
+        components: {SheetContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -362,7 +362,7 @@ describe('Sheet behavior', () => {
 
   it('supports side="top"', async () => {
     const wrapper = mount(Sheet, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -372,8 +372,8 @@ describe('Sheet behavior', () => {
         `,
       },
       global: {
-        components: { SheetContent },
-        stubs: { teleport: false, transition: true },
+        components: {SheetContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -387,7 +387,7 @@ describe('Sheet behavior', () => {
 
   it('supports side="bottom"', async () => {
     const wrapper = mount(Sheet, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -397,8 +397,8 @@ describe('Sheet behavior', () => {
         `,
       },
       global: {
-        components: { SheetContent },
-        stubs: { teleport: false, transition: true },
+        components: {SheetContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -419,7 +419,7 @@ describe('Sheet behavior', () => {
       },
       setup() {
         const open = ref(false)
-        return { open }
+        return {open}
       },
       template: `
         <Sheet v-model:open="open">
@@ -436,7 +436,7 @@ describe('Sheet behavior', () => {
     const wrapper = mount(ControlledHost, {
       attachTo: document.body,
       global: {
-        stubs: { teleport: false, transition: true },
+        stubs: {teleport: false, transition: true},
       },
     })
 

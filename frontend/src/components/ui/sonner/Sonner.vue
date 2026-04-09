@@ -1,8 +1,15 @@
 <script lang="ts" setup>
-import type { ToasterProps } from "vue-sonner"
-import { reactiveOmit } from "@vueuse/core"
-import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon, XIcon } from "lucide-vue-next"
-import { Toaster as Sonner } from "vue-sonner"
+import type {ToasterProps} from "vue-sonner"
+import {reactiveOmit} from "@vueuse/core"
+import {
+  CircleCheckIcon,
+  InfoIcon,
+  Loader2Icon,
+  OctagonXIcon,
+  TriangleAlertIcon,
+  XIcon
+} from "lucide-vue-next"
+import {Toaster as Sonner} from "vue-sonner"
 
 const props = defineProps<ToasterProps>()
 const delegatedProps = reactiveOmit(props, "toastOptions")
@@ -22,24 +29,24 @@ const delegatedProps = reactiveOmit(props, "toastOptions")
     v-bind="delegatedProps"
   >
     <template #success-icon>
-      <CircleCheckIcon class="sonner-icon" />
+      <CircleCheckIcon class="sonner-icon"/>
     </template>
     <template #info-icon>
-      <InfoIcon class="sonner-icon" />
+      <InfoIcon class="sonner-icon"/>
     </template>
     <template #warning-icon>
-      <TriangleAlertIcon class="sonner-icon" />
+      <TriangleAlertIcon class="sonner-icon"/>
     </template>
     <template #error-icon>
-      <OctagonXIcon class="sonner-icon" />
+      <OctagonXIcon class="sonner-icon"/>
     </template>
     <template #loading-icon>
       <div>
-        <Loader2Icon class="sonner-icon sonner-icon--spin" />
+        <Loader2Icon class="sonner-icon sonner-icon--spin"/>
       </div>
     </template>
     <template #close-icon>
-      <XIcon class="sonner-icon" />
+      <XIcon class="sonner-icon"/>
     </template>
   </Sonner>
 </template>
@@ -78,7 +85,11 @@ const delegatedProps = reactiveOmit(props, "toastOptions")
 }
 
 @keyframes sonner-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

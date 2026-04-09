@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick, ref } from 'vue'
+import {afterEach, describe, expect, it} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, nextTick, ref} from 'vue'
 
 import Popover from '../Popover.vue'
 import PopoverTrigger from '../PopoverTrigger.vue'
@@ -38,8 +38,8 @@ describe('Popover core behavior', () => {
         `,
       },
       global: {
-        components: { PopoverContent },
-        stubs: { transition: true },
+        components: {PopoverContent},
+        stubs: {transition: true},
       },
     })
 
@@ -53,7 +53,7 @@ describe('Popover core behavior', () => {
 
   it('respects defaultOpen=true', async () => {
     const wrapper = mount(Popover, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       slots: {
         default: `
           <PopoverContent class="extra-content">
@@ -62,8 +62,8 @@ describe('Popover core behavior', () => {
         `,
       },
       global: {
-        components: { PopoverContent },
-        stubs: { transition: true },
+        components: {PopoverContent},
+        stubs: {transition: true},
       },
     })
 
@@ -79,7 +79,7 @@ describe('Popover core behavior', () => {
 
   it('syncs internal state when controlled open prop changes', async () => {
     const wrapper = mount(Popover, {
-      props: { open: false },
+      props: {open: false},
       slots: {
         default: `
           <PopoverContent>
@@ -88,19 +88,19 @@ describe('Popover core behavior', () => {
         `,
       },
       global: {
-        components: { PopoverContent },
-        stubs: { transition: true },
+        components: {PopoverContent},
+        stubs: {transition: true},
       },
     })
 
     await nextTick()
     expect(wrapper.find('[data-test="content"]').exists()).toBe(false)
 
-    await wrapper.setProps({ open: true })
+    await wrapper.setProps({open: true})
     await nextTick()
     expect(wrapper.find('[data-test="content"]').exists()).toBe(true)
 
-    await wrapper.setProps({ open: false })
+    await wrapper.setProps({open: false})
     await nextTick()
     expect(wrapper.find('[data-test="content"]').exists()).toBe(false)
 
@@ -120,8 +120,8 @@ describe('Popover core behavior', () => {
         `,
       },
       global: {
-        components: { PopoverTrigger, PopoverContent },
-        stubs: { transition: true },
+        components: {PopoverTrigger, PopoverContent},
+        stubs: {transition: true},
       },
     })
 
@@ -149,7 +149,7 @@ describe('Popover core behavior', () => {
       },
       setup() {
         const open = ref(false)
-        return { open }
+        return {open}
       },
       template: `
         <Popover v-model:open="open">
@@ -165,7 +165,7 @@ describe('Popover core behavior', () => {
 
     const wrapper = mount(ControlledHost, {
       global: {
-        stubs: { transition: true },
+        stubs: {transition: true},
       },
     })
 
@@ -202,8 +202,8 @@ describe('Popover core behavior', () => {
         `,
       },
       global: {
-        components: { PopoverTrigger, PopoverContent },
-        stubs: { transition: true },
+        components: {PopoverTrigger, PopoverContent},
+        stubs: {transition: true},
       },
     })
 

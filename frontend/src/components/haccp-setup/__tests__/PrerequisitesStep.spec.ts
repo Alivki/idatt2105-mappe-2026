@@ -1,6 +1,6 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h} from 'vue'
+import {describe, expect, it, vi} from 'vitest'
 import PrerequisitesStep from '../Step2FoodHandling.vue'
 
 
@@ -8,7 +8,7 @@ vi.mock('lucide-vue-next', () => {
   const icon = (name: string) => defineComponent({
     name,
     setup() {
-      return () => h('svg', { 'data-icon': name })
+      return () => h('svg', {'data-icon': name})
     },
   })
   return {
@@ -48,9 +48,9 @@ vi.mock('@/types/haccp-setup', () => ({
 function makeWizard() {
   return {
     prerequisites: [
-      { id: '1', name: 'Renhold', description: 'Rutiner for renhold', status: 'OK' },
-      { id: '2', name: 'Vedlikehold', description: 'Rutiner for utstyr', status: 'NEEDS_WORK' },
-      { id: '3', name: 'Skadedyr', description: 'Forebygging', status: 'MISSING' },
+      {id: '1', name: 'Renhold', description: 'Rutiner for renhold', status: 'OK'},
+      {id: '2', name: 'Vedlikehold', description: 'Rutiner for utstyr', status: 'NEEDS_WORK'},
+      {id: '3', name: 'Skadedyr', description: 'Forebygging', status: 'MISSING'},
     ],
   }
 }
@@ -58,7 +58,7 @@ function makeWizard() {
 describe('PrerequisitesStep', () => {
   it('renders summary counts from current statuses', () => {
     const wrapper = mount(PrerequisitesStep, {
-      props: { wizard: makeWizard() },
+      props: {wizard: makeWizard()},
     })
 
     expect(wrapper.text()).toContain('1 på plass')
@@ -70,7 +70,7 @@ describe('PrerequisitesStep', () => {
   it('updates prerequisite status and summary when status buttons are clicked', async () => {
     const wizard = makeWizard()
     const wrapper = mount(PrerequisitesStep, {
-      props: { wizard },
+      props: {wizard},
     })
 
     const workCard = wrapper.findAll('.prereq-card')[1]
@@ -89,7 +89,7 @@ describe('PrerequisitesStep', () => {
 
   it('applies status classes to cards and active buttons', () => {
     const wrapper = mount(PrerequisitesStep, {
-      props: { wizard: makeWizard() },
+      props: {wizard: makeWizard()},
     })
 
     const cards = wrapper.findAll('.prereq-card')

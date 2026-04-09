@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import {computed} from "vue"
 
 const props = withDefaults(defineProps<{
   checked?: boolean
@@ -41,7 +41,7 @@ function toggle() {
       class="switch__thumb"
       :data-state="isChecked ? 'checked' : 'unchecked'"
     >
-      <slot name="thumb" />
+      <slot name="thumb"/>
     </span>
   </button>
 </template>

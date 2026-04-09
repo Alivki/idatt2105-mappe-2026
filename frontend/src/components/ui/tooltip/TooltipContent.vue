@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject } from "vue"
+import {inject} from "vue"
 
 const props = withDefaults(defineProps<{
   side?: "top" | "bottom" | "left" | "right"
@@ -11,9 +11,9 @@ const props = withDefaults(defineProps<{
   align: "center",
 })
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { isOpen } = inject("tooltip") as { isOpen: Ref<boolean> }
+const {isOpen} = inject("tooltip") as { isOpen: Ref<boolean> }
 </script>
 
 <template>
@@ -23,7 +23,7 @@ const { isOpen } = inject("tooltip") as { isOpen: Ref<boolean> }
       role="tooltip"
       :class="['tooltip-content', `tooltip-content--${side}`, `tooltip-content--align-${align}`, props.class]"
     >
-      <slot />
+      <slot/>
     </div>
   </Transition>
 </template>
@@ -99,9 +99,11 @@ const { isOpen } = inject("tooltip") as { isOpen: Ref<boolean> }
 .tooltip-enter-active {
   transition: opacity 150ms ease, transform 150ms ease;
 }
+
 .tooltip-leave-active {
   transition: opacity 100ms ease, transform 100ms ease;
 }
+
 .tooltip-enter-from,
 .tooltip-leave-to {
   opacity: 0;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
+import {Separator} from '@/components/ui/separator'
+import {SidebarTrigger} from '@/components/ui/sidebar'
 
 defineProps<{
   title: string
@@ -10,8 +10,8 @@ defineProps<{
 <template>
   <header class="page-header">
     <div class="page-header-inner">
-      <SidebarTrigger />
-      <Separator orientation="vertical" class="header-separator" />
+      <SidebarTrigger/>
+      <Separator orientation="vertical" class="header-separator"/>
       <span class="page-title">{{ title }}</span>
     </div>
   </header>
