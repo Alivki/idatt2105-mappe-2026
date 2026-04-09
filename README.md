@@ -11,21 +11,15 @@ Et digitalt internkontrollsystem for restauranter, barer og serveringssteder. Ve
 - Docker Desktop (inkludert Docker Compose)
 - Git
 
-### Kjør appen lokalt
-
+### Kjør appen lokalt med docker
+**Start:**
 Fra repo-roten:
 
 ```bash
 docker compose up --build
 ```
 
-Applikasjonen vil starte på:
-- **Frontend**: http://localhost (Nginx + Vue app)
-- **Backend API (mat)**: http://localhost:8081
-- **Backend API (alkohol)**: http://localhost:8082
-- **Database**: mysql:3306
-
-### Stopp appen
+**Stoppe:**
 
 ```bash
 docker compose down
@@ -37,24 +31,42 @@ Fjern alle data (inkludert databasen):
 docker compose down -v
 ```
 
+### Kjøre program i utvikling (uten Docker): ###
+**Start:**
+```bash
+chmod +x dev-up.sh
+./dev-up.sh
+```
+
+**Stoppe:**
+```bash
+Ctrl + c
+```
+
+Applikasjonen vil starte på:
+- **Frontend**: http://localhost (Nginx + Vue app)
+- **Backend API (mat)**: http://localhost:8081
+- **Backend API (alkohol)**: http://localhost:8082
+- **Database**: mysql:3306
+
 ## Testbrukere
 
 Default testdata er satt opp automatisk ved oppstart. Bruk disse credentials for å logge inn:
 
 | Email | Passord | Rolle | Organisasjon |
 |-------|---------|-------|--------------|
-| `admin@everest.local` | `password` | ADMIN | Everest Sushi & Fusion AS |
-| `manager@everest.local` | `password` | MANAGER | Everest Sushi & Fusion AS |
-| `employee@everest.local` | `password` | EMPLOYEE | Everest Sushi & Fusion AS & Demo Organization |
+| `admin@iksystem.local` | `password` | ADMIN | Everest Sushi & Fusion AS + Nordvik Bar & Kjøkken AS |
+| `manager@iksystem.local` | `password` | MANAGER | Everest Sushi & Fusion AS |
+| `employee@iksystem.local` | `password` | EMPLOYEE | Everest Sushi & Fusion AS |
 
 ## Prosjektstruktur
 
 ```
 FULLSTACK-V2026/
 ├── backend/           # Spring Boot API (Java 21+)
-│   ├── vera-common/           # Felles tjenester
-│   ├── vera-food-service/     # Vera Mat modul
-│   └── vera-alcohol-service/  # Vera Alkohol modul
+│   ├── ik-common/           # Felles tjenester
+│   ├── ik-food-service/     # IK-Mat modul
+│   └── ik-alcohol-service/  # IK-Alkohol modul
 ├── frontend/          # Vue.js 3 + Vite
 ├── docker-compose.yml # Container orchestration
 └── docs/              # Dokumentasjon
@@ -67,7 +79,7 @@ FULLSTACK-V2026/
 | **Frontend** | Vue.js | 3.x |
 | | Vite | 7.x |
 | | TypeScript | 5.x |
-| | Node.js | 18+ |
+| | Node.js | 20.19+ eller 22.12+ |
 | **Backend** | Java | 21 |
 | | Kotlin | 2.1+ |
 | | Spring Boot | 3.x |
@@ -84,44 +96,15 @@ FULLSTACK-V2026/
 
 ## Database
 
-- **Database**: `vera_system`
-- **Bruker**: `vera_user`
-- **Passord**: `vera_password`
+- **Database**: `ik_system`
+- **Bruker**: `ik_user`
+- **Passord**: `ik_password`
 - **Port**: 3306
 
 Backend bruker **Flyway** for databasemigrasjoner og oppretter/migrerer schema automatisk ved oppstart.
 
 ## Dokumentasjon
 
-- Kommer
+- Se `docs/docs.md`
 
-## Nyttige kommandoer
-
-**Se logger fra alle tjenester:**
-```bash
-docker compose logs -f
-```
-
-**Se logger fra bare backend:**
-```bash
-docker compose logs -f vera-mat vera-alkohol
-```
-
-**Restart bare backend (for rask utvikling):**
-```bash
-docker compose restart vera-mat vera-alkohol
-```
-
-**Kjør bare backend lokalt (uten Docker):**
-```bash
-cd backend
-mvn clean install
-mvn spring-boot:run
-```
-
-**Kjør bare frontend lokalt (uten Docker):**
-```bash
-cd frontend
-npm run dev
-```
 ---
