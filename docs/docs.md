@@ -382,6 +382,10 @@ Tabellen under er basert på `@PreAuthorize` i controllerne.
 
 ## 8. Database, migreringer og testdata
 
+**Databasetabelldiagram (ERD):**
+
+<img src="diagrammer/databasetabelldiagram.png" width="900" />
+
 ### 8.1 Database (Docker)
 
 - **DB**: `ik_system`
@@ -456,30 +460,29 @@ Coverage rapporter (JaCoCo) genereres per modul under `target/site/jacoco/`.
 
 ### 9.2 Frontend (Vitest)
 
-Kjør tester:
+Kjør tester for komponenter:
 
 ```bash
-cd frontend
-npm run test:run
+cd frontend/src/components
+npx vitest run
 ```
 
 Kjør coverage:
 
 ```bash
-cd frontend
-npm run test:coverage
+cd frontend/src/components
+npx vitest run --coverage
 ```
 
-Kjøre vitest komponenter:
+Start backhand før gjennomføring av E2E testene:
 ```bash
-cd frontend
-npx run vitest
+docker compose up --build
 ```
 
 kommandoen for å kjøre E2E testene:
 ```bash
 cd frontend
-npx playwright run
+npx playwright test
 ```
 
 > [!NOTE]
