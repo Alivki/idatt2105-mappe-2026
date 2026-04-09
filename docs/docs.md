@@ -474,7 +474,7 @@ cd frontend/src/components
 npx vitest run --coverage
 ```
 
-Start backhand før gjennomføring av E2E testene:
+Start backend før gjennomføring av E2E testene:
 ```bash
 docker compose up --build
 ```

@@ -1,5 +1,5 @@
 
-![Vera Logo](frontend/src/assets/vera.png)
+<img src="docs/bilder/vera.png" width="700" />  
 
 Semester-prosjekt IDATT2105 – Fullstack-appsutvikling (2026)
 
@@ -31,7 +31,7 @@ Fjern alle data (inkludert databasen):
 docker compose down -v
 ```
 
-### Kjøre program for utvikling: ###
+### Kjøre program for utvikling
 **Start:**
 ```bash
 chmod +x dev-up.sh
@@ -47,7 +47,7 @@ Applikasjonen vil starte på:
 - **Frontend**: http://localhost (Nginx + Vue app)
 - **Backend API (mat)**: http://localhost:8081
 - **Backend API (alkohol)**: http://localhost:8082
-- **Database**: mysql:3306
+- **Database**: localhost:3306
 
 ## Testbrukere
 
@@ -92,7 +92,7 @@ FULLSTACK-V2026/
 | | Docker Compose | Latest |
 | **API** | Swagger/OpenAPI | 3.0 |
 | **Testing** | JUnit 5 | Latest |
-| | Jest/Vitest | Latest |
+| | Vitest | Latest |
 
 ## Database
 
