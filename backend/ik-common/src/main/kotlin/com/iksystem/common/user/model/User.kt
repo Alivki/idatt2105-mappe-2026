@@ -45,6 +45,9 @@ data class User(
     @Column(nullable = false)
     val active: Boolean = true,
 
+    @Column(name = "email_notifications", nullable = false)
+    val emailNotifications: Boolean = true,
+
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),
 )

@@ -258,6 +258,7 @@ class AuthControllerTest {
         email = email,
         fullName = "Test User",
         phoneNumber = "+4712345678",
-        active = true
+        active = true,
+        emailNotifications = true
     )
 }

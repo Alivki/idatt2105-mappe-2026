@@ -88,8 +88,11 @@ class OrganizationController(private val organizationService: OrganizationServic
     )
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    fun delete(@Parameter(description = "Organization ID") @PathVariable id: Long): ResponseEntity<Void> {
-        organizationService.delete(id)
+    fun delete(
+        @Parameter(description = "Organization ID") @PathVariable id: Long,
+        @AuthenticationPrincipal auth: AuthenticatedUser,
+    ): ResponseEntity<Void> {
+        organizationService.delete(id, auth.userId)
         return ResponseEntity.noContent().build()
     }
 }

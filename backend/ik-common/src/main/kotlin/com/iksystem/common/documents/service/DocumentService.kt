@@ -2,6 +2,7 @@ package com.iksystem.common.documents.service
 
 import com.iksystem.common.documents.model.Document
 import com.iksystem.common.documents.repository.DocumentRepository
+import com.iksystem.common.exception.BadRequestException
 import com.iksystem.common.security.AuthenticatedUser
 import com.iksystem.common.user.repository.UserRepository
 import org.springframework.beans.factory.annotation.Value
@@ -37,7 +38,37 @@ class DocumentsService(
      * @param auth The authenticated user uploading the file
      * @return The saved Document entity with metadata
      */
+    companion object {
+        private const val MAX_FILE_SIZE = 5L * 1024 * 1024 // 5 MB
+        private val ALLOWED_CONTENT_TYPES = setOf(
+            "application/pdf",
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "text/plain",
+        )
+    }
+
+    private fun validateFile(file: MultipartFile) {
+        if (file.isEmpty) {
+            throw BadRequestException("File is empty")
+        }
+        if (file.size > MAX_FILE_SIZE) {
+            throw BadRequestException("File size exceeds maximum of 5 MB")
+        }
+        val contentType = file.contentType ?: throw BadRequestException("File has no content type")
+        if (contentType !in ALLOWED_CONTENT_TYPES) {
+            throw BadRequestException("File type '$contentType' is not allowed")
+        }
+    }
+
     fun uploadFile(file: MultipartFile, folder: String, auth: AuthenticatedUser): Document {
+        validateFile(file)
         val s3Key = "$folder/${UUID.randomUUID()}-${file.originalFilename}"
 
         // Upload to S3

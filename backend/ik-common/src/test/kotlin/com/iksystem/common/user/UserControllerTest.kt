@@ -268,7 +268,8 @@ class UserControllerTest {
         email = email,
         fullName = fullName,
         phoneNumber = phoneNumber,
-        active = active
+        active = active,
+        emailNotifications = true
     )
 
     private fun membershipResponse(

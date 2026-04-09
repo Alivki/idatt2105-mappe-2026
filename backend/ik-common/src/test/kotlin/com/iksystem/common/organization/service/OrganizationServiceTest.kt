@@ -94,11 +94,13 @@ class OrganizationServiceTest : FunSpec({
         result shouldHaveSize 2
     }
 
-    test("delete removes existing organization") {
+    test("delete removes existing organization when caller is admin") {
+        val membership = Membership(id = 1L, user = user, organization = org, role = Role.ADMIN)
         every { organizationRepository.existsById(1L) } returns true
+        every { membershipRepository.findByUserIdAndOrganizationId(1L, 1L) } returns membership
         every { organizationRepository.deleteById(1L) } just runs
 
-        service.delete(1L)
+        service.delete(1L, 1L)
 
         verify { organizationRepository.deleteById(1L) }
     }
@@ -107,7 +109,7 @@ class OrganizationServiceTest : FunSpec({
         every { organizationRepository.existsById(99L) } returns false
 
         shouldThrow<NotFoundException> {
-            service.delete(99L)
+            service.delete(99L, 1L)
         }
     }
 })
