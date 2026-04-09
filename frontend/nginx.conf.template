@@ -69,7 +69,7 @@ server {
 
     # Proxy API requests to backend
     location /api/v1/ {
-        proxy_pass $food_upstream/api/v1/;
+        proxy_pass $food_upstream;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -78,7 +78,8 @@ server {
 
     # Proxy IK-Mat api-docs
     location /api/mat/ {
-        proxy_pass $food_upstream/;
+        rewrite ^/api/mat/(.*)$ /$1 break;
+        proxy_pass $food_upstream;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -87,7 +88,8 @@ server {
 
     # Proxy IK-Alkohol api-docs
     location /api/alkohol/ {
-        proxy_pass $alcohol_upstream/;
+        rewrite ^/api/alkohol/(.*)$ /$1 break;
+        proxy_pass $alcohol_upstream;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
