@@ -50,22 +50,6 @@ withDefaults(defineProps<{
   color: #dc2626;
 }
 
-:deep(.text-emerald-700) {
-  color: #059669;
-}
-
-:deep(.text-amber-600) {
-  color: #d97706;
-}
-
-:deep(.text-red-600) {
-  color: #dc2626;
-}
-
-:deep(.text-gray-900) {
-  color: #111827;
-}
-
 .stat-sub {
   font-size: 0.78rem;
   color: #d97706;
