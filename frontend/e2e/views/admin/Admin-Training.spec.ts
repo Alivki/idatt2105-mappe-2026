@@ -1,4 +1,3 @@
-// e2e/views/admin/admin-training.spec.ts
 import { test, expect, Page } from '@playwright/test'
 
 const email = process.env.E2E_EMAIL ?? 'admin@everest.local'

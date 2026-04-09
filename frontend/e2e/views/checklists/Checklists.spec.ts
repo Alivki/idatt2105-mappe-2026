@@ -1,4 +1,3 @@
-// e2e/views/checklists/checklists.spec.ts
 import { test, expect, Page } from '@playwright/test'
 
 const email = process.env.E2E_EMAIL ?? 'manager@everest.local'
