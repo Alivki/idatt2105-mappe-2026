@@ -4,9 +4,8 @@ server {
     index index.html;
     client_max_body_size 10M;
 
-    # Resolve DNS at request time, not startup
-    # 8.8.8.8 for public DNS, Railway internal DNS resolves .railway.internal domains
-    resolver 8.8.8.8 valid=10s;
+    # Railway internal DNS resolver
+    resolver 100.64.0.1 valid=10s;
 
     set $food_upstream http://${BACKEND_FOOD_HOST}:${BACKEND_FOOD_PORT};
     set $alcohol_upstream http://${BACKEND_ALCOHOL_HOST}:${BACKEND_ALCOHOL_PORT};
