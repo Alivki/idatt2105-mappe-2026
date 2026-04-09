@@ -1,8 +1,8 @@
-import { describe, it, expect} from 'vitest'
-import { mount } from '@vue/test-utils'
+import {describe, it, expect} from 'vitest'
+import {mount} from '@vue/test-utils'
 import FilterPanel from '../FilterPanel.vue'
 
-const XStub = { template: '<span class="icon-x" />' }
+const XStub = {template: '<span class="icon-x" />'}
 
 const defaultProps = {
   types: ['Brannvern', 'HMS', 'Førstehjelp'],
@@ -12,8 +12,8 @@ const defaultProps = {
 
 const mountPanel = (props = {}) =>
   mount(FilterPanel, {
-    props: { ...defaultProps, ...props },
-    global: { stubs: { X: XStub } },
+    props: {...defaultProps, ...props},
+    global: {stubs: {X: XStub}},
   })
 
 describe('FilterPanel', () => {
@@ -36,36 +36,36 @@ describe('FilterPanel', () => {
     })
 
     it('does not show clear button when no filters active', () => {
-      const wrapper = mountPanel({ modelType: '', modelStatus: '' })
+      const wrapper = mountPanel({modelType: '', modelStatus: ''})
       expect(wrapper.find('.clear-btn').exists()).toBe(false)
     })
 
     it('shows clear button when modelType is set', () => {
-      const wrapper = mountPanel({ modelType: 'HMS' })
+      const wrapper = mountPanel({modelType: 'HMS'})
       expect(wrapper.find('.clear-btn').exists()).toBe(true)
     })
 
     it('shows clear button when modelStatus is set', () => {
-      const wrapper = mountPanel({ modelStatus: 'Gyldig' })
+      const wrapper = mountPanel({modelStatus: 'Gyldig'})
       expect(wrapper.find('.clear-btn').exists()).toBe(true)
     })
 
     it('shows clear button when both filters are set', () => {
-      const wrapper = mountPanel({ modelType: 'HMS', modelStatus: 'Gyldig' })
+      const wrapper = mountPanel({modelType: 'HMS', modelStatus: 'Gyldig'})
       expect(wrapper.find('.clear-btn').exists()).toBe(true)
     })
   })
 
   describe('type pill active state', () => {
     it('marks active type pill with pill-active class', () => {
-      const wrapper = mountPanel({ modelType: 'HMS' })
+      const wrapper = mountPanel({modelType: 'HMS'})
       const pills = wrapper.findAll('.pill')
       const hmsPill = pills.find((p) => p.text() === 'HMS')
       expect(hmsPill?.classes()).toContain('pill-active')
     })
 
     it('does not mark inactive type pills as active', () => {
-      const wrapper = mountPanel({ modelType: 'HMS' })
+      const wrapper = mountPanel({modelType: 'HMS'})
       const pills = wrapper.findAll('.pill')
       const brannPill = pills.find((p) => p.text() === 'Brannvern')
       expect(brannPill?.classes()).not.toContain('pill-active')
@@ -74,42 +74,42 @@ describe('FilterPanel', () => {
 
   describe('status pill classes', () => {
     it('Gyldig pill gets outline-green class when not active', () => {
-      const wrapper = mountPanel({ modelStatus: '' })
+      const wrapper = mountPanel({modelStatus: ''})
       const pills = wrapper.findAll('.pill')
       const gyldigPill = pills.find((p) => p.text().includes('Gyldig'))
       expect(gyldigPill?.classes()).toContain('pill-outline-green')
     })
 
     it('Utløper snart pill gets outline-amber class when not active', () => {
-      const wrapper = mountPanel({ modelStatus: '' })
+      const wrapper = mountPanel({modelStatus: ''})
       const pills = wrapper.findAll('.pill')
       const utloePill = pills.find((p) => p.text().includes('Utløper snart'))
       expect(utloePill?.classes()).toContain('pill-outline-amber')
     })
 
     it('Mangler pill gets outline-red class when not active', () => {
-      const wrapper = mountPanel({ modelStatus: '' })
+      const wrapper = mountPanel({modelStatus: ''})
       const pills = wrapper.findAll('.pill')
       const manglerPill = pills.find((p) => p.text().includes('Mangler'))
       expect(manglerPill?.classes()).toContain('pill-outline-red')
     })
 
     it('Gyldig pill gets pill-green class when active', () => {
-      const wrapper = mountPanel({ modelStatus: 'Gyldig' })
+      const wrapper = mountPanel({modelStatus: 'Gyldig'})
       const pills = wrapper.findAll('.pill')
       const gyldigPill = pills.find((p) => p.text().includes('Gyldig'))
       expect(gyldigPill?.classes()).toContain('pill-green')
     })
 
     it('Utløper snart pill gets pill-amber class when active', () => {
-      const wrapper = mountPanel({ modelStatus: 'Utløper snart' })
+      const wrapper = mountPanel({modelStatus: 'Utløper snart'})
       const pills = wrapper.findAll('.pill')
       const pill = pills.find((p) => p.text().includes('Utløper snart'))
       expect(pill?.classes()).toContain('pill-amber')
     })
 
     it('Mangler pill gets pill-red class when active', () => {
-      const wrapper = mountPanel({ modelStatus: 'Mangler' })
+      const wrapper = mountPanel({modelStatus: 'Mangler'})
       const pills = wrapper.findAll('.pill')
       const pill = pills.find((p) => p.text().includes('Mangler'))
       expect(pill?.classes()).toContain('pill-red')
@@ -118,7 +118,7 @@ describe('FilterPanel', () => {
 
   describe('emits', () => {
     it('emits update:modelType with the type value when an inactive type pill is clicked', async () => {
-      const wrapper = mountPanel({ modelType: '' })
+      const wrapper = mountPanel({modelType: ''})
       const pills = wrapper.findAll('.pill')
       const hmsPill = pills.find((p) => p.text() === 'HMS')
       await hmsPill?.trigger('click')
@@ -127,7 +127,7 @@ describe('FilterPanel', () => {
     })
 
     it('emits update:modelType with empty string when the active type pill is clicked (toggle off)', async () => {
-      const wrapper = mountPanel({ modelType: 'HMS' })
+      const wrapper = mountPanel({modelType: 'HMS'})
       const pills = wrapper.findAll('.pill')
       const hmsPill = pills.find((p) => p.text() === 'HMS')
       await hmsPill?.trigger('click')
@@ -135,7 +135,7 @@ describe('FilterPanel', () => {
     })
 
     it('emits update:modelType and update:modelStatus with empty strings when clear button clicked', async () => {
-      const wrapper = mountPanel({ modelType: 'HMS', modelStatus: 'Gyldig' })
+      const wrapper = mountPanel({modelType: 'HMS', modelStatus: 'Gyldig'})
       await wrapper.find('.clear-btn').trigger('click')
       expect(wrapper.emitted('update:modelType')?.[0]).toEqual([''])
       expect(wrapper.emitted('update:modelStatus')?.[0]).toEqual([''])
@@ -161,7 +161,7 @@ describe('FilterPanel', () => {
 
   describe('empty types list', () => {
     it('renders no type pills when types is empty', () => {
-      const wrapper = mountPanel({ types: [] })
+      const wrapper = mountPanel({types: []})
       // Only status pills should exist
       const pills = wrapper.findAll('.pill')
       expect(pills.length).toBe(3) // only the 3 status pills

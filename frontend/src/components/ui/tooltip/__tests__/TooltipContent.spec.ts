@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick } from 'vue'
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, nextTick} from 'vue'
 
 import Tooltip from '../Tooltip.vue'
 import TooltipContent from '../TooltipContent.vue'
@@ -20,7 +20,7 @@ describe('TooltipContent', () => {
 
   it('renders content when tooltip is open', async () => {
     const Host = defineComponent({
-      components: { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent },
+      components: {TooltipProvider, Tooltip, TooltipTrigger, TooltipContent},
       template: `
         <TooltipProvider :delayDuration="0">
           <Tooltip>
@@ -36,7 +36,7 @@ describe('TooltipContent', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const trigger = wrapper.findComponent(TooltipTrigger)
@@ -50,7 +50,7 @@ describe('TooltipContent', () => {
 
   it('does not render when hidden prop is true', async () => {
     const Host = defineComponent({
-      components: { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent },
+      components: {TooltipProvider, Tooltip, TooltipTrigger, TooltipContent},
       template: `
         <TooltipProvider :delayDuration="0">
           <Tooltip>
@@ -66,7 +66,7 @@ describe('TooltipContent', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const trigger = wrapper.findComponent(TooltipTrigger)
@@ -80,7 +80,7 @@ describe('TooltipContent', () => {
 
   it('applies default top and center classes', async () => {
     const Host = defineComponent({
-      components: { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent },
+      components: {TooltipProvider, Tooltip, TooltipTrigger, TooltipContent},
       template: `
         <TooltipProvider :delayDuration="0">
           <Tooltip>
@@ -96,7 +96,7 @@ describe('TooltipContent', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const trigger = wrapper.findComponent(TooltipTrigger)
@@ -113,7 +113,7 @@ describe('TooltipContent', () => {
 
   it('applies bottom and start classes', async () => {
     const Host = defineComponent({
-      components: { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent },
+      components: {TooltipProvider, Tooltip, TooltipTrigger, TooltipContent},
       template: `
         <TooltipProvider :delayDuration="0">
           <Tooltip>
@@ -129,7 +129,7 @@ describe('TooltipContent', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const trigger = wrapper.findComponent(TooltipTrigger)
@@ -144,7 +144,7 @@ describe('TooltipContent', () => {
 
   it('applies left and end classes', async () => {
     const Host = defineComponent({
-      components: { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent },
+      components: {TooltipProvider, Tooltip, TooltipTrigger, TooltipContent},
       template: `
         <TooltipProvider :delayDuration="0">
           <Tooltip>
@@ -160,7 +160,7 @@ describe('TooltipContent', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const trigger = wrapper.findComponent(TooltipTrigger)
@@ -175,7 +175,7 @@ describe('TooltipContent', () => {
 
   it('applies right and center classes', async () => {
     const Host = defineComponent({
-      components: { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent },
+      components: {TooltipProvider, Tooltip, TooltipTrigger, TooltipContent},
       template: `
         <TooltipProvider :delayDuration="0">
           <Tooltip>
@@ -191,7 +191,7 @@ describe('TooltipContent', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const trigger = wrapper.findComponent(TooltipTrigger)

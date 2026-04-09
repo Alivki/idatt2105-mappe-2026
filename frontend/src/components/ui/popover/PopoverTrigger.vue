@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { inject, ref, onMounted } from "vue"
+import {inject, ref, onMounted} from "vue"
 
 defineProps<{
   asChild?: boolean
 }>()
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { toggle, triggerRef } = inject("popover") as { toggle: () => void; triggerRef: Ref<HTMLElement | null> }
+const {toggle, triggerRef} = inject("popover") as {
+  toggle: () => void;
+  triggerRef: Ref<HTMLElement | null>
+}
 const elRef = ref<HTMLElement | null>(null)
 
 onMounted(() => {
@@ -19,6 +22,6 @@ onMounted(() => {
 
 <template>
   <div ref="elRef" style="display: contents" @click="toggle">
-    <slot />
+    <slot/>
   </div>
 </template>

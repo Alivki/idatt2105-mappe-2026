@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Bar } from 'vue-chartjs'
-import { BarChart3, TrendingDown, TrendingUp, Minus } from 'lucide-vue-next'
-import type { FoodDeviation } from '@/types/deviation'
-import type { AlcoholDeviation } from '@/types/deviation'
+import {computed} from 'vue'
+import {Bar} from 'vue-chartjs'
+import {BarChart3, TrendingDown, TrendingUp, Minus} from 'lucide-vue-next'
+import type {FoodDeviation} from '@/types/deviation'
+import type {AlcoholDeviation} from '@/types/deviation'
 
 const props = defineProps<{
   foodDeviations: FoodDeviation[]
@@ -78,7 +78,7 @@ const weekLabel = computed(() => {
   const sunday = new Date(monday)
   sunday.setDate(monday.getDate() + 6)
 
-  const fmt = (d: Date) => d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })
+  const fmt = (d: Date) => d.toLocaleDateString('nb-NO', {day: 'numeric', month: 'short'})
   return `${fmt(monday)} – ${fmt(sunday)}`
 })
 
@@ -129,7 +129,7 @@ const chartOptions = {
     intersect: false,
   },
   plugins: {
-    legend: { display: false },
+    legend: {display: false},
     tooltip: {
       backgroundColor: 'hsl(40, 25%, 98%)',
       titleColor: 'hsl(24, 10%, 15%)',
@@ -138,30 +138,30 @@ const chartOptions = {
       borderWidth: 1,
       padding: 12,
       cornerRadius: 8,
-      titleFont: { weight: 'bold' as const, size: 13 },
-      bodyFont: { size: 12 },
+      titleFont: {weight: 'bold' as const, size: 13},
+      bodyFont: {size: 12},
       usePointStyle: true,
       boxPadding: 6,
     },
   },
   scales: {
     x: {
-      grid: { display: false },
-      border: { display: false },
+      grid: {display: false},
+      border: {display: false},
       ticks: {
         color: 'hsl(24, 5%, 56%)',
-        font: { size: 12 },
+        font: {size: 12},
       },
     },
     y: {
       beginAtZero: true,
-      border: { display: false },
+      border: {display: false},
       grid: {
         color: 'rgba(0, 0, 0, 0.05)',
       },
       ticks: {
         color: 'hsl(24, 5%, 56%)',
-        font: { size: 11 },
+        font: {size: 11},
         stepSize: 1,
       },
       grace: '15%',
@@ -179,12 +179,12 @@ const chartOptions = {
       </div>
       <div v-if="hasData" class="chart-header-right">
         <div class="stat-pill">
-          <span class="stat-dot" style="background: #7c78d9" />
+          <span class="stat-dot" style="background: #7c78d9"/>
           <span class="stat-label">IK-Mat</span>
           <strong class="stat-value">{{ totalFood }}</strong>
         </div>
         <div class="stat-pill">
-          <span class="stat-dot" style="background: #2d2a6e" />
+          <span class="stat-dot" style="background: #2d2a6e"/>
           <span class="stat-label">IK-Alkohol</span>
           <strong class="stat-value">{{ totalAlcohol }}</strong>
         </div>
@@ -193,23 +193,25 @@ const chartOptions = {
 
     <div v-if="!hasData" class="empty-state">
       <div class="empty-icon">
-        <BarChart3 :size="28" />
+        <BarChart3 :size="28"/>
       </div>
       <p class="empty-heading">Ingen avvik registrert</p>
       <p class="empty-body">Avvik denne uken vises her.</p>
     </div>
 
     <div v-else class="chart-container">
-      <Bar :data="chartData" :options="chartOptions" />
+      <Bar :data="chartData" :options="chartOptions"/>
     </div>
 
     <div v-if="hasData" class="chart-bottom">
       <div class="chart-footer" :style="{ background: trendInfo.bg }">
         <div class="footer-icon" :style="{ color: trendInfo.color }">
-          <component :is="trendInfo.icon" :size="18" />
+          <component :is="trendInfo.icon" :size="18"/>
         </div>
         <div class="footer-text">
-          <strong class="footer-title" :style="{ color: trendInfo.color }">{{ trendInfo.title }}</strong>
+          <strong class="footer-title" :style="{ color: trendInfo.color }">{{
+              trendInfo.title
+            }}</strong>
           <span class="footer-desc">{{ trendInfo.description }}</span>
         </div>
       </div>

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { inject, ref, watch, nextTick } from "vue"
+import {inject, ref, watch, nextTick} from "vue"
 
 const props = defineProps<{
   class?: string
 }>()
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { isOpen } = inject("collapsible") as { isOpen: Ref<boolean> }
+const {isOpen} = inject("collapsible") as { isOpen: Ref<boolean> }
 const contentRef = ref<HTMLElement | null>(null)
 const height = ref("0px")
 
@@ -30,7 +30,7 @@ watch(isOpen, async (open: boolean) => {
       })
     }
   }
-}, { immediate: true })
+}, {immediate: true})
 </script>
 
 <template>
@@ -40,7 +40,7 @@ watch(isOpen, async (open: boolean) => {
     :class="['collapsible-content', props.class]"
     :style="{ height }"
   >
-    <slot />
+    <slot/>
   </div>
 </template>
 

@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { mount } from '@vue/test-utils'
+import {describe, expect, it} from 'vitest'
+import {mount} from '@vue/test-utils'
 
 import AlertDialogTitle from '../AlertDialogTitle.vue'
 import AlertDialogDescription from '../AlertDialogDescription.vue'
@@ -9,8 +9,8 @@ import AlertDialogFooter from '../AlertDialogFooter.vue'
 describe('AlertDialog presentational components', () => {
   it('renders title slot and class', () => {
     const wrapper = mount(AlertDialogTitle, {
-      props: { class: 'custom-title' },
-      slots: { default: 'Bekreft sletting' },
+      props: {class: 'custom-title'},
+      slots: {default: 'Bekreft sletting'},
     })
 
     expect(wrapper.element.tagName).toBe('H2')
@@ -21,8 +21,8 @@ describe('AlertDialog presentational components', () => {
 
   it('renders description slot and class', () => {
     const wrapper = mount(AlertDialogDescription, {
-      props: { class: 'custom-description' },
-      slots: { default: 'Denne handlingen kan ikke angres.' },
+      props: {class: 'custom-description'},
+      slots: {default: 'Denne handlingen kan ikke angres.'},
     })
 
     expect(wrapper.element.tagName).toBe('P')
@@ -33,8 +33,8 @@ describe('AlertDialog presentational components', () => {
 
   it('renders header slot and class', () => {
     const wrapper = mount(AlertDialogHeader, {
-      props: { class: 'custom-header' },
-      slots: { default: '<span data-test="header-child">Innhold</span>' },
+      props: {class: 'custom-header'},
+      slots: {default: '<span data-test="header-child">Innhold</span>'},
     })
 
     expect(wrapper.find('[data-test="header-child"]').exists()).toBe(true)
@@ -44,8 +44,8 @@ describe('AlertDialog presentational components', () => {
 
   it('renders footer slot and class', () => {
     const wrapper = mount(AlertDialogFooter, {
-      props: { class: 'custom-footer' },
-      slots: { default: '<button data-test="footer-child">OK</button>' },
+      props: {class: 'custom-footer'},
+      slots: {default: '<button data-test="footer-child">OK</button>'},
     })
 
     expect(wrapper.find('[data-test="footer-child"]').exists()).toBe(true)

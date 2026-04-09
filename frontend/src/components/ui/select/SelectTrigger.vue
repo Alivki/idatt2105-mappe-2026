@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { inject } from "vue"
-import { ChevronDown } from "lucide-vue-next"
+import {inject} from "vue"
+import {ChevronDown} from "lucide-vue-next"
 
 const props = defineProps<{
   disabled?: boolean
   class?: string
 }>()
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { isOpen, toggle } = inject("select") as { isOpen: Ref<boolean>; toggle: () => void }
+const {isOpen, toggle} = inject("select") as { isOpen: Ref<boolean>; toggle: () => void }
 </script>
 
 <template>
@@ -22,9 +22,9 @@ const { isOpen, toggle } = inject("select") as { isOpen: Ref<boolean>; toggle: (
     @click="toggle"
   >
     <span class="select-trigger__content">
-      <slot />
+      <slot/>
     </span>
-    <ChevronDown class="select-trigger__icon" />
+    <ChevronDown class="select-trigger__icon"/>
   </button>
 </template>
 

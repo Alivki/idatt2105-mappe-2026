@@ -24,47 +24,47 @@ import {
   UtensilsCrossed, Coffee, Wine, Store, Truck, Building2,
   Soup, Factory, ShoppingCart, MapPin, Check, ShieldCheck,
 } from 'lucide-vue-next'
-import type { Component } from 'vue'
+import type {Component} from 'vue'
 
-const wizard = defineModel<WizardState>('wizard', { required: true })
-const { haccpTrinn } = defineProps<{ haccpTrinn: HaccpTrinn }>()
+const wizard = defineModel<WizardState>('wizard', {required: true})
+const {haccpTrinn} = defineProps<{ haccpTrinn: HaccpTrinn }>()
 
 const businessTypeOptions: { value: BusinessType; label: string; icon: Component }[] = [
-  { value: 'RESTAURANT', label: businessTypeLabels.RESTAURANT, icon: UtensilsCrossed },
-  { value: 'CAFE', label: businessTypeLabels.CAFE, icon: Coffee },
-  { value: 'BAR', label: businessTypeLabels.BAR, icon: Wine },
-  { value: 'KIOSK', label: businessTypeLabels.KIOSK, icon: Store },
-  { value: 'CATERING', label: businessTypeLabels.CATERING, icon: Truck },
-  { value: 'CANTEEN', label: businessTypeLabels.CANTEEN, icon: Building2 },
-  { value: 'INSTITUTION_KITCHEN', label: businessTypeLabels.INSTITUTION_KITCHEN, icon: Soup },
-  { value: 'FOOD_PRODUCTION', label: businessTypeLabels.FOOD_PRODUCTION, icon: Factory },
-  { value: 'RETAIL', label: businessTypeLabels.RETAIL, icon: ShoppingCart },
-  { value: 'MOBILE_VENDOR', label: businessTypeLabels.MOBILE_VENDOR, icon: MapPin },
+  {value: 'RESTAURANT', label: businessTypeLabels.RESTAURANT, icon: UtensilsCrossed},
+  {value: 'CAFE', label: businessTypeLabels.CAFE, icon: Coffee},
+  {value: 'BAR', label: businessTypeLabels.BAR, icon: Wine},
+  {value: 'KIOSK', label: businessTypeLabels.KIOSK, icon: Store},
+  {value: 'CATERING', label: businessTypeLabels.CATERING, icon: Truck},
+  {value: 'CANTEEN', label: businessTypeLabels.CANTEEN, icon: Building2},
+  {value: 'INSTITUTION_KITCHEN', label: businessTypeLabels.INSTITUTION_KITCHEN, icon: Soup},
+  {value: 'FOOD_PRODUCTION', label: businessTypeLabels.FOOD_PRODUCTION, icon: Factory},
+  {value: 'RETAIL', label: businessTypeLabels.RETAIL, icon: ShoppingCart},
+  {value: 'MOBILE_VENDOR', label: businessTypeLabels.MOBILE_VENDOR, icon: MapPin},
 ]
 
 const businessSizeOptions: { value: BusinessSize; label: string }[] = (
   Object.entries(businessSizeLabels) as [BusinessSize, string][]
-).map(([value, label]) => ({ value, label }))
+).map(([value, label]) => ({value, label}))
 
 const foodTypeOptions: { value: FoodType; label: string }[] = (
   Object.entries(foodTypeLabels) as [FoodType, string][]
-).map(([value, label]) => ({ value, label }))
+).map(([value, label]) => ({value, label}))
 
 const foodProcessOptions: { value: FoodProcess; label: string; trinn?: 2 | 3 }[] = (
   Object.entries(foodProcessLabels) as [FoodProcess, string][]
-).map(([value, label]) => ({ value, label, trinn: processTrinnTrigger[value] }))
+).map(([value, label]) => ({value, label, trinn: processTrinnTrigger[value]}))
 
 const facilityOptions: { value: Facility; label: string }[] = (
   Object.entries(facilityLabels) as [Facility, string][]
-).map(([value, label]) => ({ value, label }))
+).map(([value, label]) => ({value, label}))
 
 const tempEquipmentOptions: { value: TempEquipment; label: string }[] = (
   Object.entries(tempEquipmentLabels) as [TempEquipment, string][]
-).map(([value, label]) => ({ value, label }))
+).map(([value, label]) => ({value, label}))
 
 const goodsReceivingOptions: { value: GoodsReceiving; label: string }[] = (
   Object.entries(goodsReceivingLabels) as [GoodsReceiving, string][]
-).map(([value, label]) => ({ value, label }))
+).map(([value, label]) => ({value, label}))
 
 function toggleFoodType(type: FoodType) {
   const idx = wizard.value!.foodTypes.indexOf(type)
@@ -110,7 +110,7 @@ function toggleTempEquipment(equipment: TempEquipment) {
           :class="{ 'option-card--selected': wizard.businessType === opt.value }"
           @click="wizard.businessType = opt.value"
         >
-          <component :is="opt.icon" :size="20" :stroke-width="1.5" aria-hidden="true" />
+          <component :is="opt.icon" :size="20" :stroke-width="1.5" aria-hidden="true"/>
           <span>{{ opt.label }}</span>
         </button>
       </div>
@@ -144,7 +144,8 @@ function toggleTempEquipment(equipment: TempEquipment) {
           @click="toggleFoodType(opt.value)"
         >
           <span class="checkbox-box">
-            <Check v-if="wizard.foodTypes.includes(opt.value)" :size="14" :stroke-width="2.5" aria-hidden="true" />
+            <Check v-if="wizard.foodTypes.includes(opt.value)" :size="14" :stroke-width="2.5"
+                   aria-hidden="true"/>
           </span>
           <span>{{ opt.label }}</span>
         </button>
@@ -163,7 +164,8 @@ function toggleTempEquipment(equipment: TempEquipment) {
           @click="toggleProcess(opt.value)"
         >
           <span class="checkbox-box">
-            <Check v-if="wizard.processes.includes(opt.value)" :size="14" :stroke-width="2.5" aria-hidden="true" />
+            <Check v-if="wizard.processes.includes(opt.value)" :size="14" :stroke-width="2.5"
+                   aria-hidden="true"/>
           </span>
           <span class="checkbox-label-row">
             <span>{{ opt.label }}</span>
@@ -188,7 +190,8 @@ function toggleTempEquipment(equipment: TempEquipment) {
           @click="toggleFacility(opt.value)"
         >
           <span class="checkbox-box">
-            <Check v-if="wizard.facilities.includes(opt.value)" :size="14" :stroke-width="2.5" aria-hidden="true" />
+            <Check v-if="wizard.facilities.includes(opt.value)" :size="14" :stroke-width="2.5"
+                   aria-hidden="true"/>
           </span>
           <span>{{ opt.label }}</span>
         </button>
@@ -206,7 +209,8 @@ function toggleTempEquipment(equipment: TempEquipment) {
           @click="toggleTempEquipment(opt.value)"
         >
           <span class="checkbox-box">
-            <Check v-if="wizard.temperatureEquipment.includes(opt.value)" :size="14" :stroke-width="2.5" aria-hidden="true" />
+            <Check v-if="wizard.temperatureEquipment.includes(opt.value)" :size="14"
+                   :stroke-width="2.5" aria-hidden="true"/>
           </span>
           <span>{{ opt.label }}</span>
         </button>
@@ -222,12 +226,14 @@ function toggleTempEquipment(equipment: TempEquipment) {
           class="option-pill"
           :class="{ 'option-pill--selected': wizard.servesVulnerableGroups === true }"
           @click="wizard.servesVulnerableGroups = true"
-        >Ja</button>
+        >Ja
+        </button>
         <button
           class="option-pill"
           :class="{ 'option-pill--selected': wizard.servesVulnerableGroups === false }"
           @click="wizard.servesVulnerableGroups = false"
-        >Nei</button>
+        >Nei
+        </button>
       </div>
     </div>
 
@@ -239,12 +245,14 @@ function toggleTempEquipment(equipment: TempEquipment) {
           class="option-pill"
           :class="{ 'option-pill--selected': wizard.handlesHighRiskProducts === true }"
           @click="wizard.handlesHighRiskProducts = true"
-        >Ja</button>
+        >Ja
+        </button>
         <button
           class="option-pill"
           :class="{ 'option-pill--selected': wizard.handlesHighRiskProducts === false }"
           @click="wizard.handlesHighRiskProducts = false"
-        >Nei</button>
+        >Nei
+        </button>
       </div>
     </div>
 
@@ -265,7 +273,7 @@ function toggleTempEquipment(equipment: TempEquipment) {
 
     <div class="haccp-trinn-card">
       <div class="haccp-trinn-header">
-        <ShieldCheck :size="20" :stroke-width="1.5" aria-hidden="true" />
+        <ShieldCheck :size="20" :stroke-width="1.5" aria-hidden="true"/>
         <span class="haccp-trinn-label">Ditt HACCP-nivå</span>
       </div>
       <div class="haccp-trinn-level">{{ haccpTrinn.label }}</div>

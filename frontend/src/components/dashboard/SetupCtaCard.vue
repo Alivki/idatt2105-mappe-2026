@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Settings } from 'lucide-vue-next'
-import { useRouter } from 'vue-router'
+import {Settings} from 'lucide-vue-next'
+import {useRouter} from 'vue-router'
 
 defineProps<{
   showHaccp: boolean
@@ -14,7 +14,7 @@ const router = useRouter()
   <div v-if="showHaccp || showAlcoholPolicy" class="cta-card">
     <div class="cta-header">
       <div class="cta-icon">
-        <Settings :size="20" />
+        <Settings :size="20"/>
       </div>
       <div>
         <h3 class="cta-title">Kom i gang</h3>
@@ -26,7 +26,8 @@ const router = useRouter()
       <div v-if="showHaccp" class="cta-item">
         <div class="cta-item-content">
           <strong>HACCP-oppsett</strong>
-          <p>Konfigurer sjekklister basert på HACCP-analyse for å sikre mattrygghet og etterlevelse av regelverket.</p>
+          <p>Konfigurer sjekklister basert på HACCP-analyse for å sikre mattrygghet og etterlevelse
+            av regelverket.</p>
         </div>
         <button class="cta-btn" @click="router.push('/haccp-oppsett')">
           Sett opp
@@ -36,7 +37,8 @@ const router = useRouter()
       <div v-if="showAlcoholPolicy" class="cta-item">
         <div class="cta-item-content">
           <strong>Skjenkepolicy</strong>
-          <p>Definer rutiner for alderskontroll og ansvarlig alkoholhåndtering for å unngå prikker.</p>
+          <p>Definer rutiner for alderskontroll og ansvarlig alkoholhåndtering for å unngå
+            prikker.</p>
         </div>
         <button class="cta-btn" @click="router.push('/skjenkepolicy')">
           Sett opp

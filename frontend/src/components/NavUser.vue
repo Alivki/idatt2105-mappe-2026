@@ -6,7 +6,7 @@ import {
   Building2,
   Check,
 } from 'lucide-vue-next'
-import { computed } from 'vue'
+import {computed} from 'vue'
 
 import {
   DropdownMenu,
@@ -22,16 +22,16 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useLogout, useMemberships, useSwitchOrg } from '@/composables/useAuth'
+import {useRouter} from 'vue-router'
+import {useAuthStore} from '@/stores/auth'
+import {useLogout, useMemberships, useSwitchOrg} from '@/composables/useAuth'
 
 const router = useRouter()
 const auth = useAuthStore()
-const { mutate: logout } = useLogout()
-const { mutate: switchOrg } = useSwitchOrg()
+const {mutate: logout} = useLogout()
+const {mutate: switchOrg} = useSwitchOrg()
 useMemberships()
-const { isMobile } = useSidebar()
+const {isMobile} = useSidebar()
 
 const userName = computed(() => auth.user?.fullName ?? 'Bruker')
 const userEmail = computed(() => auth.user?.email ?? '')
@@ -45,7 +45,7 @@ const initials = computed(() => {
 })
 
 function handleSwitchOrg(organizationId: number) {
-  switchOrg({ organizationId })
+  switchOrg({organizationId})
 }
 </script>
 
@@ -62,7 +62,7 @@ function handleSwitchOrg(organizationId: number) {
               <span class="nav-user-name">{{ userName }}</span>
               <span class="nav-user-email">{{ userEmail }}</span>
             </div>
-            <ChevronsUpDown class="nav-user-chevron" />
+            <ChevronsUpDown class="nav-user-chevron"/>
           </SidebarMenuButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent
@@ -83,7 +83,7 @@ function handleSwitchOrg(organizationId: number) {
           </DropdownMenuLabel>
 
           <template v-if="auth.memberships.length > 1">
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator/>
             <DropdownMenuLabel class="nav-org-label">
               Organisasjoner
             </DropdownMenuLabel>
@@ -93,7 +93,7 @@ function handleSwitchOrg(organizationId: number) {
               class="nav-org-item"
               @click="membership.organizationId !== auth.organizationId && handleSwitchOrg(membership.organizationId)"
             >
-              <Building2 />
+              <Building2/>
               <span>{{ membership.organizationName }}</span>
               <Check
                 v-if="membership.organizationId === auth.organizationId"
@@ -102,14 +102,14 @@ function handleSwitchOrg(organizationId: number) {
             </DropdownMenuItem>
           </template>
 
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator/>
           <DropdownMenuItem @click="router.push('/innstillinger')">
-            <Settings />
+            <Settings/>
             Innstillinger
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator/>
           <DropdownMenuItem @click="logout()">
-            <LogOut />
+            <LogOut/>
             Logg ut
           </DropdownMenuItem>
         </DropdownMenuContent>

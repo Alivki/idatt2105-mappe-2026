@@ -22,7 +22,7 @@ function handleClick(e: MouseEvent) {
     :class="['input-group-addon', `input-group-addon--${props.align}`, props.class]"
     @click="handleClick"
   >
-    <slot />
+    <slot/>
   </div>
 </template>
 

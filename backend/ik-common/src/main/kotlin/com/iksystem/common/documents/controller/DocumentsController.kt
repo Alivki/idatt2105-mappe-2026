@@ -29,7 +29,10 @@ import org.springframework.web.multipart.MultipartFile
 @SecurityRequirement(name = "bearerAuth")
 class DocumentsController(private val documentsService: DocumentsService) {
 
+    @Operation(summary = "Test S3 connectivity", description = "Verifies that the S3 connection is working. Requires ADMIN role.")
+    @ApiResponse(responseCode = "200", description = "S3 connection OK")
     @GetMapping("/test-s3")
+    @PreAuthorize("hasRole('ADMIN')")
     fun test(): String {
         documentsService.test()
         return "OK"

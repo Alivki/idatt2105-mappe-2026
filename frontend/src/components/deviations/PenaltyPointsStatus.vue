@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ShieldAlert, ShieldCheck, ShieldX } from 'lucide-vue-next'
-import type { PenaltyPointSummary } from '@/types/deviation'
+import {computed} from 'vue'
+import {ShieldAlert, ShieldCheck, ShieldX} from 'lucide-vue-next'
+import type {PenaltyPointSummary} from '@/types/deviation'
 
 const props = defineProps<{
   summary: PenaltyPointSummary | null
@@ -58,10 +58,34 @@ const progressColor = computed(() => {
 
 const riskInsight = computed(() => {
   const pts = totalPoints.value
-  if (pts === 0) return { icon: ShieldCheck, title: '0 prikker', desc: 'Ingen registrerte prikker. Bra!', color: 'var(--green)', bg: 'var(--green-soft)' }
-  if (pts <= 4) return { icon: ShieldAlert, title: `${pts} av ${MAX_POINTS}`, desc: 'Lavt risikonivå. Fortsett med gode rutiner.', color: 'var(--amber)', bg: 'var(--amber-soft)' }
-  if (pts <= 8) return { icon: ShieldAlert, title: `${pts} av ${MAX_POINTS}`, desc: 'Moderat risiko. Gjennomgå tiltak.', color: 'var(--amber)', bg: 'var(--amber-soft)' }
-  return { icon: ShieldX, title: `${pts} av ${MAX_POINTS}`, desc: 'Høy risiko for inndragning!', color: 'var(--red)', bg: 'var(--red-soft)' }
+  if (pts === 0) return {
+    icon: ShieldCheck,
+    title: '0 prikker',
+    desc: 'Ingen registrerte prikker. Bra!',
+    color: 'var(--green)',
+    bg: 'var(--green-soft)'
+  }
+  if (pts <= 4) return {
+    icon: ShieldAlert,
+    title: `${pts} av ${MAX_POINTS}`,
+    desc: 'Lavt risikonivå. Fortsett med gode rutiner.',
+    color: 'var(--amber)',
+    bg: 'var(--amber-soft)'
+  }
+  if (pts <= 8) return {
+    icon: ShieldAlert,
+    title: `${pts} av ${MAX_POINTS}`,
+    desc: 'Moderat risiko. Gjennomgå tiltak.',
+    color: 'var(--amber)',
+    bg: 'var(--amber-soft)'
+  }
+  return {
+    icon: ShieldX,
+    title: `${pts} av ${MAX_POINTS}`,
+    desc: 'Høy risiko for inndragning!',
+    color: 'var(--red)',
+    bg: 'var(--red-soft)'
+  }
 })
 </script>
 
@@ -96,7 +120,8 @@ const riskInsight = computed(() => {
     </div>
 
     <div class="risk-footer" :style="{ background: riskInsight.bg }">
-      <component :is="riskInsight.icon" :size="18" :style="{ color: riskInsight.color, flexShrink: 0 }" />
+      <component :is="riskInsight.icon" :size="18"
+                 :style="{ color: riskInsight.color, flexShrink: 0 }"/>
       <div class="risk-text">
         <strong :style="{ color: riskInsight.color }">{{ riskInsight.title }}</strong>
         <span>{{ riskInsight.desc }}</span>
@@ -176,24 +201,53 @@ const riskInsight = computed(() => {
   gap: 2px;
 }
 
-.info-card--last { background: var(--red-soft); border-color: hsl(var(--border)); }
-.info-card--period { background: var(--green-soft); border-color: hsl(var(--border)); }
+.info-card--last {
+  background: var(--red-soft);
+  border-color: hsl(var(--border));
+}
+
+.info-card--period {
+  background: var(--green-soft);
+  border-color: hsl(var(--border));
+}
 
 .info-label {
   font-size: 0.78rem;
   font-weight: 600;
 }
 
-.info-card--last .info-label { color: var(--red); }
-.info-card--period .info-label { color: var(--green); }
+.info-card--last .info-label {
+  color: var(--red);
+}
 
-.info-value { font-size: 1.05rem; font-weight: 700; }
-.info-card--last .info-value { color: var(--red); }
-.info-card--period .info-value { color: var(--green); }
+.info-card--period .info-label {
+  color: var(--green);
+}
 
-.info-sub { font-size: 0.78rem; }
-.info-card--last .info-sub { color: var(--red); }
-.info-card--period .info-sub { color: var(--green); }
+.info-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.info-card--last .info-value {
+  color: var(--red);
+}
+
+.info-card--period .info-value {
+  color: var(--green);
+}
+
+.info-sub {
+  font-size: 0.78rem;
+}
+
+.info-card--last .info-sub {
+  color: var(--red);
+}
+
+.info-card--period .info-sub {
+  color: var(--green);
+}
 
 .risk-footer {
   display: flex;

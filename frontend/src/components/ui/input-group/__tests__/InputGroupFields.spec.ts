@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick, ref } from 'vue'
+import {describe, expect, it} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, nextTick, ref} from 'vue'
 
 import InputGroupInput from '../InputGroupInput.vue'
 import InputGroupTextarea from '../InputGroupTextarea.vue'
@@ -95,7 +95,7 @@ describe('InputGroupInput', () => {
 
     expect((wrapper.element as HTMLInputElement).value).toBe('first')
 
-    await wrapper.setProps({ modelValue: 'second' })
+    await wrapper.setProps({modelValue: 'second'})
     await nextTick()
 
     expect((wrapper.element as HTMLInputElement).value).toBe('second')
@@ -103,10 +103,10 @@ describe('InputGroupInput', () => {
 
   it('works with v-model in a parent component', async () => {
     const Host = defineComponent({
-      components: { InputGroupInput },
+      components: {InputGroupInput},
       setup() {
         const value = ref('start')
-        return { value }
+        return {value}
       },
       template: `<InputGroupInput v-model="value" data-test="input" />`,
     })
@@ -133,7 +133,7 @@ describe('InputGroupInput', () => {
 
     expect((wrapper.element as HTMLInputElement).value).toBe('123')
 
-    await wrapper.setProps({ modelValue: 456 })
+    await wrapper.setProps({modelValue: 456})
     await nextTick()
 
     expect((wrapper.element as HTMLInputElement).value).toBe('456')
@@ -228,7 +228,7 @@ describe('InputGroupTextarea', () => {
 
     expect((wrapper.element as HTMLTextAreaElement).value).toBe('first')
 
-    await wrapper.setProps({ modelValue: 'second' })
+    await wrapper.setProps({modelValue: 'second'})
     await nextTick()
 
     expect((wrapper.element as HTMLTextAreaElement).value).toBe('second')
@@ -236,10 +236,10 @@ describe('InputGroupTextarea', () => {
 
   it('works with v-model in a parent component', async () => {
     const Host = defineComponent({
-      components: { InputGroupTextarea },
+      components: {InputGroupTextarea},
       setup() {
         const value = ref('start')
-        return { value }
+        return {value}
       },
       template: `<InputGroupTextarea v-model="value" data-test="textarea" />`,
     })
@@ -266,7 +266,7 @@ describe('InputGroupTextarea', () => {
 
     expect(wrapper.element.value).toBe(10)
 
-    await wrapper.setProps({ modelValue: 20 })
+    await wrapper.setProps({modelValue: 20})
     await nextTick()
 
     expect(wrapper.element.value).toBe(20)

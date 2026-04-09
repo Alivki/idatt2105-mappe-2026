@@ -1,13 +1,13 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h} from 'vue'
+import {beforeEach, describe, expect, it, vi} from 'vitest'
 import AlcoholDeviationCard from '../AlcoholDeviationListCard.vue'
 
 function pass(name: string, tag = 'div') {
   return defineComponent({
     name,
     inheritAttrs: false,
-    setup(_, { attrs, slots }) {
+    setup(_, {attrs, slots}) {
       return () => h(tag, attrs, slots.default?.())
     },
   })
@@ -17,7 +17,7 @@ vi.mock('lucide-vue-next', () => {
   const icon = (name: string) => defineComponent({
     name,
     setup() {
-      return () => h('svg', { 'data-icon': name })
+      return () => h('svg', {'data-icon': name})
     },
   })
   return {
@@ -33,9 +33,9 @@ vi.mock('lucide-vue-next', () => {
 vi.mock('@/components/ui/badge/Badge.vue', () => ({
   default: defineComponent({
     name: 'BadgeStub',
-    props: { tone: { type: String, default: '' } },
-    setup(props, { slots }) {
-      return () => h('span', { 'data-testid': 'badge', 'data-tone': props.tone }, slots.default?.())
+    props: {tone: {type: String, default: ''}},
+    setup(props, {slots}) {
+      return () => h('span', {'data-testid': 'badge', 'data-tone': props.tone}, slots.default?.())
     },
   }),
 }))
@@ -44,7 +44,7 @@ vi.mock('@/components/ui/button/Button.vue', () => ({
   default: defineComponent({
     name: 'ButtonStub',
     inheritAttrs: false,
-    setup(_, { attrs, slots }) {
+    setup(_, {attrs, slots}) {
       return () => h('button', attrs, slots.default?.())
     },
   }),
@@ -61,20 +61,20 @@ vi.mock('@/components/ui/dropdown-menu', () => ({
 vi.mock('@/components/ui/alert-dialog/AlertDialog.vue', () => ({
   default: defineComponent({
     name: 'AlertDialogStub',
-    props: { open: { type: Boolean, default: false } },
+    props: {open: {type: Boolean, default: false}},
     emits: ['update:open'],
-    setup(props, { slots }) {
-      return () => props.open ? h('div', { 'data-testid': 'alert-dialog' }, slots.default?.()) : null
+    setup(props, {slots}) {
+      return () => props.open ? h('div', {'data-testid': 'alert-dialog'}, slots.default?.()) : null
     },
   }),
 }))
-vi.mock('@/components/ui/alert-dialog/AlertDialogAction.vue', () => ({ default: pass('AlertDialogAction', 'button') }))
-vi.mock('@/components/ui/alert-dialog/AlertDialogCancel.vue', () => ({ default: pass('AlertDialogCancel', 'button') }))
-vi.mock('@/components/ui/alert-dialog/AlertDialogContent.vue', () => ({ default: pass('AlertDialogContent') }))
-vi.mock('@/components/ui/alert-dialog/AlertDialogDescription.vue', () => ({ default: pass('AlertDialogDescription', 'p') }))
-vi.mock('@/components/ui/alert-dialog/AlertDialogFooter.vue', () => ({ default: pass('AlertDialogFooter') }))
-vi.mock('@/components/ui/alert-dialog/AlertDialogHeader.vue', () => ({ default: pass('AlertDialogHeader') }))
-vi.mock('@/components/ui/alert-dialog/AlertDialogTitle.vue', () => ({ default: pass('AlertDialogTitle', 'h2') }))
+vi.mock('@/components/ui/alert-dialog/AlertDialogAction.vue', () => ({default: pass('AlertDialogAction', 'button')}))
+vi.mock('@/components/ui/alert-dialog/AlertDialogCancel.vue', () => ({default: pass('AlertDialogCancel', 'button')}))
+vi.mock('@/components/ui/alert-dialog/AlertDialogContent.vue', () => ({default: pass('AlertDialogContent')}))
+vi.mock('@/components/ui/alert-dialog/AlertDialogDescription.vue', () => ({default: pass('AlertDialogDescription', 'p')}))
+vi.mock('@/components/ui/alert-dialog/AlertDialogFooter.vue', () => ({default: pass('AlertDialogFooter')}))
+vi.mock('@/components/ui/alert-dialog/AlertDialogHeader.vue', () => ({default: pass('AlertDialogHeader')}))
+vi.mock('@/components/ui/alert-dialog/AlertDialogTitle.vue', () => ({default: pass('AlertDialogTitle', 'h2')}))
 
 const baseDeviation = {
   id: 12,
@@ -92,7 +92,7 @@ describe('AlcoholDeviationCard', () => {
 
   it('renders mapped labels, tones and relative time', () => {
     const wrapper = mount(AlcoholDeviationCard, {
-      props: { deviation: baseDeviation, canManage: true },
+      props: {deviation: baseDeviation, canManage: true},
     })
 
     const badges = wrapper.findAll('[data-testid="badge"]')
@@ -106,7 +106,7 @@ describe('AlcoholDeviationCard', () => {
 
   it('emits open on click and enter', async () => {
     const wrapper = mount(AlcoholDeviationCard, {
-      props: { deviation: baseDeviation, canManage: false },
+      props: {deviation: baseDeviation, canManage: false},
     })
 
     await wrapper.get('.deviation-card').trigger('click')
@@ -117,7 +117,7 @@ describe('AlcoholDeviationCard', () => {
 
   it('emits edit and status changes from menu actions', async () => {
     const wrapper = mount(AlcoholDeviationCard, {
-      props: { deviation: baseDeviation, canManage: true },
+      props: {deviation: baseDeviation, canManage: true},
     })
 
     await wrapper.findAll('button').find((b) => b.text().includes('Rediger'))!.trigger('click')
@@ -133,7 +133,7 @@ describe('AlcoholDeviationCard', () => {
 
   it('opens delete dialog and emits delete', async () => {
     const wrapper = mount(AlcoholDeviationCard, {
-      props: { deviation: baseDeviation, canManage: true },
+      props: {deviation: baseDeviation, canManage: true},
     })
 
     await wrapper.findAll('button').find((b) => b.text().trim() === 'Slett')!.trigger('click')
@@ -145,7 +145,7 @@ describe('AlcoholDeviationCard', () => {
 
   it('hides management actions when canManage is false', () => {
     const wrapper = mount(AlcoholDeviationCard, {
-      props: { deviation: { ...baseDeviation, status: 'OPEN' }, canManage: false },
+      props: {deviation: {...baseDeviation, status: 'OPEN'}, canManage: false},
     })
 
     expect(wrapper.find('.card-actions').exists()).toBe(false)
@@ -155,7 +155,7 @@ describe('AlcoholDeviationCard', () => {
   it('renders minute and day based relative time branches', () => {
     const minuteWrapper = mount(AlcoholDeviationCard, {
       props: {
-        deviation: { ...baseDeviation, reportedAt: '2026-04-08T11:45:00Z', status: 'OPEN' },
+        deviation: {...baseDeviation, reportedAt: '2026-04-08T11:45:00Z', status: 'OPEN'},
         canManage: false,
       },
     })
@@ -163,7 +163,7 @@ describe('AlcoholDeviationCard', () => {
 
     const dayWrapper = mount(AlcoholDeviationCard, {
       props: {
-        deviation: { ...baseDeviation, reportedAt: '2026-04-05T12:00:00Z', status: 'CLOSED' },
+        deviation: {...baseDeviation, reportedAt: '2026-04-05T12:00:00Z', status: 'CLOSED'},
         canManage: false,
       },
     })

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useSidebar } from "./utils"
+import {useSidebar} from "./utils"
 
 const props = defineProps<{
   class?: string
 }>()
 
-const { toggleSidebar } = useSidebar()
+const {toggleSidebar} = useSidebar()
 </script>
 
 <template>
@@ -17,7 +17,7 @@ const { toggleSidebar } = useSidebar()
     :class="['sidebar-rail', props.class]"
     @click="toggleSidebar"
   >
-    <slot />
+    <slot/>
   </button>
 </template>
 

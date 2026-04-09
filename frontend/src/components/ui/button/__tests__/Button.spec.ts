@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest'
-import { render } from '@testing-library/vue'
+import {describe, expect, it} from 'vitest'
+import {render} from '@testing-library/vue'
 import Button from '../Button.vue'
 
 describe('Button', () => {
   it('renders as a button by default', () => {
-    const { getByRole } = render(Button, {
+    const {getByRole} = render(Button, {
       slots: {
         default: 'Click me',
       },
@@ -16,7 +16,7 @@ describe('Button', () => {
   })
 
   it('applies default classes by default', () => {
-    const { getByRole } = render(Button, {
+    const {getByRole} = render(Button, {
       slots: {
         default: 'Save',
       },
@@ -29,7 +29,7 @@ describe('Button', () => {
   })
 
   it('applies a custom variant class', () => {
-    const { getByRole } = render(Button, {
+    const {getByRole} = render(Button, {
       props: {
         variant: 'destructive',
       },
@@ -44,7 +44,7 @@ describe('Button', () => {
   })
 
   it('applies a custom size class when size is not default', () => {
-    const { getByRole } = render(Button, {
+    const {getByRole} = render(Button, {
       props: {
         size: 'sm',
       },
@@ -58,7 +58,7 @@ describe('Button', () => {
   })
 
   it('does not add a size class when size is default', () => {
-    const { getByRole } = render(Button, {
+    const {getByRole} = render(Button, {
       props: {
         size: 'default',
       },
@@ -77,7 +77,7 @@ describe('Button', () => {
   })
 
   it('applies a custom class passed through props', () => {
-    const { getByRole } = render(Button, {
+    const {getByRole} = render(Button, {
       props: {
         class: 'my-extra-class',
       },
@@ -92,7 +92,7 @@ describe('Button', () => {
   })
 
   it('sets disabled attribute when disabled is true', () => {
-    const { getByRole } = render(Button, {
+    const {getByRole} = render(Button, {
       props: {
         disabled: true,
       },
@@ -106,7 +106,7 @@ describe('Button', () => {
   })
 
   it('does not set disabled attribute when disabled is false', () => {
-    const { getByRole } = render(Button, {
+    const {getByRole} = render(Button, {
       props: {
         disabled: false,
       },
@@ -120,7 +120,7 @@ describe('Button', () => {
   })
 
   it('renders as another element when as prop is provided', () => {
-    const { getByText } = render(Button, {
+    const {getByText} = render(Button, {
       props: {
         as: 'a',
       },
@@ -135,7 +135,7 @@ describe('Button', () => {
   })
 
   it('supports another variant and size combination', () => {
-    const { getByRole } = render(Button, {
+    const {getByRole} = render(Button, {
       props: {
         variant: 'outline',
         size: 'lg',

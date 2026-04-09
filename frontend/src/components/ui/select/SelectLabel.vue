@@ -6,7 +6,7 @@ const props = defineProps<{
 
 <template>
   <div :class="['select-label', props.class]">
-    <slot />
+    <slot/>
   </div>
 </template>
 

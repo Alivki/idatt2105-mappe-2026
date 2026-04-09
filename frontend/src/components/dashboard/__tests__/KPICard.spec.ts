@@ -1,5 +1,5 @@
-import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import {mount} from '@vue/test-utils'
+import {describe, expect, it} from 'vitest'
 import KpiCard from '../KpiCard.vue'
 
 describe('KpiCard', () => {

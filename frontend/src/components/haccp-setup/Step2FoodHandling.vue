@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { PrerequisiteStatus, WizardState } from '@/types/haccp-setup'
-import { prerequisiteStatusLabels } from '@/types/haccp-setup'
-import { CircleCheck, AlertTriangle, CircleX, Info, ClipboardCheck } from 'lucide-vue-next'
-import { computed } from 'vue'
+import type {PrerequisiteStatus, WizardState} from '@/types/haccp-setup'
+import {prerequisiteStatusLabels} from '@/types/haccp-setup'
+import {CircleCheck, AlertTriangle, CircleX, Info, ClipboardCheck} from 'lucide-vue-next'
+import {computed} from 'vue'
 
-const wizard = defineModel<WizardState>('wizard', { required: true })
+const wizard = defineModel<WizardState>('wizard', {required: true})
 
 const statusOptions: { value: PrerequisiteStatus; label: string; icon: typeof CircleCheck }[] = [
-  { value: 'OK', label: prerequisiteStatusLabels.OK, icon: CircleCheck },
-  { value: 'NEEDS_WORK', label: prerequisiteStatusLabels.NEEDS_WORK, icon: AlertTriangle },
-  { value: 'MISSING', label: prerequisiteStatusLabels.MISSING, icon: CircleX },
+  {value: 'OK', label: prerequisiteStatusLabels.OK, icon: CircleCheck},
+  {value: 'NEEDS_WORK', label: prerequisiteStatusLabels.NEEDS_WORK, icon: AlertTriangle},
+  {value: 'MISSING', label: prerequisiteStatusLabels.MISSING, icon: CircleX},
 ]
 
 function setStatus(prereqId: string, status: PrerequisiteStatus) {
@@ -21,39 +21,41 @@ const summary = computed(() => {
   const ok = wizard.value!.prerequisites.filter((p) => p.status === 'OK').length
   const work = wizard.value!.prerequisites.filter((p) => p.status === 'NEEDS_WORK').length
   const missing = wizard.value!.prerequisites.filter((p) => p.status === 'MISSING').length
-  return { ok, work, missing, total: wizard.value!.prerequisites.length }
+  return {ok, work, missing, total: wizard.value!.prerequisites.length}
 })
 </script>
 
 <template>
   <div class="step-content">
     <div class="info-banner">
-      <Info :size="16" :stroke-width="1.5" aria-hidden="true" />
+      <Info :size="16" :stroke-width="1.5" aria-hidden="true"/>
       <div>
         <p>
-          Grunnforutsetninger er basiskravene fra Mattilsynet som må være på plass for et fungerende IK-mat-system.
-          <strong>Vi genererer sjekklister for hvert av disse områdene</strong> — gå gjennom listen og angi status
+          Grunnforutsetninger er basiskravene fra Mattilsynet som må være på plass for et fungerende
+          IK-mat-system.
+          <strong>Vi genererer sjekklister for hvert av disse områdene</strong> — gå gjennom listen
+          og angi status
           slik at vi kan tilpasse sjekklistene til din virksomhet.
         </p>
       </div>
     </div>
 
     <div class="checklist-note">
-      <ClipboardCheck :size="15" :stroke-width="1.5" aria-hidden="true" />
+      <ClipboardCheck :size="15" :stroke-width="1.5" aria-hidden="true"/>
       <span>Sjekklister vil bli opprettet for disse områdene basert på dine svar.</span>
     </div>
 
     <div class="summary-bar">
       <div class="summary-item summary-item--ok">
-        <CircleCheck :size="14" :stroke-width="2" aria-hidden="true" />
+        <CircleCheck :size="14" :stroke-width="2" aria-hidden="true"/>
         {{ summary.ok }} på plass
       </div>
       <div class="summary-item summary-item--work">
-        <AlertTriangle :size="14" :stroke-width="2" aria-hidden="true" />
+        <AlertTriangle :size="14" :stroke-width="2" aria-hidden="true"/>
         {{ summary.work }} under arbeid
       </div>
       <div class="summary-item summary-item--missing">
-        <CircleX :size="14" :stroke-width="2" aria-hidden="true" />
+        <CircleX :size="14" :stroke-width="2" aria-hidden="true"/>
         {{ summary.missing }} mangler
       </div>
     </div>
@@ -86,7 +88,7 @@ const summary = computed(() => {
               }"
               @click="setStatus(prereq.id, opt.value)"
             >
-              <component :is="opt.icon" :size="12" :stroke-width="2" aria-hidden="true" />
+              <component :is="opt.icon" :size="12" :stroke-width="2" aria-hidden="true"/>
               {{ opt.label }}
             </button>
           </div>
@@ -148,9 +150,17 @@ const summary = computed(() => {
   font-weight: 500;
 }
 
-.summary-item--ok { color: var(--green); }
-.summary-item--work { color: var(--amber); }
-.summary-item--missing { color: var(--red); }
+.summary-item--ok {
+  color: var(--green);
+}
+
+.summary-item--work {
+  color: var(--amber);
+}
+
+.summary-item--missing {
+  color: var(--red);
+}
 
 .prereq-list {
   display: flex;
@@ -167,9 +177,17 @@ const summary = computed(() => {
   transition: border-color 0.15s ease;
 }
 
-.prereq-card--ok { border-left-color: var(--green); }
-.prereq-card--work { border-left-color: var(--amber); }
-.prereq-card--missing { border-left-color: var(--red); }
+.prereq-card--ok {
+  border-left-color: var(--green);
+}
+
+.prereq-card--work {
+  border-left-color: var(--amber);
+}
+
+.prereq-card--missing {
+  border-left-color: var(--red);
+}
 
 .prereq-main {
   display: flex;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { z } from 'zod'
+import {computed, ref, watch} from 'vue'
+import {z} from 'zod'
 import Dialog from '@/components/ui/dialog/Dialog.vue'
 import DialogContent from '@/components/ui/dialog/DialogContent.vue'
 import DialogDescription from '@/components/ui/dialog/DialogDescription.vue'
@@ -15,9 +15,10 @@ import SelectContent from '@/components/ui/select/SelectContent.vue'
 import SelectItem from '@/components/ui/select/SelectItem.vue'
 import SelectTrigger from '@/components/ui/select/SelectTrigger.vue'
 import SelectValue from '@/components/ui/select/SelectValue.vue'
-import { useAuthStore } from '@/stores/auth'
-import { CalendarDate } from '@internationalized/date'
-import type { DateValue } from '@internationalized/date'
+import {useAuthStore} from '@/stores/auth'
+import {CalendarDate} from '@internationalized/date'
+import type {DateValue} from '@internationalized/date'
+import {stringToCalendarDate, dateValueToString, timeToString} from '@/utils/date'
 import type {
   AlcoholDeviation,
   AlcoholReportSource,
@@ -29,7 +30,10 @@ import type {
   PenaltyPointSummary,
 } from '@/types/deviation'
 
-interface MemberOption { userId: number; label: string }
+interface MemberOption {
+  userId: number;
+  label: string
+}
 
 const props = withDefaults(
   defineProps<{
@@ -41,7 +45,7 @@ const props = withDefaults(
     penaltySummary?: PenaltyPointSummary | null
     inline?: boolean
   }>(),
-  { mode: 'create', initial: null, submitting: false, penaltySummary: null, inline: false },
+  {mode: 'create', initial: null, submitting: false, penaltySummary: null, inline: false},
 )
 
 const emits = defineEmits<{
@@ -51,22 +55,6 @@ const emits = defineEmits<{
 }>()
 
 const auth = useAuthStore()
-
-function stringToCalendarDate(str: string): CalendarDate | undefined {
-  if (!str) return undefined
-  const [y, m, d] = str.split('-').map(Number)
-  return new CalendarDate(y!, m!, d!)
-}
-
-function dateValueToString(dv: DateValue | undefined): string {
-  if (!dv) return ''
-  return `${dv.year}-${String(dv.month).padStart(2, '0')}-${String(dv.day).padStart(2, '0')}`
-}
-
-function timeToString(h: number | undefined, m: number | undefined): string {
-  if (h == null || m == null) return ''
-  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
-}
 
 const reportedDate = ref<DateValue | undefined>()
 const reportedHours = ref<number | undefined>()
@@ -87,7 +75,7 @@ const errors = ref<Record<string, string>>({})
 const descriptionSchema = z.string().min(1, 'Beskrivelse er påkrevd')
 const deviationTypeSchema = z.string().min(1, 'Velg type hendelse')
 const reportedDateSchema = z.custom<DateValue>((v) => !!v, 'Dato er påkrevd')
-const reportedTimeSchema = z.number({ error: 'Tidspunkt er påkrevd' }).min(0)
+const reportedTimeSchema = z.number({error: 'Tidspunkt er påkrevd'}).min(0)
 const reporterSchema = z.string().min(1, 'Velg hvem som rapporterer')
 const immediateActionSchema = z.string().min(1, 'Umiddelbar handling er påkrevd')
 const causalAnalysisSchema = z.string().min(1, 'Velg årsak')
@@ -121,63 +109,91 @@ const POINTS_MAP: Record<AlcoholDeviationType, number> = {
 }
 
 const reportSourceOptions: Array<{ value: AlcoholReportSource; label: string; sub: string }> = [
-  { value: 'EGENRAPPORT', label: 'Egenrapport', sub: 'Oppdaget internt' },
-  { value: 'SJENKEKONTROLL', label: 'Skjenkekontroll', sub: 'Kommunal kontroll' },
-  { value: 'POLITIRAPPORT', label: 'Politirapport', sub: 'Fra politiet' },
+  {value: 'EGENRAPPORT', label: 'Egenrapport', sub: 'Oppdaget internt'},
+  {value: 'SJENKEKONTROLL', label: 'Skjenkekontroll', sub: 'Kommunal kontroll'},
+  {value: 'POLITIRAPPORT', label: 'Politirapport', sub: 'Fra politiet'},
 ]
 
 const deviationTypeGroups = [
-  { points: 8, types: [
-    { value: 'SKJENKING_MINDREAARIGE' as AlcoholDeviationType, label: 'Skjenking til mindreårige' },
-    { value: 'BRUDD_BISTANDSPLIKT' as AlcoholDeviationType, label: 'Brudd på bistandsplikt' },
-    { value: 'UFORSVARLIG_DRIFT' as AlcoholDeviationType, label: 'Uforsvarlig drift' },
-    { value: 'HINDRING_KONTROLL' as AlcoholDeviationType, label: 'Hindring av kontroll' },
-  ]},
-  { points: 4, types: [
-    { value: 'SKJENKING_APENBART_BERUSET' as AlcoholDeviationType, label: 'Skjenking til åpenbart beruset' },
-    { value: 'BRUDD_SJENKETIDER' as AlcoholDeviationType, label: 'Brudd på skjenketider' },
-    { value: 'BRENNEVIN_18_19' as AlcoholDeviationType, label: 'Brennevin til 18-19-åringer' },
-  ]},
-  { points: 2, types: [
-    { value: 'BERUSET_PERSON_I_LOKALET' as AlcoholDeviationType, label: 'Beruset person i lokalet' },
-    { value: 'MANGLER_IK_SYSTEM' as AlcoholDeviationType, label: 'Mangler IK-system' },
-    { value: 'MANGLER_STYRER_STEDFORTREDER' as AlcoholDeviationType, label: 'Mangler styrer/stedfortreder' },
-    { value: 'NARKOTIKA' as AlcoholDeviationType, label: 'Narkotika' },
-  ]},
-  { points: 1, types: [
-    { value: 'ALKOHOLFRI_ALTERNATIV_MANGLER' as AlcoholDeviationType, label: 'Alkoholfri alternativ mangler' },
-    { value: 'MEDBRAKT_ALKOHOL' as AlcoholDeviationType, label: 'Medbrakt alkohol' },
-    { value: 'REKLAMEBRUDD' as AlcoholDeviationType, label: 'Reklamebrudd' },
-    { value: 'VILKAARSBRUDD' as AlcoholDeviationType, label: 'Vilkårsbrudd' },
-  ]},
-  { points: 0, types: [
-    { value: 'NEKTET_VISE_LEGITIMASJON' as AlcoholDeviationType, label: 'Nektet å vise legitimasjon' },
-    { value: 'GLEMTE_SJEKKE_LEGITIMASJON' as AlcoholDeviationType, label: 'Glemte å sjekke legitimasjon' },
-    { value: 'MINDREAARIG_FORSOK' as AlcoholDeviationType, label: 'Mindreårig forsøk' },
-    { value: 'FALSK_LEGITIMASJON' as AlcoholDeviationType, label: 'Falsk legitimasjon' },
-    { value: 'UTGAATT_LEGITIMASJON' as AlcoholDeviationType, label: 'Utgått legitimasjon' },
-    { value: 'LEGITIMASJON_ANNET' as AlcoholDeviationType, label: 'Legitimasjon – annet' },
-  ]},
+  {
+    points: 8, types: [
+      {value: 'SKJENKING_MINDREAARIGE' as AlcoholDeviationType, label: 'Skjenking til mindreårige'},
+      {value: 'BRUDD_BISTANDSPLIKT' as AlcoholDeviationType, label: 'Brudd på bistandsplikt'},
+      {value: 'UFORSVARLIG_DRIFT' as AlcoholDeviationType, label: 'Uforsvarlig drift'},
+      {value: 'HINDRING_KONTROLL' as AlcoholDeviationType, label: 'Hindring av kontroll'},
+    ]
+  },
+  {
+    points: 4, types: [
+      {
+        value: 'SKJENKING_APENBART_BERUSET' as AlcoholDeviationType,
+        label: 'Skjenking til åpenbart beruset'
+      },
+      {value: 'BRUDD_SJENKETIDER' as AlcoholDeviationType, label: 'Brudd på skjenketider'},
+      {value: 'BRENNEVIN_18_19' as AlcoholDeviationType, label: 'Brennevin til 18-19-åringer'},
+    ]
+  },
+  {
+    points: 2, types: [
+      {
+        value: 'BERUSET_PERSON_I_LOKALET' as AlcoholDeviationType,
+        label: 'Beruset person i lokalet'
+      },
+      {value: 'MANGLER_IK_SYSTEM' as AlcoholDeviationType, label: 'Mangler IK-system'},
+      {
+        value: 'MANGLER_STYRER_STEDFORTREDER' as AlcoholDeviationType,
+        label: 'Mangler styrer/stedfortreder'
+      },
+      {value: 'NARKOTIKA' as AlcoholDeviationType, label: 'Narkotika'},
+    ]
+  },
+  {
+    points: 1, types: [
+      {
+        value: 'ALKOHOLFRI_ALTERNATIV_MANGLER' as AlcoholDeviationType,
+        label: 'Alkoholfri alternativ mangler'
+      },
+      {value: 'MEDBRAKT_ALKOHOL' as AlcoholDeviationType, label: 'Medbrakt alkohol'},
+      {value: 'REKLAMEBRUDD' as AlcoholDeviationType, label: 'Reklamebrudd'},
+      {value: 'VILKAARSBRUDD' as AlcoholDeviationType, label: 'Vilkårsbrudd'},
+    ]
+  },
+  {
+    points: 0, types: [
+      {
+        value: 'NEKTET_VISE_LEGITIMASJON' as AlcoholDeviationType,
+        label: 'Nektet å vise legitimasjon'
+      },
+      {
+        value: 'GLEMTE_SJEKKE_LEGITIMASJON' as AlcoholDeviationType,
+        label: 'Glemte å sjekke legitimasjon'
+      },
+      {value: 'MINDREAARIG_FORSOK' as AlcoholDeviationType, label: 'Mindreårig forsøk'},
+      {value: 'FALSK_LEGITIMASJON' as AlcoholDeviationType, label: 'Falsk legitimasjon'},
+      {value: 'UTGAATT_LEGITIMASJON' as AlcoholDeviationType, label: 'Utgått legitimasjon'},
+      {value: 'LEGITIMASJON_ANNET' as AlcoholDeviationType, label: 'Legitimasjon – annet'},
+    ]
+  },
 ]
 
 const allDeviationTypes = deviationTypeGroups.flatMap((g) =>
-  g.types.map((t) => ({ ...t, points: g.points })),
+  g.types.map((t) => ({...t, points: g.points})),
 )
 
 const causalOptions: Array<{ value: AlcoholCausalAnalysis; label: string }> = [
-  { value: 'MANGLENDE_OPPLAERING', label: 'Manglende opplæring' },
-  { value: 'RUTINE_IKKE_FULGT', label: 'Rutine ikke fulgt' },
-  { value: 'RUTINE_MANGLER', label: 'Rutine mangler' },
-  { value: 'HOYT_TRYKK_STRESS', label: 'Høyt trykk / stress' },
-  { value: 'UNDERBEMANNING', label: 'Underbemanning' },
-  { value: 'KOMMUNIKASJON', label: 'Kommunikasjon' },
-  { value: 'ANNET', label: 'Annet' },
+  {value: 'MANGLENDE_OPPLAERING', label: 'Manglende opplæring'},
+  {value: 'RUTINE_IKKE_FULGT', label: 'Rutine ikke fulgt'},
+  {value: 'RUTINE_MANGLER', label: 'Rutine mangler'},
+  {value: 'HOYT_TRYKK_STRESS', label: 'Høyt trykk / stress'},
+  {value: 'UNDERBEMANNING', label: 'Underbemanning'},
+  {value: 'KOMMUNIKASJON', label: 'Kommunikasjon'},
+  {value: 'ANNET', label: 'Annet'},
 ]
 
 const statusOptions: Array<{ value: AlcoholDeviationStatus; label: string }> = [
-  { value: 'OPEN', label: 'Åpen' },
-  { value: 'UNDER_TREATMENT', label: 'Under behandling' },
-  { value: 'CLOSED', label: 'Lukket' },
+  {value: 'OPEN', label: 'Åpen'},
+  {value: 'UNDER_TREATMENT', label: 'Under behandling'},
+  {value: 'CLOSED', label: 'Lukket'},
 ]
 
 const showPenaltyWarning = computed(() => {
@@ -244,9 +260,17 @@ watch(
   },
 )
 
-function onReporterChange(val: string) { reportedByUserId.value = val }
-function onDeviationTypeChange(val: string) { deviationType.value = val as AlcoholDeviationType }
-function onPreventiveByChange(val: string) { preventiveResponsibleUserId.value = val }
+function onReporterChange(val: string) {
+  reportedByUserId.value = val
+}
+
+function onDeviationTypeChange(val: string) {
+  deviationType.value = val as AlcoholDeviationType
+}
+
+function onPreventiveByChange(val: string) {
+  preventiveResponsibleUserId.value = val
+}
 
 function handleSubmit() {
   const newErrors: Record<string, string> = {}
@@ -312,7 +336,7 @@ function handleSubmit() {
   if (preventiveResponsibleUserId.value) base.preventiveResponsibleUserId = Number(preventiveResponsibleUserId.value)
 
   if (props.mode === 'edit' && props.initial) {
-    emits('update', { id: props.initial.id, data: { ...base, status: status.value } })
+    emits('update', {id: props.initial.id, data: {...base, status: status.value}})
   } else {
     emits('create', base)
   }
@@ -320,7 +344,8 @@ function handleSubmit() {
 </script>
 
 <template>
-  <component :is="inline ? 'div' : Dialog" v-bind="inline ? {} : { open, 'onUpdate:open': (v: boolean) => emits('update:open', v) }">
+  <component :is="inline ? 'div' : Dialog"
+             v-bind="inline ? {} : { open, 'onUpdate:open': (v: boolean) => emits('update:open', v) }">
     <component :is="inline ? 'div' : DialogContent" :class="inline ? '' : 'alcohol-dialog'">
       <DialogHeader v-if="!inline">
         <DialogTitle>{{ dialogTitle }}</DialogTitle>
@@ -332,34 +357,41 @@ function handleSubmit() {
       </div>
 
       <form class="form" @submit.prevent="handleSubmit">
-        <!-- 1. Grunninfo -->
         <div class="step-header">1. Grunninfo</div>
         <div class="row-2">
           <label :class="['field', { 'field--error': errors.reportedDate }]">
             <span>Dato for hendelse *</span>
-            <DatePicker v-model="reportedDate" placeholder="Velg dato" />
-            <p v-if="errors.reportedDate" class="error-message" role="alert">{{ errors.reportedDate }}</p>
+            <DatePicker v-model="reportedDate" placeholder="Velg dato"/>
+            <p v-if="errors.reportedDate" class="error-message" role="alert">{{
+                errors.reportedDate
+              }}</p>
           </label>
           <label :class="['field', { 'field--error': errors.reportedTime }]">
             <span>Tidspunkt (ca.) *</span>
-            <TimePicker :hours="reportedHours" :minutes="reportedMinutes" @update:hours="reportedHours = $event" @update:minutes="reportedMinutes = $event" placeholder="Velg tid" />
-            <p v-if="errors.reportedTime" class="error-message" role="alert">{{ errors.reportedTime }}</p>
+            <TimePicker :hours="reportedHours" :minutes="reportedMinutes"
+                        @update:hours="reportedHours = $event"
+                        @update:minutes="reportedMinutes = $event" placeholder="Velg tid"/>
+            <p v-if="errors.reportedTime" class="error-message" role="alert">{{
+                errors.reportedTime
+              }}</p>
           </label>
         </div>
         <div :class="['field', { 'field--error': errors.reporter }]">
           <span>Hvem rapporterer? *</span>
           <Select :model-value="reportedByUserId" @update:model-value="onReporterChange">
             <SelectTrigger>
-              <SelectValue placeholder="Velg ansatt..." />
+              <SelectValue placeholder="Velg ansatt..."/>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">{{ m.label }}</SelectItem>
+              <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">{{
+                  m.label
+                }}
+              </SelectItem>
             </SelectContent>
           </Select>
           <p v-if="errors.reporter" class="error-message" role="alert">{{ errors.reporter }}</p>
         </div>
 
-        <!-- Source -->
         <div class="field">
           <span>Kilde</span>
           <div class="segmented-grid segmented-grid--3">
@@ -377,13 +409,12 @@ function handleSubmit() {
           </div>
         </div>
 
-        <!-- 2. Hva skjedde -->
         <div class="step-header">2. Hva skjedde?</div>
         <div :class="['field', { 'field--error': errors.deviationType }]">
           <span>Type hendelse *</span>
           <Select :model-value="deviationType" @update:model-value="onDeviationTypeChange">
             <SelectTrigger>
-              <SelectValue placeholder="Velg kategori..." />
+              <SelectValue placeholder="Velg kategori..."/>
             </SelectTrigger>
             <SelectContent>
               <SelectItem v-for="t in allDeviationTypes" :key="t.value" :value="t.value">
@@ -391,35 +422,43 @@ function handleSubmit() {
               </SelectItem>
             </SelectContent>
           </Select>
-          <p v-if="errors.deviationType" class="error-message" role="alert">{{ errors.deviationType }}</p>
+          <p v-if="errors.deviationType" class="error-message" role="alert">{{
+              errors.deviationType
+            }}</p>
         </div>
 
-        <!-- Penalty warning -->
         <div v-if="showPenaltyWarning && deviationType" class="penalty-warning">
           <div class="penalty-warning-header">
             <strong class="penalty-points">{{ selectedPoints }}</strong>
             <div>
-              <strong>prikker ved {{ reportSource === 'SJENKEKONTROLL' ? 'kommunal kontroll' : 'politirapport' }}</strong>
-              <p>Dere har nå {{ currentTotalPoints }} prikker. Dette avviket ville bringe dere til {{ currentTotalPoints + selectedPoints }} {{ currentTotalPoints + selectedPoints >= 12 ? '= inndragning' : '' }}</p>
+              <strong>prikker ved {{
+                  reportSource === 'SJENKEKONTROLL' ? 'kommunal kontroll' : 'politirapport'
+                }}</strong>
+              <p>Dere har nå {{ currentTotalPoints }} prikker. Dette avviket ville bringe dere til
+                {{ currentTotalPoints + selectedPoints }}
+                {{ currentTotalPoints + selectedPoints >= 12 ? '= inndragning' : '' }}</p>
             </div>
           </div>
         </div>
 
         <label :class="['field', { 'field--error': errors.description }]">
           <span>Beskriv hendelsen i detalj *</span>
-          <Textarea v-model="description" rows="3" placeholder="Hva skjedde? Hvem var involvert? Hvor i lokalet? Var det vitner?" />
-          <p v-if="errors.description" class="error-message" role="alert">{{ errors.description }}</p>
+          <Textarea v-model="description" rows="3"
+                    placeholder="Hva skjedde? Hvem var involvert? Hvor i lokalet? Var det vitner?"/>
+          <p v-if="errors.description" class="error-message" role="alert">{{
+              errors.description
+            }}</p>
         </label>
 
-        <!-- 3. Umiddelbar handling -->
         <div class="step-header">3. Umiddelbar handling</div>
         <label :class="['field', { 'field--error': errors.immediateAction }]">
           <span>Hva ble gjort med en gang for å håndtere situasjonen? *</span>
-          <Textarea v-model="immediateAction" rows="3" placeholder="F.eks.: Stoppet servering, sjekket ID, tilkalte vekter, ringte taxi..." />
-          <p v-if="errors.immediateAction" class="error-message" role="alert">{{ errors.immediateAction }}</p>
+          <Textarea v-model="immediateAction" rows="3"
+                    placeholder="F.eks.: Stoppet servering, sjekket ID, tilkalte vekter, ringte taxi..."/>
+          <p v-if="errors.immediateAction" class="error-message" role="alert">
+            {{ errors.immediateAction }}</p>
         </label>
 
-        <!-- 4. Årsaksanalyse -->
         <div class="step-header">4. Årsaksanalyse</div>
         <div :class="['field', { 'field--error': errors.causalAnalysis }]">
           <span>Hvorfor skjedde dette? Hva sviktet? *</span>
@@ -435,42 +474,51 @@ function handleSubmit() {
               {{ opt.label }}
             </button>
           </div>
-          <p v-if="errors.causalAnalysis" class="error-message" role="alert">{{ errors.causalAnalysis }}</p>
+          <p v-if="errors.causalAnalysis" class="error-message" role="alert">
+            {{ errors.causalAnalysis }}</p>
         </div>
         <label :class="['field', { 'field--error': errors.causalExplanation }]">
           <span>Utdyp: Hva er den egentlige årsaken? *</span>
-          <Textarea v-model="causalExplanation" rows="2" placeholder="Utdyp: Hva er den egentlige årsaken?" />
-          <p v-if="errors.causalExplanation" class="error-message" role="alert">{{ errors.causalExplanation }}</p>
+          <Textarea v-model="causalExplanation" rows="2"
+                    placeholder="Utdyp: Hva er den egentlige årsaken?"/>
+          <p v-if="errors.causalExplanation" class="error-message" role="alert">
+            {{ errors.causalExplanation }}</p>
         </label>
 
-        <!-- 5. Forebyggende tiltak -->
         <div class="step-header">5. Forebyggende tiltak</div>
         <label :class="['field', { 'field--error': errors.preventiveMeasures }]">
           <span>Hva skal gjøres for å hindre at dette skjer igjen? *</span>
-          <Textarea v-model="preventiveMeasures" rows="3" placeholder="F.eks.: Oppdatere rutine, gjennomføre ny opplæring, endre bemanning..." />
-          <p v-if="errors.preventiveMeasures" class="error-message" role="alert">{{ errors.preventiveMeasures }}</p>
+          <Textarea v-model="preventiveMeasures" rows="3"
+                    placeholder="F.eks.: Oppdatere rutine, gjennomføre ny opplæring, endre bemanning..."/>
+          <p v-if="errors.preventiveMeasures" class="error-message" role="alert">
+            {{ errors.preventiveMeasures }}</p>
         </label>
         <div class="row-2">
           <div :class="['field', { 'field--error': errors.preventiveResponsible }]">
             <span>Ansvarlig for oppfølging *</span>
-            <Select :model-value="preventiveResponsibleUserId" @update:model-value="onPreventiveByChange">
+            <Select :model-value="preventiveResponsibleUserId"
+                    @update:model-value="onPreventiveByChange">
               <SelectTrigger>
-                <SelectValue placeholder="Velg person..." />
+                <SelectValue placeholder="Velg person..."/>
               </SelectTrigger>
               <SelectContent open-upward>
-                <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">{{ m.label }}</SelectItem>
+                <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">
+                  {{ m.label }}
+                </SelectItem>
               </SelectContent>
             </Select>
-            <p v-if="errors.preventiveResponsible" class="error-message" role="alert">{{ errors.preventiveResponsible }}</p>
+            <p v-if="errors.preventiveResponsible" class="error-message" role="alert">
+              {{ errors.preventiveResponsible }}</p>
           </div>
-          <div :class="['field', 'field--date-right', { 'field--error': errors.preventiveDeadline }]">
+          <div
+            :class="['field', 'field--date-right', { 'field--error': errors.preventiveDeadline }]">
             <span>Frist for gjennomføring *</span>
-            <DatePicker v-model="preventiveDeadline" placeholder="Velg frist" open-upward />
-            <p v-if="errors.preventiveDeadline" class="error-message" role="alert">{{ errors.preventiveDeadline }}</p>
+            <DatePicker v-model="preventiveDeadline" placeholder="Velg frist" open-upward/>
+            <p v-if="errors.preventiveDeadline" class="error-message" role="alert">
+              {{ errors.preventiveDeadline }}</p>
           </div>
         </div>
 
-        <!-- Status (edit mode) -->
         <div v-if="mode === 'edit'" class="status-section">
           <span class="status-title">Status</span>
           <div class="status-chips">
@@ -488,7 +536,8 @@ function handleSubmit() {
         </div>
 
         <div class="form-footer">
-          <Button type="button" variant="outline" @click="emits('update:open', false)">Avbryt</Button>
+          <Button type="button" variant="outline" @click="emits('update:open', false)">Avbryt
+          </Button>
           <Button type="submit" :disabled="submitting">{{ submitLabel }}</Button>
         </div>
       </form>
@@ -497,10 +546,33 @@ function handleSubmit() {
 </template>
 
 <style scoped>
-.alcohol-dialog { max-width: 48rem; max-height: 90vh; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
-.form { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.field > span { font-size: 0.92rem; font-weight: 600; }
+.alcohol-dialog {
+  max-width: 48rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field > span {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
 
 .description-box {
   background: hsl(var(--secondary));
@@ -508,6 +580,7 @@ function handleSubmit() {
   padding: 14px 16px;
   margin: 4px 0 8px;
 }
+
 .description-box p {
   margin: 0;
   font-size: 0.85rem;
@@ -515,8 +588,16 @@ function handleSubmit() {
   line-height: 1.45;
 }
 
-.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-width: 0; }
-.row-2 > * { min-width: 0; }
+.row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-width: 0;
+}
+
+.row-2 > * {
+  min-width: 0;
+}
 
 .step-header {
   font-size: 1.05rem;
@@ -525,8 +606,14 @@ function handleSubmit() {
   color: hsl(var(--foreground));
 }
 
-.segmented-grid { display: grid; gap: 8px; }
-.segmented-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.segmented-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.segmented-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 
 .segment-button {
   border: 1px solid hsl(var(--input));
@@ -541,8 +628,15 @@ function handleSubmit() {
   gap: 2px;
   transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
 }
-.segment-button strong { font-size: 0.95rem; }
-.segment-button small { font-size: 0.78rem; color: hsl(var(--muted-foreground)); }
+
+.segment-button strong {
+  font-size: 0.95rem;
+}
+
+.segment-button small {
+  font-size: 0.78rem;
+  color: hsl(var(--muted-foreground));
+}
 
 .source-btn.segment-button--active {
   border-color: hsl(var(--primary));
@@ -550,7 +644,12 @@ function handleSubmit() {
   color: hsl(var(--accent-foreground));
 }
 
-.chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .chip {
   border: 1px solid hsl(var(--input));
   background: hsl(var(--card));
@@ -562,6 +661,7 @@ function handleSubmit() {
   cursor: pointer;
   transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
 }
+
 .chip--active {
   border-color: hsl(var(--primary));
   background: hsl(var(--accent));
@@ -575,18 +675,29 @@ function handleSubmit() {
   border-radius: var(--radius-md);
   padding: 12px 14px;
 }
+
 .penalty-warning-header {
   display: flex;
   align-items: flex-start;
   gap: 10px;
 }
+
 .penalty-points {
   font-size: 1.5rem;
   color: var(--red);
   line-height: 1;
 }
-.penalty-warning strong { color: var(--red); font-size: 0.9rem; }
-.penalty-warning p { margin: 2px 0 0; color: var(--red); font-size: 0.82rem; }
+
+.penalty-warning strong {
+  color: var(--red);
+  font-size: 0.9rem;
+}
+
+.penalty-warning p {
+  margin: 2px 0 0;
+  color: var(--red);
+  font-size: 0.82rem;
+}
 
 .status-section {
   background: hsl(var(--secondary));
@@ -596,8 +707,18 @@ function handleSubmit() {
   flex-direction: column;
   gap: 10px;
 }
-.status-title { font-weight: 600; font-size: 0.95rem; }
-.status-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.status-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.status-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .status-chip {
   border: 1.5px solid hsl(var(--input));
   background: hsl(var(--card));
@@ -608,6 +729,7 @@ function handleSubmit() {
   cursor: pointer;
   transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
 }
+
 .status-chip--active {
   border-color: hsl(var(--primary));
   background: hsl(var(--accent));
@@ -615,7 +737,10 @@ function handleSubmit() {
   font-weight: 700;
 }
 
-.error-message { color: hsl(var(--destructive)); font-size: 0.86rem; }
+.error-message {
+  color: hsl(var(--destructive));
+  font-size: 0.86rem;
+}
 
 .field--error :deep(.input),
 .field--error :deep(.textarea),
@@ -637,9 +762,17 @@ function handleSubmit() {
 }
 
 @media (max-width: 640px) {
-  .row-2 { grid-template-columns: 1fr; }
-  .segmented-grid--3 { grid-template-columns: 1fr; }
-  .form-footer { flex-direction: column-reverse; }
+  .row-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .segmented-grid--3 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-footer {
+    flex-direction: column-reverse;
+  }
 }
 
 .field--date-right :deep(.date-picker__panel) {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
+import type {Component} from 'vue'
 
 withDefaults(defineProps<{
   icon?: Component
@@ -15,14 +15,14 @@ withDefaults(defineProps<{
   <div class="empty-state">
     <div class="empty-state-inner">
       <div v-if="icon" :class="['empty-state-icon', `empty-state-icon--${variant}`]">
-        <component :is="icon" :stroke-width="1.5" aria-hidden="true" />
+        <component :is="icon" :stroke-width="1.5" aria-hidden="true"/>
       </div>
       <div class="empty-state-text">
         <h2>{{ title }}</h2>
         <p v-if="description">{{ description }}</p>
       </div>
       <div v-if="$slots.actions" class="empty-state-actions">
-        <slot name="actions" />
+        <slot name="actions"/>
       </div>
     </div>
   </div>

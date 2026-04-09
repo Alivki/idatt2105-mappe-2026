@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { Line } from 'vue-chartjs'
-import { ClipboardList } from 'lucide-vue-next'
-import type { Checklist, CompletionHistoryEntry } from '@/types/checklist'
+import {ref, computed} from 'vue'
+import {Line} from 'vue-chartjs'
+import {ClipboardList} from 'lucide-vue-next'
+import type {Checklist, CompletionHistoryEntry} from '@/types/checklist'
 
 const props = defineProps<{
   checklists: Checklist[]
@@ -13,8 +13,8 @@ type RangeKey = '1w' | '1m'
 const activeRange = ref<RangeKey>('1w')
 
 const rangeOptions: { key: RangeKey; label: string }[] = [
-  { key: '1w', label: 'Uke' },
-  { key: '1m', label: 'Måned' },
+  {key: '1w', label: 'Uke'},
+  {key: '1m', label: 'Måned'},
 ]
 
 const dailyChecklists = computed(() =>
@@ -88,9 +88,9 @@ const chartData = computed(() => {
 
 function formatLabel(d: Date): string {
   if (activeRange.value === '1w') {
-    return d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric' })
+    return d.toLocaleDateString('nb-NO', {weekday: 'short', day: 'numeric'})
   }
-  return d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })
+  return d.toLocaleDateString('nb-NO', {day: 'numeric', month: 'short'})
 }
 
 const avgCompletion = computed(() => {
@@ -103,16 +103,28 @@ const avgCompletion = computed(() => {
 
 const completionInsight = computed(() => {
   const avg = avgCompletion.value
-  if (avg >= 80) return { title: `${avg}% snittrate`, desc: 'Stabil og god fullføringsgrad', color: 'var(--green)' }
-  if (avg >= 50) return { title: `${avg}% snittrate`, desc: 'Noe forbedringspotensial i rutinene', color: 'var(--brand)' }
-  return { title: `${avg}% snittrate`, desc: 'Lav fullføringsgrad. Gjennomgå rutiner med teamet.', color: 'var(--red)' }
+  if (avg >= 80) return {
+    title: `${avg}% snittrate`,
+    desc: 'Stabil og god fullføringsgrad',
+    color: 'var(--green)'
+  }
+  if (avg >= 50) return {
+    title: `${avg}% snittrate`,
+    desc: 'Noe forbedringspotensial i rutinene',
+    color: 'var(--brand)'
+  }
+  return {
+    title: `${avg}% snittrate`,
+    desc: 'Lav fullføringsgrad. Gjennomgå rutiner med teamet.',
+    color: 'var(--red)'
+  }
 })
 
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    legend: { display: false },
+    legend: {display: false},
     tooltip: {
       backgroundColor: 'hsl(40, 25%, 98%)',
       titleColor: 'hsl(24, 10%, 15%)',
@@ -121,8 +133,8 @@ const chartOptions = {
       borderWidth: 1,
       padding: 12,
       cornerRadius: 8,
-      titleFont: { weight: 'bold' as const, size: 13 },
-      bodyFont: { size: 12 },
+      titleFont: {weight: 'bold' as const, size: 13},
+      bodyFont: {size: 12},
       callbacks: {
         label: (ctx: { parsed: { y: number | null } }) => `${ctx.parsed.y ?? 0}%`,
       },
@@ -130,24 +142,24 @@ const chartOptions = {
   },
   scales: {
     x: {
-      grid: { display: false },
-      border: { display: false },
+      grid: {display: false},
+      border: {display: false},
       ticks: {
         color: 'hsl(24, 5%, 56%)',
-        font: { size: 11 },
+        font: {size: 11},
         maxRotation: 0,
       },
     },
     y: {
       min: 0,
       max: 105,
-      border: { display: false },
+      border: {display: false},
       grid: {
         color: 'rgba(0, 0, 0, 0.05)',
       },
       ticks: {
         color: 'hsl(24, 5%, 56%)',
-        font: { size: 11 },
+        font: {size: 11},
         callback: (v: string | number) => `${v}%`,
         stepSize: 25,
       },
@@ -179,18 +191,18 @@ const chartOptions = {
     <!-- Empty state -->
     <div v-if="!hasData" class="empty-state">
       <div class="empty-icon">
-        <ClipboardList :size="28" />
+        <ClipboardList :size="28"/>
       </div>
       <p class="empty-heading">Ingen aktive sjekklister</p>
       <p class="empty-body">Opprett sjekklister for å se fullføringsgraden over tid.</p>
     </div>
 
     <div v-else class="chart-container">
-      <Line :data="chartData" :options="chartOptions" />
+      <Line :data="chartData" :options="chartOptions"/>
     </div>
 
     <div v-if="hasData" class="chart-status">
-      <span class="status-dot" :style="{ background: completionInsight.color }" />
+      <span class="status-dot" :style="{ background: completionInsight.color }"/>
       <span class="status-text">{{ completionInsight.title }} — {{ completionInsight.desc }}</span>
     </div>
   </div>

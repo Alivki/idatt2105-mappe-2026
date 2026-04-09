@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { inject, computed } from "vue"
-import type { DateValue } from "@internationalized/date"
+import {inject, computed} from "vue"
+import type {DateValue} from "@internationalized/date"
 
 const props = defineProps<{
   day: DateValue
@@ -79,6 +79,7 @@ function onClick() {
   background-color: hsl(var(--primary, 245 43% 52%));
   color: hsl(var(--primary-foreground, 0 0% 100%));
 }
+
 .calendar-cell-trigger[data-selected]:hover {
   background-color: hsl(var(--primary, 245 43% 52%));
   color: hsl(var(--primary-foreground, 0 0% 100%));
@@ -96,6 +97,7 @@ function onClick() {
   color: hsl(var(--muted-foreground, 24 5% 46%));
   opacity: 0.5;
 }
+
 .calendar-cell-trigger[data-outside-view][data-selected] {
   background-color: hsl(var(--accent, 250 40% 95%));
   opacity: 0.3;

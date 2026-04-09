@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import {computed} from 'vue'
+import {useAuthStore} from '@/stores/auth'
 import AppLayout from '@/components/layout/AppLayout.vue'
-import { SidebarTrigger } from '@/components/ui/sidebar'
+import {SidebarTrigger} from '@/components/ui/sidebar'
 import AdminAgeVerificationView from './AdminAgeVerificationView.vue'
 import EmployeeAgeVerificationView from './EmployeeAgeVerificationView.vue'
 
@@ -16,14 +16,15 @@ const canSeeAll = computed(() =>
   <AppLayout>
     <template #header>
       <div class="flex items-center gap-3 px-4 py-3 border-b border-stone-200 bg-stone-50">
-        <SidebarTrigger />
-        <span class="text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-3 py-1">
+        <SidebarTrigger/>
+        <span
+          class="text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-3 py-1">
           IK-Alkohol
         </span>
       </div>
     </template>
 
-    <AdminAgeVerificationView v-if="canSeeAll" />
-    <EmployeeAgeVerificationView v-else />
+    <AdminAgeVerificationView v-if="canSeeAll"/>
+    <EmployeeAgeVerificationView v-else/>
   </AppLayout>
 </template>

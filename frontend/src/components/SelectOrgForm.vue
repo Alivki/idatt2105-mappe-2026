@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useOrg } from '@/composables/useOrg'
+import {ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {useOrg} from '@/composables/useOrg'
 import OrgCard from '@/components/OrgCard.vue'
 import Button from '@/components/ui/button/Button.vue'
-import { Building2, Plus } from 'lucide-vue-next'
+import {Building2, Plus} from 'lucide-vue-next'
 
 const router = useRouter()
-const { memberships, hasMemberships, selectOrg } = useOrg()
+const {memberships, hasMemberships, selectOrg} = useOrg()
 
 const selectedOrgId = ref<number | null>(
   memberships.value.length === 1 ? memberships.value[0]?.organizationId ?? null : null,
@@ -15,17 +15,17 @@ const selectedOrgId = ref<number | null>(
 
 async function handleSubmit() {
   if (!selectedOrgId.value) return
-  await selectOrg.mutateAsync({ organizationId: selectedOrgId.value })
+  await selectOrg.mutateAsync({organizationId: selectedOrgId.value})
   router.push('/')
 }
 
-defineExpose({ selectOrgError: selectOrg.error })
+defineExpose({selectOrgError: selectOrg.error})
 </script>
 
 <template>
   <div v-if="!hasMemberships" class="empty">
     <div class="empty-icon">
-      <Building2 :size="32" />
+      <Building2 :size="32"/>
     </div>
     <h3 class="empty-title">Ingen virksomheter</h3>
     <p class="empty-description">
@@ -33,7 +33,7 @@ defineExpose({ selectOrgError: selectOrg.error })
     </p>
     <RouterLink to="/create-org" custom v-slot="{ navigate }">
       <Button @click="navigate" role="link" type="button">
-        <Plus :size="16" />
+        <Plus :size="16"/>
         Opprett virksomhet
       </Button>
     </RouterLink>

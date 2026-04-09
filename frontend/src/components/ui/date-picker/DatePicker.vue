@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, watch, onBeforeUnmount } from "vue"
-import type { DateValue } from "@internationalized/date"
-import { DateFormatter, getLocalTimeZone, today } from "@internationalized/date"
-import { CalendarIcon } from "lucide-vue-next"
-import { Calendar } from "@/components/ui/calendar"
+import {ref, computed, watch, onBeforeUnmount} from "vue"
+import type {DateValue} from "@internationalized/date"
+import {DateFormatter, getLocalTimeZone, today} from "@internationalized/date"
+import {CalendarIcon} from "lucide-vue-next"
+import {Calendar} from "@/components/ui/calendar"
 
 const props = withDefaults(defineProps<{
   modelValue?: DateValue
@@ -23,7 +23,7 @@ const emits = defineEmits<{
 const isOpen = ref(false)
 const rootRef = ref<HTMLElement | null>(null)
 const defaultPlaceholder = today(getLocalTimeZone())
-const df = new DateFormatter(props.locale, { dateStyle: "long" })
+const df = new DateFormatter(props.locale, {dateStyle: "long"})
 
 const displayText = computed(() => {
   if (!props.modelValue) return null
@@ -65,7 +65,7 @@ onBeforeUnmount(() => {
   <div ref="rootRef" class="date-picker">
     <button type="button" class="date-picker__trigger" @click="isOpen = !isOpen">
       <span class="date-picker__icon">
-        <CalendarIcon />
+        <CalendarIcon/>
       </span>
       <span :class="['date-picker__text', !modelValue && 'date-picker__text--placeholder']">
         {{ displayText ?? placeholder }}
@@ -122,6 +122,7 @@ onBeforeUnmount(() => {
   padding-left: 0.75rem;
   color: hsl(var(--muted-foreground, 24 5% 46%));
 }
+
 .date-picker__icon :deep(svg) {
   width: 1rem;
   height: 1rem;
@@ -160,16 +161,30 @@ onBeforeUnmount(() => {
 .date-picker-panel-enter-active {
   animation: dp-in 150ms ease-out;
 }
+
 .date-picker-panel-leave-active {
   animation: dp-out 100ms ease-in;
 }
 
 @keyframes dp-in {
-  from { opacity: 0; transform: scale(0.95) translateY(-4px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
+
 @keyframes dp-out {
-  from { opacity: 1; transform: scale(1) translateY(0); }
-  to { opacity: 0; transform: scale(0.95) translateY(-4px); }
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
 }
 </style>

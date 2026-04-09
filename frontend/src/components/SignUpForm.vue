@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useForm } from '@tanstack/vue-form'
-import { z } from 'zod'
-import { useRegister } from '@/composables/useAuth'
-import { useRouter } from 'vue-router'
-import { ref } from 'vue'
-import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-vue-next'
+import {useForm} from '@tanstack/vue-form'
+import {z} from 'zod'
+import {useRegister} from '@/composables/useAuth'
+import {useRouter} from 'vue-router'
+import {ref} from 'vue'
+import {Eye, EyeOff, Mail, Lock, User, Phone} from 'lucide-vue-next'
 import Button from '@/components/ui/button/Button.vue'
 import Checkbox from '@/components/ui/checkbox/Checkbox.vue'
 import InputGroup from '@/components/ui/input-group/InputGroup.vue'
@@ -30,7 +30,7 @@ const form = useForm({
     password: '',
     termsAccepted: false,
   },
-  onSubmit: async ({ value }) => {
+  onSubmit: async ({value}) => {
     await register.mutateAsync({
       fullName: `${value.fornavn} ${value.etternavn}`.trim(),
       email: value.email,
@@ -41,7 +41,7 @@ const form = useForm({
   },
 })
 
-defineExpose({ registerError: register.error })
+defineExpose({registerError: register.error})
 </script>
 
 <template>
@@ -60,7 +60,7 @@ defineExpose({ registerError: register.error })
               <label>Fornavn</label>
               <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
                 <InputGroupAddon>
-                  <User />
+                  <User/>
                 </InputGroupAddon>
                 <InputGroupInput
                   type="text"
@@ -86,7 +86,7 @@ defineExpose({ registerError: register.error })
               <label>Etternavn</label>
               <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
                 <InputGroupAddon>
-                  <User />
+                  <User/>
                 </InputGroupAddon>
                 <InputGroupInput
                   type="text"
@@ -114,7 +114,7 @@ defineExpose({ registerError: register.error })
             <label>E-post</label>
             <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
               <InputGroupAddon>
-                <Mail />
+                <Mail/>
               </InputGroupAddon>
               <InputGroupInput
                 type="email"
@@ -141,7 +141,7 @@ defineExpose({ registerError: register.error })
             <label>Telefonnummer</label>
             <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
               <InputGroupAddon>
-                <Phone />
+                <Phone/>
               </InputGroupAddon>
               <InputGroupInput
                 type="tel"
@@ -168,7 +168,7 @@ defineExpose({ registerError: register.error })
             <label>Passord</label>
             <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
               <InputGroupAddon>
-                <Lock />
+                <Lock/>
               </InputGroupAddon>
               <InputGroupInput
                 :type="showPassword ? 'text' : 'password'"
@@ -179,8 +179,8 @@ defineExpose({ registerError: register.error })
               />
               <InputGroupAddon align="inline-end">
                 <InputGroupButton @click="showPassword = !showPassword">
-                  <Eye v-if="!showPassword" />
-                  <EyeOff v-else />
+                  <Eye v-if="!showPassword"/>
+                  <EyeOff v-else/>
                 </InputGroupButton>
               </InputGroupAddon>
             </InputGroup>

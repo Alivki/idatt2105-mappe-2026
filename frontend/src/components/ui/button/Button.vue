@@ -1,5 +1,12 @@
 <script setup lang="ts">
-type ButtonVariant = "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "destructive-ghost"
+type ButtonVariant =
+  "default"
+  | "destructive"
+  | "outline"
+  | "secondary"
+  | "ghost"
+  | "link"
+  | "destructive-ghost"
 type ButtonSize = "default" | "xs" | "sm" | "lg" | "icon" | "icon-sm" | "icon-lg"
 
 interface Props {
@@ -24,7 +31,7 @@ const classes = computed(() => {
   return parts.join(" ")
 })
 
-import { computed } from "vue"
+import {computed} from "vue"
 </script>
 
 <template>
@@ -33,7 +40,7 @@ import { computed } from "vue"
     :class="classes"
     :disabled="disabled || undefined"
   >
-    <slot />
+    <slot/>
   </component>
 </template>
 
@@ -85,9 +92,11 @@ import { computed } from "vue"
   color: hsl(var(--primary-foreground, 0 0% 100%));
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
+
 .btn--default:hover {
   background-color: hsl(var(--primary, 245 43% 52%) / 0.85);
 }
+
 .btn--default:active {
   background-color: hsl(var(--primary, 245 43% 52%) / 0.75);
 }
@@ -97,9 +106,11 @@ import { computed } from "vue"
   color: hsl(var(--destructive-foreground, 0 0% 100%));
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
+
 .btn--destructive:hover {
   background-color: hsl(0, 55%, 48%);
 }
+
 .btn--destructive:active {
   background-color: hsl(0, 55%, 36%);
 }
@@ -109,9 +120,11 @@ import { computed } from "vue"
   color: hsl(var(--destructive, 0 55% 42%));
   box-shadow: none;
 }
+
 .btn--destructive-ghost:hover {
   background-color: hsl(0 80% 90%);
 }
+
 .btn--destructive-ghost:active {
   background-color: hsl(0 80% 85%);
 }
@@ -122,10 +135,12 @@ import { computed } from "vue"
   color: inherit;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
+
 .btn--outline:hover {
   background-color: hsl(var(--accent, 250 40% 95%));
   color: hsl(var(--accent-foreground, 245 43% 42%));
 }
+
 .btn--outline:active {
   background-color: hsl(var(--accent, 250 40% 95%) / 0.8);
 }
@@ -135,9 +150,11 @@ import { computed } from "vue"
   color: hsl(var(--secondary-foreground, 24 10% 20%));
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
+
 .btn--secondary:hover {
   background-color: hsl(var(--secondary, 40 20% 93%) / 0.7);
 }
+
 .btn--secondary:active {
   background-color: hsl(var(--secondary, 40 20% 93%) / 0.6);
 }
@@ -146,10 +163,12 @@ import { computed } from "vue"
   background-color: transparent;
   color: inherit;
 }
+
 .btn--ghost:hover {
   background-color: hsl(var(--accent, 250 40% 95%));
   color: hsl(var(--accent-foreground, 245 43% 42%));
 }
+
 .btn--ghost:active {
   background-color: hsl(var(--accent, 250 40% 95%) / 0.8);
 }
@@ -160,10 +179,12 @@ import { computed } from "vue"
   text-underline-offset: 4px;
   box-shadow: none;
 }
+
 .btn--link:hover {
   text-decoration: underline;
   background-color: transparent;
 }
+
 .btn--link:active {
   transform: scale(1);
 }

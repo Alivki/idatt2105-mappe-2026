@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CreateOrgForm from '@/components/CreateOrgForm.vue'
-import { ref } from 'vue'
+import {ref} from 'vue'
 import veraLogo from '@/assets/vera.png'
 
 const createOrgFormRef = ref<InstanceType<typeof CreateOrgForm> | null>(null)
@@ -16,7 +16,7 @@ const createOrgFormRef = ref<InstanceType<typeof CreateOrgForm> | null>(null)
         <p class="subtitle">Fyll inn informasjon om din virksomhet</p>
       </div>
 
-      <CreateOrgForm ref="createOrgFormRef" />
+      <CreateOrgForm ref="createOrgFormRef"/>
     </div>
 
     <div v-if="createOrgFormRef?.createOrgError" class="error-card">

@@ -6,7 +6,7 @@ const props = defineProps<{
 
 <template>
   <li data-sidebar="menu-item" :class="['sidebar-menu-item', props.class]">
-    <slot />
+    <slot/>
   </li>
 </template>
 

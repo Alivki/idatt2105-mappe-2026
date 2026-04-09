@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { inject, onMounted, onBeforeUnmount } from "vue"
-import { X } from "lucide-vue-next"
+import {inject, onMounted, onBeforeUnmount} from "vue"
+import {X} from "lucide-vue-next"
 
 const props = defineProps<{
   class?: string
 }>()
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { isOpen, close } = inject("dialog") as { isOpen: Ref<boolean>; close: () => void }
+const {isOpen, close} = inject("dialog") as { isOpen: Ref<boolean>; close: () => void }
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === "Escape") close()
@@ -21,7 +21,7 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKeydown))
 <template>
   <Teleport to="body">
     <Transition name="dialog-overlay">
-      <div v-if="isOpen" class="dialog-overlay" @click="close" />
+      <div v-if="isOpen" class="dialog-overlay" @click="close"/>
     </Transition>
     <Transition name="dialog-content">
       <div
@@ -30,9 +30,9 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKeydown))
         aria-modal="true"
         :class="['dialog-content', props.class]"
       >
-        <slot />
+        <slot/>
         <button class="dialog-close" @click="close">
-          <X class="dialog-close__icon" />
+          <X class="dialog-close__icon"/>
           <span class="sr-only">Close</span>
         </button>
       </div>
@@ -108,14 +108,28 @@ onBeforeUnmount(() => document.removeEventListener("keydown", onKeydown))
 }
 
 /* Overlay transitions */
-.dialog-overlay-enter-active { transition: opacity 200ms ease; }
-.dialog-overlay-leave-active { transition: opacity 150ms ease; }
+.dialog-overlay-enter-active {
+  transition: opacity 200ms ease;
+}
+
+.dialog-overlay-leave-active {
+  transition: opacity 150ms ease;
+}
+
 .dialog-overlay-enter-from,
-.dialog-overlay-leave-to { opacity: 0; }
+.dialog-overlay-leave-to {
+  opacity: 0;
+}
 
 /* Content transitions */
-.dialog-content-enter-active { transition: all 200ms ease; }
-.dialog-content-leave-active { transition: all 150ms ease; }
+.dialog-content-enter-active {
+  transition: all 200ms ease;
+}
+
+.dialog-content-leave-active {
+  transition: all 150ms ease;
+}
+
 .dialog-content-enter-from,
 .dialog-content-leave-to {
   opacity: 0;

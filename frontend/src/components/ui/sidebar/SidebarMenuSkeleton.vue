@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from "vue"
-import { Skeleton } from "@/components/ui/skeleton"
+import {computed} from "vue"
+import {Skeleton} from "@/components/ui/skeleton"
 
 const props = defineProps<{
   showIcon?: boolean

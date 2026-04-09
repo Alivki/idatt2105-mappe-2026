@@ -3,7 +3,7 @@ withDefaults(defineProps<{
   initials: string
   color: string
   size?: 'sm' | 'lg'
-}>(), { size: 'sm' })
+}>(), {size: 'sm'})
 </script>
 
 <template>

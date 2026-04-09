@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick } from 'vue'
+import {describe, expect, it} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, nextTick} from 'vue'
 
 import Collapsible from '../Collapsible.vue'
 import CollapsibleTrigger from '../CollapsibleTrigger.vue'
@@ -41,7 +41,7 @@ describe('Collapsible', () => {
 
   it('uses defaultOpen=false by default', () => {
     const Host = defineComponent({
-      components: { Collapsible, CollapsibleTrigger },
+      components: {Collapsible, CollapsibleTrigger},
       template: `
         <Collapsible>
           <CollapsibleTrigger>
@@ -59,7 +59,7 @@ describe('Collapsible', () => {
 
   it('uses defaultOpen=true when provided', () => {
     const Host = defineComponent({
-      components: { Collapsible, CollapsibleTrigger },
+      components: {Collapsible, CollapsibleTrigger},
       template: `
         <Collapsible :defaultOpen="true">
           <CollapsibleTrigger>
@@ -108,7 +108,7 @@ describe('Collapsible', () => {
 
   it('toggles internal state and emits update:open when trigger is clicked', async () => {
     const Host = defineComponent({
-      components: { Collapsible, CollapsibleTrigger },
+      components: {Collapsible, CollapsibleTrigger},
       template: `
         <Collapsible>
           <CollapsibleTrigger>
@@ -154,12 +154,12 @@ describe('Collapsible', () => {
 
     expect(wrapper.get('[data-test="slot-open"]').text()).toBe('false')
 
-    await wrapper.setProps({ open: true })
+    await wrapper.setProps({open: true})
     await nextTick()
 
     expect(wrapper.get('[data-test="slot-open"]').text()).toBe('true')
 
-    await wrapper.setProps({ open: false })
+    await wrapper.setProps({open: false})
     await nextTick()
 
     expect(wrapper.get('[data-test="slot-open"]').text()).toBe('false')
@@ -167,7 +167,7 @@ describe('Collapsible', () => {
 
   it('still toggles its own state even when open prop is controlled', async () => {
     const Host = defineComponent({
-      components: { Collapsible, CollapsibleTrigger },
+      components: {Collapsible, CollapsibleTrigger},
       template: `
         <Collapsible :open="false">
           <CollapsibleTrigger>
@@ -193,7 +193,7 @@ describe('Collapsible', () => {
 
   it('trigger renders display: contents wrapper and exposes current data-state', () => {
     const Host = defineComponent({
-      components: { Collapsible, CollapsibleTrigger },
+      components: {Collapsible, CollapsibleTrigger},
       template: `
         <Collapsible :defaultOpen="true">
           <CollapsibleTrigger>

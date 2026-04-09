@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Component } from "vue"
-import { useSidebar } from "./utils"
+import type {Component} from "vue"
+import {useSidebar} from "./utils"
 
 export interface SidebarMenuButtonProps {
   as?: string | Component
@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<SidebarMenuButtonProps>(), {
   size: "default",
 })
 
-const { state, collapsible } = useSidebar()
+const {state, collapsible} = useSidebar()
 </script>
 
 <template>
@@ -35,7 +35,7 @@ const { state, collapsible } = useSidebar()
     ]"
     v-bind="$attrs"
   >
-    <slot />
+    <slot/>
   </component>
 </template>
 

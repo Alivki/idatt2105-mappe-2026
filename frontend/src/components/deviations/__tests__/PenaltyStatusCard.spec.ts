@@ -1,10 +1,10 @@
-import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import {mount} from '@vue/test-utils'
+import {describe, expect, it} from 'vitest'
 import PenaltyStatusCard from '../PenaltyPointsStatus.vue'
 
 describe('PenaltyStatusCard', () => {
   it('renders zero-state when summary is null', () => {
-    const wrapper = mount(PenaltyStatusCard, { props: { summary: null } })
+    const wrapper = mount(PenaltyStatusCard, {props: {summary: null}})
     expect(wrapper.text()).toContain('Prikkstatus')
     expect(wrapper.text()).toContain('0')
     expect(wrapper.text()).toContain('av 12')
@@ -19,8 +19,8 @@ describe('PenaltyStatusCard', () => {
         summary: {
           totalPoints: 6,
           entries: [
-            { createdAt: '2026-04-08T00:00:00Z', violationType: 'BRUDD_SJENKETIDER', points: 4 },
-            { createdAt: '2026-04-01T00:00:00Z', violationType: 'REKLAMEBRUDD', points: 1 },
+            {createdAt: '2026-04-08T00:00:00Z', violationType: 'BRUDD_SJENKETIDER', points: 4},
+            {createdAt: '2026-04-01T00:00:00Z', violationType: 'REKLAMEBRUDD', points: 1},
           ],
         },
       },
@@ -39,7 +39,7 @@ describe('PenaltyStatusCard', () => {
         summary: {
           totalPoints: 14,
           entries: [
-            { createdAt: '2026-04-08T00:00:00Z', violationType: 'UKJENT_TYPE', points: 8 },
+            {createdAt: '2026-04-08T00:00:00Z', violationType: 'UKJENT_TYPE', points: 8},
           ],
         },
       },

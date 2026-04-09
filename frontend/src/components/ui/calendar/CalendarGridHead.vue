@@ -3,6 +3,6 @@
 
 <template>
   <thead aria-hidden="true">
-    <slot />
+  <slot/>
   </thead>
 </template>

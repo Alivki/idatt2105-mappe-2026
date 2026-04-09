@@ -1,6 +1,6 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h} from 'vue'
+import {describe, expect, it, vi} from 'vitest'
 import RecentDeviationsPanel from '../LatestDeviationCard.vue'
 
 vi.mock('@/components/ui/badge/Badge.vue', () => ({
@@ -12,8 +12,8 @@ vi.mock('@/components/ui/badge/Badge.vue', () => ({
         default: '',
       },
     },
-    setup(props, { slots }) {
-      return () => h('span', { 'data-testid': 'badge', 'data-tone': props.tone }, slots.default?.())
+    setup(props, {slots}) {
+      return () => h('span', {'data-testid': 'badge', 'data-tone': props.tone}, slots.default?.())
     },
   }),
 }))

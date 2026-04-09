@@ -4,7 +4,7 @@ const props = defineProps<{ class?: string }>()
 
 <template>
   <p :class="['dialog-description', props.class]">
-    <slot />
+    <slot/>
   </p>
 </template>
 

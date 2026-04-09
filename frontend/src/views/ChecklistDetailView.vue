@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeft, ClipboardCheck, MoreVertical, Pencil, Trash2 } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
+import {computed, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {ArrowLeft, ClipboardCheck, MoreVertical, Pencil, Trash2} from 'lucide-vue-next'
+import {toast} from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/button/Button.vue'
 import Checkbox from '@/components/ui/checkbox/Checkbox.vue'
 import Badge from '@/components/ui/badge/Badge.vue'
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
+import {Separator} from '@/components/ui/separator'
+import {SidebarTrigger} from '@/components/ui/sidebar'
 import Tooltip from '@/components/ui/tooltip/Tooltip.vue'
 import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue'
 import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue'
@@ -29,7 +29,8 @@ import AlertDialogHeader from '@/components/ui/alert-dialog/AlertDialogHeader.vu
 import AlertDialogTitle from '@/components/ui/alert-dialog/AlertDialogTitle.vue'
 import ChecklistFormDialog from '@/components/checklists/ChecklistFormDialog.vue'
 import ChecklistItemFormDialog from '@/components/checklists/ChecklistItemFormDialog.vue'
-import { useAuthStore } from '@/stores/auth'
+import {useAuthStore} from '@/stores/auth'
+import {useCanManage} from '@/composables/useCanManage'
 import {
   useChecklistsQuery,
   useCreateChecklistItemMutation,
@@ -58,7 +59,7 @@ const updateChecklist = useUpdateChecklistMutation()
 const deleteChecklist = useDeleteChecklistMutation()
 const setChecklistCompletion = useSetChecklistCompletionMutation()
 
-const canManage = computed(() => auth.role === 'ADMIN' || auth.role === 'MANAGER')
+const canManage = useCanManage()
 const canComplete = computed(() => !!auth.role)
 
 const checklistId = computed(() => Number(route.params.id))
@@ -95,9 +96,12 @@ const completionPercent = computed(() => {
 const statusTone = computed(() => {
   if (!checklist.value) return 'neutral'
   switch (checklist.value.status) {
-    case 'COMPLETED': return 'ok'
-    case 'IN_PROGRESS': return 'warning'
-    default: return 'neutral'
+    case 'COMPLETED':
+      return 'ok'
+    case 'IN_PROGRESS':
+      return 'warning'
+    default:
+      return 'neutral'
   }
 })
 
@@ -119,7 +123,7 @@ function formatTime(value: string | null): string {
   if (!value) return ''
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return ''
-  return date.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' })
+  return date.toLocaleTimeString('nb-NO', {hour: '2-digit', minute: '2-digit'})
 }
 
 function openCreateItemDialog() {
@@ -140,14 +144,17 @@ async function handleToggleItem(item: ChecklistItem) {
     await updateItem.mutateAsync({
       checklistId: checklistId.value,
       itemId: item.id,
-      payload: { completed: !item.completed },
+      payload: {completed: !item.completed},
     })
   } catch (error) {
     handleMutationError(error, 'Kunne ikke oppdatere oppgavestatus')
   }
 }
 
-async function handleCreateItem(payload: { checklistId: number; data: CreateChecklistItemRequest }) {
+async function handleCreateItem(payload: {
+  checklistId: number;
+  data: CreateChecklistItemRequest
+}) {
   try {
     await createItem.mutateAsync({
       checklistId: payload.checklistId,
@@ -180,7 +187,7 @@ async function handleUpdateItem(payload: {
 
 async function handleDeleteItem(itemId: number) {
   try {
-    await deleteItem.mutateAsync({ checklistId: checklistId.value, itemId })
+    await deleteItem.mutateAsync({checklistId: checklistId.value, itemId})
     deleteItemDialogId.value = null
     toast.success('Oppgave slettet')
   } catch (error) {
@@ -188,7 +195,10 @@ async function handleDeleteItem(itemId: number) {
   }
 }
 
-async function handleUpdateChecklist(payload: { checklistId: number; data: UpdateChecklistRequest }) {
+async function handleUpdateChecklist(payload: {
+  checklistId: number;
+  data: UpdateChecklistRequest
+}) {
   try {
     await updateChecklist.mutateAsync({
       checklistId: payload.checklistId,
@@ -241,15 +251,15 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
   <AppLayout active-menu-item="Sjekklister">
     <header class="page-header">
       <div class="page-header-inner">
-        <SidebarTrigger />
-        <Separator orientation="vertical" class="header-separator" />
+        <SidebarTrigger/>
+        <Separator orientation="vertical" class="header-separator"/>
         <span class="page-title">Sjekklister</span>
       </div>
     </header>
 
     <div class="page-content">
       <Button variant="ghost" size="sm" class="back-btn" @click="router.push('/sjekklister')">
-        <ArrowLeft :size="16" aria-hidden="true" />
+        <ArrowLeft :size="16" aria-hidden="true"/>
         Tilbake til sjekklister
       </Button>
 
@@ -263,7 +273,7 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
       <div v-else-if="!checklist" class="empty-state">
         <div class="empty-state-inner">
           <div class="empty-state-icon">
-            <ClipboardCheck :stroke-width="1.5" aria-hidden="true" />
+            <ClipboardCheck :stroke-width="1.5" aria-hidden="true"/>
           </div>
           <div class="empty-state-text">
             <h2>Sjekkliste ikke funnet</h2>
@@ -277,13 +287,19 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
         <section class="detail-header">
           <div>
             <div class="tag-row">
-              <Badge :tone="frequencyTone[checklist.frequency]">{{ frequencyLabel[checklist.frequency] }}</Badge>
+              <Badge :tone="frequencyTone[checklist.frequency]">
+                {{ frequencyLabel[checklist.frequency] }}
+              </Badge>
               <Badge :tone="statusTone">
-                {{ checklist.status === 'COMPLETED' ? 'Fullført' : checklist.status === 'IN_PROGRESS' ? 'Pågår' : 'Ikke startet' }}
+                {{
+                  checklist.status === 'COMPLETED' ? 'Fullført' : checklist.status === 'IN_PROGRESS' ? 'Pågår' : 'Ikke startet'
+                }}
               </Badge>
             </div>
             <h1>{{ checklist.name }}</h1>
-            <p v-if="checklist.description" class="detail-description">{{ checklist.description }}</p>
+            <p v-if="checklist.description" class="detail-description">{{
+                checklist.description
+              }}</p>
             <p class="date-label">{{ dateLabel }}</p>
           </div>
 
@@ -296,7 +312,7 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
           <div v-if="checklist.items.length === 0" class="empty-state">
             <div class="empty-state-inner">
               <div class="empty-state-icon">
-                <ClipboardCheck :stroke-width="1.5" aria-hidden="true" />
+                <ClipboardCheck :stroke-width="1.5" aria-hidden="true"/>
               </div>
               <div class="empty-state-text">
                 <h2>Ingen oppgaver ennå</h2>
@@ -331,23 +347,26 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
                     <div v-if="canManage" class="item-actions" @click.stop>
                       <DropdownMenu>
                         <DropdownMenuTrigger as-child>
-                          <Button type="button" variant="ghost" size="icon-sm" class="item-action-btn" aria-label="Oppgavemeny">
-                            <MoreVertical :size="16" aria-hidden="true" />
+                          <Button type="button" variant="ghost" size="icon-sm"
+                                  class="item-action-btn" aria-label="Oppgavemeny">
+                            <MoreVertical :size="16" aria-hidden="true"/>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" :side-offset="4">
                           <DropdownMenuItem @click="openEditItemDialog(item)">
-                            <Pencil :size="16" aria-hidden="true" />
+                            <Pencil :size="16" aria-hidden="true"/>
                             Rediger
                           </DropdownMenuItem>
-                          <DropdownMenuItem class="menu-item--danger" @click="deleteItemDialogId = item.id">
-                            <Trash2 :size="16" aria-hidden="true" />
+                          <DropdownMenuItem class="menu-item--danger"
+                                            @click="deleteItemDialogId = item.id">
+                            <Trash2 :size="16" aria-hidden="true"/>
                             Slett oppgave
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
 
-                      <AlertDialog :open="deleteItemDialogId === item.id" @update:open="(v) => { if (!v) deleteItemDialogId = null }">
+                      <AlertDialog :open="deleteItemDialogId === item.id"
+                                   @update:open="(v) => { if (!v) deleteItemDialogId = null }">
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Slett oppgave?</AlertDialogTitle>
@@ -357,7 +376,8 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Avbryt</AlertDialogCancel>
-                            <AlertDialogAction variant="destructive" @click="handleDeleteItem(item.id)">
+                            <AlertDialogAction variant="destructive"
+                                               @click="handleDeleteItem(item.id)">
                               Slett
                             </AlertDialogAction>
                           </AlertDialogFooter>
@@ -376,7 +396,9 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 
         <section v-if="checklist.items.length > 0" class="actions-section">
           <Button v-if="canComplete" class="complete-btn" @click="handleCompleteAll">
-            {{ checklistComplete ? 'Angre fullføring' : `Fullfør sjekkliste (${checklist.completedItemCount}/${checklist.itemCount})` }}
+            {{
+              checklistComplete ? 'Angre fullføring' : `Fullfør sjekkliste (${checklist.completedItemCount}/${checklist.itemCount})`
+            }}
           </Button>
           <Button variant="outline" @click="router.push('/avvik')">
             Rapporter avvik
@@ -384,16 +406,22 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
         </section>
 
         <section class="progress-section">
-          <div class="progress-track" role="progressbar" :aria-valuenow="completionPercent" aria-valuemin="0" aria-valuemax="100">
-            <div class="progress-fill" :class="`progress-fill--${statusTone}`" :style="{ width: `${completionPercent}%` }" />
+          <div class="progress-track" role="progressbar" :aria-valuenow="completionPercent"
+               aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-fill" :class="`progress-fill--${statusTone}`"
+                 :style="{ width: `${completionPercent}%` }"/>
           </div>
           <div class="progress-stats">
             <div class="stat">
-              <strong class="stat-number stat-number--green">{{ checklist.completedItemCount }}</strong>
+              <strong class="stat-number stat-number--green">{{
+                  checklist.completedItemCount
+                }}</strong>
               <span>fullført</span>
             </div>
             <div class="stat">
-              <strong class="stat-number">{{ checklist.itemCount - checklist.completedItemCount }}</strong>
+              <strong class="stat-number">{{
+                  checklist.itemCount - checklist.completedItemCount
+                }}</strong>
               <span>gjenstår</span>
             </div>
           </div>
@@ -401,12 +429,13 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 
         <div v-if="canManage" class="detail-actions">
           <Button variant="secondary" @click="editChecklistDialogOpen = true">
-            <Pencil aria-hidden="true" />
+            <Pencil aria-hidden="true"/>
             Rediger sjekkliste
           </Button>
 
-          <Button variant="destructive" class="delete-btn" @click="deleteChecklistDialogOpen = true">
-            <Trash2 aria-hidden="true" />
+          <Button variant="destructive" class="delete-btn"
+                  @click="deleteChecklistDialogOpen = true">
+            <Trash2 aria-hidden="true"/>
             Slett sjekkliste
           </Button>
 
@@ -451,20 +480,81 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 </template>
 
 <style scoped>
-.page-header { display: flex; height: 4rem; flex-shrink: 0; align-items: center; }
-.page-header-inner { display: flex; align-items: center; gap: 0.5rem; padding: 0 1rem; }
-.header-separator { height: 1rem !important; width: 1px !important; margin-right: 0.5rem; }
-.page-title { font-weight: 500; color: hsl(var(--sidebar-primary, 245 43% 52%)); }
-.page-content { display: flex; flex: 1; flex-direction: column; gap: 1.25rem; padding: 0 1rem 2rem; }
+.page-header {
+  display: flex;
+  height: 4rem;
+  flex-shrink: 0;
+  align-items: center;
+}
 
-.back-btn { margin-bottom: 0.5rem; align-self: flex-start; }
+.page-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
 
-.skeleton-list { display: flex; flex-direction: column; gap: 12px; }
-.skeleton-card { padding: 16px; border-radius: var(--radius-lg); border: 1px solid hsl(var(--border)); background: var(--card-bg); }
-.skeleton-line { height: 14px; border-radius: 6px; background: hsl(var(--muted)); animation: shimmer 1.4s ease-in-out infinite; }
-.skeleton-line--title { width: 55%; margin-bottom: 10px; }
-.skeleton-line--short { width: 35%; }
-@keyframes shimmer { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.header-separator {
+  height: 1rem !important;
+  width: 1px !important;
+  margin-right: 0.5rem;
+}
+
+.page-title {
+  font-weight: 500;
+  color: hsl(var(--sidebar-primary, 245 43% 52%));
+}
+
+.page-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 0 1rem 2rem;
+}
+
+.back-btn {
+  margin-bottom: 0.5rem;
+  align-self: flex-start;
+}
+
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-card {
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid hsl(var(--border));
+  background: var(--card-bg);
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 6px;
+  background: hsl(var(--muted));
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-line--title {
+  width: 55%;
+  margin-bottom: 10px;
+}
+
+.skeleton-line--short {
+  width: 35%;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
 
 .detail-header {
   display: flex;
@@ -638,7 +728,10 @@ h1 {
   color: hsl(var(--foreground));
 }
 
-.menu-item--danger { color: var(--red); }
+.menu-item--danger {
+  color: var(--red);
+}
+
 .menu-item--danger:hover {
   background-color: var(--red-soft) !important;
   color: var(--red) !important;
@@ -677,9 +770,17 @@ h1 {
   transition: width 400ms ease;
 }
 
-.progress-fill--ok { background: var(--green); }
-.progress-fill--warning { background: var(--amber); }
-.progress-fill--neutral { background: hsl(var(--muted-foreground)); }
+.progress-fill--ok {
+  background: var(--green);
+}
+
+.progress-fill--warning {
+  background: var(--amber);
+}
+
+.progress-fill--neutral {
+  background: hsl(var(--muted-foreground));
+}
 
 .progress-stats {
   display: flex;
@@ -713,8 +814,16 @@ h1 {
   border: none;
   box-shadow: none;
 }
-.delete-btn:hover { background-color: var(--red-soft); opacity: 0.85; }
-.delete-btn:active { background-color: var(--red-soft); opacity: 0.7; }
+
+.delete-btn:hover {
+  background-color: var(--red-soft);
+  opacity: 0.85;
+}
+
+.delete-btn:active {
+  background-color: var(--red-soft);
+  opacity: 0.7;
+}
 
 @media (max-width: 760px) {
   .detail-header {

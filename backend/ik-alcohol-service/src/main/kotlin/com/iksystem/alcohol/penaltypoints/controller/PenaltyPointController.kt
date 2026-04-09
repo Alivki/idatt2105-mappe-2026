@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*
 @SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/v1/penalty-points")
-@PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'MANAGER')")
 class PenaltyPointController(
     private val service: PenaltyPointService,
 ) {
@@ -36,8 +35,10 @@ class PenaltyPointController(
     @ApiResponses(
         ApiResponse(responseCode = "201", description = "Penalty point entry created"),
         ApiResponse(responseCode = "400", description = "Validation error"),
+        ApiResponse(responseCode = "403", description = "Insufficient permissions"),
     )
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     fun add(
         @Valid @RequestBody request: CreatePenaltyPointRequest,
         @AuthenticationPrincipal auth: AuthenticatedUser,
@@ -47,9 +48,11 @@ class PenaltyPointController(
     @Operation(summary = "Delete penalty point entry")
     @ApiResponses(
         ApiResponse(responseCode = "204", description = "Penalty point entry deleted"),
+        ApiResponse(responseCode = "403", description = "Insufficient permissions"),
         ApiResponse(responseCode = "404", description = "Not found"),
     )
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     fun delete(
         @PathVariable id: Long,
         @AuthenticationPrincipal auth: AuthenticatedUser,
