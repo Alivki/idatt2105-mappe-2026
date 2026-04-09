@@ -18,6 +18,17 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.LocalDate
 
+/**
+ * Service responsible for managing age verification shifts and related reporting.
+ *
+ * Handles:
+ * - Shift lifecycle operations such as start, update, end, and reopen
+ * - Registration of shift-related deviations
+ * - Access control for employees and managers
+ * - Aggregated reporting for daily summaries and statistics
+ *
+ * All operations are scoped to the authenticated user's organization.
+ */
 @Service
 class AgeVerificationService(
     private val shiftRepository: AgeVerificationShiftRepository,
@@ -25,7 +36,15 @@ class AgeVerificationService(
     private val userRepository: UserRepository,
 ) {
 
-
+    /**
+     * Retrieves the authenticated user's current active shift.
+     *
+     * If no active shift exists, today's most recent completed shift is returned if available.
+     * Otherwise, the method returns null.
+     *
+     * @param auth The authenticated user
+     * @return Active shift, latest completed shift for today, or null
+     */
     @Transactional(readOnly = true)
     fun getActiveShift(auth: AuthenticatedUser): ShiftDetailResponse? {
         val orgId = auth.requireOrganizationId()
@@ -37,11 +56,23 @@ class AgeVerificationService(
                 orgId,
                 LocalDate.now(),
             )
-            ?.takeIf { it.status == ShiftStatus.COMPLETED }
+                ?.takeIf { it.status == ShiftStatus.COMPLETED }
             ?: return null
         return toShiftDetail(shift)
     }
 
+    /**
+     * Starts a new shift for the authenticated user.
+     *
+     * Business rules:
+     * - A user can only have one active shift at a time
+     * - A new shift cannot be started if today's shift has already been completed
+     *
+     * @param auth The authenticated user
+     * @return The created shift response
+     * @throws ConflictException If the user already has an active shift
+     * @throws BadRequestException If today's shift has already been completed
+     */
     @Transactional
     fun startShift(auth: AuthenticatedUser): ShiftResponse {
         val orgId = auth.requireOrganizationId()
@@ -74,6 +105,16 @@ class AgeVerificationService(
         return shift.toResponse(0)
     }
 
+    /**
+     * Updates the number of IDs checked for an active shift.
+     *
+     * Only the owner of an active shift may perform this operation.
+     *
+     * @param shiftId The shift ID
+     * @param request Request containing the updated ID check count
+     * @param auth The authenticated user
+     * @return The updated shift response
+     */
     @Transactional
     fun updateIdCheckCount(shiftId: Long, request: UpdateIdCheckCountRequest, auth: AuthenticatedUser): ShiftResponse {
         val shift = requireOwnActiveShift(shiftId, auth)
@@ -87,6 +128,17 @@ class AgeVerificationService(
         return updated.toResponse(deviationCount)
     }
 
+    /**
+     * Creates a deviation linked to the specified active shift.
+     *
+     * If no description is provided, a default human-readable description
+     * is generated from the deviation type.
+     *
+     * @param shiftId The shift ID
+     * @param request Request containing deviation details
+     * @param auth The authenticated user
+     * @return The created shift deviation response
+     */
     @Transactional
     fun createShiftDeviation(shiftId: Long, request: CreateShiftDeviationRequest, auth: AuthenticatedUser): ShiftDeviationResponse {
         val shift = requireOwnActiveShift(shiftId, auth)
@@ -109,6 +161,15 @@ class AgeVerificationService(
         return deviation.toShiftDeviationResponse()
     }
 
+    /**
+     * Ends and signs off an active shift.
+     *
+     * The shift is marked as completed and finalized.
+     *
+     * @param shiftId The shift ID
+     * @param auth The authenticated user
+     * @return The completed shift response
+     */
     @Transactional
     fun endShift(shiftId: Long, auth: AuthenticatedUser): ShiftResponse {
         val shift = requireOwnActiveShift(shiftId, auth)
@@ -126,6 +187,19 @@ class AgeVerificationService(
         return updated.toResponse(deviationCount)
     }
 
+    /**
+     * Reopens a previously completed shift from the current day.
+     *
+     * Business rules:
+     * - Only the owner can reopen the shift
+     * - Only completed shifts can be reopened
+     * - Only today's shift can be reopened
+     * - The user cannot already have another active shift
+     *
+     * @param shiftId The shift ID
+     * @param auth The authenticated user
+     * @return The reopened shift response
+     */
     @Transactional
     fun reopenShift(shiftId: Long, auth: AuthenticatedUser): ShiftResponse {
         val orgId = auth.requireOrganizationId()
@@ -160,8 +234,18 @@ class AgeVerificationService(
         return updated.toResponse(deviationCount)
     }
 
-    // ── Employee: own shift history ──
-
+    /**
+     * Retrieves detailed information about a specific shift.
+     *
+     * Access is granted to:
+     * - The owner of the shift
+     * - Users with ADMIN or MANAGER role
+     *
+     * @param shiftId The shift ID
+     * @param auth The authenticated user
+     * @return Detailed shift information
+     * @throws ForbiddenException If the user does not have access to the shift
+     */
     @Transactional(readOnly = true)
     fun getShiftById(shiftId: Long, auth: AuthenticatedUser): ShiftDetailResponse {
         val orgId = auth.requireOrganizationId()
@@ -175,8 +259,19 @@ class AgeVerificationService(
         return toShiftDetail(shift)
     }
 
-    // ── Manager: aggregated views ──
-
+    /**
+     * Retrieves aggregated daily summaries for a date range.
+     *
+     * Each summary includes:
+     * - Shift count
+     * - Total IDs checked
+     * - Total deviations
+     *
+     * @param from Start date, inclusive
+     * @param to End date, inclusive
+     * @param auth The authenticated user
+     * @return List of daily summaries
+     */
     @Transactional(readOnly = true)
     fun getDailySummaries(from: LocalDate, to: LocalDate, auth: AuthenticatedUser): List<DailySummaryResponse> {
         val orgId = auth.requireOrganizationId()
@@ -203,6 +298,16 @@ class AgeVerificationService(
         }
     }
 
+    /**
+     * Retrieves detailed information for a specific day.
+     *
+     * Includes all shifts, total ID checks, total deviations,
+     * and a breakdown of deviations by type.
+     *
+     * @param date The date to retrieve details for
+     * @param auth The authenticated user
+     * @return Detailed day information
+     */
     @Transactional(readOnly = true)
     fun getDayDetail(date: LocalDate, auth: AuthenticatedUser): DayDetailResponse {
         val orgId = auth.requireOrganizationId()
@@ -235,6 +340,21 @@ class AgeVerificationService(
         )
     }
 
+    /**
+     * Retrieves statistics and trends for a date range.
+     *
+     * Includes:
+     * - Total shifts
+     * - Total IDs checked
+     * - Total deviations
+     * - Average IDs checked per shift
+     * - Daily summaries
+     *
+     * @param from Start date, inclusive
+     * @param to End date, inclusive
+     * @param auth The authenticated user
+     * @return Statistics for the selected period
+     */
     @Transactional(readOnly = true)
     fun getStats(from: LocalDate, to: LocalDate, auth: AuthenticatedUser): StatsResponse {
         val orgId = auth.requireOrganizationId()
@@ -278,8 +398,16 @@ class AgeVerificationService(
         )
     }
 
-    // ── Helpers ──
-
+    /**
+     * Ensures that the specified shift belongs to the authenticated user and is active.
+     *
+     * @param shiftId The shift ID
+     * @param auth The authenticated user
+     * @return The active shift
+     * @throws NotFoundException If the shift does not exist
+     * @throws ForbiddenException If the user does not own the shift
+     * @throws BadRequestException If the shift is already completed
+     */
     private fun requireOwnActiveShift(shiftId: Long, auth: AuthenticatedUser): AgeVerificationShift {
         val orgId = auth.requireOrganizationId()
         val shift = shiftRepository.findByIdAndOrganizationId(shiftId, orgId)
@@ -293,11 +421,24 @@ class AgeVerificationService(
         return shift
     }
 
+    /**
+     * Retrieves a user by ID.
+     *
+     * @param userId The user ID
+     * @return The user entity
+     * @throws NotFoundException If the user does not exist
+     */
     private fun requireUser(userId: Long): User {
         return userRepository.findById(userId)
             .orElseThrow { NotFoundException("Bruker ikke funnet") }
     }
 
+    /**
+     * Converts a shift entity into a detailed response including linked deviations.
+     *
+     * @param shift The shift entity
+     * @return Detailed shift response
+     */
     private fun toShiftDetail(shift: AgeVerificationShift): ShiftDetailResponse {
         val deviations = deviationRepository.findAllByAgeVerificationShiftId(shift.id)
         return ShiftDetailResponse(
@@ -307,6 +448,12 @@ class AgeVerificationService(
     }
 }
 
+/**
+ * Maps an [AgeVerificationShift] entity to a [ShiftResponse].
+ *
+ * @param deviationCount Number of deviations linked to the shift
+ * @return Shift response DTO
+ */
 private fun AgeVerificationShift.toResponse(deviationCount: Int) = ShiftResponse(
     id = id,
     organizationId = organizationId,
@@ -324,6 +471,11 @@ private fun AgeVerificationShift.toResponse(deviationCount: Int) = ShiftResponse
     updatedAt = updatedAt.toString(),
 )
 
+/**
+ * Maps an [AlcoholDeviation] entity to a [ShiftDeviationResponse].
+ *
+ * @return Shift deviation response DTO
+ */
 private fun AlcoholDeviation.toShiftDeviationResponse() = ShiftDeviationResponse(
     id = id,
     deviationType = deviationType,

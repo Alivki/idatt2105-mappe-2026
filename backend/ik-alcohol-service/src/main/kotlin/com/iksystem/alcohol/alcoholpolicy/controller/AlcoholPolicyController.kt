@@ -14,39 +14,68 @@ import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
+/**
+ * REST controller for managing alcohol policies within an organization.
+ *
+ * Provides endpoints to:
+ * - Check if a policy exists
+ * - Retrieve the current policy
+ * - Create or update a policy
+ * - Partially update an existing policy
+ *
+ * All operations are scoped to the authenticated user's organization.
+ * Write operations require ADMIN or MANAGER roles.
+ *
+ * @property alcoholPolicyService Service layer handling business logic
+ */
 @Tag(name = "Alcohol Policy", description = "Management of organization alcohol serving policy")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("api/v1/alcohol-policy")
-class AlcoholPolicyController(private val alcoholPolicyService: AlcoholPolicyService) {
-    @Operation(summary = "Check if an alcohol policy exists for the organization")
-    @ApiResponse(responseCode = "200", description = "Existence check result returned")
+class AlcoholPolicyController(
+    private val alcoholPolicyService: AlcoholPolicyService
+) {
+
+    /**
+     * Checks whether an alcohol policy exists for the authenticated user's organization.
+     *
+     * @param auth The authenticated user
+     * @return HTTP 200 with a boolean flag indicating existence
+     */
     @GetMapping("/exists")
-    fun exists(@AuthenticationPrincipal auth: AuthenticatedUser): ResponseEntity<Map<String, Boolean>> =
+    fun exists(
+        @AuthenticationPrincipal auth: AuthenticatedUser
+    ): ResponseEntity<Map<String, Boolean>> =
         ResponseEntity.ok(mapOf("exists" to alcoholPolicyService.existsForOrg(auth)))
 
-    @Operation(summary = "Get the organization's alcohol policy")
-    @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Alcohol policy returned"),
-        ApiResponse(responseCode = "404", description = "No alcohol policy found for this organization"),
-    )
+    /**
+     * Retrieves the alcohol policy for the authenticated user's organization.
+     *
+     * @param auth The authenticated user
+     * @return HTTP 200 with the policy
+     * @throws NotFoundException if no policy exists for the organization
+     */
     @GetMapping
-    fun get(@AuthenticationPrincipal auth: AuthenticatedUser): ResponseEntity<AlcoholPolicyResponse> =
+    fun get(
+        @AuthenticationPrincipal auth: AuthenticatedUser
+    ): ResponseEntity<AlcoholPolicyResponse> =
         ResponseEntity.ok(alcoholPolicyService.getByOrg(auth))
 
-    @Operation(summary = "Create or Update the alcohol policy")
-    @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Alcohol policy created or updated"),
-        ApiResponse(responseCode = "400", description = "Validation error"),
-        ApiResponse(responseCode = "403", description = "Insufficient permissions"),
-    )
+    /**
+     * Creates a new alcohol policy or updates an existing one.
+     *
+     * This endpoint performs an "upsert" operation:
+     * - Creates a policy if none exists
+     * - Updates the existing policy otherwise
+     *
+     * Access restricted to ADMIN and MANAGER roles.
+     *
+     * @param request Request containing policy data
+     * @param auth The authenticated user
+     * @return HTTP 200 with the created or updated policy
+     */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     fun upsert(
@@ -55,13 +84,18 @@ class AlcoholPolicyController(private val alcoholPolicyService: AlcoholPolicySer
     ): ResponseEntity<AlcoholPolicyResponse> =
         ResponseEntity.ok(alcoholPolicyService.upsert(request, auth))
 
-    @Operation(summary = "Partial update of the alcohol policy")
-    @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Alcohol policy updated"),
-        ApiResponse(responseCode = "400", description = "Validation error"),
-        ApiResponse(responseCode = "403", description = "Insufficient permissions"),
-        ApiResponse(responseCode = "404", description = "No alcohol policy found for this organization"),
-    )
+    /**
+     * Partially updates the alcohol policy for the organization.
+     *
+     * Only the provided fields will be updated.
+     *
+     * Access restricted to ADMIN and MANAGER roles.
+     *
+     * @param request Request containing fields to update
+     * @param auth The authenticated user
+     * @return HTTP 200 with the updated policy
+     * @throws NotFoundException if no policy exists
+     */
     @PatchMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     fun patch(

@@ -1,8 +1,13 @@
 package com.iksystem.alcohol.deviation.model
 
 /**
- * Types of alcohol-related deviations. Each type has an associated penalty-point value
- * that is applied when the report source is SJENKEKONTROLL or POLITIRAPPORT.
+ * Represents types of alcohol-related deviations.
+ *
+ * Each type is associated with a penalty point value,
+ * which is applied when the report source is SJENKEKONTROLL or POLITIRAPPORT.
+ *
+ * Deviations with 0 penalty points are typically internal incidents
+ * related to age verification and are not part of official penalty scoring.
  */
 enum class AlcoholDeviationType(val penaltyPoints: Int) {
     // 8 points

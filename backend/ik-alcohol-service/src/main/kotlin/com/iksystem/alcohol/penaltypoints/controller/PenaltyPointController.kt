@@ -17,6 +17,19 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
+/**
+ * REST controller for managing penalty points related to alcohol deviations.
+ *
+ * Provides endpoints to:
+ * - Retrieve penalty point summaries
+ * - Manually add penalty points
+ * - Delete penalty point entries
+ *
+ * All operations are scoped to the authenticated user's organization.
+ * Write operations require ADMIN or MANAGER roles.
+ *
+ * @property service Service layer handling penalty point logic
+ */
 @Tag(name = "Penalty Points", description = "Alcohol deviation penalty point management")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
@@ -25,18 +38,31 @@ class PenaltyPointController(
     private val service: PenaltyPointService,
 ) {
 
-    @Operation(summary = "Get penalty points summary", description = "Returns total points and all entries for the organization")
-    @ApiResponse(responseCode = "200", description = "Summary returned")
+    /**
+     * Retrieves the penalty point summary for the organization.
+     *
+     * Includes total points and all individual entries.
+     *
+     * @param auth The authenticated user
+     * @return HTTP 200 with penalty point summary
+     */
     @GetMapping
-    fun getSummary(@AuthenticationPrincipal auth: AuthenticatedUser): ResponseEntity<PenaltyPointSummaryResponse> =
+    fun getSummary(
+        @AuthenticationPrincipal auth: AuthenticatedUser
+    ): ResponseEntity<PenaltyPointSummaryResponse> =
         ResponseEntity.ok(service.getSummary(auth))
 
-    @Operation(summary = "Add penalty points manually")
-    @ApiResponses(
-        ApiResponse(responseCode = "201", description = "Penalty point entry created"),
-        ApiResponse(responseCode = "400", description = "Validation error"),
-        ApiResponse(responseCode = "403", description = "Insufficient permissions"),
-    )
+    /**
+     * Adds a new penalty point entry manually.
+     *
+     * Typically used for administrative adjustments.
+     *
+     * Access restricted to ADMIN and MANAGER roles.
+     *
+     * @param request Request containing penalty point details
+     * @param auth The authenticated user
+     * @return HTTP 201 with the created penalty point entry
+     */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     fun add(
@@ -45,12 +71,15 @@ class PenaltyPointController(
     ): ResponseEntity<PenaltyPointResponse> =
         ResponseEntity.status(HttpStatus.CREATED).body(service.add(request, auth))
 
-    @Operation(summary = "Delete penalty point entry")
-    @ApiResponses(
-        ApiResponse(responseCode = "204", description = "Penalty point entry deleted"),
-        ApiResponse(responseCode = "403", description = "Insufficient permissions"),
-        ApiResponse(responseCode = "404", description = "Not found"),
-    )
+    /**
+     * Deletes a penalty point entry.
+     *
+     * Access restricted to ADMIN and MANAGER roles.
+     *
+     * @param id ID of the penalty point entry
+     * @param auth The authenticated user
+     * @return HTTP 204 if deletion is successful
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     fun delete(

@@ -15,9 +15,41 @@ import jakarta.persistence.Table
 import java.time.Instant
 import java.time.LocalDate
 
+/**
+ * Represents an alcohol policy for an organization, containing all information required
+ * to document and enforce legal alcohol sales compliance in Norway.
+ *
+ * This includes bevilling (liquor licence) details, knowledge test (kunnskapsprøve) results,
+ * age verification settings, and operational routines for staff.
+ *
+ * Each organization may have at most one alcohol policy, enforced by the unique constraint
+ * on [organizationId].
+ *
+ * @property id Auto-generated primary key.
+ * @property organizationId The ID of the organization this policy belongs to. Must be unique.
+ * @property bevillingNumber The liquor licence number issued by the municipality, if available.
+ * @property bevillingValidUntil The expiry date of the liquor licence, if set.
+ * @property styrerName The full name of the designated licence manager (styrer).
+ * @property stedfortrederName The full name of the deputy licence manager (stedfortreder), if appointed.
+ * @property bevillingDocument An optional reference to the uploaded bevilling document.
+ * @property kunnskapsproveCandidateName The full name of the candidate who took the knowledge test.
+ * @property kunnskapsproveBirthDate The birth date of the knowledge test candidate.
+ * @property kunnskapsproveType The type of knowledge test taken. See [KnowledgeTestType].
+ * @property kunnskapsproveMunicipality The municipality in which the knowledge test was conducted.
+ * @property kunnskapsprovePassedDate The date on which the knowledge test was passed.
+ * @property kunnskapsproveDocument An optional reference to the uploaded knowledge test certificate.
+ * @property ageCheckLimit The age threshold used when checking customer ID. Defaults to [AgeCheckLimit.UNDER_25].
+ * @property acceptedIdTypes A comma-separated list of accepted identification types (e.g. `PASS,FORERKORT`).
+ * @property doubtRoutine A description of the routine to follow when staff are uncertain about a customer's age or sobriety.
+ * @property intoxicationSigns A description of the signs staff should look for when assessing customer intoxication.
+ * @property refusalProcedure A description of the procedure to follow when refusing a sale.
+ * @property expiryNotified Whether a notification has been sent regarding the upcoming or past expiry of the bevilling.
+ * @property createdAt The timestamp when this policy was first created.
+ * @property updatedAt The timestamp when this policy was last updated.
+ */
 @Entity
 @Table(name = "alcohol_policies")
-data class AlcoholPolicy (
+data class AlcoholPolicy(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,

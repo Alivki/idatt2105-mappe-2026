@@ -8,6 +8,12 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
+/**
+ * Request DTO for creating a new alcohol deviation.
+ *
+ * Contains required reporting information and optional fields
+ * for follow-up actions and preventive measures.
+ */
 data class CreateAlcoholDeviationRequest(
     val reportedAt: String? = null,
 
@@ -36,6 +42,11 @@ data class CreateAlcoholDeviationRequest(
     val preventiveResponsibleUserId: Long? = null,
 )
 
+/**
+ * Request DTO for updating an existing alcohol deviation.
+ *
+ * All fields are optional to support partial updates.
+ */
 data class UpdateAlcoholDeviationRequest(
     val reportedAt: String? = null,
     val reportSource: AlcoholReportSource? = null,
@@ -60,6 +71,12 @@ data class UpdateAlcoholDeviationRequest(
     val status: AlcoholDeviationStatus? = null,
 )
 
+/**
+ * Response DTO representing a reported alcohol deviation.
+ *
+ * Includes reporting details, follow-up actions,
+ * responsible users, and current status.
+ */
 data class AlcoholDeviationResponse(
     val id: Long,
     val organizationId: Long,
