@@ -13,6 +13,14 @@
 
 ---
 
+## Gruppemedlemmer
+
+- Iver Lindholm
+- Piranavan Visvalingam
+- Sigve Eriksen
+
+---
+
 ## Innhold
 
 - [Dokumentasjon](#dokumentasjon)
