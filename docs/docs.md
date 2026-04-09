@@ -100,22 +100,25 @@ Tabellen under speiler dokumentasjonskravene fra oppgaveteksten (pkt. 5–6) og 
 
 ### 3.2 Arkitekturdiagrammer
 
-**Container-arkitektur arkitektur**
+**Container-arkitektur arkitektur:**
 
 <img src="diagrammer/container-arkitektur.png" width="500" />
 
 
-**Datamodell (ER-diagram)**
+**Klassediagram:**
 
-kommer
+<img src="diagrammer/classdiagram.png" width="500" />
 
-**Sekvensdiagram: innlogging + organisasjonsvalg**
+
+**Sekvensdiagram: innlogging + organisasjonsvalg:**
 
 <img src="diagrammer/auth-sekvens.png" width="500" />
 
-**System-kontekst**
+
+**System-kontekst:**
 
 <img src="diagrammer/system-kontekst.png" width="500" />
+
 
 ### 3.3 Request-flyt (viktig for forståelse)
 
