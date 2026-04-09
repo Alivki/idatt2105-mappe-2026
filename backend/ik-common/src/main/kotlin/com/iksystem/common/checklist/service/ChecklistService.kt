@@ -7,6 +7,7 @@ import com.iksystem.common.checklist.dto.ChecklistItemResponse
 import com.iksystem.common.checklist.dto.ChecklistResponse
 import com.iksystem.common.checklist.dto.ChecklistStatus
 import com.iksystem.common.checklist.dto.ChecklistStatsResponse
+import com.iksystem.common.checklist.dto.CompletionHistoryEntry
 import com.iksystem.common.checklist.dto.CreateChecklistItemRequest
 import com.iksystem.common.checklist.dto.CreateChecklistRequest
 import com.iksystem.common.checklist.dto.SetChecklistCompletionRequest
@@ -203,6 +204,15 @@ class ChecklistService(
 
         val items = checklistItemRepository.findAllByChecklistIdOrderByIdAsc(checklist.id)
         return checklist.toResponse(items)
+    }
+
+    @Transactional(readOnly = true)
+    fun completionHistory(days: Int, auth: AuthenticatedUser): List<CompletionHistoryEntry> {
+        val orgId = auth.requireOrganizationId()
+        val from = Instant.now().minus(java.time.Duration.ofDays(days.toLong()))
+        return checklistCompletionRepository
+            .findAllByOrganizationIdAndCompletedAtGreaterThanEqualOrderByCompletedAtAsc(orgId, from)
+            .map { CompletionHistoryEntry(checklistId = it.checklist.id, completedAt = it.completedAt) }
     }
 
     private fun recordCompletion(checklist: Checklist, auth: AuthenticatedUser) {

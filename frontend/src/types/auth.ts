@@ -10,6 +10,7 @@ export interface MembershipSummary {
   membershipId: number
   organizationId: number
   organizationName: string
+  orgNumber: string | null
   role: string
 }
 

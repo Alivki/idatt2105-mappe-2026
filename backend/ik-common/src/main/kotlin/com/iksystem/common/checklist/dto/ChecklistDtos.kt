@@ -85,3 +85,8 @@ data class ChecklistStatsResponse(
     val activeChecklists: Long,
     val totalChecklistItems: Long,
 )
+
+data class CompletionHistoryEntry(
+    val checklistId: Long,
+    val completedAt: java.time.Instant,
+)

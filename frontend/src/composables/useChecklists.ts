@@ -3,6 +3,7 @@ import api from '@/lib/api'
 import type {
   Checklist,
   ChecklistStats,
+  CompletionHistoryEntry,
   CreateChecklistItemRequest,
   CreateChecklistRequest,
   UpdateChecklistItemRequest,
@@ -23,6 +24,14 @@ export function useChecklistStatsQuery() {
   return useQuery({
     queryKey: checklistStatsQueryKey,
     queryFn: () => api.get<ChecklistStats>('/checklists/stats').then((r) => r.data),
+  })
+}
+
+export function useCompletionHistoryQuery(days = 30) {
+  return useQuery({
+    queryKey: ['checklists', 'completion-history', days],
+    queryFn: () =>
+      api.get<CompletionHistoryEntry[]>(`/checklists/completion-history?days=${days}`).then((r) => r.data),
   })
 }
 

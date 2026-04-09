@@ -41,7 +41,10 @@ const orgName = computed(() => {
 })
 
 const orgNumber = computed(() => {
-  return auth.organizationId ? `Org. nr: ${auth.organizationId}` : ''
+  const orgId = auth.organizationId
+  const membership = auth.memberships.find((m) => m.organizationId === orgId)
+  const num = membership?.orgNumber
+  return num ? `Org. nr: ${num}` : ''
 })
 
 const isManagerOrAdmin = computed(() =>

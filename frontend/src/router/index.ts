@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import DashboardView from '@/views/DashboardView.vue'
 import LoginView from '@/views/LoginView.vue'
 import BusinessView from '@/views/BusinessView.vue'
 import ChecklistView from '@/views/ChecklistView.vue'
@@ -17,7 +16,7 @@ const router = createRouter({
     {
       path: '/signup',
       name: 'signup',
-      component: () => import('@/views/signUpView.vue'),
+      component: () => import('@/views/SignUpView.vue'),
       meta: { public: true },
     },
     {
@@ -46,12 +45,12 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: DashboardView,
+      component: () => import('@/views/DashboardView.vue'),
     },
     {
       path: '/create-org',
       name: 'create-org',
-      component: () => import('@/views/createBusinessView.vue'),
+      component: () => import('@/views/CreateBusinessView.vue'),
       meta: { public: true },
     },
     {
