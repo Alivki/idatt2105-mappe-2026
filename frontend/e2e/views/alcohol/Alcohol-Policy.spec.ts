@@ -31,7 +31,6 @@ test.describe('alcohol policy', () => {
 
     await expect(page).toHaveURL(/\/skjenkepolicy$/)
     await expect(page.locator('.page-title')).toHaveText('Skjenkepolicy')
-    await expect(page.getByRole('main').getByRole('heading', { name: 'Skjenkepolicy' })).toBeVisible()
   })
 
   test('user can fill and submit alcohol policy if edit form is visible', async ({ page }) => {

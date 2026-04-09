@@ -1,6 +1,6 @@
 import { test, expect, Page } from '@playwright/test'
 
-const email = process.env.E2E_EMAIL ?? 'admin@everest.local'
+const email = process.env.E2E_EMAIL ?? 'admin@iksystem.local'
 const password = process.env.E2E_PASSWORD ?? 'password'
 
 async function loginAsAdmin(page: Page) {

@@ -44,6 +44,6 @@ test.describe('login flow', () => {
     await continueButton.click()
 
     await expect(page).toHaveURL(/\/$/)
-    await expect(page.getByRole('heading', { name: 'Oversikt' })).toBeVisible()
+    await expect(page.locator('.page-title')).toHaveText('Oversikt')
   })
 })

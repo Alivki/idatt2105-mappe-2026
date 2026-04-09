@@ -12,7 +12,6 @@ async function login(page) {
 
   await expect(page).toHaveURL(/\/select-org$/)
 
-  // velg org
   await page.getByText(/Everest|Demo/i).first().click()
 
   const continueButton = page.getByRole('button', { name: /fortsett/i })
@@ -28,42 +27,42 @@ test.describe('navigation flow', () => {
   })
 
   test('can navigate to employees', async ({ page }) => {
-    await page.getByRole('link', { name: /ansatte/i }).click()
+    await page.getByRole('link', { name: 'Ansatte', exact: true }).first().click()
     await expect(page).toHaveURL(/\/ansatte/)
   })
 
   test('can navigate to checklists', async ({ page }) => {
-    await page.getByRole('link', { name: /sjekklister/i }).click()
+    await page.getByRole('link', { name: 'Sjekklister', exact: true }).first().click()
     await expect(page).toHaveURL(/\/sjekklister/)
   })
 
   test('can navigate to deviations', async ({ page }) => {
-    await page.getByRole('link', { name: /avvik/i }).click()
+    await page.getByRole('link', { name: 'Avvik', exact: true }).first().click()
     await expect(page).toHaveURL(/\/avvik/)
   })
 
   test('can navigate to temperature', async ({ page }) => {
-    await page.getByRole('link', { name: /temperatur/i }).click()
+    await page.getByRole('link', { name: /temperatur/i }).first().click()
     await expect(page).toHaveURL(/\/temperatur/)
   })
 
   test('can navigate to training', async ({ page }) => {
-    await page.getByRole('link', { name: /opplæring|opplaering/i }).click()
+    await page.getByRole('link', { name: 'Opplæring', exact: true }).first().click()
     await expect(page).toHaveURL(/\/opplaering/)
   })
 
   test('can navigate to allowance', async ({ page }) => {
-    await page.getByRole('link', { name: /bevilling/i }).click()
+    await page.getByRole('link', { name: 'Bevilling', exact: true }).first().click()
     await expect(page).toHaveURL(/\/bevilling/)
   })
 
   test('can navigate to alcohol policy', async ({ page }) => {
-    await page.getByRole('link', { name: /skjenkepolicy/i }).click()
+    await page.getByRole('link', { name: 'Skjenkepolicy', exact: true }).first().click()
     await expect(page).toHaveURL(/\/skjenkepolicy/)
   })
 
   test('can navigate to settings', async ({ page }) => {
-    await page.getByRole('link', { name: /innstillinger/i }).click()
+    await page.getByRole('link', { name: 'Innstillinger', exact: true }).first().click()
     await expect(page).toHaveURL(/\/innstillinger/)
   })
 })

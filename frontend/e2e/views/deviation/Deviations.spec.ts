@@ -58,17 +58,20 @@ test.describe('deviations as admin', () => {
     await filters.getByRole('button', { name: 'Lukket', exact: true }).click()
     await filters.getByRole('button', { name: 'IK-Alkohol', exact: true }).click()
 
+    await page.waitForLoadState('networkidle')
+
     const listCards = page.locator('.deviation-card')
     const emptyHeading = page.getByRole('heading', { name: 'Ingen avvik i valgt liste' })
 
-    await expect(listCards.or(emptyHeading)).toBeVisible()
+    const cardCount = await listCards.count()
 
-    if (await emptyHeading.isVisible()) {
+    if (cardCount > 0) {
+      await expect(listCards.first()).toBeVisible()
+    } else {
+      await expect(emptyHeading).toBeVisible()
       await expect(
         page.getByText('Det finnes ingen registrerte avvik med valgte filtre.')
       ).toBeVisible()
-    } else {
-      await expect(listCards.first()).toBeVisible()
     }
   })
 
@@ -124,5 +127,4 @@ test.describe('deviations as admin', () => {
       await expect(emptyText).toBeVisible()
     }
   })
-
 })
