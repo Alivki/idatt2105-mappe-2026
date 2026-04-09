@@ -46,7 +46,7 @@ function toShortDateTime(value: string): string {
         <Refrigerator v-if="appliance.type === 'FRIDGE'" aria-hidden="true"/>
         <Snowflake v-else aria-hidden="true"/>
       </div>
-      <div>
+      <div class="device-name-wrap">
         <h3>{{ appliance.name }}</h3>
       </div>
       <div class="device-meta-actions">
@@ -154,6 +154,11 @@ function toShortDateTime(value: string): string {
 .device-icon-wrap :deep(svg) {
   width: 1rem;
   height: 1rem;
+}
+
+.device-name-wrap {
+  min-width: 0;
+  overflow: hidden;
 }
 
 .device-card-head h3 {
