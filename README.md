@@ -43,18 +43,18 @@ Default testdata er satt opp automatisk ved oppstart. Bruk disse credentials for
 
 | Email | Passord | Rolle | Organisasjon |
 |-------|---------|-------|--------------|
-| `admin@everest.local` | `password` | ADMIN | Everest Sushi & Fusion AS |
-| `manager@everest.local` | `password` | MANAGER | Everest Sushi & Fusion AS |
-| `employee@everest.local` | `password` | EMPLOYEE | Everest Sushi & Fusion AS & Demo Organization |
+| `admin@iksystem.local` | `password` | ADMIN | Everest Sushi & Fusion AS + Nordvik Bar & Kjøkken AS |
+| `manager@iksystem.local` | `password` | MANAGER | Everest Sushi & Fusion AS |
+| `employee@iksystem.local` | `password` | EMPLOYEE | Everest Sushi & Fusion AS |
 
 ## Prosjektstruktur
 
 ```
 FULLSTACK-V2026/
 ├── backend/           # Spring Boot API (Java 21+)
-│   ├── vera-common/           # Felles tjenester
-│   ├── vera-food-service/     # Vera Mat modul
-│   └── vera-alcohol-service/  # Vera Alkohol modul
+│   ├── ik-common/           # Felles tjenester
+│   ├── ik-food-service/     # IK-Mat modul
+│   └── ik-alcohol-service/  # IK-Alkohol modul
 ├── frontend/          # Vue.js 3 + Vite
 ├── docker-compose.yml # Container orchestration
 └── docs/              # Dokumentasjon
@@ -84,16 +84,16 @@ FULLSTACK-V2026/
 
 ## Database
 
-- **Database**: `vera_system`
-- **Bruker**: `vera_user`
-- **Passord**: `vera_password`
+- **Database**: `ik_system`
+- **Bruker**: `ik_user`
+- **Passord**: `ik_password`
 - **Port**: 3306
 
 Backend bruker **Flyway** for databasemigrasjoner og oppretter/migrerer schema automatisk ved oppstart.
 
 ## Dokumentasjon
 
-- Kommer
+- Se `docs/README.md`
 
 ## Nyttige kommandoer
 
