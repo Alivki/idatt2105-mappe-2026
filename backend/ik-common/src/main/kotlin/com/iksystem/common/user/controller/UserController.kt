@@ -230,4 +230,29 @@ class UserController(private val userService: UserService) {
         userService.removeMember(id, auth)
         return ResponseEntity.noContent().build()
     }
+
+    @Operation(summary = "Update email notifications", description = "Toggles email notification preference for the authenticated user.")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Preference updated"),
+    )
+    @PatchMapping("/me/email-notifications")
+    fun updateEmailNotifications(
+        @RequestBody request: Map<String, Boolean>,
+        @AuthenticationPrincipal auth: AuthenticatedUser,
+    ): ResponseEntity<UserResponse> {
+        val enabled = request["enabled"] ?: throw IllegalArgumentException("Missing 'enabled' field")
+        return ResponseEntity.ok(userService.updateEmailNotifications(auth, enabled))
+    }
+
+    @Operation(summary = "Delete own account", description = "Permanently deletes the authenticated user's account and all associated data.")
+    @ApiResponses(
+        ApiResponse(responseCode = "204", description = "Account deleted"),
+    )
+    @DeleteMapping("/me")
+    fun deleteAccount(
+        @AuthenticationPrincipal auth: AuthenticatedUser,
+    ): ResponseEntity<Void> {
+        userService.deleteAccount(auth)
+        return ResponseEntity.noContent().build()
+    }
 }

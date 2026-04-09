@@ -206,6 +206,32 @@ class UserService(
         sessionRepository.deactivateAllByUserIdAndOrganizationId(userId, orgId)
     }
 
+    /**
+     * Updates the email notifications preference for the authenticated user.
+     */
+    @Transactional
+    fun updateEmailNotifications(auth: AuthenticatedUser, enabled: Boolean): UserResponse {
+        val user = userRepository.findById(auth.userId)
+            .orElseThrow { NotFoundException("User not found") }
+
+        val updated = userRepository.save(user.copy(emailNotifications = enabled))
+        return updated.toResponse()
+    }
+
+    /**
+     * Permanently deletes the authenticated user's account and all associated data.
+     */
+    @Transactional
+    fun deleteAccount(auth: AuthenticatedUser) {
+        val user = userRepository.findById(auth.userId)
+            .orElseThrow { NotFoundException("User not found") }
+
+        refreshTokenRepository.revokeAllByUserId(user.id)
+        sessionRepository.deactivateAllByUserId(user.id)
+        membershipRepository.deleteAllByUserId(user.id)
+        userRepository.delete(user)
+    }
+
     private fun parseRole(role: String): Role =
         try {
             Role.valueOf(role.uppercase())
@@ -221,6 +247,7 @@ fun User.toResponse() = UserResponse(
     fullName = fullName,
     phoneNumber = phoneNumber,
     active = active,
+    emailNotifications = emailNotifications,
 )
 
 /** Extension function that maps a [Membership] to a [MembershipResponse] DTO. */

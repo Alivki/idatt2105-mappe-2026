@@ -46,7 +46,7 @@ class NotificationsService(
 
         if (sendEmail) {
             val user = userRepository.findById(recipientUserId).orElse(null)
-            if (user != null && user.email.isNotEmpty()) {
+            if (user != null && user.email.isNotEmpty() && user.emailNotifications) {
                 try {
                     resendService.sendNotificationEmail(user.email, title, message)
                     notification.emailSent = true

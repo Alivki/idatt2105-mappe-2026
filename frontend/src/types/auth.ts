@@ -4,6 +4,7 @@ export interface UserResponse {
   fullName: string
   phoneNumber: string
   active: boolean
+  emailNotifications: boolean
 }
 
 export interface MembershipSummary {

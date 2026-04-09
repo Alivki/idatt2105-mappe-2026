@@ -21,4 +21,7 @@ interface MembershipRepository : JpaRepository<Membership, Long> {
 
     /** Checks if a membership exists for a user in an organization. */
     fun existsByUserIdAndOrganizationId(userId: Long, organizationId: Long): Boolean
+
+    /** Deletes all memberships for a given user. */
+    fun deleteAllByUserId(userId: Long)
 }

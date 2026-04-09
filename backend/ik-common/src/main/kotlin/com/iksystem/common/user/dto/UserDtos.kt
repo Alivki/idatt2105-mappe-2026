@@ -20,6 +20,8 @@ data class UserResponse(
     val phoneNumber: String,
     @Schema(description = "Whether the account is active", example = "true")
     val active: Boolean,
+    @Schema(description = "Whether the user wants email notifications", example = "true")
+    val emailNotifications: Boolean,
 )
 
 /**

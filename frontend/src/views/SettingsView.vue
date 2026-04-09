@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import {ref} from 'vue'
-import {useRouter} from 'vue-router'
+import {computed} from 'vue'
 import {useAuthStore} from '@/stores/auth'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import {Separator} from '@/components/ui/separator'
@@ -16,40 +15,24 @@ import AlertDialogDescription from '@/components/ui/alert-dialog/AlertDialogDesc
 import AlertDialogFooter from '@/components/ui/alert-dialog/AlertDialogFooter.vue'
 import AlertDialogCancel from '@/components/ui/alert-dialog/AlertDialogCancel.vue'
 import AlertDialogAction from '@/components/ui/alert-dialog/AlertDialogAction.vue'
+import {
+  useUpdateEmailNotificationsMutation,
+  useDeleteAccountMutation,
+  useDeleteOrganizationMutation,
+} from '@/composables/useSettings'
 
 const auth = useAuthStore()
-const router = useRouter()
 
 const isAdmin = auth.role === 'ADMIN'
 
-const unreadBadge = ref(true)
-const commEmails = ref(false)
-const socialEmails = ref(false)
-const announcementEmails = ref(false)
-const tipsEmails = ref(false)
+const emailNotifications = computed(() => auth.user?.emailNotifications ?? true)
 
-async function handleDeleteAccount() {
-  auth.clearAuth()
-  router.push('/login')
-}
+const updateEmailNotifications = useUpdateEmailNotificationsMutation()
+const deleteAccount = useDeleteAccountMutation()
+const deleteOrganization = useDeleteOrganizationMutation()
 
-async function handleDeactivateAccount() {
-  auth.clearAuth()
-  router.push('/login')
-}
-
-async function handleDeleteOrganization() {
-  if (!auth.organizationId) return
-  try {
-    await fetch(`/api/v1/organizations/${auth.organizationId}`, {
-      method: 'DELETE',
-      headers: {Authorization: `Bearer ${auth.accessToken}`},
-    })
-    auth.clearAuth()
-    router.push('/login')
-  } catch (e) {
-    console.error('Failed to delete organization', e)
-  }
+function handleToggleEmailNotifications(value: boolean) {
+  updateEmailNotifications.mutate(value)
 }
 </script>
 
@@ -66,52 +49,17 @@ async function handleDeleteOrganization() {
     <div class="page-content">
 
       <section class="settings-section">
-        <h2 class="section-title">Merker</h2>
-        <div class="setting-row">
-          <div class="setting-info">
-            <span class="setting-label">Aktiver ulest melding-merke</span>
-            <span
-              class="setting-desc">Viser et rødt merke i appikonet når du har uleste meldinger.</span>
-          </div>
-          <Switch :checked="unreadBadge" @update:checked="unreadBadge = $event"/>
-        </div>
-      </section>
-
-      <Separator/>
-
-      <section class="settings-section">
         <h2 class="section-title">E-postadresse</h2>
 
         <div class="setting-row">
           <div class="setting-info">
             <span class="setting-label">Kommunikasjons-e-poster</span>
-            <span class="setting-desc">Motta e-poster om ubesvarte anrop, meldinger og sammendrag av meldinger.</span>
+            <span class="setting-desc">Motta varsler og viktige oppdateringer på e-post.</span>
           </div>
-          <Switch :checked="commEmails" @update:checked="commEmails = $event"/>
-        </div>
-
-        <div class="setting-row">
-          <div class="setting-info">
-            <span class="setting-label">Sosiale e-poster</span>
-            <span class="setting-desc">Motta e-poster om venneforespørsler, forslag til venner og eventer på serveren din.</span>
-          </div>
-          <Switch :checked="socialEmails" @update:checked="socialEmails = $event"/>
-        </div>
-
-        <div class="setting-row">
-          <div class="setting-info">
-            <span class="setting-label">E-poster med kunngjøringer og oppdateringer</span>
-            <span class="setting-desc">Motta e-poster om produktoppdateringer, nytt innhold, forbedringer og feilretting.</span>
-          </div>
-          <Switch :checked="announcementEmails" @update:checked="announcementEmails = $event"/>
-        </div>
-
-        <div class="setting-row">
-          <div class="setting-info">
-            <span class="setting-label">E-poster med tips</span>
-            <span class="setting-desc">Motta e-poster med nyttige råd om hvordan du bruker Discord, og med informasjon om mindre kjente funksjoner.</span>
-          </div>
-          <Switch :checked="tipsEmails" @update:checked="tipsEmails = $event"/>
+          <Switch
+            :checked="emailNotifications"
+            @update:checked="handleToggleEmailNotifications"
+          />
         </div>
       </section>
 
@@ -119,34 +67,10 @@ async function handleDeleteOrganization() {
 
       <section class="settings-section">
         <h2 class="section-title">Fjerning av konto</h2>
-        <p class="section-desc">Hvis du deaktiverer kontoen din, kan du når som helst hente den frem
-          igjen.</p>
         <div class="button-row">
-
           <AlertDialog>
             <AlertDialogTrigger>
-              <Button variant="destructive">Deaktiver kontoen</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Deaktiver kontoen?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Er du sikker på at du vil deaktivere kontoen din? Du kan aktivere den igjen når
-                  som helst.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Avbryt</AlertDialogCancel>
-                <AlertDialogAction variant="destructive" @click="handleDeactivateAccount">
-                  Ja, deaktiver
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-
-          <AlertDialog>
-            <AlertDialogTrigger>
-              <Button variant="outline" class="btn--danger-outline">Slett kontoen</Button>
+              <Button variant="destructive">Slett kontoen</Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
@@ -158,13 +82,12 @@ async function handleDeleteOrganization() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Avbryt</AlertDialogCancel>
-                <AlertDialogAction variant="destructive" @click="handleDeleteAccount">
+                <AlertDialogAction variant="destructive" @click="deleteAccount.mutate()">
                   Ja, slett
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-
         </div>
       </section>
 
@@ -194,7 +117,7 @@ async function handleDeleteOrganization() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Avbryt</AlertDialogCancel>
-                  <AlertDialogAction variant="destructive" @click="handleDeleteOrganization">
+                  <AlertDialogAction variant="destructive" @click="deleteOrganization.mutate()">
                     Ja, slett organisasjon
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -287,19 +210,15 @@ async function handleDeleteOrganization() {
   color: hsl(var(--foreground));
 }
 
+.setting-desc {
+  font-size: 0.85rem;
+  color: hsl(var(--muted-foreground));
+}
+
 .button-row {
   display: flex;
   flex-wrap: wrap;
   gap: 0.625rem;
   margin-top: 0.75rem;
-}
-
-:deep(.btn--danger-outline) {
-  color: hsl(var(--destructive, 0 55% 48%));
-}
-
-:deep(.btn--danger-outline:hover) {
-  color: hsl(var(--destructive, 0 55% 42%));
-  background-color: hsl(var(--destructive, 0 55% 48%) / 0.05);
 }
 </style>
