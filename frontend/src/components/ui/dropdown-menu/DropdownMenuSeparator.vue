@@ -5,7 +5,7 @@ defineProps<{
 </script>
 
 <template>
-  <div :class="['dropdown-separator', $props.class]" role="separator" />
+  <div :class="['dropdown-separator', $props.class]" role="separator"/>
 </template>
 
 <style scoped>

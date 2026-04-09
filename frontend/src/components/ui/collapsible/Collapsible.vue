@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { provide, ref, watch } from "vue"
+import {provide, ref, watch} from "vue"
 
 const props = withDefaults(defineProps<{
   open?: boolean
@@ -27,11 +27,11 @@ function toggle() {
   emits("update:open", next)
 }
 
-provide("collapsible", { isOpen, toggle })
+provide("collapsible", {isOpen, toggle})
 </script>
 
 <template>
   <div :class="props.class" v-bind="$attrs">
-    <slot :open="isOpen" />
+    <slot :open="isOpen"/>
   </div>
 </template>

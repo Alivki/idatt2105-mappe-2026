@@ -6,7 +6,7 @@ defineProps<{
 
 <template>
   <tfoot :class="['table-footer', $props.class]">
-    <slot />
+  <slot/>
   </tfoot>
 </template>
 

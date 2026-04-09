@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { inject, ref, onBeforeUnmount, watch, nextTick } from "vue"
+import {inject, ref, onBeforeUnmount, watch, nextTick} from "vue"
 
 defineProps<{
   class?: string
 }>()
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { isSubOpen, closeSub } = inject("dropdown-sub") as { isSubOpen: Ref<boolean>; closeSub: () => void }
+const {isSubOpen, closeSub} = inject("dropdown-sub") as {
+  isSubOpen: Ref<boolean>;
+  closeSub: () => void
+}
 const contentRef = ref<HTMLElement | null>(null)
 
 function onClickOutside(e: MouseEvent) {
@@ -43,7 +46,7 @@ onBeforeUnmount(() => {
       @mouseenter="isSubOpen = true"
       @mouseleave="closeSub()"
     >
-      <slot />
+      <slot/>
     </div>
   </Transition>
 </template>

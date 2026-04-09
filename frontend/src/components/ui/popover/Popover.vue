@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { provide, ref, watch } from "vue"
+import {provide, ref, watch} from "vue"
 
 const props = withDefaults(defineProps<{
   open?: boolean
@@ -31,12 +31,12 @@ function close() {
   emits("update:open", false)
 }
 
-provide("popover", { isOpen, triggerRef, toggle, close })
+provide("popover", {isOpen, triggerRef, toggle, close})
 </script>
 
 <template>
   <div class="popover-root">
-    <slot />
+    <slot/>
   </div>
 </template>
 

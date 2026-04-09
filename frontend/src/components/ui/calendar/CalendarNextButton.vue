@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { inject } from "vue"
-import { ChevronRight } from "lucide-vue-next"
+import {inject} from "vue"
+import {ChevronRight} from "lucide-vue-next"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const { nextMonth, disabled } = inject("calendar") as any
+const {nextMonth, disabled} = inject("calendar") as any
 </script>
 
 <template>
@@ -15,7 +15,7 @@ const { nextMonth, disabled } = inject("calendar") as any
     @click="nextMonth"
   >
     <slot>
-      <ChevronRight class="calendar-nav-btn__icon" />
+      <ChevronRight class="calendar-nav-btn__icon"/>
     </slot>
   </button>
 </template>
@@ -37,14 +37,17 @@ const { nextMonth, disabled } = inject("calendar") as any
   padding: 0;
   font-family: inherit;
 }
+
 .calendar-nav-btn:hover {
   opacity: 1;
   background-color: hsl(var(--accent, 250 40% 95%));
 }
+
 .calendar-nav-btn:disabled {
   pointer-events: none;
   opacity: 0.3;
 }
+
 .calendar-nav-btn__icon {
   width: 1rem;
   height: 1rem;

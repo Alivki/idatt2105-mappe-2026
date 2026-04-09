@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import { provide, ref, computed, watch, nextTick, onMounted, type Ref } from "vue"
-import { CalendarDate, type DateValue, today, getLocalTimeZone, isSameDay } from "@internationalized/date"
-import { useCalendar } from "./useCalendar"
+import {provide, ref, computed, watch, nextTick, onMounted, type Ref} from "vue"
+import {
+  CalendarDate,
+  type DateValue,
+  today,
+  getLocalTimeZone,
+  isSameDay
+} from "@internationalized/date"
+import {useCalendar} from "./useCalendar"
 import CalendarHeader from "./CalendarHeader.vue"
 import CalendarPrevButton from "./CalendarPrevButton.vue"
 import CalendarNextButton from "./CalendarNextButton.vue"
@@ -49,7 +55,7 @@ watch(() => props.modelValue, (v) => {
   if (v) placeholder.value = v
 })
 
-const { grid, weekDays } = useCalendar({
+const {grid, weekDays} = useCalendar({
   placeholder,
   locale: props.locale,
   weekStartsOn: props.weekStartsOn,
@@ -131,22 +137,22 @@ provide("calendar", {
 
 // Month/year select data
 const months = [
-  { value: '1', short: 'jan' },
-  { value: '2', short: 'feb' },
-  { value: '3', short: 'mar' },
-  { value: '4', short: 'apr' },
-  { value: '5', short: 'mai' },
-  { value: '6', short: 'jun' },
-  { value: '7', short: 'jul' },
-  { value: '8', short: 'aug' },
-  { value: '9', short: 'sep' },
-  { value: '10', short: 'okt' },
-  { value: '11', short: 'nov' },
-  { value: '12', short: 'des' },
+  {value: '1', short: 'jan'},
+  {value: '2', short: 'feb'},
+  {value: '3', short: 'mar'},
+  {value: '4', short: 'apr'},
+  {value: '5', short: 'mai'},
+  {value: '6', short: 'jun'},
+  {value: '7', short: 'jul'},
+  {value: '8', short: 'aug'},
+  {value: '9', short: 'sep'},
+  {value: '10', short: 'okt'},
+  {value: '11', short: 'nov'},
+  {value: '12', short: 'des'},
 ]
 
 const currentYear = new Date().getFullYear()
-const years = Array.from({ length: 110 }, (_, i) => currentYear - 100 + i)
+const years = Array.from({length: 110}, (_, i) => currentYear - 100 + i)
 
 const rootRef = ref<HTMLElement | null>(null)
 onMounted(() => {
@@ -162,7 +168,7 @@ onMounted(() => {
 <template>
   <div ref="rootRef" class="calendar" :data-disabled="disabled || undefined">
     <CalendarHeader>
-      <CalendarPrevButton />
+      <CalendarPrevButton/>
       <div class="calendar__selects">
         <Select
           :model-value="String(placeholder.month)"
@@ -191,7 +197,7 @@ onMounted(() => {
           </SelectContent>
         </Select>
       </div>
-      <CalendarNextButton />
+      <CalendarNextButton/>
     </CalendarHeader>
 
     <div class="calendar__grids">
@@ -210,7 +216,7 @@ onMounted(() => {
               :key="weekDate.toString()"
               :date="weekDate"
             >
-              <CalendarCellTrigger :day="weekDate" :month="month.value" />
+              <CalendarCellTrigger :day="weekDate" :month="month.value"/>
             </CalendarCell>
           </CalendarGridRow>
         </CalendarGridBody>

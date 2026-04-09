@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import axios from 'axios'
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeft, Calendar, Clock, AlertTriangle, Pencil, Trash2, Shield, Zap, Search, ChevronRight } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
+import {computed, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {ArrowLeft, AlertTriangle, Pencil, Trash2, Shield, Zap, Search} from 'lucide-vue-next'
+import {toast} from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/button/Button.vue'
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
+import {Separator} from '@/components/ui/separator'
+import {SidebarTrigger} from '@/components/ui/sidebar'
 import Badge from '@/components/ui/badge/Badge.vue'
 import AlertDialog from '@/components/ui/alert-dialog/AlertDialog.vue'
 import AlertDialogAction from '@/components/ui/alert-dialog/AlertDialogAction.vue'
@@ -17,10 +17,13 @@ import AlertDialogDescription from '@/components/ui/alert-dialog/AlertDialogDesc
 import AlertDialogFooter from '@/components/ui/alert-dialog/AlertDialogFooter.vue'
 import AlertDialogHeader from '@/components/ui/alert-dialog/AlertDialogHeader.vue'
 import AlertDialogTitle from '@/components/ui/alert-dialog/AlertDialogTitle.vue'
+import DeviationStatusWorkflow from '@/components/deviations/DeviationStatusWorkflow.vue'
+import DeviationDetailSidebar from '@/components/deviations/DeviationDetailSidebar.vue'
 import FoodDeviationFormDialog from '@/components/deviations/FoodDeviationFormDialog.vue'
 import AlcoholDeviationFormDialog from '@/components/deviations/AlcoholDeviationFormDialog.vue'
-import { useAuthStore } from '@/stores/auth'
-import { useMembersQuery } from '@/composables/useMembers'
+import {useAuthStore} from '@/stores/auth'
+import {useCanManage} from '@/composables/useCanManage'
+import {useMembersQuery} from '@/composables/useMembers'
 import {
   useFoodDeviationsQuery,
   useUpdateFoodDeviationMutation,
@@ -31,7 +34,7 @@ import {
   useUpdateAlcoholDeviationMutation,
   useDeleteAlcoholDeviationMutation,
 } from '@/composables/useAlcoholDeviations'
-import { usePenaltyPointsQuery } from '@/composables/usePenaltyPoints'
+import {usePenaltyPointsQuery} from '@/composables/usePenaltyPoints'
 import type {
   FoodDeviation,
   AlcoholDeviation,
@@ -48,7 +51,7 @@ import type {
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
-const canManage = computed(() => auth.role === 'ADMIN' || auth.role === 'MANAGER')
+const canManage = useCanManage()
 const membersQuery = useMembersQuery(canManage)
 
 const deviationModule = computed(() => route.params.module as 'mat' | 'alkohol')
@@ -95,10 +98,9 @@ const memberOptions = computed(() => {
     }))
   }
   if (!auth.user) return []
-  return [{ userId: auth.user.id, label: `${auth.user.fullName} (Deg)` }]
+  return [{userId: auth.user.id, label: `${auth.user.fullName} (Deg)`}]
 })
 
-// ── Labels ─────────────────────────────────────────────────
 const foodTypeLabel: Record<FoodDeviationType, string> = {
   TEMPERATUR: 'Temperatur', RENHOLD: 'Renhold', PERSONLIG_HYGIENE: 'Personlig hygiene',
   ALLERGEN: 'Allergen', SKADEDYR: 'Skadedyr', MOTTAKSKONTROLL: 'Mottakskontroll', ANNET: 'Annet',
@@ -117,16 +119,27 @@ const sourceLabel: Record<AlcoholReportSource, string> = {
 }
 
 const alcoholTypeLabel: Record<AlcoholDeviationType, string> = {
-  SKJENKING_MINDREAARIGE: 'Skjenking til mindreårige', BRUDD_BISTANDSPLIKT: 'Brudd på bistandsplikt',
-  UFORSVARLIG_DRIFT: 'Uforsvarlig drift', HINDRING_KONTROLL: 'Hindring av kontroll',
-  SKJENKING_APENBART_BERUSET: 'Skjenking til åpenbart beruset', BRUDD_SJENKETIDER: 'Brudd på skjenketider',
-  BRENNEVIN_18_19: 'Brennevin til 18-19-åringer', BERUSET_PERSON_I_LOKALET: 'Beruset person i lokalet',
-  MANGLER_IK_SYSTEM: 'Mangler IK-system', MANGLER_STYRER_STEDFORTREDER: 'Mangler styrer/stedfortreder',
-  NARKOTIKA: 'Narkotika', ALKOHOLFRI_ALTERNATIV_MANGLER: 'Alkoholfri alternativ mangler',
-  MEDBRAKT_ALKOHOL: 'Medbrakt alkohol', REKLAMEBRUDD: 'Reklamebrudd', VILKAARSBRUDD: 'Vilkårsbrudd',
-  NEKTET_VISE_LEGITIMASJON: 'Nektet å vise legitimasjon', GLEMTE_SJEKKE_LEGITIMASJON: 'Glemte å sjekke legitimasjon',
-  MINDREAARIG_FORSOK: 'Mindreårig forsøk', FALSK_LEGITIMASJON: 'Falsk legitimasjon',
-  UTGAATT_LEGITIMASJON: 'Utgått legitimasjon', LEGITIMASJON_ANNET: 'Annet (legitimasjon)',
+  SKJENKING_MINDREAARIGE: 'Skjenking til mindreårige',
+  BRUDD_BISTANDSPLIKT: 'Brudd på bistandsplikt',
+  UFORSVARLIG_DRIFT: 'Uforsvarlig drift',
+  HINDRING_KONTROLL: 'Hindring av kontroll',
+  SKJENKING_APENBART_BERUSET: 'Skjenking til åpenbart beruset',
+  BRUDD_SJENKETIDER: 'Brudd på skjenketider',
+  BRENNEVIN_18_19: 'Brennevin til 18-19-åringer',
+  BERUSET_PERSON_I_LOKALET: 'Beruset person i lokalet',
+  MANGLER_IK_SYSTEM: 'Mangler IK-system',
+  MANGLER_STYRER_STEDFORTREDER: 'Mangler styrer/stedfortreder',
+  NARKOTIKA: 'Narkotika',
+  ALKOHOLFRI_ALTERNATIV_MANGLER: 'Alkoholfri alternativ mangler',
+  MEDBRAKT_ALKOHOL: 'Medbrakt alkohol',
+  REKLAMEBRUDD: 'Reklamebrudd',
+  VILKAARSBRUDD: 'Vilkårsbrudd',
+  NEKTET_VISE_LEGITIMASJON: 'Nektet å vise legitimasjon',
+  GLEMTE_SJEKKE_LEGITIMASJON: 'Glemte å sjekke legitimasjon',
+  MINDREAARIG_FORSOK: 'Mindreårig forsøk',
+  FALSK_LEGITIMASJON: 'Falsk legitimasjon',
+  UTGAATT_LEGITIMASJON: 'Utgått legitimasjon',
+  LEGITIMASJON_ANNET: 'Annet (legitimasjon)',
 }
 
 const causalLabel: Record<AlcoholCausalAnalysis, string> = {
@@ -135,7 +148,6 @@ const causalLabel: Record<AlcoholCausalAnalysis, string> = {
   UNDERBEMANNING: 'Underbemanning', KOMMUNIKASJON: 'Kommunikasjon', ANNET: 'Annet',
 }
 
-// ── Computed helpers ───────────────────────────────────────
 const currentStatus = computed<FoodDeviationStatus | AlcoholDeviationStatus | null>(() => {
   return foodDeviation.value?.status ?? alcoholDeviation.value?.status ?? null
 })
@@ -143,9 +155,14 @@ const currentStatus = computed<FoodDeviationStatus | AlcoholDeviationStatus | nu
 const statusSteps = computed(() => {
   const s = currentStatus.value
   return [
-    { key: 'OPEN' as const, label: 'Åpen', done: true, active: s === 'OPEN' },
-    { key: 'UNDER_TREATMENT' as const, label: 'Under behandling', done: s === 'UNDER_TREATMENT' || s === 'CLOSED', active: s === 'UNDER_TREATMENT' },
-    { key: 'CLOSED' as const, label: 'Lukket', done: s === 'CLOSED', active: s === 'CLOSED' },
+    {key: 'OPEN' as const, label: 'Åpen', done: true, active: s === 'OPEN'},
+    {
+      key: 'UNDER_TREATMENT' as const,
+      label: 'Under behandling',
+      done: s === 'UNDER_TREATMENT' || s === 'CLOSED',
+      active: s === 'UNDER_TREATMENT'
+    },
+    {key: 'CLOSED' as const, label: 'Lukket', done: s === 'CLOSED', active: s === 'CLOSED'},
   ]
 })
 
@@ -161,15 +178,20 @@ const nextStatusLabel = computed(() => {
   return null
 })
 
-// ── Actions ────────────────────────────────────────────────
 async function changeStatus() {
   if (!nextStatus.value || !canManage.value) return
   statusChanging.value = true
   try {
     if (foodDeviation.value) {
-      await updateFood.mutateAsync({ id: foodDeviation.value.id, payload: { status: nextStatus.value as FoodDeviationStatus } })
+      await updateFood.mutateAsync({
+        id: foodDeviation.value.id,
+        payload: {status: nextStatus.value as FoodDeviationStatus}
+      })
     } else if (alcoholDeviation.value) {
-      await updateAlcohol.mutateAsync({ id: alcoholDeviation.value.id, payload: { status: nextStatus.value as AlcoholDeviationStatus } })
+      await updateAlcohol.mutateAsync({
+        id: alcoholDeviation.value.id,
+        payload: {status: nextStatus.value as AlcoholDeviationStatus}
+      })
     }
     toast.success(`Status endret til "${nextStatus.value === 'UNDER_TREATMENT' ? 'Under behandling' : 'Lukket'}"`)
   } catch (err) {
@@ -186,27 +208,24 @@ function formatDate(value: string | null): string {
   })
 }
 
-function getInitials(name: string | null): string {
-  if (!name) return '?'
-  const parts = name.split(' ').filter(Boolean)
-  if (parts.length >= 2) return ((parts[0]?.[0] ?? '') + (parts[parts.length - 1]?.[0] ?? '')).toUpperCase()
-  return parts[0]?.[0]?.toUpperCase() ?? '?'
-}
-
 async function handleUpdateFood(p: { id: number; data: UpdateFoodDeviationRequest }) {
   try {
-    await updateFood.mutateAsync({ id: p.id, payload: p.data })
+    await updateFood.mutateAsync({id: p.id, payload: p.data})
     editFoodOpen.value = false
     toast.success('Avvik oppdatert')
-  } catch (err) { handleError(err, 'Kunne ikke oppdatere avvik') }
+  } catch (err) {
+    handleError(err, 'Kunne ikke oppdatere avvik')
+  }
 }
 
 async function handleUpdateAlcohol(p: { id: number; data: UpdateAlcoholDeviationRequest }) {
   try {
-    await updateAlcohol.mutateAsync({ id: p.id, payload: p.data })
+    await updateAlcohol.mutateAsync({id: p.id, payload: p.data})
     editAlcoholOpen.value = false
     toast.success('Avvik oppdatert')
-  } catch (err) { handleError(err, 'Kunne ikke oppdatere avvik') }
+  } catch (err) {
+    handleError(err, 'Kunne ikke oppdatere avvik')
+  }
 }
 
 async function handleDelete() {
@@ -215,13 +234,18 @@ async function handleDelete() {
     else if (alcoholDeviation.value) await deleteAlcohol.mutateAsync(alcoholDeviation.value.id)
     toast.success('Avvik slettet')
     router.push('/avvik')
-  } catch (err) { handleError(err, 'Kunne ikke slette avvik') }
+  } catch (err) {
+    handleError(err, 'Kunne ikke slette avvik')
+  }
 }
 
 function handleError(error: unknown, fallback: string) {
   if (axios.isAxiosError(error)) {
     const msg = error.response?.data?.error?.message
-    if (typeof msg === 'string' && msg.trim().length > 0) { toast.error(msg); return }
+    if (typeof msg === 'string' && msg.trim().length > 0) {
+      toast.error(msg);
+      return
+    }
   }
   toast.error(fallback)
 }
@@ -231,18 +255,18 @@ function handleError(error: unknown, fallback: string) {
   <AppLayout>
     <header class="page-header">
       <div class="page-header-inner">
-        <SidebarTrigger />
-        <Separator orientation="vertical" class="header-separator" />
+        <SidebarTrigger/>
+        <Separator orientation="vertical" class="header-separator"/>
         <span class="page-title">Avvik</span>
       </div>
     </header>
 
     <div class="page-content">
       <Button variant="ghost" class="back-button" @click="router.push('/avvik')">
-        <ArrowLeft :size="18" aria-hidden="true" /><span>Tilbake til oversikt</span>
+        <ArrowLeft :size="18" aria-hidden="true"/>
+        <span>Tilbake til oversikt</span>
       </Button>
 
-      <!-- Loading -->
       <div v-if="isLoading" class="loading-state">
         <div class="skeleton-header"></div>
         <div class="skeleton-bar"></div>
@@ -250,11 +274,12 @@ function handleError(error: unknown, fallback: string) {
         <div class="skeleton-block skeleton-block--short"></div>
       </div>
 
-      <!-- Not found -->
       <div v-else-if="notFound" class="empty-state">
-        <div class="empty-state-bg" />
+        <div class="empty-state-bg"/>
         <div class="empty-state-inner">
-          <div class="empty-state-icon"><AlertTriangle :stroke-width="1.5" /></div>
+          <div class="empty-state-icon">
+            <AlertTriangle :stroke-width="1.5"/>
+          </div>
           <div class="empty-state-text">
             <h3>Avvik ikke funnet</h3>
             <p>Avviket du leter etter finnes ikke eller har blitt slettet.</p>
@@ -263,21 +288,25 @@ function handleError(error: unknown, fallback: string) {
         </div>
       </div>
 
-      <!-- ═══ FOOD DEVIATION ═══ -->
       <template v-else-if="foodDeviation">
         <div class="detail-layout">
-          <!-- Main content -->
           <div class="detail-main">
-            <!-- Hero header -->
-            <div class="detail-hero" :class="`detail-hero--${foodDeviation.severity === 'CRITICAL' || foodDeviation.severity === 'HIGH' ? 'danger' : foodDeviation.severity === 'MEDIUM' ? 'warning' : 'ok'}`">
+            <div class="detail-hero"
+                 :class="`detail-hero--${foodDeviation.severity === 'CRITICAL' || foodDeviation.severity === 'HIGH' ? 'danger' : foodDeviation.severity === 'MEDIUM' ? 'warning' : 'ok'}`">
               <div class="hero-top">
                 <div class="tag-row">
                   <Badge tone="brand">IK-Mat</Badge>
                   <Badge tone="neutral">{{ foodTypeLabel[foodDeviation.deviationType] }}</Badge>
                 </div>
                 <div v-if="canManage" class="hero-actions">
-                  <Button variant="ghost" size="icon-sm" @click="editFoodOpen = true" title="Rediger avvik" aria-label="Rediger avvik"><Pencil :size="16" aria-hidden="true" /></Button>
-                  <Button variant="ghost" size="icon-sm" @click="deleteDialogOpen = true" title="Slett avvik" aria-label="Slett avvik" class="delete-icon"><Trash2 :size="16" aria-hidden="true" /></Button>
+                  <Button variant="ghost" size="icon-sm" @click="editFoodOpen = true"
+                          title="Rediger avvik" aria-label="Rediger avvik">
+                    <Pencil :size="16" aria-hidden="true"/>
+                  </Button>
+                  <Button variant="ghost" size="icon-sm" @click="deleteDialogOpen = true"
+                          title="Slett avvik" aria-label="Slett avvik" class="delete-icon">
+                    <Trash2 :size="16" aria-hidden="true"/>
+                  </Button>
                 </div>
               </div>
               <div class="hero-severity">
@@ -286,48 +315,27 @@ function handleError(error: unknown, fallback: string) {
               <p class="hero-description">{{ foodDeviation.description }}</p>
             </div>
 
-            <!-- Status workflow -->
-            <div class="status-workflow" role="group" aria-label="Avviksstatus">
-              <div class="status-track" role="list">
-                <div
-                  v-for="(step, i) in statusSteps"
-                  :key="step.key"
-                  class="status-step"
-                  :class="{ 'status-step--done': step.done, 'status-step--active': step.active }"
-                  role="listitem"
-                  :aria-current="step.active ? 'step' : undefined"
-                >
-                  <div class="step-dot" aria-hidden="true">
-                    <svg v-if="step.done && !step.active" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
-                    <span v-else class="step-number">{{ i + 1 }}</span>
-                  </div>
-                  <span class="step-label">{{ step.label }}</span>
-                  <ChevronRight v-if="i < statusSteps.length - 1" :size="14" class="step-arrow" aria-hidden="true" />
-                </div>
-              </div>
-              <Button
-                v-if="canManage && nextStatusLabel"
-                size="sm"
-                :disabled="statusChanging"
-                @click="changeStatus"
-                class="status-action-btn"
-              >
-                {{ statusChanging ? 'Endrer...' : nextStatusLabel }}
-              </Button>
-            </div>
+            <DeviationStatusWorkflow
+              :steps="statusSteps"
+              :next-status-label="nextStatusLabel"
+              :can-manage="canManage"
+              :status-changing="statusChanging"
+              @change-status="changeStatus"
+            />
 
-            <!-- Content sections -->
             <div class="sections">
               <section class="content-section">
                 <div class="section-header">
-                  <Zap :size="16" class="section-icon section-icon--amber" />
+                  <Zap :size="16" class="section-icon section-icon--amber"/>
                   <h2>Umiddelbar handling</h2>
                 </div>
                 <div v-if="foodDeviation.immediateAction">
                   <p class="detail-body">{{ foodDeviation.immediateAction }}</p>
                   <div v-if="foodDeviation.immediateActionByUserName" class="meta-inline">
                     Utført av {{ foodDeviation.immediateActionByUserName }}
-                    <span v-if="foodDeviation.immediateActionAt"> · {{ formatDate(foodDeviation.immediateActionAt) }}</span>
+                    <span v-if="foodDeviation.immediateActionAt"> · {{
+                        formatDate(foodDeviation.immediateActionAt)
+                      }}</span>
                   </div>
                 </div>
                 <p v-else class="empty-field">Ikke registrert</p>
@@ -335,7 +343,7 @@ function handleError(error: unknown, fallback: string) {
 
               <section class="content-section">
                 <div class="section-header">
-                  <Search :size="16" class="section-icon section-icon--brand" />
+                  <Search :size="16" class="section-icon section-icon--brand"/>
                   <h2>Årsak</h2>
                 </div>
                 <p v-if="foodDeviation.cause" class="detail-body">{{ foodDeviation.cause }}</p>
@@ -344,14 +352,16 @@ function handleError(error: unknown, fallback: string) {
 
               <section class="content-section">
                 <div class="section-header">
-                  <Shield :size="16" class="section-icon section-icon--green" />
+                  <Shield :size="16" class="section-icon section-icon--green"/>
                   <h2>Forebyggende tiltak</h2>
                 </div>
                 <div v-if="foodDeviation.preventiveMeasures">
                   <p class="detail-body">{{ foodDeviation.preventiveMeasures }}</p>
                   <div v-if="foodDeviation.preventiveResponsibleUserName" class="meta-inline">
                     Ansvarlig: {{ foodDeviation.preventiveResponsibleUserName }}
-                    <span v-if="foodDeviation.preventiveDeadline"> · Frist: {{ formatDate(foodDeviation.preventiveDeadline) }}</span>
+                    <span v-if="foodDeviation.preventiveDeadline"> · Frist: {{
+                        formatDate(foodDeviation.preventiveDeadline)
+                      }}</span>
                   </div>
                 </div>
                 <p v-else class="empty-field">Ikke registrert</p>
@@ -359,41 +369,17 @@ function handleError(error: unknown, fallback: string) {
             </div>
           </div>
 
-          <!-- Sidebar -->
-          <aside class="detail-sidebar">
-            <div class="sidebar-card">
-              <h3 class="sidebar-title">Detaljer</h3>
-              <div class="sidebar-field">
-                <span class="sidebar-label">Rapportert av</span>
-                <div class="person-row">
-                  <div class="avatar">{{ getInitials(foodDeviation.reportedByUserName) }}</div>
-                  <span class="person-name">{{ foodDeviation.reportedByUserName }}</span>
-                </div>
-              </div>
-              <div class="sidebar-field">
-                <span class="sidebar-label">Rapportert</span>
-                <div class="date-row"><Calendar :size="14" class="date-icon" /><span>{{ formatDate(foodDeviation.reportedAt) }}</span></div>
-              </div>
-              <div class="sidebar-field">
-                <span class="sidebar-label">Sist oppdatert</span>
-                <div class="date-row"><Clock :size="14" class="date-icon" /><span>{{ formatDate(foodDeviation.updatedAt) }}</span></div>
-              </div>
-              <div class="sidebar-field">
-                <span class="sidebar-label">Status</span>
-                <Badge :tone="foodDeviation.status === 'OPEN' ? 'danger' : foodDeviation.status === 'UNDER_TREATMENT' ? 'warning' : 'ok'">
-                  {{ foodStatusLabel[foodDeviation.status] }}
-                </Badge>
-              </div>
-              <div class="sidebar-field">
-                <span class="sidebar-label">Type</span>
-                <span class="sidebar-value">{{ foodTypeLabel[foodDeviation.deviationType] }}</span>
-              </div>
-            </div>
-          </aside>
+          <DeviationDetailSidebar
+            :reported-by-name="foodDeviation.reportedByUserName"
+            :reported-at="foodDeviation.reportedAt"
+            :updated-at="foodDeviation.updatedAt"
+            :status-label="foodStatusLabel[foodDeviation.status]"
+            :status-tone="foodDeviation.status === 'OPEN' ? 'danger' : foodDeviation.status === 'UNDER_TREATMENT' ? 'warning' : 'ok'"
+            :fields="[{ label: 'Type', value: foodTypeLabel[foodDeviation.deviationType] }]"
+          />
         </div>
       </template>
 
-      <!-- ═══ ALCOHOL DEVIATION ═══ -->
       <template v-else-if="alcoholDeviation">
         <div class="detail-layout">
           <div class="detail-main">
@@ -402,57 +388,43 @@ function handleError(error: unknown, fallback: string) {
               <div class="hero-top">
                 <div class="tag-row">
                   <Badge tone="brand">IK-Alkohol</Badge>
-                  <Badge :tone="alcoholDeviation.reportSource === 'EGENRAPPORT' ? 'neutral' : alcoholDeviation.reportSource === 'SJENKEKONTROLL' ? 'warning' : 'danger'">
+                  <Badge
+                    :tone="alcoholDeviation.reportSource === 'EGENRAPPORT' ? 'neutral' : alcoholDeviation.reportSource === 'SJENKEKONTROLL' ? 'warning' : 'danger'">
                     {{ sourceLabel[alcoholDeviation.reportSource] }}
                   </Badge>
                 </div>
                 <div v-if="canManage" class="hero-actions">
-                  <Button variant="ghost" size="icon-sm" @click="editAlcoholOpen = true" title="Rediger avvik" aria-label="Rediger avvik"><Pencil :size="16" aria-hidden="true" /></Button>
-                  <Button variant="ghost" size="icon-sm" @click="deleteDialogOpen = true" title="Slett avvik" aria-label="Slett avvik" class="delete-icon"><Trash2 :size="16" aria-hidden="true" /></Button>
+                  <Button variant="ghost" size="icon-sm" @click="editAlcoholOpen = true"
+                          title="Rediger avvik" aria-label="Rediger avvik">
+                    <Pencil :size="16" aria-hidden="true"/>
+                  </Button>
+                  <Button variant="ghost" size="icon-sm" @click="deleteDialogOpen = true"
+                          title="Slett avvik" aria-label="Slett avvik" class="delete-icon">
+                    <Trash2 :size="16" aria-hidden="true"/>
+                  </Button>
                 </div>
               </div>
               <div class="hero-severity">
-                <Badge tone="neutral" class="severity-badge">{{ alcoholTypeLabel[alcoholDeviation.deviationType] }}</Badge>
+                <Badge tone="neutral" class="severity-badge">
+                  {{ alcoholTypeLabel[alcoholDeviation.deviationType] }}
+                </Badge>
                 <span class="hero-id">#{{ alcoholDeviation.id }}</span>
               </div>
               <p class="hero-description">{{ alcoholDeviation.description }}</p>
             </div>
 
-            <!-- Status workflow -->
-            <div class="status-workflow" role="group" aria-label="Avviksstatus">
-              <div class="status-track" role="list">
-                <div
-                  v-for="(step, i) in statusSteps"
-                  :key="step.key"
-                  class="status-step"
-                  :class="{ 'status-step--done': step.done, 'status-step--active': step.active }"
-                  role="listitem"
-                  :aria-current="step.active ? 'step' : undefined"
-                >
-                  <div class="step-dot" aria-hidden="true">
-                    <svg v-if="step.done && !step.active" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
-                    <span v-else class="step-number">{{ i + 1 }}</span>
-                  </div>
-                  <span class="step-label">{{ step.label }}</span>
-                  <ChevronRight v-if="i < statusSteps.length - 1" :size="14" class="step-arrow" aria-hidden="true" />
-                </div>
-              </div>
-              <Button
-                v-if="canManage && nextStatusLabel"
-                size="sm"
-                :disabled="statusChanging"
-                @click="changeStatus"
-                class="status-action-btn"
-              >
-                {{ statusChanging ? 'Endrer...' : nextStatusLabel }}
-              </Button>
-            </div>
+            <DeviationStatusWorkflow
+              :steps="statusSteps"
+              :next-status-label="nextStatusLabel"
+              :can-manage="canManage"
+              :status-changing="statusChanging"
+              @change-status="changeStatus"
+            />
 
-            <!-- Content sections -->
             <div class="sections">
               <section v-if="alcoholDeviation.immediateAction" class="content-section">
                 <div class="section-header">
-                  <Zap :size="16" class="section-icon section-icon--amber" />
+                  <Zap :size="16" class="section-icon section-icon--amber"/>
                   <h2>Umiddelbar handling</h2>
                 </div>
                 <p class="detail-body">{{ alcoholDeviation.immediateAction }}</p>
@@ -460,26 +432,31 @@ function handleError(error: unknown, fallback: string) {
 
               <section class="content-section">
                 <div class="section-header">
-                  <Search :size="16" class="section-icon section-icon--brand" />
+                  <Search :size="16" class="section-icon section-icon--brand"/>
                   <h2>Årsaksanalyse</h2>
                 </div>
                 <div v-if="alcoholDeviation.causalAnalysis">
                   <Badge tone="neutral">{{ causalLabel[alcoholDeviation.causalAnalysis] }}</Badge>
-                  <p v-if="alcoholDeviation.causalExplanation" class="detail-body detail-body--spaced">{{ alcoholDeviation.causalExplanation }}</p>
+                  <p v-if="alcoholDeviation.causalExplanation"
+                     class="detail-body detail-body--spaced">{{
+                      alcoholDeviation.causalExplanation
+                    }}</p>
                 </div>
                 <p v-else class="empty-field">Ikke registrert</p>
               </section>
 
               <section class="content-section">
                 <div class="section-header">
-                  <Shield :size="16" class="section-icon section-icon--green" />
+                  <Shield :size="16" class="section-icon section-icon--green"/>
                   <h2>Forebyggende tiltak</h2>
                 </div>
                 <div v-if="alcoholDeviation.preventiveMeasures">
                   <p class="detail-body">{{ alcoholDeviation.preventiveMeasures }}</p>
                   <div v-if="alcoholDeviation.preventiveResponsibleUserName" class="meta-inline">
                     Ansvarlig: {{ alcoholDeviation.preventiveResponsibleUserName }}
-                    <span v-if="alcoholDeviation.preventiveDeadline"> · Frist: {{ formatDate(alcoholDeviation.preventiveDeadline) }}</span>
+                    <span v-if="alcoholDeviation.preventiveDeadline"> · Frist: {{
+                        formatDate(alcoholDeviation.preventiveDeadline)
+                      }}</span>
                   </div>
                 </div>
                 <p v-else class="empty-field">Ikke registrert</p>
@@ -487,41 +464,17 @@ function handleError(error: unknown, fallback: string) {
             </div>
           </div>
 
-          <!-- Sidebar -->
-          <aside class="detail-sidebar">
-            <div class="sidebar-card">
-              <h3 class="sidebar-title">Detaljer</h3>
-              <div class="sidebar-field">
-                <span class="sidebar-label">Rapportert av</span>
-                <div class="person-row">
-                  <div class="avatar">{{ getInitials(alcoholDeviation.reportedByUserName) }}</div>
-                  <span class="person-name">{{ alcoholDeviation.reportedByUserName }}</span>
-                </div>
-              </div>
-              <div class="sidebar-field">
-                <span class="sidebar-label">Rapportert</span>
-                <div class="date-row"><Calendar :size="14" class="date-icon" /><span>{{ formatDate(alcoholDeviation.reportedAt) }}</span></div>
-              </div>
-              <div class="sidebar-field">
-                <span class="sidebar-label">Sist oppdatert</span>
-                <div class="date-row"><Clock :size="14" class="date-icon" /><span>{{ formatDate(alcoholDeviation.updatedAt) }}</span></div>
-              </div>
-              <div class="sidebar-field">
-                <span class="sidebar-label">Status</span>
-                <Badge :tone="alcoholDeviation.status === 'OPEN' ? 'danger' : alcoholDeviation.status === 'UNDER_TREATMENT' ? 'warning' : 'ok'">
-                  {{ alcoholStatusLabel[alcoholDeviation.status] }}
-                </Badge>
-              </div>
-              <div class="sidebar-field">
-                <span class="sidebar-label">Kilde</span>
-                <span class="sidebar-value">{{ sourceLabel[alcoholDeviation.reportSource] }}</span>
-              </div>
-              <div class="sidebar-field">
-                <span class="sidebar-label">Type</span>
-                <span class="sidebar-value">{{ alcoholTypeLabel[alcoholDeviation.deviationType] }}</span>
-              </div>
-            </div>
-          </aside>
+          <DeviationDetailSidebar
+            :reported-by-name="alcoholDeviation.reportedByUserName"
+            :reported-at="alcoholDeviation.reportedAt"
+            :updated-at="alcoholDeviation.updatedAt"
+            :status-label="alcoholStatusLabel[alcoholDeviation.status]"
+            :status-tone="alcoholDeviation.status === 'OPEN' ? 'danger' : alcoholDeviation.status === 'UNDER_TREATMENT' ? 'warning' : 'ok'"
+            :fields="[
+              { label: 'Kilde', value: sourceLabel[alcoholDeviation.reportSource] },
+              { label: 'Type', value: alcoholTypeLabel[alcoholDeviation.deviationType] },
+            ]"
+          />
         </div>
       </template>
     </div>
@@ -530,7 +483,8 @@ function handleError(error: unknown, fallback: string) {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Slette avvik?</AlertDialogTitle>
-          <AlertDialogDescription>Avviket blir permanent slettet og kan ikke gjenopprettes.</AlertDialogDescription>
+          <AlertDialogDescription>Avviket blir permanent slettet og kan ikke gjenopprettes.
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Avbryt</AlertDialogCancel>
@@ -560,22 +514,58 @@ function handleError(error: unknown, fallback: string) {
 </template>
 
 <style scoped>
-.page-header { display: flex; height: 4rem; flex-shrink: 0; align-items: center; }
-.page-header-inner { display: flex; align-items: center; gap: 0.5rem; padding: 0 1rem; }
-.header-separator { height: 1rem !important; width: 1px !important; margin-right: 0.5rem; }
-.page-title { font-weight: 500; color: hsl(var(--sidebar-primary, 245 43% 52%)); }
-.page-content { display: flex; flex: 1; flex-direction: column; gap: 1.25rem; padding: 0 1.25rem 2rem; }
+.page-header {
+  display: flex;
+  height: 4rem;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.page-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.header-separator {
+  height: 1rem !important;
+  width: 1px !important;
+  margin-right: 0.5rem;
+}
+
+.page-title {
+  font-weight: 500;
+  color: hsl(var(--sidebar-primary, 245 43% 52%));
+}
+
+.page-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 0 1.25rem 2rem;
+}
 
 .back-button {
-  display: inline-flex; align-items: center; gap: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   width: fit-content;
-  background: none !important; border: none; cursor: pointer;
-  color: hsl(var(--muted-foreground)); font-size: 0.85rem; padding: 4px 0;
+  background: none !important;
+  border: none;
+  cursor: pointer;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.85rem;
+  padding: 4px 0;
   transition: color 150ms ease;
 }
-.back-button:hover { background: none !important; color: hsl(var(--foreground)); }
 
-/* ── Layout ─────────────────────────────────────────────── */
+.back-button:hover {
+  background: none !important;
+  color: hsl(var(--foreground));
+}
+
 .detail-layout {
   display: grid;
   grid-template-columns: 1fr 280px;
@@ -583,9 +573,13 @@ function handleError(error: unknown, fallback: string) {
   align-items: start;
 }
 
-.detail-main { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+.detail-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
 
-/* ── Hero header ────────────────────────────────────────── */
 .detail-hero {
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
@@ -605,9 +599,17 @@ function handleError(error: unknown, fallback: string) {
   background: hsl(var(--border));
 }
 
-.detail-hero--danger::before { background: var(--red); }
-.detail-hero--warning::before { background: var(--amber); }
-.detail-hero--ok::before { background: var(--green); }
+.detail-hero--danger::before {
+  background: var(--red);
+}
+
+.detail-hero--warning::before {
+  background: var(--amber);
+}
+
+.detail-hero--ok::before {
+  background: var(--green);
+}
 
 .hero-top {
   display: flex;
@@ -617,11 +619,24 @@ function handleError(error: unknown, fallback: string) {
   margin-bottom: 10px;
 }
 
-.hero-actions { display: flex; gap: 2px; }
-.delete-icon { color: var(--red); }
-.delete-icon:hover { background: var(--red-soft); }
+.hero-actions {
+  display: flex;
+  gap: 2px;
+}
 
-.tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.delete-icon {
+  color: var(--red);
+}
+
+.delete-icon:hover {
+  background: var(--red-soft);
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
 
 .hero-severity {
   display: flex;
@@ -630,8 +645,16 @@ function handleError(error: unknown, fallback: string) {
   margin-bottom: 8px;
 }
 
-.severity-badge { font-size: 0.82rem; }
-.hero-id { font-size: 0.82rem; color: var(--text-secondary); font-weight: 500; font-variant-numeric: tabular-nums; }
+.severity-badge {
+  font-size: 0.82rem;
+}
+
+.hero-id {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
 
 .hero-description {
   margin: 0;
@@ -641,85 +664,6 @@ function handleError(error: unknown, fallback: string) {
   white-space: pre-wrap;
 }
 
-/* ── Status workflow ────────────────────────────────────── */
-.status-workflow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 20px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  background: var(--card-bg);
-}
-
-.status-track {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.status-step {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.step-dot {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: hsl(var(--muted));
-  color: var(--text-secondary);
-  font-size: 0.7rem;
-  font-weight: 700;
-  flex-shrink: 0;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-}
-
-.status-step--done .step-dot {
-  background: var(--green-soft);
-  color: var(--green);
-}
-
-.status-step--active .step-dot {
-  background: var(--brand);
-  color: hsl(var(--primary-foreground));
-  box-shadow: 0 0 0 3px var(--brand-soft);
-}
-
-.step-label {
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
-
-.status-step--active .step-label {
-  color: hsl(var(--foreground));
-  font-weight: 600;
-}
-
-.status-step--done .step-label {
-  color: var(--green);
-}
-
-.step-arrow {
-  color: hsl(var(--border));
-  flex-shrink: 0;
-  margin: 0 2px;
-}
-
-.step-number { line-height: 1; }
-
-.status-action-btn {
-  flex-shrink: 0;
-}
-
-/* ── Content sections ───────────────────────────────────── */
 .sections {
   display: flex;
   flex-direction: column;
@@ -732,11 +676,21 @@ function handleError(error: unknown, fallback: string) {
   background: var(--card-bg);
 }
 
-.content-section:first-child { border-radius: var(--radius-xl) var(--radius-xl) 0 0; }
-.content-section:last-child { border-radius: 0 0 var(--radius-xl) var(--radius-xl); }
-.content-section:only-child { border-radius: var(--radius-xl); }
+.content-section:first-child {
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
 
-.content-section + .content-section { border-top: none; }
+.content-section:last-child {
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+.content-section:only-child {
+  border-radius: var(--radius-xl);
+}
+
+.content-section + .content-section {
+  border-top: none;
+}
 
 .section-header {
   display: flex;
@@ -749,72 +703,50 @@ function handleError(error: unknown, fallback: string) {
   flex-shrink: 0;
 }
 
-.section-icon--amber { color: var(--amber); }
-.section-icon--brand { color: var(--brand); }
-.section-icon--green { color: var(--green); }
-
-.content-section h2 { margin: 0; font-size: 0.9rem; font-weight: 600; color: hsl(var(--foreground)); }
-.detail-body { margin: 0; font-size: 0.9rem; line-height: 1.65; white-space: pre-wrap; color: hsl(var(--foreground) / 0.85); }
-.detail-body--spaced { margin-top: 8px; }
-.meta-inline { font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px; }
-.empty-field { color: var(--text-secondary); font-size: 0.85rem; font-style: italic; margin: 0; }
-
-/* ── Sidebar ────────────────────────────────────────────── */
-.detail-sidebar {
-  position: sticky;
-  top: 1rem;
+.section-icon--amber {
+  color: var(--amber);
 }
 
-.sidebar-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  background: var(--card-bg);
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+.section-icon--brand {
+  color: var(--brand);
 }
 
-.sidebar-title {
+.section-icon--green {
+  color: var(--green);
+}
+
+.content-section h2 {
   margin: 0;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.sidebar-field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.sidebar-label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.sidebar-value {
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
   color: hsl(var(--foreground));
 }
 
-.person-row { display: flex; align-items: center; gap: 8px; }
-.avatar {
-  display: flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; border-radius: 0.5rem;
-  background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground));
-  font-weight: 600; font-size: 0.7rem; flex-shrink: 0;
+.detail-body {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  color: hsl(var(--foreground) / 0.85);
 }
-.person-name { font-size: 0.85rem; font-weight: 500; }
 
-.date-row { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: hsl(var(--foreground)); }
-.date-icon { color: var(--text-secondary); flex-shrink: 0; }
+.detail-body--spaced {
+  margin-top: 8px;
+}
 
-/* ── Loading skeletons ──────────────────────────────────── */
+.meta-inline {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.empty-field {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-style: italic;
+  margin: 0;
+}
+
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -829,60 +761,97 @@ function handleError(error: unknown, fallback: string) {
   animation: shimmer 1.5s infinite ease-in-out;
 }
 
-.skeleton-header { height: 80px; }
-.skeleton-bar { height: 48px; }
-.skeleton-block { height: 120px; }
-.skeleton-block--short { height: 80px; }
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+.skeleton-header {
+  height: 80px;
 }
 
-/* ── Empty state ────────────────────────────────────────── */
+.skeleton-bar {
+  height: 48px;
+}
+
+.skeleton-block {
+  height: 120px;
+}
+
+.skeleton-block--short {
+  height: 80px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 .empty-state {
-  position: relative; display: flex; min-height: 260px;
-  flex-direction: column; align-items: center; justify-content: center;
-  overflow: hidden; border-radius: 1rem;
+  position: relative;
+  display: flex;
+  min-height: 260px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 1rem;
   border: 2px dashed hsl(var(--muted-foreground) / 0.2);
   background: linear-gradient(to bottom right, hsl(var(--muted) / 0.4), hsl(var(--muted) / 0.2), hsl(var(--background)));
   padding: 2rem;
 }
-.empty-state-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at center, hsl(var(--muted)) 0%, transparent 70%); opacity: 0.5; }
-.empty-state-inner { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
-.empty-state-icon {
-  display: flex; height: 5rem; width: 5rem; align-items: center; justify-content: center;
-  border-radius: 1rem; background-color: hsl(var(--primary) / 0.1); box-shadow: 0 0 0 4px hsl(var(--primary) / 0.05);
-}
-.empty-state-icon :deep(svg) { width: 2.5rem; height: 2.5rem; color: hsl(var(--primary) / 0.7); }
-.empty-state-text h3 { font-size: 1.125rem; font-weight: 600; }
-.empty-state-text p { max-width: 24rem; font-size: 0.875rem; color: hsl(var(--muted-foreground)); margin-top: 0.25rem; }
 
-/* ── Responsive ─────────────────────────────────────────── */
+.empty-state-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, hsl(var(--muted)) 0%, transparent 70%);
+  opacity: 0.5;
+}
+
+.empty-state-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.empty-state-icon {
+  display: flex;
+  height: 5rem;
+  width: 5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  background-color: hsl(var(--primary) / 0.1);
+  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.05);
+}
+
+.empty-state-icon :deep(svg) {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: hsl(var(--primary) / 0.7);
+}
+
+.empty-state-text h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.empty-state-text p {
+  max-width: 24rem;
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+  margin-top: 0.25rem;
+}
+
 @media (max-width: 860px) {
   .detail-layout {
     grid-template-columns: 1fr;
   }
-
-  .detail-sidebar {
-    position: static;
-  }
-
-  .status-workflow {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .status-action-btn {
-    width: 100%;
-  }
 }
 
 @media (max-width: 600px) {
-  .status-track {
-    flex-wrap: wrap;
-  }
-
   .hero-top {
     flex-direction: column;
     align-items: flex-start;

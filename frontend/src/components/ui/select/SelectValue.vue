@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { inject, computed } from "vue"
-import type { Ref } from "vue"
+import {inject, computed} from "vue"
+import type {Ref} from "vue"
 
 defineProps<{
   placeholder?: string
 }>()
 
-const { selectedValue, selectedLabel } = inject("select") as { selectedValue: Ref<string>; selectedLabel: Ref<string> }
+const {selectedValue, selectedLabel} = inject("select") as {
+  selectedValue: Ref<string>;
+  selectedLabel: Ref<string>
+}
 
 const showPlaceholder = computed(() => !selectedValue.value)
 </script>

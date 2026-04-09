@@ -6,7 +6,7 @@ const props = defineProps<{
 
 <template>
   <div role="group" :class="['select-group', props.class]">
-    <slot />
+    <slot/>
   </div>
 </template>
 

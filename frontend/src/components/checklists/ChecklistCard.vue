@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { MoreVertical, CheckCircle2, Pencil, Trash2, Check } from 'lucide-vue-next'
-import type { Checklist } from '@/types/checklist'
+import {computed, ref} from 'vue'
+import {MoreVertical, CheckCircle2, Pencil, Trash2, Check} from 'lucide-vue-next'
+import type {Checklist} from '@/types/checklist'
 import Badge from '@/components/ui/badge/Badge.vue'
 import Button from '@/components/ui/button/Button.vue'
 import {
@@ -37,21 +37,31 @@ const deleteDialogOpen = ref(false)
 
 const frequencyLabel = computed(() => {
   switch (props.checklist.frequency) {
-    case 'DAILY': return 'Daglig'
-    case 'WEEKLY': return 'Ukentlig'
-    case 'MONTHLY': return 'M\u00E5nedlig'
-    case 'YEARLY': return '\u00C5rlig'
-    default: return props.checklist.frequency
+    case 'DAILY':
+      return 'Daglig'
+    case 'WEEKLY':
+      return 'Ukentlig'
+    case 'MONTHLY':
+      return 'M\u00E5nedlig'
+    case 'YEARLY':
+      return '\u00C5rlig'
+    default:
+      return props.checklist.frequency
   }
 })
 
 const frequencyTone = computed(() => {
   switch (props.checklist.frequency) {
-    case 'DAILY': return 'brand'
-    case 'WEEKLY': return 'ok'
-    case 'MONTHLY': return 'warning'
-    case 'YEARLY': return 'neutral'
-    default: return 'neutral'
+    case 'DAILY':
+      return 'brand'
+    case 'WEEKLY':
+      return 'ok'
+    case 'MONTHLY':
+      return 'warning'
+    case 'YEARLY':
+      return 'neutral'
+    default:
+      return 'neutral'
   }
 })
 
@@ -62,9 +72,12 @@ const completionPercent = computed(() => {
 
 const statusLabel = computed(() => {
   switch (props.checklist.status) {
-    case 'COMPLETED': return 'Fullf\u00F8rt'
-    case 'IN_PROGRESS': return 'P\u00E5g\u00E5r'
-    default: return 'Ikke startet'
+    case 'COMPLETED':
+      return 'Fullf\u00F8rt'
+    case 'IN_PROGRESS':
+      return 'P\u00E5g\u00E5r'
+    default:
+      return 'Ikke startet'
   }
 })
 
@@ -74,14 +87,17 @@ const isComplete = computed(() =>
 
 const progressColor = computed(() => {
   switch (props.checklist.status) {
-    case 'COMPLETED': return 'var(--green)'
-    case 'IN_PROGRESS': return 'var(--amber)'
-    default: return 'hsl(var(--muted-foreground))'
+    case 'COMPLETED':
+      return 'var(--green)'
+    case 'IN_PROGRESS':
+      return 'var(--amber)'
+    default:
+      return 'hsl(var(--muted-foreground))'
   }
 })
 
 const metaLine = computed(() => {
-  const { checklist } = props
+  const {checklist} = props
   const parts: string[] = []
 
   const countLabel = `${checklist.completedItemCount}/${checklist.itemCount} punkter`
@@ -105,7 +121,7 @@ const metaLine = computed(() => {
 
     if (lastCompleted) {
       const d = new Date(lastCompleted)
-      parts.push(d.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' }))
+      parts.push(d.toLocaleTimeString('nb-NO', {hour: '2-digit', minute: '2-digit'}))
     }
   }
 
@@ -117,9 +133,12 @@ const metaLine = computed(() => {
   <div class="checklist-card">
     <button type="button" class="card-body" @click="emits('open', checklist)">
       <!-- Circle indicator -->
-      <div class="circle" :class="{ 'circle--done': isComplete, 'circle--progress': !isComplete && checklist.status === 'IN_PROGRESS', 'circle--idle': checklist.status === 'NOT_STARTED' }">
-        <Check v-if="isComplete" class="circle-check" />
-        <span v-else class="circle-count">{{ checklist.completedItemCount }}/{{ checklist.itemCount }}</span>
+      <div class="circle"
+           :class="{ 'circle--done': isComplete, 'circle--progress': !isComplete && checklist.status === 'IN_PROGRESS', 'circle--idle': checklist.status === 'NOT_STARTED' }">
+        <Check v-if="isComplete" class="circle-check"/>
+        <span v-else class="circle-count">{{ checklist.completedItemCount }}/{{
+            checklist.itemCount
+          }}</span>
       </div>
 
       <!-- Content -->
@@ -147,7 +166,7 @@ const metaLine = computed(() => {
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger">
-            <MoreVertical :size="18" aria-hidden="true" />
+            <MoreVertical :size="18" aria-hidden="true"/>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" :side-offset="4">
@@ -155,16 +174,17 @@ const metaLine = computed(() => {
             v-if="canComplete && checklist.itemCount > 0"
             @click="emits('toggle-checklist-completed', { checklistId: checklist.id, completed: !isComplete })"
           >
-            <CheckCircle2 :size="16" class="menu-icon--green" aria-hidden="true" />
+            <CheckCircle2 :size="16" class="menu-icon--green" aria-hidden="true"/>
             {{ isComplete ? 'Angre fullf\u00F8ring' : 'Fullf\u00F8r hele' }}
           </DropdownMenuItem>
-          <DropdownMenuSeparator v-if="canComplete && canManage && checklist.itemCount > 0" />
+          <DropdownMenuSeparator v-if="canComplete && canManage && checklist.itemCount > 0"/>
           <DropdownMenuItem v-if="canManage" @click="emits('edit-checklist', checklist)">
-            <Pencil :size="16" aria-hidden="true" />
+            <Pencil :size="16" aria-hidden="true"/>
             Rediger
           </DropdownMenuItem>
-          <DropdownMenuItem v-if="canManage" class="menu-item--danger" @click="deleteDialogOpen = true">
-            <Trash2 :size="16" aria-hidden="true" />
+          <DropdownMenuItem v-if="canManage" class="menu-item--danger"
+                            @click="deleteDialogOpen = true">
+            <Trash2 :size="16" aria-hidden="true"/>
             Slett sjekkliste
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -180,7 +200,8 @@ const metaLine = computed(() => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Avbryt</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" @click="emits('delete-checklist', checklist.id)">
+            <AlertDialogAction variant="destructive"
+                               @click="emits('delete-checklist', checklist.id)">
               Slett
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -356,9 +377,14 @@ h3 {
   color: hsl(var(--foreground));
 }
 
-.menu-icon--green { color: var(--green); }
+.menu-icon--green {
+  color: var(--green);
+}
 
-.menu-item--danger { color: var(--red); }
+.menu-item--danger {
+  color: var(--red);
+}
+
 .menu-item--danger:hover {
   background-color: var(--red-soft) !important;
   color: var(--red) !important;

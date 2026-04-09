@@ -1,14 +1,14 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent, h, nextTick } from 'vue'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { CalendarDate } from '@internationalized/date'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h, nextTick} from 'vue'
+import {describe, it, expect, vi, beforeEach, afterEach} from 'vitest'
+import {CalendarDate} from '@internationalized/date'
 import DatePicker from '../DatePicker.vue'
 
 vi.mock('lucide-vue-next', () => ({
   CalendarIcon: defineComponent({
     name: 'CalendarIcon',
     setup() {
-      return () => h('svg', { class: 'calendar-icon-stub' })
+      return () => h('svg', {class: 'calendar-icon-stub'})
     },
   }),
 }))
@@ -17,18 +17,18 @@ vi.mock('@/components/ui/calendar', () => ({
   Calendar: defineComponent({
     name: 'Calendar',
     props: {
-      modelValue: { type: null, required: false },
-      defaultPlaceholder: { type: null, required: false },
-      initialFocus: { type: Boolean, required: false },
+      modelValue: {type: null, required: false},
+      defaultPlaceholder: {type: null, required: false},
+      initialFocus: {type: Boolean, required: false},
     },
     emits: ['update:modelValue'],
-    setup(props, { emit }) {
+    setup(props, {emit}) {
       return () =>
-        h('div', { class: 'calendar-stub' }, [
-          h('div', { class: 'calendar-props' }, [
-            h('span', { class: 'calendar-has-model' }, String(!!props.modelValue)),
-            h('span', { class: 'calendar-has-default-placeholder' }, String(!!props.defaultPlaceholder)),
-            h('span', { class: 'calendar-initial-focus' }, String(!!props.initialFocus)),
+        h('div', {class: 'calendar-stub'}, [
+          h('div', {class: 'calendar-props'}, [
+            h('span', {class: 'calendar-has-model'}, String(!!props.modelValue)),
+            h('span', {class: 'calendar-has-default-placeholder'}, String(!!props.defaultPlaceholder)),
+            h('span', {class: 'calendar-initial-focus'}, String(!!props.initialFocus)),
           ]),
           h(
             'button',
@@ -45,7 +45,7 @@ vi.mock('@/components/ui/calendar', () => ({
 
 const TransitionStub = defineComponent({
   name: 'TransitionStub',
-  setup(_, { slots }) {
+  setup(_, {slots}) {
     return () => slots.default?.()
   },
 })
@@ -156,7 +156,7 @@ describe('DatePicker', () => {
     await nextTick()
     expect(wrapper.find('.date-picker__panel').exists()).toBe(true)
 
-    document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    document.dispatchEvent(new MouseEvent('mousedown', {bubbles: true}))
     await nextTick()
 
     expect(wrapper.find('.date-picker__panel').exists()).toBe(false)
@@ -182,7 +182,7 @@ describe('DatePicker', () => {
     await nextTick()
     expect(wrapper.find('.date-picker__panel').exists()).toBe(true)
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}))
     await nextTick()
 
     expect(wrapper.find('.date-picker__panel').exists()).toBe(false)
@@ -195,7 +195,7 @@ describe('DatePicker', () => {
     await nextTick()
     expect(wrapper.find('.date-picker__panel').exists()).toBe(true)
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', bubbles: true}))
     await nextTick()
 
     expect(wrapper.find('.date-picker__panel').exists()).toBe(true)

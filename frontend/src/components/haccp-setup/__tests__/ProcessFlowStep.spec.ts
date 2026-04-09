@@ -1,6 +1,6 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h} from 'vue'
+import {beforeEach, describe, expect, it, vi} from 'vitest'
 import ProcessFlowStep from '../Step3Premises.vue'
 
 vi.mock('lucide-vue-next', () => {
@@ -8,7 +8,7 @@ vi.mock('lucide-vue-next', () => {
     defineComponent({
       name,
       setup() {
-        return () => h('svg', { 'data-icon': name })
+        return () => h('svg', {'data-icon': name})
       },
     })
 
@@ -23,8 +23,8 @@ vi.mock('lucide-vue-next', () => {
 function createWizard() {
   return {
     processSteps: [
-      { id: 'a', name: 'Mottak', hazards: [], isKKP: false },
-      { id: 'b', name: 'Lagring', hazards: [], isKKP: false },
+      {id: 'a', name: 'Mottak', hazards: [], isKKP: false},
+      {id: 'b', name: 'Lagring', hazards: [], isKKP: false},
     ],
   }
 }
@@ -38,7 +38,7 @@ describe('ProcessFlowStep', () => {
 
   it('renders existing process steps in inputs', () => {
     const wrapper = mount(ProcessFlowStep, {
-      props: { wizard },
+      props: {wizard},
     })
 
     const inputs = wrapper.findAll('input.flow-step-input')
@@ -49,7 +49,7 @@ describe('ProcessFlowStep', () => {
 
   it('shows add button and adds step when end add button is clicked', async () => {
     const wrapper = mount(ProcessFlowStep, {
-      props: { wizard },
+      props: {wizard},
     })
 
     const addButton = wrapper.get('button.flow-add-end')
@@ -65,13 +65,13 @@ describe('ProcessFlowStep', () => {
 
   it('removes step when remove button is clicked', async () => {
     wizard.processSteps = [
-      { id: 'a', name: 'Mottak', hazards: [], isKKP: false },
-      { id: 'b', name: 'Lagring', hazards: [], isKKP: false },
-      { id: 'c', name: 'Servering', hazards: [], isKKP: false },
+      {id: 'a', name: 'Mottak', hazards: [], isKKP: false},
+      {id: 'b', name: 'Lagring', hazards: [], isKKP: false},
+      {id: 'c', name: 'Servering', hazards: [], isKKP: false},
     ]
 
     const wrapper = mount(ProcessFlowStep, {
-      props: { wizard },
+      props: {wizard},
     })
 
     const removeButtons = wrapper.findAll('button.flow-step-remove')
@@ -85,7 +85,7 @@ describe('ProcessFlowStep', () => {
 
   it('does not show remove buttons when there are only two steps', () => {
     const wrapper = mount(ProcessFlowStep, {
-      props: { wizard },
+      props: {wizard},
     })
 
     expect(wrapper.findAll('button.flow-step-remove')).toHaveLength(0)
@@ -93,7 +93,7 @@ describe('ProcessFlowStep', () => {
 
   it('adds a hazard when a hazard tag is clicked and removes it on second click', async () => {
     const wrapper = mount(ProcessFlowStep, {
-      props: { wizard },
+      props: {wizard},
     })
 
     const firstStepButtons = wrapper.findAll('.flow-step-wrapper')[0].findAll('button.tag')
@@ -108,7 +108,7 @@ describe('ProcessFlowStep', () => {
 
   it('toggles KKP flag', async () => {
     const wrapper = mount(ProcessFlowStep, {
-      props: { wizard },
+      props: {wizard},
     })
 
     const firstStepButtons = wrapper.findAll('.flow-step-wrapper')[0].findAll('button.tag')
@@ -124,7 +124,7 @@ describe('ProcessFlowStep', () => {
 
   it('updates step name through v-model input', async () => {
     const wrapper = mount(ProcessFlowStep, {
-      props: { wizard },
+      props: {wizard},
     })
 
     const input = wrapper.get('input.flow-step-input')
@@ -135,7 +135,7 @@ describe('ProcessFlowStep', () => {
 
   it('shows connector add buttons between steps', () => {
     const wrapper = mount(ProcessFlowStep, {
-      props: { wizard },
+      props: {wizard},
     })
 
     expect(wrapper.findAll('button.flow-add-btn')).toHaveLength(1)

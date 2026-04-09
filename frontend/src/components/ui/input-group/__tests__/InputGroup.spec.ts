@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import {describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
 
 import InputGroup from '../InputGroup.vue'
 import InputGroupAddon from '../InputGroupAddon.vue'
@@ -94,7 +94,7 @@ describe('InputGroupAddon', () => {
     const focusSpy = vi.fn()
 
     const wrapper = mount({
-      components: { InputGroupAddon },
+      components: {InputGroupAddon},
       template: `
         <div>
           <InputGroupAddon data-test="addon">Prefix</InputGroupAddon>
@@ -115,7 +115,7 @@ describe('InputGroupAddon', () => {
     const focusSpy = vi.fn()
 
     const wrapper = mount({
-      components: { InputGroupAddon },
+      components: {InputGroupAddon},
       template: `
         <div>
           <InputGroupAddon data-test="addon">

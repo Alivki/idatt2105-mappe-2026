@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useForm } from '@tanstack/vue-form'
-import { z } from 'zod'
-import { Eye, EyeOff, Lock, User, Phone } from 'lucide-vue-next'
+import {ref, onMounted} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {useForm} from '@tanstack/vue-form'
+import {z} from 'zod'
+import {Eye, EyeOff, Lock, User, Phone} from 'lucide-vue-next'
 import Button from '@/components/ui/button/Button.vue'
 import InputGroup from '@/components/ui/input-group/InputGroup.vue'
 import InputGroupAddon from '@/components/ui/input-group/InputGroupAddon.vue'
 import InputGroupInput from '@/components/ui/input-group/InputGroupInput.vue'
 import InputGroupButton from '@/components/ui/input-group/InputGroupButton.vue'
-import { useAuthStore } from '@/stores/auth'
+import {useAuthStore} from '@/stores/auth'
 import api from '@/lib/api'
-import type { AuthResponse } from '@/types/auth'
-import type { AxiosError } from 'axios'
+import type {AuthResponse} from '@/types/auth'
+import type {AxiosError} from 'axios'
 
 type ApiError = AxiosError<{ error: { message: string } }>
 
@@ -40,7 +40,7 @@ onMounted(async () => {
   }
 
   try {
-    const { data } = await api.get(`/invitations/${token}`)
+    const {data} = await api.get(`/invitations/${token}`)
     inviteEmail.value = data.email
     orgName.value = data.organizationName
     existingUser.value = data.existingUser
@@ -62,7 +62,7 @@ const form = useForm({
     phoneNumber: '',
     password: '',
   },
-  onSubmit: async ({ value }) => {
+  onSubmit: async ({value}) => {
     submitting.value = true
     submitError.value = ''
     try {
@@ -76,7 +76,7 @@ const form = useForm({
         payload.password = value.password
       }
 
-      const { data } = await api.post<AuthResponse>(`/invitations/${token}/accept`, payload)
+      const {data} = await api.post<AuthResponse>(`/invitations/${token}/accept`, payload)
       auth.setAuth(data)
       router.push('/')
     } catch (e) {
@@ -114,7 +114,9 @@ const form = useForm({
             <p class="step">INVITASJON</p>
             <h2>{{ orgName }}</h2>
             <p class="subtitle">
-              Du er invitert til <strong>{{ orgName }}</strong> som <strong>{{ inviteEmail }}</strong>.
+              Du er invitert til <strong>{{ orgName }}</strong> som <strong>{{
+                inviteEmail
+              }}</strong>.
               <template v-if="existingUser">
                 Bekreft passordet ditt for å godta invitasjonen.
               </template>
@@ -141,7 +143,7 @@ const form = useForm({
                         <label>Fornavn</label>
                         <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
                           <InputGroupAddon>
-                            <User />
+                            <User/>
                           </InputGroupAddon>
                           <InputGroupInput
                             type="text"
@@ -151,7 +153,9 @@ const form = useForm({
                             @blur="field.handleBlur"
                           />
                         </InputGroup>
-                        <p v-if="state.meta.errors.length" class="error">{{ state.meta.errors[0] }}</p>
+                        <p v-if="state.meta.errors.length" class="error">{{
+                            state.meta.errors[0]
+                          }}</p>
                       </template>
                     </form.Field>
                   </div>
@@ -167,7 +171,7 @@ const form = useForm({
                         <label>Etternavn</label>
                         <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
                           <InputGroupAddon>
-                            <User />
+                            <User/>
                           </InputGroupAddon>
                           <InputGroupInput
                             type="text"
@@ -177,7 +181,9 @@ const form = useForm({
                             @blur="field.handleBlur"
                           />
                         </InputGroup>
-                        <p v-if="state.meta.errors.length" class="error">{{ state.meta.errors[0] }}</p>
+                        <p v-if="state.meta.errors.length" class="error">{{
+                            state.meta.errors[0]
+                          }}</p>
                       </template>
                     </form.Field>
                   </div>
@@ -195,7 +201,7 @@ const form = useForm({
                       <label>Telefonnummer</label>
                       <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
                         <InputGroupAddon>
-                          <Phone />
+                          <Phone/>
                         </InputGroupAddon>
                         <InputGroupInput
                           type="tel"
@@ -205,7 +211,9 @@ const form = useForm({
                           @blur="field.handleBlur"
                         />
                       </InputGroup>
-                      <p v-if="state.meta.errors.length" class="error">{{ state.meta.errors[0] }}</p>
+                      <p v-if="state.meta.errors.length" class="error">{{
+                          state.meta.errors[0]
+                        }}</p>
                     </template>
                   </form.Field>
                 </div>
@@ -224,7 +232,7 @@ const form = useForm({
                     <label>{{ existingUser ? 'Bekreft passord' : 'Passord' }}</label>
                     <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
                       <InputGroupAddon>
-                        <Lock />
+                        <Lock/>
                       </InputGroupAddon>
                       <InputGroupInput
                         :type="showPassword ? 'text' : 'password'"
@@ -235,8 +243,8 @@ const form = useForm({
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupButton @click="showPassword = !showPassword">
-                          <Eye v-if="!showPassword" />
-                          <EyeOff v-else />
+                          <Eye v-if="!showPassword"/>
+                          <EyeOff v-else/>
                         </InputGroupButton>
                       </InputGroupAddon>
                     </InputGroup>

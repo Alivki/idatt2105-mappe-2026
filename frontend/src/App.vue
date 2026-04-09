@@ -9,7 +9,9 @@ init()
 
 <template>
   <div v-if="isLoading">Loading...</div>
-  <RouterView v-else />
+  <RouterView v-else v-slot="{ Component, route }">
+    <component :is="Component" :key="route.path" />
+  </RouterView>
   <Sonner position="bottom-right" />
 </template>
 

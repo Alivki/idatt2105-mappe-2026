@@ -1,5 +1,5 @@
-import type { ComputedRef, InjectionKey, Ref } from "vue"
-import { inject, provide } from "vue"
+import type {ComputedRef, InjectionKey, Ref} from "vue"
+import {inject, provide} from "vue"
 
 export const SIDEBAR_COOKIE_NAME = "sidebar_state"
 export const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7

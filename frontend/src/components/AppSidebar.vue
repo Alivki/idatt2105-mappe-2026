@@ -28,8 +28,8 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from '@/components/ui/sidebar'
-import { useAuthStore } from '@/stores/auth'
-import { computed } from 'vue'
+import {useAuthStore} from '@/stores/auth'
+import {computed} from 'vue'
 import veraIcon from '@/assets/vera-icon.png'
 
 const auth = useAuthStore()
@@ -41,7 +41,10 @@ const orgName = computed(() => {
 })
 
 const orgNumber = computed(() => {
-  return auth.organizationId ? `Org. nr: ${auth.organizationId}` : ''
+  const orgId = auth.organizationId
+  const membership = auth.memberships.find((m) => m.organizationId === orgId)
+  const num = membership?.orgNumber
+  return num ? `Org. nr: ${num}` : ''
 })
 
 const isManagerOrAdmin = computed(() =>
@@ -52,19 +55,19 @@ const navMain = computed(() => [
   {
     label: 'OVERSIKT',
     items: [
-      { title: 'Dashboard', url: '/', icon: LayoutDashboard },
+      {title: 'Dashboard', url: '/', icon: LayoutDashboard},
     ],
   },
   {
     label: 'IK-MAT',
     items: [
       ...(isManagerOrAdmin.value
-        ? [{ title: 'HACCP-oppsett', url: '/haccp-oppsett', icon: ListChecks }]
+        ? [{title: 'HACCP-oppsett', url: '/haccp-oppsett', icon: ListChecks}]
         : []),
-      { title: 'Sjekklister', url: '/sjekklister', icon: ClipboardCheck },
-      { title: 'Temperaturlogg', url: '/temperatur', icon: Thermometer },
+      {title: 'Sjekklister', url: '/sjekklister', icon: ClipboardCheck},
+      {title: 'Temperaturlogg', url: '/temperatur', icon: Thermometer},
       ...(isManagerOrAdmin.value
-        ? [{ title: 'Hvitevarer', url: '/temperatur/hvitevarer', icon: Refrigerator }]
+        ? [{title: 'Hvitevarer', url: '/temperatur/hvitevarer', icon: Refrigerator}]
         : []),
     ],
   },
@@ -72,30 +75,30 @@ const navMain = computed(() => [
     label: 'IK-ALKOHOL',
     items: [
       ...(isManagerOrAdmin.value
-        ? [{ title: 'Opplæring', url: '/opplaering', icon: GraduationCap }]
+        ? [{title: 'Opplæring', url: '/opplaering', icon: GraduationCap}]
         : []),
-      { title: 'Bevilling', url: '/bevilling', icon: ScrollText },
+      {title: 'Bevilling', url: '/bevilling', icon: ScrollText},
       ...(isManagerOrAdmin.value
-        ? [{ title: 'Skjenkepolicy', url: '/skjenkepolicy', icon: ShieldCheck }]
+        ? [{title: 'Skjenkepolicy', url: '/skjenkepolicy', icon: ShieldCheck}]
         : []),
     ],
   },
   {
     label: 'FELLES',
     items: [
-      { title: 'Avvik', url: '/avvik', icon: AlertTriangle },
+      {title: 'Avvik', url: '/avvik', icon: AlertTriangle},
       ...(isManagerOrAdmin.value
         ? [
-            { title: 'Rapporter', url: '/rapporter', icon: FileText },
-            { title: 'Ansatte', url: '/ansatte', icon: Users },
-          ]
+          {title: 'Rapporter', url: '/rapporter', icon: FileText},
+          {title: 'Ansatte', url: '/ansatte', icon: Users},
+        ]
         : []),
     ],
   },
 ])
 
 const navSecondary = [
-  { title: 'Innstillinger', url: '/innstillinger', icon: Settings },
+  {title: 'Innstillinger', url: '/innstillinger', icon: Settings},
 ]
 </script>
 
@@ -117,14 +120,14 @@ const navSecondary = [
       </SidebarMenu>
     </SidebarHeader>
     <SidebarContent>
-      <NavMain :sections="navMain" />
+      <NavMain :sections="navMain"/>
       <NavSecondary :items="navSecondary">
-        <NavNotifications />
+        <NavNotifications/>
       </NavSecondary>
     </SidebarContent>
-    <SidebarSeparator />
+    <SidebarSeparator/>
     <SidebarFooter>
-      <NavUser />
+      <NavUser/>
     </SidebarFooter>
   </Sidebar>
 </template>

@@ -6,7 +6,7 @@ defineProps<{
 
 <template>
   <tbody :class="['table-body', $props.class]">
-    <slot />
+  <slot/>
   </tbody>
 </template>
 

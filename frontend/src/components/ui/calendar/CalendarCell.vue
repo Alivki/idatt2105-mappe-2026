@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DateValue } from "@internationalized/date"
+import type {DateValue} from "@internationalized/date"
 
 defineProps<{
   date: DateValue
@@ -8,7 +8,7 @@ defineProps<{
 
 <template>
   <td class="calendar-cell">
-    <slot />
+    <slot/>
   </td>
 </template>
 

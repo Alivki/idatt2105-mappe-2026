@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { CalendarDate } from '@internationalized/date'
+import {describe, expect, it} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {CalendarDate} from '@internationalized/date'
 import CalendarCell from '../CalendarCell.vue'
 import CalendarGrid from '../CalendarGrid.vue'
 import CalendarGridBody from '../CalendarGridBody.vue'
@@ -12,8 +12,8 @@ import CalendarHeader from '../CalendarHeader.vue'
 describe('presentational calendar components', () => {
   it('renders CalendarCell with slot content', () => {
     const wrapper = mount(CalendarCell, {
-      props: { date: new CalendarDate(2026, 4, 8) },
-      slots: { default: 'day cell' },
+      props: {date: new CalendarDate(2026, 4, 8)},
+      slots: {default: 'day cell'},
     })
 
     expect(wrapper.find('td.calendar-cell').exists()).toBe(true)

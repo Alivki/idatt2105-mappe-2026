@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import SelectOrgForm from '@/components/SelectOrgForm.vue'
-import { ref } from 'vue'
-import { useOrg } from '@/composables/useOrg'
+import {ref} from 'vue'
+import {useOrg} from '@/composables/useOrg'
 
 const selectOrgFormRef = ref<InstanceType<typeof SelectOrgForm> | null>(null)
-const { hasMemberships } = useOrg()
+const {hasMemberships} = useOrg()
 </script>
 
 <template>
@@ -15,11 +15,13 @@ const { hasMemberships } = useOrg()
       <div>
         <h2>Velg virksomhet</h2>
         <p class="subtitle">
-          {{ hasMemberships ? 'Du har tilgang til flere virksomheter' : 'Kom i gang med din første virksomhet' }}
+          {{
+            hasMemberships ? 'Du har tilgang til flere virksomheter' : 'Kom i gang med din første virksomhet'
+          }}
         </p>
       </div>
 
-      <SelectOrgForm ref="selectOrgFormRef" />
+      <SelectOrgForm ref="selectOrgFormRef"/>
     </div>
 
     <div v-if="selectOrgFormRef?.selectOrgError" class="error-card">

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import {ref, watch, computed} from 'vue'
 import axios from 'axios'
-import { toast } from 'vue-sonner'
-import { z } from 'zod'
-import { CalendarDate } from '@internationalized/date'
-import type { DateValue } from '@internationalized/date'
+import {toast} from 'vue-sonner'
+import {z} from 'zod'
+import type {DateValue} from '@internationalized/date'
+import {stringToCalendarDate, dateValueToIso, isoToDateString} from '@/utils/date'
 import Dialog from '@/components/ui/dialog/Dialog.vue'
 import DialogContent from '@/components/ui/dialog/DialogContent.vue'
 import DialogDescription from '@/components/ui/dialog/DialogDescription.vue'
@@ -24,7 +24,7 @@ import {
   useUpdateTrainingLogMutation,
   useOrganizationMembersQuery,
 } from '@/composables/useTrainingLogs'
-import type { TrainingLog, TrainingStatus } from '@/types/training'
+import type {TrainingLog, TrainingStatus} from '@/types/training'
 
 const props = defineProps<{
   open: boolean
@@ -51,27 +51,11 @@ const completedAtSchema = z.custom<DateValue>((v) => !!v, 'Fullført dato er på
 const expiresAtSchema = z.custom<DateValue>((v) => !!v, 'Utløpsdato er påkrevd')
 
 const statusOptions: Array<{ value: TrainingStatus; label: string }> = [
-  { value: 'COMPLETED', label: 'Fullført' },
-  { value: 'EXPIRES_SOON', label: 'Utløper snart' },
-  { value: 'EXPIRED', label: 'Utgått' },
-  { value: 'NOT_COMPLETED', label: 'Ikke fullført' },
+  {value: 'COMPLETED', label: 'Fullført'},
+  {value: 'EXPIRES_SOON', label: 'Utløper snart'},
+  {value: 'EXPIRED', label: 'Utgått'},
+  {value: 'NOT_COMPLETED', label: 'Ikke fullført'},
 ]
-
-function isoToDateInput(iso: string | null): string {
-  if (!iso) return ''
-  return iso.slice(0, 10)
-}
-
-function stringToCalendarDate(str: string): CalendarDate | undefined {
-  if (!str) return undefined
-  const [y, m, d] = str.split('-').map(Number)
-  return new CalendarDate(y!, m!, d!)
-}
-
-function dateValueToIso(dv: DateValue | undefined): string | undefined {
-  if (!dv) return undefined
-  return new Date(dv.year, dv.month - 1, dv.day).toISOString()
-}
 
 watch(
   () => [props.open, props.training],
@@ -81,8 +65,8 @@ watch(
       employeeUserId.value = String(props.training.employeeUserId)
       title.value = props.training.title
       description.value = props.training.description ?? ''
-      completedAt.value = stringToCalendarDate(isoToDateInput(props.training.completedAt))
-      expiresAt.value = stringToCalendarDate(isoToDateInput(props.training.expiresAt))
+      completedAt.value = stringToCalendarDate(isoToDateString(props.training.completedAt))
+      expiresAt.value = stringToCalendarDate(isoToDateString(props.training.expiresAt))
       status.value = props.training.status
     }
     errors.value = {}
@@ -156,7 +140,7 @@ async function handleSubmit() {
           <span>Ansatt</span>
           <Select v-model="employeeUserId">
             <SelectTrigger>
-              <SelectValue placeholder="Velg ansatt..." />
+              <SelectValue placeholder="Velg ansatt..."/>
             </SelectTrigger>
             <SelectContent>
               <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">
@@ -169,25 +153,25 @@ async function handleSubmit() {
 
         <label :class="['field', { 'field--error': errors.title }]">
           <span>Opplæringstype *</span>
-          <Input v-model="title" placeholder="Skriv inn type..." />
+          <Input v-model="title" placeholder="Skriv inn type..."/>
           <p v-if="errors.title" class="error-message">{{ errors.title }}</p>
         </label>
 
         <label :class="['field', { 'field--error': errors.description }]">
           <span>Beskrivelse *</span>
-          <Textarea v-model="description" rows="3" placeholder="Beskriv opplæringen..." />
+          <Textarea v-model="description" rows="3" placeholder="Beskriv opplæringen..."/>
           <p v-if="errors.description" class="error-message">{{ errors.description }}</p>
         </label>
 
         <div class="field-row">
           <div :class="['field', { 'field--error': errors.completedAt }]">
             <span>Fullført dato *</span>
-            <DatePicker v-model="completedAt" placeholder="Velg dato" open-upward />
+            <DatePicker v-model="completedAt" placeholder="Velg dato" open-upward/>
             <p v-if="errors.completedAt" class="error-message">{{ errors.completedAt }}</p>
           </div>
           <div :class="['field', { 'field--error': errors.expiresAt }]">
             <span>Utløpsdato *</span>
-            <DatePicker v-model="expiresAt" placeholder="Velg dato" open-upward />
+            <DatePicker v-model="expiresAt" placeholder="Velg dato" open-upward/>
             <p v-if="errors.expiresAt" class="error-message">{{ errors.expiresAt }}</p>
           </div>
         </div>

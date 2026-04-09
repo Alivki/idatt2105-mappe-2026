@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Separator } from "@/components/ui/separator"
+import {Separator} from "@/components/ui/separator"
 
 const props = defineProps<{
   class?: string
@@ -12,6 +12,6 @@ const props = defineProps<{
     :class="props.class"
     style="margin: 0 0.5rem; width: auto; background-color: hsl(var(--sidebar-border, 35 15% 90%));"
   >
-    <slot />
+    <slot/>
   </Separator>
 </template>

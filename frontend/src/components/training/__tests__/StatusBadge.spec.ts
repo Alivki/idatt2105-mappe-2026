@@ -1,5 +1,5 @@
-import { describe, it, expect} from 'vitest'
-import { mount } from '@vue/test-utils'
+import {describe, it, expect} from 'vitest'
+import {mount} from '@vue/test-utils'
 import StatusBadge from '../StatusBadge.vue'
 
 // Mock the Badge UI component
@@ -12,8 +12,8 @@ const BadgeStub = {
 describe('StatusBadge', () => {
   const mountBadge = (status: string) =>
     mount(StatusBadge, {
-      props: { status },
-      global: { stubs: { Badge: BadgeStub } },
+      props: {status},
+      global: {stubs: {Badge: BadgeStub}},
     })
 
   it('renders the status text', () => {

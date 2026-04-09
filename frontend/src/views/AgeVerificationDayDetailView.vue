@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeft, AlertTriangle, IdCard, CalendarDays } from 'lucide-vue-next'
+import {computed, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {ArrowLeft, AlertTriangle, IdCard, CalendarDays} from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
+import {Separator} from '@/components/ui/separator'
+import {SidebarTrigger} from '@/components/ui/sidebar'
 import Button from '@/components/ui/button/Button.vue'
 import OverviewCard from '@/components/common/OverviewCard.vue'
 import {
@@ -15,8 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useDayDetailQuery } from '@/composables/useAgeVerification'
-import type { AlcoholDeviationType } from '@/types/deviation'
+import {useDayDetailQuery} from '@/composables/useAgeVerification'
+import type {AlcoholDeviationType} from '@/types/deviation'
 
 const route = useRoute()
 const router = useRouter()
@@ -27,11 +27,16 @@ const detail = computed(() => dayDetailQuery.data.value)
 
 function formatDate(iso: string): string {
   const d = new Date(iso + 'T00:00:00')
-  return d.toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  return d.toLocaleDateString('nb-NO', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
 }
 
 function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' })
+  return new Date(iso).toLocaleTimeString('nb-NO', {hour: '2-digit', minute: '2-digit'})
 }
 
 const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
@@ -48,15 +53,16 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
   <AppLayout>
     <header class="page-header">
       <div class="page-header-inner">
-        <SidebarTrigger />
-        <Separator orientation="vertical" class="header-separator" />
+        <SidebarTrigger/>
+        <Separator orientation="vertical" class="header-separator"/>
         <span class="page-title">Bevilling</span>
       </div>
     </header>
 
     <div class="page-content">
-      <Button variant="ghost" size="sm" class="back-btn" @click="router.push({ name: 'bevilling' })">
-        <ArrowLeft :size="16" aria-hidden="true" />
+      <Button variant="ghost" size="sm" class="back-btn"
+              @click="router.push({ name: 'bevilling' })">
+        <ArrowLeft :size="16" aria-hidden="true"/>
         Tilbake til oversikt
       </Button>
 
@@ -76,16 +82,21 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
         </section>
 
         <section class="cards-group">
-          <OverviewCard label="Skift" :value="detail.shifts.length" :icon="CalendarDays" />
-          <OverviewCard label="Leg sjekket" :value="detail.totalIdsChecked" :icon="IdCard" variant="resolved" />
-          <OverviewCard label="Avvik totalt" :value="detail.totalDeviations" :icon="AlertTriangle" :variant="detail.totalDeviations > 0 ? 'open' : 'neutral'" />
+          <OverviewCard label="Skift" :value="detail.shifts.length" :icon="CalendarDays"/>
+          <OverviewCard label="Leg sjekket" :value="detail.totalIdsChecked" :icon="IdCard"
+                        variant="resolved"/>
+          <OverviewCard label="Avvik totalt" :value="detail.totalDeviations" :icon="AlertTriangle"
+                        :variant="detail.totalDeviations > 0 ? 'open' : 'neutral'"/>
         </section>
 
         <section v-if="Object.keys(detail.deviationsByType).length > 0" class="breakdown-section">
           <h2>Avvik fordelt på type</h2>
           <div class="breakdown-grid">
-            <div v-for="(count, type) in detail.deviationsByType" :key="type" class="breakdown-item">
-              <span class="breakdown-label">{{ deviationLabel[type as AlcoholDeviationType] ?? type }}</span>
+            <div v-for="(count, type) in detail.deviationsByType" :key="type"
+                 class="breakdown-item">
+              <span class="breakdown-label">{{
+                  deviationLabel[type as AlcoholDeviationType] ?? type
+                }}</span>
               <span class="breakdown-value">{{ count }}</span>
             </div>
           </div>
@@ -98,7 +109,9 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
             <div class="shift-card-header">
               <div class="shift-user">
                 <div class="user-avatar">
-                  {{ s.shift.userName.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() }}
+                  {{
+                    s.shift.userName.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
+                  }}
                 </div>
                 <div>
                   <p class="shift-user-name">{{ s.shift.userName }}</p>
@@ -111,11 +124,11 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
               </div>
               <div class="shift-stats-inline">
                 <span class="stat-chip stat-chip--ids">
-                  <IdCard :size="14" aria-hidden="true" />
+                  <IdCard :size="14" aria-hidden="true"/>
                   {{ s.shift.idsCheckedCount }}
                 </span>
                 <span v-if="s.deviations.length > 0" class="stat-chip stat-chip--dev">
-                  <AlertTriangle :size="14" aria-hidden="true" />
+                  <AlertTriangle :size="14" aria-hidden="true"/>
                   {{ s.deviations.length }}
                 </span>
               </div>
@@ -132,7 +145,9 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
                 </TableHeader>
                 <TableBody>
                   <TableRow v-for="dev in s.deviations" :key="dev.id">
-                    <TableCell class="cell-bold">{{ deviationLabel[dev.deviationType] ?? dev.deviationType }}</TableCell>
+                    <TableCell class="cell-bold">
+                      {{ deviationLabel[dev.deviationType] ?? dev.deviationType }}
+                    </TableCell>
                     <TableCell class="cell-text">{{ dev.description }}</TableCell>
                     <TableCell class="cell-text">{{ formatTime(dev.reportedAt) }}</TableCell>
                   </TableRow>
@@ -153,13 +168,43 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
 </template>
 
 <style scoped>
-.page-header { display: flex; height: 4rem; flex-shrink: 0; align-items: center; }
-.page-header-inner { display: flex; align-items: center; gap: 0.5rem; padding: 0 1rem; }
-.header-separator { height: 1rem !important; width: 1px !important; margin-right: 0.5rem; }
-.page-title { font-weight: 500; color: hsl(var(--sidebar-primary, 245 43% 52%)); }
-.page-content { display: flex; flex: 1; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; }
+.page-header {
+  display: flex;
+  height: 4rem;
+  flex-shrink: 0;
+  align-items: center;
+}
 
-.back-btn { margin-bottom: 0.5rem; align-self: flex-start; }
+.page-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.header-separator {
+  height: 1rem !important;
+  width: 1px !important;
+  margin-right: 0.5rem;
+}
+
+.page-title {
+  font-weight: 500;
+  color: hsl(var(--sidebar-primary, 245 43% 52%));
+}
+
+.page-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1rem 1rem;
+}
+
+.back-btn {
+  margin-bottom: 0.5rem;
+  align-self: flex-start;
+}
 
 .header-row {
   display: flex;
@@ -167,9 +212,22 @@ const deviationLabel: Partial<Record<AlcoholDeviationType, string>> = {
   align-items: flex-start;
 }
 
-h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
-h1::first-letter { text-transform: uppercase; }
-.header-row p { margin-top: 6px; color: var(--text-secondary); font-size: 1rem; }
+h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+h1::first-letter {
+  text-transform: uppercase;
+}
+
+.header-row p {
+  margin-top: 6px;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
 
 h2 {
   font-size: 1.1rem;
@@ -208,8 +266,14 @@ h2 {
   font-size: 0.85rem;
 }
 
-.breakdown-label { color: hsl(var(--muted-foreground)); }
-.breakdown-value { font-weight: 700; color: var(--red); }
+.breakdown-label {
+  color: hsl(var(--muted-foreground));
+}
+
+.breakdown-value {
+  font-weight: 700;
+  color: var(--red);
+}
 
 .shifts-section {
   display: flex;
@@ -252,7 +316,11 @@ h2 {
   flex-shrink: 0;
 }
 
-.shift-user-name { font-weight: 600; margin: 0; font-size: 0.9rem; }
+.shift-user-name {
+  font-weight: 600;
+  margin: 0;
+  font-size: 0.9rem;
+}
 
 .shift-time {
   font-size: 0.8rem;
@@ -284,8 +352,15 @@ h2 {
   border-radius: 8px;
 }
 
-.stat-chip--ids { background: var(--green-soft); color: var(--green); }
-.stat-chip--dev { background: var(--red-soft); color: var(--red); }
+.stat-chip--ids {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.stat-chip--dev {
+  background: var(--red-soft);
+  color: var(--red);
+}
 
 .shift-deviations {
   border-top: 1px solid hsl(var(--border));
@@ -298,8 +373,14 @@ h2 {
   margin: 0;
 }
 
-.cell-bold { font-weight: 500; }
-.cell-text { color: hsl(var(--muted-foreground)); font-size: 0.85rem; }
+.cell-bold {
+  font-weight: 500;
+}
+
+.cell-text {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.85rem;
+}
 
 .empty-state-small {
   text-align: center;
@@ -311,16 +392,56 @@ h2 {
   background: hsl(var(--card));
 }
 
-.skeleton-list { display: flex; flex-direction: column; gap: 12px; }
-.skeleton-card { padding: 16px; border-radius: var(--radius-lg); border: 1px solid hsl(var(--border)); background: var(--card-bg); }
-.skeleton-line { height: 14px; border-radius: 6px; background: hsl(var(--muted)); animation: shimmer 1.4s ease-in-out infinite; }
-.skeleton-line--title { width: 55%; margin-bottom: 10px; }
-.skeleton-line--short { width: 35%; }
-@keyframes shimmer { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-card {
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid hsl(var(--border));
+  background: var(--card-bg);
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 6px;
+  background: hsl(var(--muted));
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-line--title {
+  width: 55%;
+  margin-bottom: 10px;
+}
+
+.skeleton-line--short {
+  width: 35%;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
 
 @media (max-width: 768px) {
-  h1 { font-size: 1.5rem; }
-  .cards-group { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .shift-card-header { flex-direction: column; align-items: flex-start; }
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .cards-group {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .shift-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 </style>

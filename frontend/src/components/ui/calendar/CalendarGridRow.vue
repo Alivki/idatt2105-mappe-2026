@@ -3,7 +3,7 @@
 
 <template>
   <tr class="calendar-grid-row">
-    <slot />
+    <slot/>
   </tr>
 </template>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { z } from 'zod'
+import {computed, ref, watch} from 'vue'
+import {z} from 'zod'
 import Dialog from '@/components/ui/dialog/Dialog.vue'
 import DialogContent from '@/components/ui/dialog/DialogContent.vue'
 import DialogDescription from '@/components/ui/dialog/DialogDescription.vue'
@@ -15,9 +15,10 @@ import SelectContent from '@/components/ui/select/SelectContent.vue'
 import SelectItem from '@/components/ui/select/SelectItem.vue'
 import SelectTrigger from '@/components/ui/select/SelectTrigger.vue'
 import SelectValue from '@/components/ui/select/SelectValue.vue'
-import { useAuthStore } from '@/stores/auth'
-import { CalendarDate } from '@internationalized/date'
-import type { DateValue } from '@internationalized/date'
+import {useAuthStore} from '@/stores/auth'
+import {CalendarDate} from '@internationalized/date'
+import type {DateValue} from '@internationalized/date'
+import {stringToCalendarDate, dateValueToString, timeToString} from '@/utils/date'
 import type {
   CreateFoodDeviationRequest,
   FoodDeviation,
@@ -27,7 +28,10 @@ import type {
   UpdateFoodDeviationRequest,
 } from '@/types/deviation'
 
-interface MemberOption { userId: number; label: string }
+interface MemberOption {
+  userId: number;
+  label: string
+}
 
 const props = withDefaults(
   defineProps<{
@@ -39,7 +43,7 @@ const props = withDefaults(
     members: MemberOption[]
     inline?: boolean
   }>(),
-  { mode: 'create', initial: null, prefill: null, submitting: false, inline: false },
+  {mode: 'create', initial: null, prefill: null, submitting: false, inline: false},
 )
 
 const emits = defineEmits<{
@@ -50,23 +54,6 @@ const emits = defineEmits<{
 
 const auth = useAuthStore()
 
-function stringToCalendarDate(str: string): CalendarDate | undefined {
-  if (!str) return undefined
-  const [y, m, d] = str.split('-').map(Number)
-  return new CalendarDate(y!, m!, d!)
-}
-
-function dateValueToString(dv: DateValue | undefined): string {
-  if (!dv) return ''
-  return `${dv.year}-${String(dv.month).padStart(2, '0')}-${String(dv.day).padStart(2, '0')}`
-}
-
-function timeToString(h: number | undefined, m: number | undefined): string {
-  if (h == null || m == null) return ''
-  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
-}
-
-// Form state
 const reportedDate = ref<DateValue | undefined>()
 const reportedHours = ref<number | undefined>()
 const reportedMinutes = ref<number | undefined>()
@@ -87,36 +74,36 @@ const errors = ref<Record<string, string>>({})
 
 const descriptionSchema = z.string().min(1, 'Beskrivelse er påkrevd')
 const reportedDateSchema = z.custom<DateValue>((v) => !!v, 'Dato er påkrevd')
-const reportedTimeSchema = z.number({ error: 'Tidspunkt er påkrevd' }).min(0)
+const reportedTimeSchema = z.number({error: 'Tidspunkt er påkrevd'}).min(0)
 const reporterSchema = z.string().min(1, 'Velg hvem som oppdaget avviket')
 const immediateActionSchema = z.string().min(1, 'Umiddelbar handling er påkrevd')
 const immediateActionBySchema = z.string().min(1, 'Velg hvem som utførte handlingen')
-const immediateActionTimeSchema = z.number({ error: 'Tidspunkt er påkrevd' }).min(0)
+const immediateActionTimeSchema = z.number({error: 'Tidspunkt er påkrevd'}).min(0)
 const causeSchema = z.string().min(1, 'Årsaksanalyse er påkrevd')
 const preventiveSchema = z.string().min(1, 'Forebyggende tiltak er påkrevd')
 const preventiveResponsibleSchema = z.string().min(1, 'Velg ansvarlig person')
 const preventiveDeadlineSchema = z.custom<DateValue>((v) => !!v, 'Frist er påkrevd')
 
 const deviationTypeOptions: Array<{ value: FoodDeviationType; label: string }> = [
-  { value: 'TEMPERATUR', label: 'Temperatur' },
-  { value: 'RENHOLD', label: 'Renhold' },
-  { value: 'PERSONLIG_HYGIENE', label: 'Personlig hygiene' },
-  { value: 'ALLERGEN', label: 'Allergen' },
-  { value: 'SKADEDYR', label: 'Skadedyr' },
-  { value: 'MOTTAKSKONTROLL', label: 'Mottakskontroll' },
-  { value: 'ANNET', label: 'Annet' },
+  {value: 'TEMPERATUR', label: 'Temperatur'},
+  {value: 'RENHOLD', label: 'Renhold'},
+  {value: 'PERSONLIG_HYGIENE', label: 'Personlig hygiene'},
+  {value: 'ALLERGEN', label: 'Allergen'},
+  {value: 'SKADEDYR', label: 'Skadedyr'},
+  {value: 'MOTTAKSKONTROLL', label: 'Mottakskontroll'},
+  {value: 'ANNET', label: 'Annet'},
 ]
 
 const severityOptions: Array<{ value: DeviationSeverity; label: string; sub: string }> = [
-  { value: 'LOW', label: 'Lav', sub: 'Ingen helsefare' },
-  { value: 'MEDIUM', label: 'Middels', sub: 'Mulig risiko' },
-  { value: 'HIGH', label: 'Kritisk', sub: 'Direkte helsefare' },
+  {value: 'LOW', label: 'Lav', sub: 'Ingen helsefare'},
+  {value: 'MEDIUM', label: 'Middels', sub: 'Mulig risiko'},
+  {value: 'HIGH', label: 'Kritisk', sub: 'Direkte helsefare'},
 ]
 
 const statusOptions: Array<{ value: FoodDeviationStatus; label: string }> = [
-  { value: 'OPEN', label: 'Åpen' },
-  { value: 'UNDER_TREATMENT', label: 'Under behandling' },
-  { value: 'CLOSED', label: 'Lukket' },
+  {value: 'OPEN', label: 'Åpen'},
+  {value: 'UNDER_TREATMENT', label: 'Under behandling'},
+  {value: 'CLOSED', label: 'Lukket'},
 ]
 
 const dialogTitle = computed(() => props.mode === 'create' ? 'Registrer matavvik' : 'Rediger matavvik')
@@ -225,9 +212,17 @@ function buildImmediateActionAt(): string | undefined {
   return new Date(`${dateStr}T${time}:00`).toISOString()
 }
 
-function onReporterChange(val: string) { reportedByUserId.value = val }
-function onImmediateByChange(val: string) { immediateActionByUserId.value = val }
-function onPreventiveByChange(val: string) { preventiveResponsibleUserId.value = val }
+function onReporterChange(val: string) {
+  reportedByUserId.value = val
+}
+
+function onImmediateByChange(val: string) {
+  immediateActionByUserId.value = val
+}
+
+function onPreventiveByChange(val: string) {
+  preventiveResponsibleUserId.value = val
+}
 
 function handleSubmit() {
   const newErrors: Record<string, string> = {}
@@ -292,8 +287,8 @@ function handleSubmit() {
   }
 
   if (props.mode === 'edit' && props.initial) {
-    const updatePayload: UpdateFoodDeviationRequest = { ...base, status: status.value }
-    emits('update', { id: props.initial.id, data: updatePayload })
+    const updatePayload: UpdateFoodDeviationRequest = {...base, status: status.value}
+    emits('update', {id: props.initial.id, data: updatePayload})
   } else {
     emits('create', base)
   }
@@ -301,7 +296,8 @@ function handleSubmit() {
 </script>
 
 <template>
-  <component :is="inline ? 'div' : Dialog" v-bind="inline ? {} : { open, 'onUpdate:open': (v: boolean) => emits('update:open', v) }">
+  <component :is="inline ? 'div' : Dialog"
+             v-bind="inline ? {} : { open, 'onUpdate:open': (v: boolean) => emits('update:open', v) }">
     <component :is="inline ? 'div' : DialogContent" :class="inline ? '' : 'food-dialog'">
       <DialogHeader v-if="!inline">
         <DialogTitle>{{ dialogTitle }}</DialogTitle>
@@ -313,35 +309,41 @@ function handleSubmit() {
       </div>
 
       <form class="form" @submit.prevent="handleSubmit">
-        <!-- Date/time in one row -->
         <div class="row-2">
           <label :class="['field', { 'field--error': errors.reportedDate }]">
             <span>Dato *</span>
-            <DatePicker v-model="reportedDate" placeholder="Velg dato" />
-            <p v-if="errors.reportedDate" class="error-message" role="alert">{{ errors.reportedDate }}</p>
+            <DatePicker v-model="reportedDate" placeholder="Velg dato"/>
+            <p v-if="errors.reportedDate" class="error-message" role="alert">{{
+                errors.reportedDate
+              }}</p>
           </label>
           <label :class="['field', { 'field--error': errors.reportedTime }]">
             <span>Tidspunkt *</span>
-            <TimePicker :hours="reportedHours" :minutes="reportedMinutes" @update:hours="reportedHours = $event" @update:minutes="reportedMinutes = $event" placeholder="Velg tid" />
-            <p v-if="errors.reportedTime" class="error-message" role="alert">{{ errors.reportedTime }}</p>
+            <TimePicker :hours="reportedHours" :minutes="reportedMinutes"
+                        @update:hours="reportedHours = $event"
+                        @update:minutes="reportedMinutes = $event" placeholder="Velg tid"/>
+            <p v-if="errors.reportedTime" class="error-message" role="alert">{{
+                errors.reportedTime
+              }}</p>
           </label>
         </div>
 
-        <!-- Reporter below -->
         <div :class="['field', { 'field--error': errors.reporter }]">
           <span>Oppdaget av *</span>
           <Select :model-value="reportedByUserId" @update:model-value="onReporterChange">
             <SelectTrigger>
-              <SelectValue placeholder="Velg ansatt..." />
+              <SelectValue placeholder="Velg ansatt..."/>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">{{ m.label }}</SelectItem>
+              <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">{{
+                  m.label
+                }}
+              </SelectItem>
             </SelectContent>
           </Select>
           <p v-if="errors.reporter" class="error-message" role="alert">{{ errors.reporter }}</p>
         </div>
 
-        <!-- Deviation type chips -->
         <div class="field">
           <span>Avvikstype</span>
           <div class="chip-grid">
@@ -358,7 +360,6 @@ function handleSubmit() {
           </div>
         </div>
 
-        <!-- Severity -->
         <div class="field">
           <span>Alvorlighetsgrad</span>
           <div class="segmented-grid segmented-grid--3">
@@ -376,74 +377,91 @@ function handleSubmit() {
           </div>
         </div>
 
-        <!-- Step 1 -->
         <div class="step-header">Steg 1: Hva skjedde?</div>
         <label :class="['field', { 'field--error': errors.description }]">
           <span>Beskriv avviket *</span>
-          <Textarea v-model="description" rows="3" placeholder="Hva ble observert? Hvor skjedde det? Hvilke produkter/prosesser var berørt?" />
-          <p v-if="errors.description" class="error-message" role="alert">{{ errors.description }}</p>
+          <Textarea v-model="description" rows="3"
+                    placeholder="Hva ble observert? Hvor skjedde det? Hvilke produkter/prosesser var berørt?"/>
+          <p v-if="errors.description" class="error-message" role="alert">{{
+              errors.description
+            }}</p>
         </label>
 
-        <!-- Step 2 -->
         <div class="step-header">Steg 2: Umiddelbar handling (§5.4)</div>
         <label :class="['field', { 'field--error': errors.immediateAction }]">
           <span>Hva ble gjort umiddelbart? *</span>
-          <Textarea v-model="immediateAction" rows="3" placeholder="F.eks.: Varer kastet, kjøleskap justert, område rengjort..." />
-          <p v-if="errors.immediateAction" class="error-message" role="alert">{{ errors.immediateAction }}</p>
+          <Textarea v-model="immediateAction" rows="3"
+                    placeholder="F.eks.: Varer kastet, kjøleskap justert, område rengjort..."/>
+          <p v-if="errors.immediateAction" class="error-message" role="alert">
+            {{ errors.immediateAction }}</p>
         </label>
         <div class="row-2">
           <div :class="['field', { 'field--error': errors.immediateActionBy }]">
             <span>Utført av *</span>
-            <Select :model-value="immediateActionByUserId" @update:model-value="onImmediateByChange">
+            <Select :model-value="immediateActionByUserId"
+                    @update:model-value="onImmediateByChange">
               <SelectTrigger>
-                <SelectValue placeholder="Velg ansatt..." />
+                <SelectValue placeholder="Velg ansatt..."/>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">{{ m.label }}</SelectItem>
+                <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">
+                  {{ m.label }}
+                </SelectItem>
               </SelectContent>
             </Select>
-            <p v-if="errors.immediateActionBy" class="error-message" role="alert">{{ errors.immediateActionBy }}</p>
+            <p v-if="errors.immediateActionBy" class="error-message" role="alert">
+              {{ errors.immediateActionBy }}</p>
           </div>
           <div :class="['field', { 'field--error': errors.immediateActionTime }]">
             <span>Tidspunkt for handling *</span>
-            <TimePicker :hours="immediateActionHours" :minutes="immediateActionMinutes" @update:hours="immediateActionHours = $event" @update:minutes="immediateActionMinutes = $event" placeholder="Velg tid" />
-            <p v-if="errors.immediateActionTime" class="error-message" role="alert">{{ errors.immediateActionTime }}</p>
+            <TimePicker :hours="immediateActionHours" :minutes="immediateActionMinutes"
+                        @update:hours="immediateActionHours = $event"
+                        @update:minutes="immediateActionMinutes = $event" placeholder="Velg tid"/>
+            <p v-if="errors.immediateActionTime" class="error-message" role="alert">
+              {{ errors.immediateActionTime }}</p>
           </div>
         </div>
 
-        <!-- Step 3 -->
         <div class="step-header">Steg 3: Årsaksanalyse og forebygging (§5.5)</div>
         <label :class="['field', { 'field--error': errors.cause }]">
           <span>Hva var årsaken til avviket? *</span>
-          <Textarea v-model="cause" rows="3" placeholder="Hvorfor oppstod dette? Var det menneskelig feil, utstyrsfeil, manglende rutine?" />
+          <Textarea v-model="cause" rows="3"
+                    placeholder="Hvorfor oppstod dette? Var det menneskelig feil, utstyrsfeil, manglende rutine?"/>
           <p v-if="errors.cause" class="error-message" role="alert">{{ errors.cause }}</p>
         </label>
         <label :class="['field', { 'field--error': errors.preventiveMeasures }]">
           <span>Forebyggende tiltak *</span>
-          <Textarea v-model="preventiveMeasures" rows="3" placeholder="Hva gjør dere for å hindre at dette skjer igjen?" />
-          <p v-if="errors.preventiveMeasures" class="error-message" role="alert">{{ errors.preventiveMeasures }}</p>
+          <Textarea v-model="preventiveMeasures" rows="3"
+                    placeholder="Hva gjør dere for å hindre at dette skjer igjen?"/>
+          <p v-if="errors.preventiveMeasures" class="error-message" role="alert">
+            {{ errors.preventiveMeasures }}</p>
         </label>
         <div class="row-2">
           <div :class="['field', { 'field--error': errors.preventiveResponsible }]">
             <span>Ansvarlig for oppfølging *</span>
-            <Select :model-value="preventiveResponsibleUserId" @update:model-value="onPreventiveByChange">
+            <Select :model-value="preventiveResponsibleUserId"
+                    @update:model-value="onPreventiveByChange">
               <SelectTrigger>
-                <SelectValue placeholder="Velg ansatt..." />
+                <SelectValue placeholder="Velg ansatt..."/>
               </SelectTrigger>
               <SelectContent open-upward>
-                <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">{{ m.label }}</SelectItem>
+                <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">
+                  {{ m.label }}
+                </SelectItem>
               </SelectContent>
             </Select>
-            <p v-if="errors.preventiveResponsible" class="error-message" role="alert">{{ errors.preventiveResponsible }}</p>
+            <p v-if="errors.preventiveResponsible" class="error-message" role="alert">
+              {{ errors.preventiveResponsible }}</p>
           </div>
-          <div :class="['field', 'field--date-right', { 'field--error': errors.preventiveDeadline }]">
+          <div
+            :class="['field', 'field--date-right', { 'field--error': errors.preventiveDeadline }]">
             <span>Frist for gjennomføring *</span>
-            <DatePicker v-model="preventiveDeadline" placeholder="Velg frist" open-upward />
-            <p v-if="errors.preventiveDeadline" class="error-message" role="alert">{{ errors.preventiveDeadline }}</p>
+            <DatePicker v-model="preventiveDeadline" placeholder="Velg frist" open-upward/>
+            <p v-if="errors.preventiveDeadline" class="error-message" role="alert">
+              {{ errors.preventiveDeadline }}</p>
           </div>
         </div>
 
-        <!-- Status (edit mode) -->
         <div v-if="mode === 'edit'" class="status-section">
           <span class="status-title">Status og oppfølging</span>
           <div class="status-chips">
@@ -461,7 +479,8 @@ function handleSubmit() {
         </div>
 
         <div class="form-footer">
-          <Button type="button" variant="outline" @click="emits('update:open', false)">Avbryt</Button>
+          <Button type="button" variant="outline" @click="emits('update:open', false)">Avbryt
+          </Button>
           <Button type="submit" :disabled="submitting">{{ submitLabel }}</Button>
         </div>
       </form>
@@ -470,10 +489,33 @@ function handleSubmit() {
 </template>
 
 <style scoped>
-.food-dialog { max-width: 48rem; max-height: 90vh; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
-.form { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.field > span { font-size: 0.92rem; font-weight: 600; }
+.food-dialog {
+  max-width: 48rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field > span {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
 
 .description-box {
   background: hsl(var(--secondary));
@@ -481,6 +523,7 @@ function handleSubmit() {
   padding: 14px 16px;
   margin: 4px 0 8px;
 }
+
 .description-box p {
   margin: 0;
   font-size: 0.85rem;
@@ -488,10 +531,23 @@ function handleSubmit() {
   line-height: 1.45;
 }
 
-.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-width: 0; }
-.row-2 > * { min-width: 0; }
+.row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-width: 0;
+}
 
-.chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.row-2 > * {
+  min-width: 0;
+}
+
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .chip {
   border: 1px solid hsl(var(--input));
   background: hsl(var(--card));
@@ -503,6 +559,7 @@ function handleSubmit() {
   cursor: pointer;
   transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
 }
+
 .chip--active {
   border-color: hsl(var(--primary));
   background: hsl(var(--accent));
@@ -510,8 +567,14 @@ function handleSubmit() {
   font-weight: 700;
 }
 
-.segmented-grid { display: grid; gap: 8px; }
-.segmented-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.segmented-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.segmented-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 
 .segment-button {
   border: 1px solid hsl(var(--input));
@@ -526,21 +589,45 @@ function handleSubmit() {
   gap: 2px;
   transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
 }
-.segment-button strong { font-size: 0.95rem; }
-.segment-button small { font-size: 0.78rem; color: hsl(var(--muted-foreground)); }
+
+.segment-button strong {
+  font-size: 0.95rem;
+}
+
+.segment-button small {
+  font-size: 0.78rem;
+  color: hsl(var(--muted-foreground));
+}
 
 .severity-btn--low.segment-button--active {
-  border-color: var(--green); background: var(--green-soft); color: var(--green);
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
 }
-.severity-btn--low.segment-button--active small { color: var(--green); }
+
+.severity-btn--low.segment-button--active small {
+  color: var(--green);
+}
+
 .severity-btn--medium.segment-button--active {
-  border-color: var(--amber); background: var(--amber-soft); color: var(--amber);
+  border-color: var(--amber);
+  background: var(--amber-soft);
+  color: var(--amber);
 }
-.severity-btn--medium.segment-button--active small { color: var(--amber); }
+
+.severity-btn--medium.segment-button--active small {
+  color: var(--amber);
+}
+
 .severity-btn--high.segment-button--active {
-  border-color: var(--red); background: var(--red-soft); color: var(--red);
+  border-color: var(--red);
+  background: var(--red-soft);
+  color: var(--red);
 }
-.severity-btn--high.segment-button--active small { color: var(--red); }
+
+.severity-btn--high.segment-button--active small {
+  color: var(--red);
+}
 
 .step-header {
   font-size: 1.05rem;
@@ -557,8 +644,18 @@ function handleSubmit() {
   flex-direction: column;
   gap: 10px;
 }
-.status-title { font-weight: 600; font-size: 0.95rem; }
-.status-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.status-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.status-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .status-chip {
   border: 1.5px solid hsl(var(--input));
   background: hsl(var(--card));
@@ -569,6 +666,7 @@ function handleSubmit() {
   cursor: pointer;
   transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
 }
+
 .status-chip--active {
   border-color: hsl(var(--primary));
   background: hsl(var(--accent));
@@ -576,7 +674,10 @@ function handleSubmit() {
   font-weight: 700;
 }
 
-.error-message { color: hsl(var(--destructive)); font-size: 0.86rem; }
+.error-message {
+  color: hsl(var(--destructive));
+  font-size: 0.86rem;
+}
 
 .field--error :deep(.input),
 .field--error :deep(.textarea),
@@ -594,9 +695,17 @@ function handleSubmit() {
 }
 
 @media (max-width: 640px) {
-  .row-2 { grid-template-columns: 1fr; }
-  .segmented-grid--3 { grid-template-columns: 1fr; }
-  .form-footer { flex-direction: column-reverse; }
+  .row-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .segmented-grid--3 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-footer {
+    flex-direction: column-reverse;
+  }
 }
 
 .field--date-right :deep(.date-picker__panel) {

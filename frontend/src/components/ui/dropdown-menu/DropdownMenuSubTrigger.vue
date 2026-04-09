@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { inject } from "vue"
-import { ChevronRight } from "lucide-vue-next"
+import {inject} from "vue"
+import {ChevronRight} from "lucide-vue-next"
 
 defineProps<{
   class?: string
 }>()
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { openSub, closeSub, isSubOpen } = inject("dropdown-sub") as { openSub: () => void; closeSub: () => void; isSubOpen: Ref<boolean> }
+const {openSub, closeSub, isSubOpen} = inject("dropdown-sub") as {
+  openSub: () => void;
+  closeSub: () => void;
+  isSubOpen: Ref<boolean>
+}
 
 function handleMouseEnter() {
   openSub()
@@ -25,8 +29,8 @@ function handleMouseLeave() {
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
   >
-    <slot />
-    <ChevronRight class="dropdown-sub-chevron" />
+    <slot/>
+    <ChevronRight class="dropdown-sub-chevron"/>
   </div>
 </template>
 

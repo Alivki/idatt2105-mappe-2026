@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { WizardState, HaccpTrinn } from '@/types/haccp-setup'
+import type {WizardState, HaccpTrinn} from '@/types/haccp-setup'
 import {
   businessTypeLabels,
   businessSizeLabels,
 } from '@/types/haccp-setup'
-import { computed } from 'vue'
-import { ShieldCheck, ClipboardCheck, Info, AlertTriangle } from 'lucide-vue-next'
+import {computed} from 'vue'
+import {ShieldCheck, ClipboardCheck, Info, AlertTriangle} from 'lucide-vue-next'
 
 const props = defineProps<{
   wizard: WizardState
@@ -20,7 +20,7 @@ defineEmits<{
 const prereqSummary = computed(() => {
   const ok = props.wizard.prerequisites.filter((p) => p.status === 'OK').length
   const total = props.wizard.prerequisites.length
-  return { ok, total }
+  return {ok, total}
 })
 
 const kkpCount = computed(() => {
@@ -31,42 +31,106 @@ const previewChecklists = computed(() => {
   const w = props.wizard
   const list: { name: string; frequency: string; description: string }[] = []
 
-  list.push({ name: 'Daglig renhold', frequency: 'Daglig', description: 'Rutiner for daglig rengjøring av lokaler, utstyr og overflater.' })
-  list.push({ name: 'Personlig hygiene', frequency: 'Daglig', description: 'Håndvask, arbeidstøy, sykdomskontroll og hygieneatferd.' })
-  list.push({ name: 'Avfallshåndtering', frequency: 'Daglig', description: 'Sortering, oppbevaring og henting av avfall.' })
+  list.push({
+    name: 'Daglig renhold',
+    frequency: 'Daglig',
+    description: 'Rutiner for daglig rengjøring av lokaler, utstyr og overflater.'
+  })
+  list.push({
+    name: 'Personlig hygiene',
+    frequency: 'Daglig',
+    description: 'Håndvask, arbeidstøy, sykdomskontroll og hygieneatferd.'
+  })
+  list.push({
+    name: 'Avfallshåndtering',
+    frequency: 'Daglig',
+    description: 'Sortering, oppbevaring og henting av avfall.'
+  })
 
   if (w.temperatureEquipment.includes('REFRIGERATORS'))
-    list.push({ name: 'Temperaturkontroll – Kjøleskap', frequency: 'Daglig', description: 'Loggføring av kjøleskaptemperaturer. Maks 4°C.' })
+    list.push({
+      name: 'Temperaturkontroll – Kjøleskap',
+      frequency: 'Daglig',
+      description: 'Loggføring av kjøleskaptemperaturer. Maks 4°C.'
+    })
   if (w.temperatureEquipment.includes('FREEZERS'))
-    list.push({ name: 'Temperaturkontroll – Frysere', frequency: 'Daglig', description: 'Loggføring av frysertemperaturer. Maks -18°C.' })
+    list.push({
+      name: 'Temperaturkontroll – Frysere',
+      frequency: 'Daglig',
+      description: 'Loggføring av frysertemperaturer. Maks -18°C.'
+    })
 
   const hasNonShelfStable = !w.foodTypes.includes('SHELF_STABLE_ONLY') || w.foodTypes.length > 1
   if (hasNonShelfStable)
-    list.push({ name: 'Mottakskontroll', frequency: 'Daglig', description: 'Kontroll av temperatur, holdbarhet og emballasje ved varemottak.' })
+    list.push({
+      name: 'Mottakskontroll',
+      frequency: 'Daglig',
+      description: 'Kontroll av temperatur, holdbarhet og emballasje ved varemottak.'
+    })
 
   if (w.processes.includes('COOKING_HEAT_TREATMENT'))
-    list.push({ name: 'Tilberedningskontroll', frequency: 'Daglig', description: 'Kjernetemperatur ved varmebehandling. Min 75°C.' })
+    list.push({
+      name: 'Tilberedningskontroll',
+      frequency: 'Daglig',
+      description: 'Kjernetemperatur ved varmebehandling. Min 75°C.'
+    })
   if (w.processes.includes('COOLING_COOKED'))
-    list.push({ name: 'Nedkjølingskontroll', frequency: 'Daglig', description: 'Nedkjøling fra 60°C til 4°C innen 4 timer.' })
+    list.push({
+      name: 'Nedkjølingskontroll',
+      frequency: 'Daglig',
+      description: 'Nedkjøling fra 60°C til 4°C innen 4 timer.'
+    })
 
   if (w.servesVulnerableGroups || w.foodTypes.includes('ALLERGEN_CONTAINING'))
-    list.push({ name: 'Allergenkontroll', frequency: 'Daglig', description: 'Merking, kryssforurensning og informasjon til gjester om allergener.' })
+    list.push({
+      name: 'Allergenkontroll',
+      frequency: 'Daglig',
+      description: 'Merking, kryssforurensning og informasjon til gjester om allergener.'
+    })
 
   if (w.servesVulnerableGroups || w.handlesHighRiskProducts)
-    list.push({ name: 'Kritiske kontrollpunkter (KKP)', frequency: 'Daglig', description: 'Overvåking av kritiske kontrollpunkter med grenseverdier og korrigerende tiltak.' })
+    list.push({
+      name: 'Kritiske kontrollpunkter (KKP)',
+      frequency: 'Daglig',
+      description: 'Overvåking av kritiske kontrollpunkter med grenseverdier og korrigerende tiltak.'
+    })
 
   if (w.temperatureEquipment.includes('HOT_HOLDING'))
-    list.push({ name: 'Varmholdingskontroll', frequency: 'Daglig', description: 'Varmholding over 60°C. Maks 2 timer under 60°C.' })
+    list.push({
+      name: 'Varmholdingskontroll',
+      frequency: 'Daglig',
+      description: 'Varmholding over 60°C. Maks 2 timer under 60°C.'
+    })
 
-  list.push({ name: 'Ukentlig renhold', frequency: 'Ukentlig', description: 'Grundig rengjøring av kjøleskap, ventilasjon, gulv og vegger.' })
-  list.push({ name: 'Skadedyrkontroll', frequency: 'Månedlig', description: 'Inspeksjon for tegn på skadedyr og forebyggende tiltak.' })
+  list.push({
+    name: 'Ukentlig renhold',
+    frequency: 'Ukentlig',
+    description: 'Grundig rengjøring av kjøleskap, ventilasjon, gulv og vegger.'
+  })
+  list.push({
+    name: 'Skadedyrkontroll',
+    frequency: 'Månedlig',
+    description: 'Inspeksjon for tegn på skadedyr og forebyggende tiltak.'
+  })
 
   const hasRealEquipment = w.temperatureEquipment.length > 0 && !w.temperatureEquipment.includes('NONE')
   if (hasRealEquipment)
-    list.push({ name: 'Vedlikehold av utstyr', frequency: 'Månedlig', description: 'Kalibrering av termometre og vedlikehold av kjøle-/fryseutstyr.' })
+    list.push({
+      name: 'Vedlikehold av utstyr',
+      frequency: 'Månedlig',
+      description: 'Kalibrering av termometre og vedlikehold av kjøle-/fryseutstyr.'
+    })
 
-  list.push({ name: 'Årlig gjennomgang av IK-mat', frequency: 'Årlig', description: 'Gjennomgang og oppdatering av internkontrollsystemet.' })
-  list.push({ name: 'Opplæringsplan', frequency: 'Årlig', description: 'Opplæring av ansatte i mathygiene, HACCP og IK-mat-rutiner.' })
+  list.push({
+    name: 'Årlig gjennomgang av IK-mat',
+    frequency: 'Årlig',
+    description: 'Gjennomgang og oppdatering av internkontrollsystemet.'
+  })
+  list.push({
+    name: 'Opplæringsplan',
+    frequency: 'Årlig',
+    description: 'Opplæring av ansatte i mathygiene, HACCP og IK-mat-rutiner.'
+  })
 
   return list
 })
@@ -77,7 +141,7 @@ const previewChecklists = computed(() => {
     <!-- HACCP Level summary -->
     <div class="haccp-summary-card">
       <div class="haccp-summary-header">
-        <ShieldCheck :size="20" :stroke-width="1.5" aria-hidden="true" />
+        <ShieldCheck :size="20" :stroke-width="1.5" aria-hidden="true"/>
         <span>{{ haccpTrinn.label }}</span>
       </div>
       <div class="haccp-summary-details">
@@ -90,7 +154,9 @@ const previewChecklists = computed(() => {
         </div>
         <div class="detail-item">
           <span class="detail-label">Grunnforutsetninger</span>
-          <span class="detail-value">{{ prereqSummary.ok }} av {{ prereqSummary.total }} på plass</span>
+          <span class="detail-value">{{ prereqSummary.ok }} av {{
+              prereqSummary.total
+            }} på plass</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Prosesstrinn</span>
@@ -98,22 +164,26 @@ const previewChecklists = computed(() => {
         </div>
         <div class="detail-item">
           <span class="detail-label">Fareanalyse</span>
-          <span class="detail-value">{{ wizard.hazardEntries.length }} farer vurdert · {{ kkpCount }} KKP</span>
+          <span class="detail-value">{{ wizard.hazardEntries.length }} farer vurdert · {{
+              kkpCount
+            }} KKP</span>
         </div>
       </div>
     </div>
 
     <div v-if="prereqSummary.ok < prereqSummary.total" class="prereq-warning">
-      <AlertTriangle :size="16" :stroke-width="1.5" aria-hidden="true" />
+      <AlertTriangle :size="16" :stroke-width="1.5" aria-hidden="true"/>
       <p>
-        <strong>{{ prereqSummary.total - prereqSummary.ok }} grunnforutsetning{{ prereqSummary.total - prereqSummary.ok !== 1 ? 'er' : '' }}</strong>
-        er ikke markert som «på plass». Vi anbefaler å få disse på plass. Sjekklistene genereres uansett.
+        <strong>{{ prereqSummary.total - prereqSummary.ok }}
+          grunnforutsetning{{ prereqSummary.total - prereqSummary.ok !== 1 ? 'er' : '' }}</strong>
+        er ikke markert som «på plass». Vi anbefaler å få disse på plass. Sjekklistene genereres
+        uansett.
       </p>
     </div>
 
     <div class="preview-section">
       <h3>
-        <ClipboardCheck :size="18" :stroke-width="1.5" aria-hidden="true" />
+        <ClipboardCheck :size="18" :stroke-width="1.5" aria-hidden="true"/>
         {{ previewChecklists.length }} sjekklister vil bli generert
       </h3>
       <div class="checklist-grid">
@@ -132,9 +202,10 @@ const previewChecklists = computed(() => {
     </div>
 
     <div class="info-banner">
-      <Info :size="16" :stroke-width="1.5" aria-hidden="true" />
+      <Info :size="16" :stroke-width="1.5" aria-hidden="true"/>
       <p>
-        Sjekklistene blir lagt inn i din sjekkliste-modul og vil dukke opp som oppgaver for kjøkkenpersonalet
+        Sjekklistene blir lagt inn i din sjekkliste-modul og vil dukke opp som oppgaver for
+        kjøkkenpersonalet
         basert på frekvens (daglig, ukentlig, månedlig, årlig). Du kan tilpasse dem når som helst.
       </p>
     </div>
@@ -207,7 +278,9 @@ const previewChecklists = computed(() => {
   margin-top: 0.125rem;
 }
 
-.prereq-warning p { margin: 0; }
+.prereq-warning p {
+  margin: 0;
+}
 
 .preview-section h3 {
   font-size: 1rem;
@@ -279,5 +352,7 @@ const previewChecklists = computed(() => {
   color: hsl(var(--primary));
 }
 
-.info-banner p { margin: 0; }
+.info-banner p {
+  margin: 0;
+}
 </style>

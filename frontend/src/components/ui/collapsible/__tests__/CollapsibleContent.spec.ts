@@ -1,6 +1,6 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick } from 'vue'
+import {describe, expect, it, vi, beforeEach, afterEach} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, nextTick} from 'vue'
 
 import Collapsible from '../Collapsible.vue'
 import CollapsibleTrigger from '../CollapsibleTrigger.vue'
@@ -26,7 +26,7 @@ describe('CollapsibleContent', () => {
 
   it('renders slot content', () => {
     const Host = defineComponent({
-      components: { Collapsible, CollapsibleContent },
+      components: {Collapsible, CollapsibleContent},
       template: `
         <Collapsible>
           <CollapsibleContent>
@@ -44,7 +44,7 @@ describe('CollapsibleContent', () => {
 
   it('applies base class and custom class', () => {
     const Host = defineComponent({
-      components: { Collapsible, CollapsibleContent },
+      components: {Collapsible, CollapsibleContent},
       template: `
         <Collapsible>
           <CollapsibleContent class="custom-content">
@@ -63,7 +63,7 @@ describe('CollapsibleContent', () => {
 
   it('starts closed by default with data-state=closed and height=0px', async () => {
     const Host = defineComponent({
-      components: { Collapsible, CollapsibleContent },
+      components: {Collapsible, CollapsibleContent},
       template: `
         <Collapsible>
           <CollapsibleContent>
@@ -84,7 +84,7 @@ describe('CollapsibleContent', () => {
 
   it('starts open when defaultOpen=true and becomes auto after timeout', async () => {
     const Host = defineComponent({
-      components: { Collapsible, CollapsibleContent },
+      components: {Collapsible, CollapsibleContent},
       template: `
         <Collapsible :defaultOpen="true">
           <CollapsibleContent>
@@ -117,7 +117,7 @@ describe('CollapsibleContent', () => {
 
   it('expands content to scrollHeight when opened', async () => {
     const Host = defineComponent({
-      components: { Collapsible, CollapsibleTrigger, CollapsibleContent },
+      components: {Collapsible, CollapsibleTrigger, CollapsibleContent},
       template: `
         <Collapsible>
           <CollapsibleTrigger>
@@ -157,7 +157,7 @@ describe('CollapsibleContent', () => {
 
   it('collapses from explicit height to 0px when closed', async () => {
     const Host = defineComponent({
-      components: { Collapsible, CollapsibleTrigger, CollapsibleContent },
+      components: {Collapsible, CollapsibleTrigger, CollapsibleContent},
       template: `
         <Collapsible :defaultOpen="true">
           <CollapsibleTrigger>
@@ -197,7 +197,7 @@ describe('CollapsibleContent', () => {
 
   it('updates data-state along with trigger toggles', async () => {
     const Host = defineComponent({
-      components: { Collapsible, CollapsibleTrigger, CollapsibleContent },
+      components: {Collapsible, CollapsibleTrigger, CollapsibleContent},
       template: `
         <Collapsible>
           <CollapsibleTrigger>
@@ -228,7 +228,7 @@ describe('CollapsibleContent', () => {
 
   it('works with controlled open prop updates', async () => {
     const Host = defineComponent({
-      components: { Collapsible, CollapsibleContent },
+      components: {Collapsible, CollapsibleContent},
       data() {
         return {
           open: false,
@@ -254,7 +254,7 @@ describe('CollapsibleContent', () => {
 
     expect(content.attributes('data-state')).toBe('closed')
 
-    await wrapper.setData({ open: true })
+    await wrapper.setData({open: true})
     await nextTick()
     await nextTick()
 

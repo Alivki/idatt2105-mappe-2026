@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { z } from 'zod'
-import type { Checklist, ChecklistFrequency, CreateChecklistRequest, UpdateChecklistRequest } from '@/types/checklist'
+import {computed, ref, watch} from 'vue'
+import {z} from 'zod'
+import type {
+  Checklist,
+  ChecklistFrequency,
+  CreateChecklistRequest,
+  UpdateChecklistRequest
+} from '@/types/checklist'
 import Dialog from '@/components/ui/dialog/Dialog.vue'
 import DialogContent from '@/components/ui/dialog/DialogContent.vue'
 import DialogHeader from '@/components/ui/dialog/DialogHeader.vue'
@@ -75,7 +80,7 @@ watch(
 
     errors.value = {}
   },
-  { immediate: true },
+  {immediate: true},
 )
 
 function closeDialog() {
@@ -133,7 +138,7 @@ function handleSubmit() {
       <form class="form" @submit.prevent="handleSubmit">
         <label :class="['field', { 'field--error': errors.name }]">
           <span>Navn</span>
-          <Input v-model="formName" placeholder="For eksempel: Morgenrutine kjøkken" />
+          <Input v-model="formName" placeholder="For eksempel: Morgenrutine kjøkken"/>
           <p v-if="errors.name" class="error-message">{{ errors.name }}</p>
         </label>
 
@@ -141,7 +146,7 @@ function handleSubmit() {
           <span>Frekvens</span>
           <Select v-model="formFrequency">
             <SelectTrigger>
-              <SelectValue placeholder="Velg frekvens" />
+              <SelectValue placeholder="Velg frekvens"/>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="DAILY">Daglig</SelectItem>
@@ -154,7 +159,8 @@ function handleSubmit() {
 
         <label class="field">
           <span>Beskrivelse (valgfritt)</span>
-          <Textarea v-model="formDescription" rows="3" placeholder="Kort beskrivelse av hva sjekklisten gjelder" />
+          <Textarea v-model="formDescription" rows="3"
+                    placeholder="Kort beskrivelse av hva sjekklisten gjelder"/>
         </label>
 
         <DialogFooter>

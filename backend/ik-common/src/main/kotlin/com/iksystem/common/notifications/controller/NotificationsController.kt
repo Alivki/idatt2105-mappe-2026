@@ -4,6 +4,12 @@ import com.iksystem.common.notifications.dto.UnreadCountResponse
 import com.iksystem.common.notifications.dto.NotificationsResponse
 import com.iksystem.common.notifications.model.Notification
 import com.iksystem.common.notifications.repository.NotificationsRepository
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import com.iksystem.common.security.AuthenticatedUser
@@ -19,9 +25,14 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
 
+@Tag(name = "Notifications", description = "User notification management")
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("api/v1/notifications")
 class NotificationsController(private val notificationsRepository: NotificationsRepository) {
+
+    @Operation(summary = "List notifications", description = "Returns paginated notifications for the authenticated user in the active organization.")
+    @ApiResponse(responseCode = "200", description = "Notification list returned")
     @GetMapping
     fun list(
         @AuthenticationPrincipal auth: AuthenticatedUser,
@@ -36,6 +47,8 @@ class NotificationsController(private val notificationsRepository: Notifications
         return ResponseEntity.ok(notifications)
     }
 
+    @Operation(summary = "Get unread count", description = "Returns the number of unread notifications for the authenticated user.")
+    @ApiResponse(responseCode = "200", description = "Unread count returned")
     @GetMapping("/unread-count")
     fun getUnreadCount(@AuthenticationPrincipal auth: AuthenticatedUser): ResponseEntity<UnreadCountResponse> {
         val orgId = auth.requireOrganizationId()
@@ -43,6 +56,8 @@ class NotificationsController(private val notificationsRepository: Notifications
         return ResponseEntity.ok(UnreadCountResponse(count))
     }
 
+    @Operation(summary = "Mark notification as read", description = "Marks a single notification as read.")
+    @ApiResponse(responseCode = "204", description = "Notification marked as read")
     @PatchMapping("/{id}/read")
     @Transactional
     fun markRead(
@@ -58,6 +73,8 @@ class NotificationsController(private val notificationsRepository: Notifications
         return ResponseEntity.noContent().build()
     }
 
+    @Operation(summary = "Mark all notifications as read", description = "Marks all notifications as read for the authenticated user in the active organization.")
+    @ApiResponse(responseCode = "204", description = "All notifications marked as read")
     @PostMapping("/mark-all-read")
     @Transactional
     fun markAllRead(@AuthenticationPrincipal auth: AuthenticatedUser): ResponseEntity<Void> {

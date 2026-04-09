@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, ref, onBeforeUnmount, watch, nextTick } from "vue"
+import {inject, ref, onBeforeUnmount, watch, nextTick} from "vue"
 
 const props = withDefaults(defineProps<{
   class?: string
@@ -8,9 +8,9 @@ const props = withDefaults(defineProps<{
   align: "center",
 })
 
-import type { Ref } from "vue"
+import type {Ref} from "vue"
 
-const { isOpen, close } = inject("popover") as { isOpen: Ref<boolean>; close: () => void }
+const {isOpen, close} = inject("popover") as { isOpen: Ref<boolean>; close: () => void }
 const contentRef = ref<HTMLElement | null>(null)
 
 function onClickOutside(e: MouseEvent) {
@@ -50,7 +50,7 @@ onBeforeUnmount(() => {
       ref="contentRef"
       :class="['popover-content', `popover-content--${align}`, props.class]"
     >
-      <slot />
+      <slot/>
     </div>
   </Transition>
 </template>

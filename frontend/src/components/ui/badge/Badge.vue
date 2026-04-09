@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import {computed} from 'vue'
 
 type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline'
 type BadgeTone = 'neutral' | 'ok' | 'warning' | 'danger' | 'brand'
@@ -24,7 +24,7 @@ const classes = computed(() => {
 
 <template>
   <div :class="classes">
-    <slot />
+    <slot/>
   </div>
 </template>
 
@@ -56,6 +56,7 @@ const classes = computed(() => {
   color: hsl(var(--primary-foreground, 0 0% 100%));
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
+
 :where(.badge--default):hover {
   background-color: hsl(var(--primary, 245 43% 52%) / 0.8);
 }
@@ -65,6 +66,7 @@ const classes = computed(() => {
   background-color: hsl(var(--secondary, 40 20% 93%));
   color: hsl(var(--secondary-foreground, 24 10% 20%));
 }
+
 :where(.badge--secondary):hover {
   background-color: hsl(var(--secondary, 40 20% 93%) / 0.8);
 }
@@ -75,6 +77,7 @@ const classes = computed(() => {
   color: hsl(var(--destructive-foreground, 0 0% 100%));
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
+
 :where(.badge--destructive):hover {
   background-color: hsl(var(--destructive, 0 55% 42%) / 0.8);
 }

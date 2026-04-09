@@ -1,9 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, h, nextTick, ref } from 'vue'
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h, nextTick, ref} from 'vue'
 
 import SidebarProvider from '../SidebarProvider.vue'
-import { SIDEBAR_COOKIE_NAME, useSidebar } from '../utils'
+import {SIDEBAR_COOKIE_NAME, useSidebar} from '../utils'
 
 const isMobileRef = ref(false)
 let registeredKeydownHandler: ((event: KeyboardEvent) => void) | undefined
@@ -20,11 +20,11 @@ const SidebarConsumer = defineComponent({
   setup() {
     const sidebar = useSidebar()
     return () =>
-      h('div', { 'data-test': 'consumer' }, [
-        h('span', { 'data-test': 'state' }, sidebar.state.value),
-        h('span', { 'data-test': 'open' }, String(sidebar.open.value)),
-        h('span', { 'data-test': 'mobile' }, String(sidebar.isMobile.value)),
-        h('span', { 'data-test': 'open-mobile' }, String(sidebar.openMobile.value)),
+      h('div', {'data-test': 'consumer'}, [
+        h('span', {'data-test': 'state'}, sidebar.state.value),
+        h('span', {'data-test': 'open'}, String(sidebar.open.value)),
+        h('span', {'data-test': 'mobile'}, String(sidebar.isMobile.value)),
+        h('span', {'data-test': 'open-mobile'}, String(sidebar.openMobile.value)),
         h(
           'button',
           {
@@ -49,9 +49,9 @@ const SidebarConsumer = defineComponent({
           },
           'set-open-mobile',
         ),
-        h('span', { 'data-test': 'variant' }, sidebar.variant),
-        h('span', { 'data-test': 'collapsible' }, sidebar.collapsible),
-        h('span', { 'data-test': 'side' }, sidebar.side),
+        h('span', {'data-test': 'variant'}, sidebar.variant),
+        h('span', {'data-test': 'collapsible'}, sidebar.collapsible),
+        h('span', {'data-test': 'side'}, sidebar.side),
       ])
   },
 })
@@ -121,7 +121,7 @@ describe('SidebarProvider', () => {
     expect(wrapper.get('[data-test="state"]').text()).toBe('collapsed')
     expect(wrapper.get('[data-test="open"]').text()).toBe('false')
 
-    await wrapper.setProps({ open: true })
+    await wrapper.setProps({open: true})
     await nextTick()
 
     expect(wrapper.get('[data-test="state"]').text()).toBe('expanded')
@@ -205,7 +205,7 @@ describe('SidebarProvider', () => {
 
     expect(registeredKeydownHandler).toBeTruthy()
 
-    const event = new KeyboardEvent('keydown', { key: 'b', ctrlKey: true })
+    const event = new KeyboardEvent('keydown', {key: 'b', ctrlKey: true})
     const preventDefault = vi.spyOn(event, 'preventDefault')
 
     registeredKeydownHandler?.(event)
@@ -222,7 +222,7 @@ describe('SidebarProvider', () => {
       },
     })
 
-    const event = new KeyboardEvent('keydown', { key: 'b', metaKey: true })
+    const event = new KeyboardEvent('keydown', {key: 'b', metaKey: true})
     registeredKeydownHandler?.(event)
     await nextTick()
 
@@ -236,7 +236,7 @@ describe('SidebarProvider', () => {
       },
     })
 
-    const event = new KeyboardEvent('keydown', { key: 'x', ctrlKey: true })
+    const event = new KeyboardEvent('keydown', {key: 'x', ctrlKey: true})
     registeredKeydownHandler?.(event)
     await nextTick()
 

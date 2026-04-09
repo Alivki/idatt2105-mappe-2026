@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { CalendarDate } from '@internationalized/date'
+import {describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {CalendarDate} from '@internationalized/date'
 import CalendarCellTrigger from '../CalendarCellTrigger.vue'
 
 function makeCalendarCtx(overrides: Record<string, unknown> = {}) {
@@ -19,8 +19,8 @@ describe('CalendarCellTrigger', () => {
     const day = new CalendarDate(2026, 4, 8)
     const ctx = makeCalendarCtx()
     const wrapper = mount(CalendarCellTrigger, {
-      props: { day, month: new CalendarDate(2026, 4, 1) },
-      global: { provide: { calendar: ctx } },
+      props: {day, month: new CalendarDate(2026, 4, 1)},
+      global: {provide: {calendar: ctx}},
     })
 
     expect(wrapper.text()).toBe('8')
@@ -34,8 +34,8 @@ describe('CalendarCellTrigger', () => {
     })
 
     const wrapper = mount(CalendarCellTrigger, {
-      props: { day, month: new CalendarDate(2026, 4, 1) },
-      global: { provide: { calendar: ctx } },
+      props: {day, month: new CalendarDate(2026, 4, 1)},
+      global: {provide: {calendar: ctx}},
     })
 
     const button = wrapper.get('button')
@@ -52,8 +52,8 @@ describe('CalendarCellTrigger', () => {
     })
 
     const wrapper = mount(CalendarCellTrigger, {
-      props: { day, month: new CalendarDate(2026, 4, 1) },
-      global: { provide: { calendar: ctx } },
+      props: {day, month: new CalendarDate(2026, 4, 1)},
+      global: {provide: {calendar: ctx}},
     })
 
     const button = wrapper.get('button')
@@ -71,8 +71,8 @@ describe('CalendarCellTrigger', () => {
     const ctx = makeCalendarCtx()
 
     const wrapper = mount(CalendarCellTrigger, {
-      props: { day, month: new CalendarDate(2026, 4, 1) },
-      global: { provide: { calendar: ctx } },
+      props: {day, month: new CalendarDate(2026, 4, 1)},
+      global: {provide: {calendar: ctx}},
     })
 
     await wrapper.get('button').trigger('click')
@@ -84,9 +84,9 @@ describe('CalendarCellTrigger', () => {
     const ctx = makeCalendarCtx()
 
     const wrapper = mount(CalendarCellTrigger, {
-      props: { day, month: new CalendarDate(2026, 4, 1) },
-      slots: { default: 'custom day' },
-      global: { provide: { calendar: ctx } },
+      props: {day, month: new CalendarDate(2026, 4, 1)},
+      slots: {default: 'custom day'},
+      global: {provide: {calendar: ctx}},
     })
 
     expect(wrapper.text()).toBe('custom day')
