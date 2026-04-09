@@ -2,6 +2,7 @@ package com.iksystem.common.documents.service
 
 import com.iksystem.common.documents.model.Document
 import com.iksystem.common.documents.repository.DocumentRepository
+import com.iksystem.common.exception.BadRequestException
 import com.iksystem.common.security.AuthenticatedUser
 import com.iksystem.common.user.model.User
 import com.iksystem.common.user.repository.UserRepository
@@ -100,21 +101,17 @@ class DocumentsServiceTest {
     }
 
     @Test
-    fun `uploadFile uses fallback file name and content type`() {
+    fun `uploadFile rejects file with no content type`() {
         val auth = auth()
         val file = mock(MultipartFile::class.java)
 
-        `when`(file.originalFilename).thenReturn(null)
+        `when`(file.isEmpty).thenReturn(false)
+        `when`(file.size).thenReturn(3L)
         `when`(file.contentType).thenReturn(null)
-        `when`(file.bytes).thenReturn(byteArrayOf(1, 2, 3))
-        `when`(userRepository.findById(10L)).thenReturn(Optional.of(user()))
-        `when`(documentRepository.save(any(Document::class.java))).thenAnswer { it.arguments[0] }
 
-        val result = service.uploadFile(file, "docs", auth)
-
-        assertEquals("file", result.fileName)
-        assertEquals("application/octet-stream", result.contentType)
-        assertEquals(true, result.s3Key.startsWith("docs/"))
+        assertThrows(BadRequestException::class.java) {
+            service.uploadFile(file, "docs", auth)
+        }
     }
 
     @Test
