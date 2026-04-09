@@ -31,6 +31,8 @@ jobs:
           cache: maven
 
       - name: Build and run tests
+        env:
+          JWT_SECRET: ci-test-secret-key-that-must-be-at-least-256-bits-long-for-hmac-sha
         run: ./mvnw -B -ntp -f pom.xml clean verify
 
   frontend:
@@ -59,3 +61,10 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Run unit tests
+        run: npm run test:run
+
+  # E2E tests (Playwright) require the full stack (frontend + backends + MySQL).
+  # Run locally with: cd frontend && npx playwright test
+  # To run in CI, use docker-compose to start the full stack first.

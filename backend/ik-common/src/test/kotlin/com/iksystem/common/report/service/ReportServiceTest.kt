@@ -93,13 +93,10 @@ class ReportServiceTest : FunSpec({
             checklistRepo, checklistItemRepo, checklistCompletionRepo, trainingRepo, reportDataRepo,
             documentsService, pdfGenerator,
         )
-        // Common stubs for header building
         every { organizationRepo.findById(orgId) } returns Optional.of(org)
         every { userRepo.findById(userId) } returns Optional.of(user)
         every { membershipRepo.findByUserIdAndOrganizationId(userId, orgId) } returns membership
     }
-
-    // ── preview ──
 
     test("preview returns header with org info and user info") {
         every { checklistItemRepo.countAllByOrganizationId(orgId) } returns 50L
@@ -220,7 +217,6 @@ class ReportServiceTest : FunSpec({
         )
 
         every { checklistRepo.findAllByOrganizationIdOrderByCreatedAtDesc(orgId) } returns listOf(checklist)
-        // 28 completions out of 31 days in March
         every { checklistCompletionRepo.countByChecklistIdAndCompletedAtBetween(1L, any(), any()) } returns 28L
 
         val result = service.preview(request, auth)
@@ -467,7 +463,6 @@ class ReportServiceTest : FunSpec({
         )
 
         every { checklistRepo.findAllByOrganizationIdAndSource(orgId, "HACCP_WIZARD") } returns listOf(haccpChecklist)
-        // 20 completions out of 31 days in March
         every { checklistCompletionRepo.countByChecklistIdAndCompletedAtBetween(5L, any(), any()) } returns 20L
         every { checklistItemRepo.findAllByChecklistIdOrderByIdAsc(5L) } returns listOf(
             ChecklistItem(id = 10L, checklist = haccpChecklist, title = "Rengjør arbeidsflater", completed = true, completedAt = Instant.parse("2026-03-10T08:00:00Z")),
@@ -502,10 +497,7 @@ class ReportServiceTest : FunSpec({
         }
     }
 
-    // ── generate ──
-
     test("generate creates PDF, uploads to S3, and saves report") {
-        // Stub compliance summary (default section)
         every { checklistItemRepo.countAllByOrganizationId(orgId) } returns 10L
         every { checklistItemRepo.countCompletedByOrganizationId(orgId) } returns 10L
         every { reportDataRepo.countFoodDeviationsByStatus(orgId, any(), any(), any()) } returns 0L
@@ -572,8 +564,6 @@ class ReportServiceTest : FunSpec({
         result.title shouldBe "Mars Rapport 2026"
     }
 
-    // ── list ──
-
     test("list returns all reports for the organization") {
         val report1 = GeneratedReport(
             id = 1L, organizationId = orgId, title = "Report 1",
@@ -594,8 +584,6 @@ class ReportServiceTest : FunSpec({
         result[0].title shouldBe "Report 1"
         result[1].title shouldBe "Report 2"
     }
-
-    // ── getReport ──
 
     test("getReport returns report with download URL") {
         val document = Document(
@@ -625,8 +613,6 @@ class ReportServiceTest : FunSpec({
             service.getReport(99L, auth)
         }
     }
-
-    // ── getDownloadUrl ──
 
     test("getDownloadUrl returns presigned URL") {
         val document = Document(
@@ -668,8 +654,6 @@ class ReportServiceTest : FunSpec({
             service.getDownloadUrl(1L, auth)
         }
     }
-
-    // ── delete ──
 
     test("delete removes report and associated document") {
         val document = Document(
@@ -715,8 +699,6 @@ class ReportServiceTest : FunSpec({
             service.delete(99L, auth)
         }
     }
-
-    // ── exportJson ──
 
     test("exportJson returns same data as preview") {
         every { checklistItemRepo.countAllByOrganizationId(orgId) } returns 10L

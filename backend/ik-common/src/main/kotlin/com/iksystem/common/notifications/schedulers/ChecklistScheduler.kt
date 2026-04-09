@@ -38,10 +38,7 @@ class ChecklistScheduler(
      * Runs every day at 22:00 (end of business day).
      */
     @Scheduled(cron = "0 0 22 * * *")
-    fun checkDailyChecklists() {
-        log.info("Running daily checklist overdue check")
-        notifyIncompleteChecklists(ChecklistFrequency.DAILY)
-    }
+    fun checkDailyChecklists() = notifyIncompleteChecklists(ChecklistFrequency.DAILY)
 
     /**
      * Checks weekly checklists for incomplete items.
@@ -49,10 +46,7 @@ class ChecklistScheduler(
      * Runs every Sunday at 22:00.
      */
     @Scheduled(cron = "0 0 22 * * SUN")
-    fun checkWeeklyChecklists() {
-        log.info("Running weekly checklist overdue check")
-        notifyIncompleteChecklists(ChecklistFrequency.WEEKLY)
-    }
+    fun checkWeeklyChecklists() = notifyIncompleteChecklists(ChecklistFrequency.WEEKLY)
 
     /**
      * Checks monthly checklists for incomplete items.
@@ -60,10 +54,7 @@ class ChecklistScheduler(
      * Runs on the last day of each month at 22:00.
      */
     @Scheduled(cron = "0 0 22 L * *")
-    fun checkMonthlyChecklists() {
-        log.info("Running monthly checklist overdue check")
-        notifyIncompleteChecklists(ChecklistFrequency.MONTHLY)
-    }
+    fun checkMonthlyChecklists() = notifyIncompleteChecklists(ChecklistFrequency.MONTHLY)
 
     /**
      * Checks yearly checklists for incomplete items.
@@ -71,10 +62,7 @@ class ChecklistScheduler(
      * Runs on December 31st at 22:00.
      */
     @Scheduled(cron = "0 0 22 31 12 *")
-    fun checkYearlyChecklists() {
-        log.info("Running yearly checklist overdue check")
-        notifyIncompleteChecklists(ChecklistFrequency.YEARLY)
-    }
+    fun checkYearlyChecklists() = notifyIncompleteChecklists(ChecklistFrequency.YEARLY)
 
     /**
      * Finds incomplete checklists for a given frequency and sends notifications.
@@ -86,6 +74,7 @@ class ChecklistScheduler(
      * @param frequency The checklist frequency to evaluate
      */
     private fun notifyIncompleteChecklists(frequency: ChecklistFrequency) {
+        log.info("Checking {} checklists for overdue items", frequency)
         val incompleteChecklists = checklistRepository.findIncompleteByFrequency(frequency)
 
         if (incompleteChecklists.isEmpty()) {
@@ -93,8 +82,7 @@ class ChecklistScheduler(
             return
         }
 
-        log.info("Found {} incomplete {} checklists", incompleteChecklists.size, frequency)
-
+        log.info("Found {} incomplete {} checklists, sending notifications", incompleteChecklists.size, frequency)
         incompleteChecklists.forEach { checklist ->
             val incompleteCount = checklistItemRepository.countByChecklistIdAndCompletedFalse(checklist.id)
             val message = "Checklist '${checklist.name}' ($frequency) has $incompleteCount incomplete item(s) and is overdue."

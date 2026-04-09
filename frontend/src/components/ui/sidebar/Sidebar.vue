@@ -18,7 +18,6 @@ const props = withDefaults(defineProps<{
 })
 
 const ctx = useSidebar()
-// Update context with this sidebar's props
 ctx.variant = props.variant
 ctx.collapsible = props.collapsible
 ctx.side = props.side

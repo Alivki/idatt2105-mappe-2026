@@ -118,7 +118,6 @@ const filteredAndSorted = computed(() => {
   return list
 })
 
-// ── Checkbox selection ──
 const selected = ref<Set<number>>(new Set())
 
 function toggleSelect(id: number) {

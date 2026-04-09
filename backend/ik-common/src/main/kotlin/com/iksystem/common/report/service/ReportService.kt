@@ -373,7 +373,7 @@ class ReportService(
         val days = ChronoUnit.DAYS.between(from, to.plusDays(1))
         return when (frequency) {
             ChecklistFrequency.DAILY -> days
-            ChecklistFrequency.WEEKLY -> (days + 6) / 7  // number of weeks (ceiling)
+            ChecklistFrequency.WEEKLY -> (days + 6) / 7
             ChecklistFrequency.MONTHLY -> {
                 var count = 0L
                 var current = from.withDayOfMonth(1)

@@ -1,8 +1,6 @@
-// ── Shared enums ────────────────────────────────────────────
 export type DeviationModule = 'IK_MAT' | 'IK_ALKOHOL'
 export type DeviationSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
 
-// ── Food deviation types ────────────────────────────────────
 export type FoodDeviationType =
   | 'TEMPERATUR'
   | 'RENHOLD'
@@ -66,7 +64,6 @@ export interface UpdateFoodDeviationRequest {
   status?: FoodDeviationStatus
 }
 
-// ── Alcohol deviation types ─────────────────────────────────
 export type AlcoholReportSource = 'EGENRAPPORT' | 'SJENKEKONTROLL' | 'POLITIRAPPORT'
 
 export type AlcoholDeviationType =
@@ -85,7 +82,6 @@ export type AlcoholDeviationType =
   | 'MEDBRAKT_ALKOHOL'
   | 'REKLAMEBRUDD'
   | 'VILKAARSBRUDD'
-  // 0 points — age verification incidents
   | 'NEKTET_VISE_LEGITIMASJON'
   | 'GLEMTE_SJEKKE_LEGITIMASJON'
   | 'MINDREAARIG_FORSOK'
@@ -152,7 +148,6 @@ export interface UpdateAlcoholDeviationRequest {
   status?: AlcoholDeviationStatus
 }
 
-// ── Penalty points types ────────────────────────────────────
 export interface PenaltyPoint {
   id: number
   organizationId: number
@@ -174,12 +169,10 @@ export interface CreatePenaltyPointRequest {
   description?: string
 }
 
-// ── Combined deviation for unified list ─────────────────────
 export type CombinedDeviation =
   | { _type: 'food'; data: FoodDeviation }
   | { _type: 'alcohol'; data: AlcoholDeviation }
 
-// ── Penalty point helpers ───────────────────────────────────
 export const PENALTY_POINTS_MAP: Record<AlcoholDeviationType, number> = {
   SKJENKING_MINDREAARIGE: 8,
   BRUDD_BISTANDSPLIKT: 8,
@@ -196,7 +189,6 @@ export const PENALTY_POINTS_MAP: Record<AlcoholDeviationType, number> = {
   MEDBRAKT_ALKOHOL: 1,
   REKLAMEBRUDD: 1,
   VILKAARSBRUDD: 1,
-  // 0 points — age verification
   NEKTET_VISE_LEGITIMASJON: 0,
   GLEMTE_SJEKKE_LEGITIMASJON: 0,
   MINDREAARIG_FORSOK: 0,

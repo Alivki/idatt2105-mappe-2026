@@ -1,6 +1,7 @@
 package com.iksystem.common.resend
 
 import com.iksystem.common.config.ResendConfig
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.http.*
@@ -10,6 +11,7 @@ import org.springframework.http.*
  */
 @Component
 class ResendClient(private val props: ResendConfig) {
+    private val log = LoggerFactory.getLogger(ResendClient::class.java)
     private val restTemplate = RestTemplate()
 
     /**
@@ -18,7 +20,7 @@ class ResendClient(private val props: ResendConfig) {
      */
     fun sendEmail(to: String, subject: String, html: String) {
         if (props.devMode) {
-            println("DEV MODE: Email not sent to $to with subject: $subject")
+            log.debug("DEV MODE: Skipping email to {} with subject: {}", to, subject)
             return
         }
 

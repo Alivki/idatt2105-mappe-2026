@@ -94,12 +94,10 @@ class UserService(
         var user = userRepository.findByEmail(request.email)
 
         if (user != null) {
-            // User exists — check they're not already in this org
             if (membershipRepository.existsByUserIdAndOrganizationId(user.id, orgId)) {
                 throw ConflictException("User is already a member of this organization")
             }
         } else {
-            // Create new user identity
             user = userRepository.save(
                 User(
                     email = request.email,
@@ -201,7 +199,6 @@ class UserService(
         }
 
         membershipRepository.delete(membership)
-        // Revoke org-scoped tokens
         refreshTokenRepository.revokeAllByUserIdAndOrganizationId(userId, orgId)
         sessionRepository.deactivateAllByUserIdAndOrganizationId(userId, orgId)
     }

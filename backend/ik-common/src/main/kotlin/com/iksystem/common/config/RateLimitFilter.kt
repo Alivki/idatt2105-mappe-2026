@@ -3,6 +3,7 @@ package com.iksystem.common.config
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.slf4j.LoggerFactory
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
@@ -15,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class RateLimitFilter : OncePerRequestFilter() {
 
+    private val log = LoggerFactory.getLogger(RateLimitFilter::class.java)
     private val buckets = ConcurrentHashMap<String, TokenBucket>()
 
     companion object {
@@ -37,6 +39,7 @@ class RateLimitFilter : OncePerRequestFilter() {
         val bucket = buckets.computeIfAbsent(key) { TokenBucket(limit) }
 
         if (!bucket.tryConsume()) {
+            log.warn("Rate limit exceeded: ip={}, path={}", ip, path)
             response.status = HttpStatus.TOO_MANY_REQUESTS.value()
             response.contentType = "application/json"
             response.writer.write("""{"error":{"code":"rate_limited","message":"Too many requests. Try again later."}}""")

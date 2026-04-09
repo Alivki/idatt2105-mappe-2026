@@ -18,7 +18,7 @@ spring:
     locations: classpath:db/migration
 
 jwt:
-  secret: ${JWT_SECRET:super-secret-key-that-must-be-at-least-256-bits-long-for-hmac-sha}
+  secret: ${JWT_SECRET}
   access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}
   refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
 

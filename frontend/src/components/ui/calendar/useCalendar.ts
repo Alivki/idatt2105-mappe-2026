@@ -19,7 +19,6 @@ export function useCalendar(opts: {
   const weekDays = computed(() => {
     const fmt = new Intl.DateTimeFormat(locale, {weekday: "short"})
     const days: string[] = []
-    // Jan 5 2025 is a Sunday (day 0)
     for (let i = 0; i < 7; i++) {
       const d = new Date(2025, 0, 5 + weekStartsOn + i)
       days.push(fmt.format(d))

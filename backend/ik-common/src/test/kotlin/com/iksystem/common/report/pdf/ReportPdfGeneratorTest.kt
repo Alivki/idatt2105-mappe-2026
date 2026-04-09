@@ -76,7 +76,6 @@ class ReportPdfGeneratorTest {
 
         val pdfBytes = generator.generatePdf(data)
         assertTrue(pdfBytes.isNotEmpty(), "PDF should not be empty")
-        // PDF files start with %PDF
         val header = String(pdfBytes.take(5).toByteArray())
         assertTrue(header.startsWith("%PDF"), "Output should be a valid PDF, got: $header")
     }

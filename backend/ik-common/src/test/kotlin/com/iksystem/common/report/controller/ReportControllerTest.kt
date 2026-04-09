@@ -50,8 +50,6 @@ class ReportControllerTest : FunSpec({
         clearMocks(reportService)
     }
 
-    // ── preview ──
-
     test("preview returns 200 with preview data") {
         every { reportService.preview(request, auth) } returns previewResponse
 
@@ -61,8 +59,6 @@ class ReportControllerTest : FunSpec({
         result.body!!.header.organizationName shouldBe "Test Org AS"
         result.body!!.header.periodFrom shouldBe "01.03.2026"
     }
-
-    // ── generate ──
 
     test("generate returns 201 with report metadata") {
         every { reportService.generate(request, auth) } returns generatedResponse
@@ -74,8 +70,6 @@ class ReportControllerTest : FunSpec({
         result.body!!.title shouldBe "Internkontroll Rapport 01.03.2026 – 31.03.2026"
         result.body!!.downloadUrl shouldBe "https://s3.example.com/presigned"
     }
-
-    // ── list ──
 
     test("list returns 200 with report list") {
         every { reportService.list(auth) } returns listOf(generatedResponse)
@@ -96,8 +90,6 @@ class ReportControllerTest : FunSpec({
         result.body!!.size shouldBe 0
     }
 
-    // ── getReport ──
-
     test("getReport returns 200 with report data") {
         every { reportService.getReport(1L, auth) } returns generatedResponse
 
@@ -116,8 +108,6 @@ class ReportControllerTest : FunSpec({
         }
     }
 
-    // ── download ──
-
     test("download returns 200 with presigned URL") {
         every { reportService.getDownloadUrl(1L, auth) } returns "https://s3.example.com/download"
 
@@ -135,8 +125,6 @@ class ReportControllerTest : FunSpec({
         }
     }
 
-    // ── delete ──
-
     test("delete returns 204 no content") {
         every { reportService.delete(1L, auth) } just runs
 
@@ -153,8 +141,6 @@ class ReportControllerTest : FunSpec({
             controller.delete(99L, auth)
         }
     }
-
-    // ── exportJson ──
 
     test("exportJson returns 200 with same data as preview") {
         every { reportService.exportJson(request, auth) } returns previewResponse

@@ -32,7 +32,7 @@ class JwtService(
      */
     fun generatePreAuthToken(user: User): String {
         val now = Date()
-        val expiry = Date(now.time + 300_000) // 5 minutes
+        val expiry = Date(now.time + 300_000)
 
         return Jwts.builder()
             .subject(user.id.toString())

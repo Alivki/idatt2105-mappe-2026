@@ -16,7 +16,6 @@ interface TrainingRow {
   }
 }
 
-// Stubs
 const EmployeeAvatarStub = {
   name: 'EmployeeAvatar',
   template: '<div class="avatar-stub" :data-initials="initials" :data-color="color" />',
@@ -197,7 +196,6 @@ describe('TrainingTable', () => {
         },
         global: {stubs: globalStubs},
       })
-      // Find the expires td - it should have amber coloring
       const tds = wrapper.findAll('td')
       const expiresTd = tds.find((td) => td.text().includes('2024-06-01'))
       expect(expiresTd?.classes()).toContain('text-amber-600')
@@ -257,7 +255,6 @@ describe('TrainingTable', () => {
         props: {groupedTrainings: makeGrouped([makeRow()])},
         global: {stubs: globalStubs},
       })
-      // The dropdown div should not be visible initially
       expect(wrapper.find('.absolute.right-0').exists()).toBe(false)
     })
 
@@ -267,7 +264,6 @@ describe('TrainingTable', () => {
         global: {stubs: globalStubs},
         attachTo: document.body,
       })
-      // The ctx-wrap button (⋮)
       const menuBtn = wrapper.find('.ctx-wrap button')
       await menuBtn.trigger('click')
       expect(wrapper.find('.ctx-wrap .absolute').exists()).toBe(true)
@@ -281,8 +277,8 @@ describe('TrainingTable', () => {
         attachTo: document.body,
       })
       const menuBtn = wrapper.find('.ctx-wrap button')
-      await menuBtn.trigger('click') // open
-      await menuBtn.trigger('click') // close
+      await menuBtn.trigger('click')
+      await menuBtn.trigger('click')
       expect(wrapper.find('.ctx-wrap .absolute').exists()).toBe(false)
       wrapper.unmount()
     })
@@ -295,7 +291,6 @@ describe('TrainingTable', () => {
         attachTo: document.body,
       })
       await wrapper.find('.ctx-wrap button').trigger('click')
-      // Click Rediger button (first button in dropdown)
       const dropdownBtns = wrapper.findAll('.ctx-wrap .absolute button')
       await dropdownBtns[0].trigger('click')
       expect(wrapper.emitted('edit')).toBeTruthy()
@@ -355,7 +350,6 @@ describe('TrainingTable', () => {
       await wrapper.find('.ctx-wrap button').trigger('click')
       expect(wrapper.find('.ctx-wrap .absolute').exists()).toBe(true)
 
-      // Simulate outside click
       document.body.dispatchEvent(new MouseEvent('click', {bubbles: true}))
       await wrapper.vm.$nextTick()
       expect(wrapper.find('.ctx-wrap .absolute').exists()).toBe(false)

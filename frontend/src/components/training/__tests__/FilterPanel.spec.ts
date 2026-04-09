@@ -21,7 +21,6 @@ describe('FilterPanel', () => {
     it('renders all type pills', () => {
       const wrapper = mountPanel()
       const pills = wrapper.findAll('.pill')
-      // 3 type pills + 3 status pills
       expect(pills.length).toBeGreaterThanOrEqual(3)
       expect(wrapper.text()).toContain('Brannvern')
       expect(wrapper.text()).toContain('HMS')
@@ -162,9 +161,8 @@ describe('FilterPanel', () => {
   describe('empty types list', () => {
     it('renders no type pills when types is empty', () => {
       const wrapper = mountPanel({types: []})
-      // Only status pills should exist
       const pills = wrapper.findAll('.pill')
-      expect(pills.length).toBe(3) // only the 3 status pills
+      expect(pills.length).toBe(3)
     })
   })
 })

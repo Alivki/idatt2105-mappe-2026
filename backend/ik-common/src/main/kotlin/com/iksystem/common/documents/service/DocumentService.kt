@@ -5,6 +5,7 @@ import com.iksystem.common.documents.repository.DocumentRepository
 import com.iksystem.common.exception.BadRequestException
 import com.iksystem.common.security.AuthenticatedUser
 import com.iksystem.common.user.repository.UserRepository
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -26,6 +27,8 @@ class DocumentsService(
     private val userRepository: UserRepository,
     @Value("\${aws.s3.bucket}") val bucketName: String,
 ) {
+    private val log = LoggerFactory.getLogger(DocumentsService::class.java)
+
     fun test() {
         s3Client.listBuckets()
     }
@@ -39,7 +42,7 @@ class DocumentsService(
      * @return The saved Document entity with metadata
      */
     companion object {
-        private const val MAX_FILE_SIZE = 5L * 1024 * 1024 // 5 MB
+        private const val MAX_FILE_SIZE = 5L * 1024 * 1024
         private val ALLOWED_CONTENT_TYPES = setOf(
             "application/pdf",
             "image/png",
@@ -71,7 +74,6 @@ class DocumentsService(
         validateFile(file)
         val s3Key = "$folder/${UUID.randomUUID()}-${file.originalFilename}"
 
-        // Upload to S3
         val putObjectRequest = PutObjectRequest.builder()
             .bucket(bucketName)
             .key(s3Key)
@@ -79,12 +81,11 @@ class DocumentsService(
             .build()
 
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.bytes))
+        log.info("Uploaded file to S3: key={}, size={}", s3Key, file.size)
 
-        // Fetch the authenticated user
         val user = userRepository.findById(auth.userId)
             .orElseThrow { IllegalArgumentException("User not found") }
 
-        // Save metadata to database
         val document = Document(
             organizationId = auth.requireOrganizationId(),
             s3Key = s3Key,
@@ -106,15 +107,14 @@ class DocumentsService(
         val document = documentRepository.findByIdAndOrganizationId(documentId, organizationId)
             ?: throw IllegalArgumentException("Document not found")
 
-        // Delete from S3
         val deleteObjectRequest = DeleteObjectRequest.builder()
             .bucket(bucketName)
             .key(document.s3Key)
             .build()
 
         s3Client.deleteObject(deleteObjectRequest)
+        log.info("Deleted document: id={}, s3Key={}", documentId, document.s3Key)
 
-        // Delete from database
         documentRepository.delete(document)
     }
 

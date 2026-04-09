@@ -5,7 +5,6 @@ const api = axios.create({
   baseURL: '/api/v1',
 })
 
-// Attach access token to every request
 api.interceptors.request.use((config) => {
   const auth = useAuthStore()
   if (auth.accessToken) {
@@ -14,7 +13,6 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Auto-refresh on 401
 let refreshPromise: Promise<void> | null = null
 
 api.interceptors.response.use(
@@ -34,7 +32,6 @@ api.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    // Deduplicate: if a refresh is already in flight, wait for it
     if (!refreshPromise) {
       refreshPromise = axios
         .post('/api/v1/auth/refresh', { refreshToken })
@@ -52,7 +49,6 @@ api.interceptors.response.use(
 
     await refreshPromise
 
-    // If refresh succeeded, retry the original request
     if (auth.accessToken) {
       original.headers.Authorization = `Bearer ${auth.accessToken}`
       return api(original)

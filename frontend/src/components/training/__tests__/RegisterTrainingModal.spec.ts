@@ -2,8 +2,6 @@ import {describe, it, expect, vi, beforeEach} from 'vitest'
 import {mount, flushPromises} from '@vue/test-utils'
 import {ref} from 'vue'
 
-// ── Mock composables ─────────────────────────────────────────────────────────
-
 const mockMutateAsync = vi.fn()
 const mockIsPending = ref(false)
 
@@ -24,8 +22,6 @@ vi.mock('vue-sonner', () => ({toast: {success: vi.fn(), error: vi.fn()}}))
 vi.mock('axios', () => ({
   default: {isAxiosError: vi.fn().mockReturnValue(false)},
 }))
-
-// ── Stubs ────────────────────────────────────────────────────────────────────
 
 const globalStubs = {
   Dialog: {
@@ -215,19 +211,11 @@ describe('RegisterTrainingModal', () => {
   describe('submit success', () => {
     it('shows success toast after successful submit', async () => {
       mockMutateAsync.mockResolvedValue({})
-      // We can't easily fill all fields via stubs, so just check the toast
-      // on a mocked resolved mutation by directly calling mutateAsync
-      // This is tested via the integration path — the actual validation guard
-      // prevents calling mutateAsync on empty form (tested above).
-      // Here we verify mutation call results in a toast:
-      mockMutateAsync.mockResolvedValue({})
       expect(toast.success).not.toHaveBeenCalled()
     })
 
     it('shows error toast on generic network error', async () => {
       mockMutateAsync.mockRejectedValue(new Error('Network error'))
-      // Only fires if validation passes — registration form starts empty,
-      // so mutateAsync won't be called. This tests the error path separately.
       expect(toast.error).not.toHaveBeenCalled()
     })
   })
@@ -253,10 +241,8 @@ describe('RegisterTrainingModal', () => {
   describe('form reset on open', () => {
     it('resets form fields when modal is re-opened', async () => {
       const wrapper = mountModal({open: false})
-      // Change input
       await wrapper.setProps({open: true})
       await wrapper.vm.$nextTick()
-      // After opening, input should be empty
       const input = wrapper.find('.input-stub')
       expect(input.attributes('value')).toBe('')
     })

@@ -2,8 +2,6 @@ import {describe, it, expect, vi, beforeEach} from 'vitest'
 import {mount, flushPromises} from '@vue/test-utils'
 import {ref} from 'vue'
 
-// ── Helpers extracted from EditTrainingModal (tested in isolation) ──────────
-
 function isoToDateInput(iso: string | null): string {
   if (!iso) return ''
   return iso.slice(0, 10)
@@ -23,8 +21,6 @@ function dateValueToIso(dv: {
   if (!dv) return undefined
   return new Date(dv.year, dv.month - 1, dv.day).toISOString()
 }
-
-// ── Mock composables ─────────────────────────────────────────────────────────
 
 const mockMutateAsync = vi.fn()
 const mockIsPending = ref(false)
@@ -46,8 +42,6 @@ vi.mock('vue-sonner', () => ({toast: {success: vi.fn(), error: vi.fn()}}))
 vi.mock('axios', () => ({
   default: {isAxiosError: vi.fn().mockReturnValue(false)},
 }))
-
-// ── Stubs ────────────────────────────────────────────────────────────────────
 
 const makeStub = (name: string, tag = 'div') => ({
   name,
@@ -166,14 +160,6 @@ describe('EditTrainingModal – helper functions', () => {
   })
 })
 
-// ── Helpers for script setup components ─────────────────────────────────────
-// Vue 3 <script setup> exposes refs as a non-extensible Proxy, so setData()
-// and direct assignment on vm fail. The only reliable way to set internal
-// reactive state is to trigger it through the component's own watch by
-// toggling the `open` prop from false → true.
-// For date values that come from a DatePicker (which our stub cannot emit as
-// CalendarDate objects), we write through the Proxy via Object.assign, which
-// mutates existing reactive properties without adding new ones.
 
 /** Mount closed, then open so watch([open, training]) fires */
 async function mountAndOpen(extraProps: Record<string, unknown> = {}) {

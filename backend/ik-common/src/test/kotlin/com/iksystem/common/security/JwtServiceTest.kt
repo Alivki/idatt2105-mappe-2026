@@ -11,7 +11,6 @@ import io.kotest.matchers.shouldBe
 
 class JwtServiceTest : FunSpec({
 
-    // 256-bit key for HMAC-SHA
     val secret = "test-secret-key-that-must-be-at-least-256-bits-long-for-hmac-sha!!"
     val jwtService = JwtService(secret = secret, accessTokenExpiration = 900_000L)
 

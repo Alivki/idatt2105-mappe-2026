@@ -101,7 +101,6 @@ class AlcoholDeviationService(
             )
         )
 
-        // Auto-add penalty points for sjenkekontroll or politirapport
         if (request.reportSource == AlcoholReportSource.SJENKEKONTROLL ||
             request.reportSource == AlcoholReportSource.POLITIRAPPORT
         ) {

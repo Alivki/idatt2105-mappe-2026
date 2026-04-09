@@ -39,7 +39,6 @@ const chartData = computed(() => {
       data.push(0)
     }
   } else {
-    // Count unique checklist completions per day from completion history
     const completionsByDate: Record<string, Set<number>> = {}
     const dailyIds = new Set(dailyChecklists.value.map((c) => c.id))
 
