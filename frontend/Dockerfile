@@ -18,4 +18,8 @@ ENV BACKEND_FOOD_PORT=8080
 ENV BACKEND_ALCOHOL_HOST=ik-alkohol
 ENV BACKEND_ALCOHOL_PORT=8080
 
+# Script to extract DNS resolver from /etc/resolv.conf at startup
+COPY docker-entrypoint-resolver.sh /docker-entrypoint.d/15-resolve-dns.envsh
+RUN chmod +x /docker-entrypoint.d/15-resolve-dns.envsh
+
 EXPOSE 80
