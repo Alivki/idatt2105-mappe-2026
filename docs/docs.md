@@ -170,41 +170,29 @@ docker compose down -v
 ## 5. Kjøring lokalt uten Docker (utvikling)
 
 > [!WARNING]
-> Når du kjører uten Docker må du passe på porter: begge backend-moduler bruker default `8080`. Kjør dem på ulike porter via `SERVER_PORT`.
+> Når du kjører uten Docker må du passe på porter: begge backend-moduler bruker default `8080`.
 
 ### 5.1 Backend
 
-```bash
-cd backend
-./mvnw -B -ntp clean verify
-```
+Vi har et samlet dev-script som starter **alt** du trenger i utvikling:
 
-Kjør IK-Mat lokalt (eksempel):
+- MySQL (Docker Compose)
+- IK-Mat (port `8081`)
+- IK-Alkohol (port `8082`)
+- Frontend (Vite, port `5173`)
 
-```bash
-cd backend
-SERVER_PORT=8081 ./mvnw -pl ik-food-service spring-boot:run
-```
-
-Kjør IK-Alkohol lokalt (eksempel):
+Kjør fra repo-roten:
 
 ```bash
-cd backend
-SERVER_PORT=8082 ./mvnw -pl ik-alcohol-service spring-boot:run
+chmod +x dev-up.sh
+./dev-up.sh
 ```
 
-> [!NOTE]
-> DB kan være Docker-MySQL (anbefalt). Konfig styres via env-variabler (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`). Se `.env.example`.
+Logger skrives til `.run-logs/` (i repo-roten).
 
 ### 5.2 Frontend
 
-```bash
-cd frontend
-npm ci
-npm run dev
-```
-
-Typisk dev-URL: http://localhost:5173
+Frontend startes automatisk av `./dev-up.sh`.
 
 ---
 
@@ -223,8 +211,11 @@ Den peker til:
 
 ### 6.2 Direkte OpenAPI JSON
 
-- IK-Mat: http://localhost:8081/v3/api-docs
-- IK-Alkohol: http://localhost:8082/v3/api-docs
+- Docker (begge tjenester):
+  - IK-Mat: http://localhost:8081/v3/api-docs
+  - IK-Alkohol: http://localhost:8082/v3/api-docs
+- Uten Docker (én modul lokalt):
+  - Aktiv modul: http://localhost:8080/v3/api-docs
 
 > [!NOTE]
 > `springdoc.swagger-ui.enabled` er satt til `false` i backend sin `application.yml`. Det betyr at backend ikke serverer egen Swagger UI som standard, men OpenAPI JSON er tilgjengelig.
@@ -364,6 +355,14 @@ Kjør alt:
 cd backend
 ./mvnw -B -ntp clean verify
 ```
+
+eller
+ 
+```bash
+cd backend
+mvn clean test 
+```
+coverage kan man se når man klikker på target - sites, og åpner index.html i browser
 
 Coverage rapporter (JaCoCo) genereres per modul under `target/site/jacoco/`.
 

@@ -11,21 +11,15 @@ Et digitalt internkontrollsystem for restauranter, barer og serveringssteder. Ve
 - Docker Desktop (inkludert Docker Compose)
 - Git
 
-### Kjør appen lokalt
-
+### Kjør appen lokalt med docker
+**Start:**
 Fra repo-roten:
 
 ```bash
 docker compose up --build
 ```
 
-Applikasjonen vil starte på:
-- **Frontend**: http://localhost (Nginx + Vue app)
-- **Backend API (mat)**: http://localhost:8081
-- **Backend API (alkohol)**: http://localhost:8082
-- **Database**: mysql:3306
-
-### Stopp appen
+**Stoppe:**
 
 ```bash
 docker compose down
@@ -36,6 +30,24 @@ Fjern alle data (inkludert databasen):
 ```bash
 docker compose down -v
 ```
+
+### Kjøre program i utvikling (uten Docker): ###
+**Start:**
+```bash
+chmod +x dev-up.sh
+./dev-up.sh
+```
+
+**Stoppe:**
+```bash
+Ctrl + c
+```
+
+Applikasjonen vil starte på:
+- **Frontend**: http://localhost (Nginx + Vue app)
+- **Backend API (mat)**: http://localhost:8081
+- **Backend API (alkohol)**: http://localhost:8082
+- **Database**: mysql:3306
 
 ## Testbrukere
 
@@ -67,7 +79,7 @@ FULLSTACK-V2026/
 | **Frontend** | Vue.js | 3.x |
 | | Vite | 7.x |
 | | TypeScript | 5.x |
-| | Node.js | 18+ |
+| | Node.js | 20.19+ eller 22.12+ |
 | **Backend** | Java | 21 |
 | | Kotlin | 2.1+ |
 | | Spring Boot | 3.x |
@@ -93,35 +105,6 @@ Backend bruker **Flyway** for databasemigrasjoner og oppretter/migrerer schema a
 
 ## Dokumentasjon
 
-- Se `docs/README.md`
+- Se `docs/docs.md`
 
-## Nyttige kommandoer
-
-**Se logger fra alle tjenester:**
-```bash
-docker compose logs -f
-```
-
-**Se logger fra bare backend:**
-```bash
-docker compose logs -f vera-mat vera-alkohol
-```
-
-**Restart bare backend (for rask utvikling):**
-```bash
-docker compose restart vera-mat vera-alkohol
-```
-
-**Kjør bare backend lokalt (uten Docker):**
-```bash
-cd backend
-mvn clean install
-mvn spring-boot:run
-```
-
-**Kjør bare frontend lokalt (uten Docker):**
-```bash
-cd frontend
-npm run dev
-```
 ---
