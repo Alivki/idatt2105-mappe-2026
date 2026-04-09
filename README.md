@@ -5,6 +5,12 @@ Semester-prosjekt IDATT2105 – Fullstack-appsutvikling (2026)
 
 Et digitalt internkontrollsystem for restauranter, barer og serveringssteder. Vera hjelper virksomheter å forenkle compliance med helse-, sikkerhets- og alkoholreguleringer ved å digitalisere sjekklister, temperaturlogging og rutiner for avviksoppfølging.
 
+## Gruppemedlemmer
+
+- Iver Lindholm
+- Piranavan Visvalingam
+- Sigve Eriksen
+
 ## Rask oppstart
 
 ### Forutsetninger
