@@ -51,7 +51,7 @@ class ChecklistServiceTest {
             checklistRepository,
             checklistItemRepository,
             checklistCompletionRepository,
-            userRepository,
+            userRepository
         )
     }
 
@@ -396,4 +396,5 @@ class ChecklistServiceTest {
         completed = completed,
         completedAt = completedAt
     )
+
 }
