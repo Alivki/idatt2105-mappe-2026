@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, h, nextTick, ref } from 'vue'
+import {afterEach, describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h, nextTick, ref} from 'vue'
 
 import AlertDialog from '../AlertDialog.vue'
 import AlertDialogContent from '../AlertDialogContent.vue'
@@ -12,11 +12,11 @@ vi.mock('@/components/ui/button', () => ({
   Button: defineComponent({
     name: 'ButtonStub',
     props: {
-      variant: { type: String, default: 'default' },
-      class: { type: String, default: '' },
+      variant: {type: String, default: 'default'},
+      class: {type: String, default: ''},
     },
     emits: ['click'],
-    setup(props, { slots, emit, attrs }) {
+    setup(props, {slots, emit, attrs}) {
       return () =>
         h(
           'button',
@@ -59,8 +59,8 @@ describe('AlertDialog behavior', () => {
         `,
       },
       global: {
-        components: { AlertDialogContent },
-        stubs: { teleport: false, transition: true },
+        components: {AlertDialogContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -73,7 +73,7 @@ describe('AlertDialog behavior', () => {
 
   it('respects defaultOpen', async () => {
     const wrapper = mount(AlertDialog, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -83,8 +83,8 @@ describe('AlertDialog behavior', () => {
         `,
       },
       global: {
-        components: { AlertDialogContent },
-        stubs: { teleport: false, transition: true },
+        components: {AlertDialogContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -103,7 +103,7 @@ describe('AlertDialog behavior', () => {
 
   it('syncs internal state when controlled open prop changes', async () => {
     const wrapper = mount(AlertDialog, {
-      props: { open: false },
+      props: {open: false},
       attachTo: document.body,
       slots: {
         default: `
@@ -113,19 +113,19 @@ describe('AlertDialog behavior', () => {
         `,
       },
       global: {
-        components: { AlertDialogContent },
-        stubs: { teleport: false, transition: true },
+        components: {AlertDialogContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
     await nextTick()
     expect(document.body.querySelector('[role="alertdialog"]')).toBeNull()
 
-    await wrapper.setProps({ open: true })
+    await wrapper.setProps({open: true})
     await nextTick()
     expect(document.body.querySelector('[role="alertdialog"]')).not.toBeNull()
 
-    await wrapper.setProps({ open: false })
+    await wrapper.setProps({open: false})
     await nextTick()
     expect(document.body.querySelector('[role="alertdialog"]')).toBeNull()
 
@@ -146,8 +146,8 @@ describe('AlertDialog behavior', () => {
         `,
       },
       global: {
-        components: { AlertDialogTrigger, AlertDialogContent },
-        stubs: { teleport: false, transition: true },
+        components: {AlertDialogTrigger, AlertDialogContent},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -168,7 +168,7 @@ describe('AlertDialog behavior', () => {
 
   it('action button uses default variant and closes dialog', async () => {
     const wrapper = mount(AlertDialog, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -180,8 +180,8 @@ describe('AlertDialog behavior', () => {
         `,
       },
       global: {
-        components: { AlertDialogContent, AlertDialogAction },
-        stubs: { teleport: false, transition: true },
+        components: {AlertDialogContent, AlertDialogAction},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -202,7 +202,7 @@ describe('AlertDialog behavior', () => {
 
   it('action button respects custom variant and class', async () => {
     const wrapper = mount(AlertDialog, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -218,8 +218,8 @@ describe('AlertDialog behavior', () => {
         `,
       },
       global: {
-        components: { AlertDialogContent, AlertDialogAction },
-        stubs: { teleport: false, transition: true },
+        components: {AlertDialogContent, AlertDialogAction},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -235,7 +235,7 @@ describe('AlertDialog behavior', () => {
 
   it('cancel button uses outline variant, merges class and closes dialog', async () => {
     const wrapper = mount(AlertDialog, {
-      props: { defaultOpen: true },
+      props: {defaultOpen: true},
       attachTo: document.body,
       slots: {
         default: `
@@ -247,8 +247,8 @@ describe('AlertDialog behavior', () => {
         `,
       },
       global: {
-        components: { AlertDialogContent, AlertDialogCancel },
-        stubs: { teleport: false, transition: true },
+        components: {AlertDialogContent, AlertDialogCancel},
+        stubs: {teleport: false, transition: true},
       },
     })
 
@@ -278,7 +278,7 @@ describe('AlertDialog behavior', () => {
       },
       setup() {
         const open = ref(false)
-        return { open }
+        return {open}
       },
       template: `
         <AlertDialog v-model:open="open">
@@ -295,7 +295,7 @@ describe('AlertDialog behavior', () => {
     const wrapper = mount(ControlledHost, {
       attachTo: document.body,
       global: {
-        stubs: { teleport: false, transition: true },
+        stubs: {teleport: false, transition: true},
       },
     })
 

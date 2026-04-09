@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick, ref } from 'vue'
+import {describe, expect, it} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, nextTick, ref} from 'vue'
 
 import SwitchComponent from '../Switch.vue'
 
@@ -117,7 +117,7 @@ describe('Switch', () => {
 
     expect(wrapper.attributes('aria-checked')).toBe('false')
 
-    await wrapper.setProps({ checked: true })
+    await wrapper.setProps({checked: true})
     await nextTick()
 
     expect(wrapper.attributes('aria-checked')).toBe('true')
@@ -211,10 +211,10 @@ describe('Switch', () => {
 
   it('works with v-model in a parent component', async () => {
     const Host = defineComponent({
-      components: { AppSwitch: SwitchComponent },
+      components: {AppSwitch: SwitchComponent},
       setup() {
         const checked = ref(false)
-        return { checked }
+        return {checked}
       },
       template: `<AppSwitch v-model:checked="checked" data-test="switch" />`,
     })

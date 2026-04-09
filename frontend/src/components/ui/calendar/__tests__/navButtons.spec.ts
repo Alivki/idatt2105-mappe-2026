@@ -1,11 +1,11 @@
-import { describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import {describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
 import CalendarNextButton from '../CalendarNextButton.vue'
 import CalendarPrevButton from '../CalendarPrevButton.vue'
 
 vi.mock('lucide-vue-next', () => ({
-  ChevronLeft: { name: 'ChevronLeft', template: '<svg data-test="chevron-left" />' },
-  ChevronRight: { name: 'ChevronRight', template: '<svg data-test="chevron-right" />' },
+  ChevronLeft: {name: 'ChevronLeft', template: '<svg data-test="chevron-left" />'},
+  ChevronRight: {name: 'ChevronRight', template: '<svg data-test="chevron-right" />'},
 }))
 
 describe('calendar navigation buttons', () => {
@@ -14,7 +14,7 @@ describe('calendar navigation buttons', () => {
     const wrapper = mount(CalendarPrevButton, {
       global: {
         provide: {
-          calendar: { prevMonth, disabled: false },
+          calendar: {prevMonth, disabled: false},
         },
       },
     })
@@ -30,7 +30,7 @@ describe('calendar navigation buttons', () => {
     const wrapper = mount(CalendarNextButton, {
       global: {
         provide: {
-          calendar: { nextMonth, disabled: false },
+          calendar: {nextMonth, disabled: false},
         },
       },
     })
@@ -43,10 +43,10 @@ describe('calendar navigation buttons', () => {
 
   it('respects disabled state and allows slot override', () => {
     const wrapper = mount(CalendarPrevButton, {
-      slots: { default: '<span data-test="custom-slot">custom</span>' },
+      slots: {default: '<span data-test="custom-slot">custom</span>'},
       global: {
         provide: {
-          calendar: { prevMonth: vi.fn(), disabled: true },
+          calendar: {prevMonth: vi.fn(), disabled: true},
         },
       },
     })

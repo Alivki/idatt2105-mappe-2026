@@ -12,7 +12,7 @@ defineProps<{
     :data-disabled="disabled || undefined"
     :class="['input-group', $props.class]"
   >
-    <slot />
+    <slot/>
   </div>
 </template>
 

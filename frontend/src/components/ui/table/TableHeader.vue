@@ -6,7 +6,7 @@ defineProps<{
 
 <template>
   <thead :class="['table-header', $props.class]">
-    <slot />
+  <slot/>
   </thead>
 </template>
 

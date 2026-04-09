@@ -1,11 +1,24 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useMediaQuery } from '@vueuse/core'
+import {computed, ref} from 'vue'
+import {useTableSort} from '@/composables/useTableSort'
+import {useMediaQuery} from '@vueuse/core'
 import axios from 'axios'
-import { MoreVertical, ArrowUpDown, Search, Plus, Pencil, Trash2, AlertTriangle, Users, ShieldCheck, Clock, UserX } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
+import {
+  MoreVertical,
+  ArrowUpDown,
+  Search,
+  Plus,
+  Pencil,
+  Trash2,
+  AlertTriangle,
+  Users,
+  ShieldCheck,
+  Clock,
+  UserX
+} from 'lucide-vue-next'
+import {toast} from 'vue-sonner'
+import {Separator} from '@/components/ui/separator'
+import {SidebarTrigger} from '@/components/ui/sidebar'
 import Button from '@/components/ui/button/Button.vue'
 import Checkbox from '@/components/ui/checkbox/Checkbox.vue'
 import {
@@ -41,7 +54,7 @@ import {
   useTrainingLogsQuery,
   useDeleteTrainingLogMutation,
 } from '@/composables/useTrainingLogs'
-import type { TrainingLog, TrainingStatus } from '@/types/training'
+import type {TrainingLog, TrainingStatus} from '@/types/training'
 
 const trainingLogsQuery = useTrainingLogsQuery()
 const deleteTrainingLog = useDeleteTrainingLogMutation()
@@ -52,18 +65,7 @@ const trainingLogs = computed(() => trainingLogsQuery.data.value ?? [])
 const search = ref('')
 
 type SortField = 'employee' | 'title' | 'completed' | 'expires' | 'status'
-type SortDir = 'asc' | 'desc'
-const sortField = ref<SortField>('employee')
-const sortDir = ref<SortDir>('asc')
-
-function toggleSort(field: SortField) {
-  if (sortField.value === field) {
-    sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
-  } else {
-    sortField.value = field
-    sortDir.value = 'asc'
-  }
-}
+const {sortField, sortDir, toggleSort} = useTableSort<SortField>('employee')
 
 const statusLabel: Record<TrainingStatus, string> = {
   COMPLETED: 'Gyldig',
@@ -82,7 +84,7 @@ const statusOrder: Record<TrainingStatus, number> = {
 function formatDate(iso: string | null): string {
   if (!iso) return '—'
   const d = new Date(iso)
-  return d.toLocaleDateString('nb-NO', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  return d.toLocaleDateString('nb-NO', {day: '2-digit', month: '2-digit', year: 'numeric'})
 }
 
 const filteredAndSorted = computed(() => {
@@ -201,8 +203,8 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 <template>
   <header class="page-header">
     <div class="page-header-inner">
-      <SidebarTrigger />
-      <Separator orientation="vertical" class="header-separator" />
+      <SidebarTrigger/>
+      <Separator orientation="vertical" class="header-separator"/>
       <span class="page-title">Opplæring</span>
     </div>
   </header>
@@ -215,32 +217,36 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
       </div>
       <div class="header-actions">
         <Button @click="showRegister = true">
-          <Plus :size="16" />
+          <Plus :size="16"/>
           Registrer opplæring
         </Button>
       </div>
     </section>
 
     <section class="cards-group">
-      <OverviewCard label="Totalt opplærte" :value="stats.total" :icon="Users" />
-      <OverviewCard label="Fullført" :value="stats.completed" :icon="ShieldCheck" variant="resolved" />
-      <OverviewCard label="Utløper snart" :value="stats.expiringSoon" :icon="Clock" variant="in-progress" />
-      <OverviewCard label="Utgått" :value="stats.expired" :icon="AlertTriangle" variant="open" />
-      <OverviewCard label="Mangler" :value="stats.notCompleted" :icon="UserX" variant="open" />
+      <OverviewCard label="Totalt opplærte" :value="stats.total" :icon="Users"/>
+      <OverviewCard label="Fullført" :value="stats.completed" :icon="ShieldCheck"
+                    variant="resolved"/>
+      <OverviewCard label="Utløper snart" :value="stats.expiringSoon" :icon="Clock"
+                    variant="in-progress"/>
+      <OverviewCard label="Utgått" :value="stats.expired" :icon="AlertTriangle" variant="open"/>
+      <OverviewCard label="Mangler" :value="stats.notCompleted" :icon="UserX" variant="open"/>
     </section>
 
     <section class="table-section">
       <div class="search-row">
         <div class="search-wrapper">
-          <Search :size="16" class="search-icon" />
-          <input v-model="search" class="search-input" placeholder="Søk etter ansatt, type eller status..." aria-label="Søk etter ansatt, type eller status" />
+          <Search :size="16" class="search-icon"/>
+          <input v-model="search" class="search-input"
+                 placeholder="Søk etter ansatt, type eller status..."
+                 aria-label="Søk etter ansatt, type eller status"/>
         </div>
         <Button
           v-if="selected.size > 0"
           variant="destructive-ghost"
           @click="openDeleteSelected"
         >
-          <Trash2 :size="16" />
+          <Trash2 :size="16"/>
           Slett ({{ selected.size }})
         </Button>
       </div>
@@ -250,10 +256,10 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
       </div>
 
       <div v-else-if="trainingLogsQuery.isError.value" class="empty-state">
-        <div class="empty-state-bg" />
+        <div class="empty-state-bg"/>
         <div class="empty-state-inner">
           <div class="empty-state-icon">
-            <AlertTriangle :stroke-width="1.5" />
+            <AlertTriangle :stroke-width="1.5"/>
           </div>
           <div class="empty-state-text">
             <h3>Kunne ikke hente opplæringer</h3>
@@ -270,23 +276,23 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
           :class="selected.has(log.id) ? 'mobile-training-card--selected' : ''"
         >
           <div class="mobile-training-top">
-            <Checkbox :checked="selected.has(log.id)" @update:checked="toggleSelect(log.id)" />
+            <Checkbox :checked="selected.has(log.id)" @update:checked="toggleSelect(log.id)"/>
             <DropdownMenu>
               <DropdownMenuTrigger as-child>
                 <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger">
-                  <MoreVertical :size="18" />
+                  <MoreVertical :size="18"/>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" :side-offset="4">
                 <DropdownMenuLabel>Handlinger</DropdownMenuLabel>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator/>
                 <DropdownMenuItem @click="openEdit(log)">
-                  <Pencil :size="16" />
+                  <Pencil :size="16"/>
                   Rediger
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator/>
                 <DropdownMenuItem class="menu-item--danger" @click="openDeleteSingle(log)">
-                  <Trash2 :size="16" />
+                  <Trash2 :size="16"/>
                   Slett
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -307,19 +313,21 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
           </div>
           <div class="mobile-training-row">
             <span>Utløper</span>
-            <span :class="log.status === 'EXPIRES_SOON' ? 'cell-expires-soon' : ''">{{ formatDate(log.expiresAt) }}</span>
+            <span :class="log.status === 'EXPIRES_SOON' ? 'cell-expires-soon' : ''">{{
+                formatDate(log.expiresAt)
+              }}</span>
           </div>
           <div class="mobile-training-row">
             <span>Status</span>
-            <StatusBadge :status="statusLabel[log.status]" />
+            <StatusBadge :status="statusLabel[log.status]"/>
           </div>
         </article>
 
         <div v-if="filteredAndSorted.length === 0" class="empty-state">
-          <div class="empty-state-bg" />
+          <div class="empty-state-bg"/>
           <div class="empty-state-inner">
             <div class="empty-state-icon">
-              <AlertTriangle :stroke-width="1.5" />
+              <AlertTriangle :stroke-width="1.5"/>
             </div>
             <div class="empty-state-text">
               <h3>Ingen opplæringer matcher søket</h3>
@@ -334,39 +342,44 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
           <TableHeader>
             <TableRow>
               <TableHead class="th-check">
-                <Checkbox :checked="allSelected" @update:checked="toggleSelectAll" />
+                <Checkbox :checked="allSelected" @update:checked="toggleSelectAll"/>
               </TableHead>
               <TableHead class="th-employee">
                 <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('employee')">
                   Ansatt
-                  <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'employee' }" />
+                  <ArrowUpDown :size="14" class="sort-icon"
+                               :class="{ 'sort-icon--active': sortField === 'employee' }"/>
                 </Button>
               </TableHead>
               <TableHead class="th-title">
                 <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('title')">
                   Opplæringstype
-                  <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'title' }" />
+                  <ArrowUpDown :size="14" class="sort-icon"
+                               :class="{ 'sort-icon--active': sortField === 'title' }"/>
                 </Button>
               </TableHead>
               <TableHead class="th-date hide-mobile">
                 <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('completed')">
                   Fullført
-                  <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'completed' }" />
+                  <ArrowUpDown :size="14" class="sort-icon"
+                               :class="{ 'sort-icon--active': sortField === 'completed' }"/>
                 </Button>
               </TableHead>
               <TableHead class="th-date hide-mobile">
                 <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('expires')">
                   Utløper
-                  <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'expires' }" />
+                  <ArrowUpDown :size="14" class="sort-icon"
+                               :class="{ 'sort-icon--active': sortField === 'expires' }"/>
                 </Button>
               </TableHead>
               <TableHead class="th-status">
                 <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('status')">
                   Status
-                  <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'status' }" />
+                  <ArrowUpDown :size="14" class="sort-icon"
+                               :class="{ 'sort-icon--active': sortField === 'status' }"/>
                 </Button>
               </TableHead>
-              <TableHead class="th-actions" />
+              <TableHead class="th-actions"/>
             </TableRow>
           </TableHeader>
 
@@ -377,41 +390,47 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
               :class="selected.has(log.id) ? 'row-selected' : ''"
             >
               <TableCell class="td-check" data-label="Velg">
-                <Checkbox :checked="selected.has(log.id)" @update:checked="toggleSelect(log.id)" />
+                <Checkbox :checked="selected.has(log.id)" @update:checked="toggleSelect(log.id)"/>
               </TableCell>
               <TableCell data-label="Ansatt">
                 <div class="cell-user">
                   <div class="user-avatar">
-                    {{ log.employeeUserName.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() }}
+                    {{
+                      log.employeeUserName.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
+                    }}
                   </div>
                   <span class="user-name">{{ log.employeeUserName }}</span>
                 </div>
               </TableCell>
               <TableCell class="cell-text" data-label="Opplæringstype">{{ log.title }}</TableCell>
-              <TableCell class="cell-text hide-mobile" data-label="Fullført">{{ formatDate(log.completedAt) }}</TableCell>
-              <TableCell :class="`cell-text hide-mobile${log.status === 'EXPIRES_SOON' ? ' cell-expires-soon' : ''}`" data-label="Utløper">
+              <TableCell class="cell-text hide-mobile" data-label="Fullført">
+                {{ formatDate(log.completedAt) }}
+              </TableCell>
+              <TableCell
+                :class="`cell-text hide-mobile${log.status === 'EXPIRES_SOON' ? ' cell-expires-soon' : ''}`"
+                data-label="Utløper">
                 {{ formatDate(log.expiresAt) }}
               </TableCell>
               <TableCell data-label="Status">
-                <StatusBadge :status="statusLabel[log.status]" />
+                <StatusBadge :status="statusLabel[log.status]"/>
               </TableCell>
               <TableCell class="cell-actions" data-label="Handlinger">
                 <DropdownMenu>
                   <DropdownMenuTrigger as-child>
                     <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger">
-                      <MoreVertical :size="18" />
+                      <MoreVertical :size="18"/>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" :side-offset="4">
                     <DropdownMenuLabel>Handlinger</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
+                    <DropdownMenuSeparator/>
                     <DropdownMenuItem @click="openEdit(log)">
-                      <Pencil :size="16" />
+                      <Pencil :size="16"/>
                       Rediger
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
+                    <DropdownMenuSeparator/>
                     <DropdownMenuItem class="menu-item--danger" @click="openDeleteSingle(log)">
-                      <Trash2 :size="16" />
+                      <Trash2 :size="16"/>
                       Slett
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -427,7 +446,7 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
       </div>
     </section>
 
-    <RegisterTrainingModal :open="showRegister" @update:open="(v) => { showRegister = v }" />
+    <RegisterTrainingModal :open="showRegister" @update:open="(v) => { showRegister = v }"/>
     <EditTrainingModal
       :open="editModalOpen"
       :training="editingLog"
@@ -439,9 +458,10 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
         <AlertDialogHeader>
           <AlertDialogTitle>Slett opplæring?</AlertDialogTitle>
           <AlertDialogDescription>
-            {{ deletingIds.length === 1
-            ? 'Er du sikker på at du vil slette denne opplæringen? Dette kan ikke angres.'
-            : `Er du sikker på at du vil slette ${deletingIds.length} opplæringer? Dette kan ikke angres.`
+            {{
+              deletingIds.length === 1
+                ? 'Er du sikker på at du vil slette denne opplæringen? Dette kan ikke angres.'
+                : `Er du sikker på at du vil slette ${deletingIds.length} opplæringer? Dette kan ikke angres.`
             }}
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -455,11 +475,38 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 </template>
 
 <style scoped>
-.page-header { display: flex; height: 4rem; flex-shrink: 0; align-items: center; }
-.page-header-inner { display: flex; align-items: center; gap: 0.5rem; padding: 0 1rem; }
-.header-separator { height: 1rem !important; width: 1px !important; margin-right: 0.5rem; }
-.page-title { font-weight: 500; color: hsl(var(--sidebar-primary, 245 43% 52%)); }
-.page-content { display: flex; flex: 1; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; }
+.page-header {
+  display: flex;
+  height: 4rem;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.page-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.header-separator {
+  height: 1rem !important;
+  width: 1px !important;
+  margin-right: 0.5rem;
+}
+
+.page-title {
+  font-weight: 500;
+  color: hsl(var(--sidebar-primary, 245 43% 52%));
+}
+
+.page-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1rem 1rem;
+}
 
 .header-row {
   display: flex;
@@ -474,8 +521,18 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
   gap: 8px;
 }
 
-h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
-.header-row p { margin-top: 4px; color: var(--text-secondary); font-size: 0.88rem; }
+h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.header-row p {
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
 
 /* Stats cards */
 .cards-group {
@@ -514,7 +571,11 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   box-shadow: 0 0 0 2px hsl(var(--ring, 245 43% 52%) / 0.15);
 }
 
-.table-section { display: flex; flex-direction: column; gap: 0.75rem; }
+.table-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
 
 .search-row {
   display: flex;
@@ -550,10 +611,20 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   color: hsl(var(--foreground, 24 10% 15%));
 }
 
-.sort-icon { opacity: 0.4; transition: opacity 150ms; }
-.sort-icon--active { opacity: 1; }
+.sort-icon {
+  opacity: 0.4;
+  transition: opacity 150ms;
+}
 
-.th-check, .td-check { width: 3rem; padding-left: 1rem; padding-right: 0; }
+.sort-icon--active {
+  opacity: 1;
+}
+
+.th-check, .td-check {
+  width: 3rem;
+  padding-left: 1rem;
+  padding-right: 0;
+}
 
 .row-selected {
   background-color: hsl(var(--muted, 40 18% 93%) / 0.6) !important;
@@ -579,9 +650,18 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   flex-shrink: 0;
 }
 
-.user-name { font-weight: 500; }
-.cell-text { color: hsl(var(--muted-foreground, 24 5% 46%)); }
-.cell-expires-soon { color: var(--amber); font-weight: 600; }
+.user-name {
+  font-weight: 500;
+}
+
+.cell-text {
+  color: hsl(var(--muted-foreground, 24 5% 46%));
+}
+
+.cell-expires-soon {
+  color: var(--amber);
+  font-weight: 600;
+}
 
 .cell-actions {
   width: 3rem;
@@ -607,7 +687,9 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   color: hsl(var(--foreground, 24 10% 15%));
 }
 
-.menu-item--danger { color: var(--red); }
+.menu-item--danger {
+  color: var(--red);
+}
 
 .mobile-training-list {
   display: flex;
@@ -652,11 +734,25 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   text-align: right;
 }
 
-.th-employee { min-width: 10rem; }
-.th-title { min-width: 8rem; }
-.th-date { min-width: 6rem; }
-.th-status { min-width: 6rem; }
-.th-actions { width: 3rem; }
+.th-employee {
+  min-width: 10rem;
+}
+
+.th-title {
+  min-width: 8rem;
+}
+
+.th-date {
+  min-width: 6rem;
+}
+
+.th-status {
+  min-width: 6rem;
+}
+
+.th-actions {
+  width: 3rem;
+}
 
 .loading-state {
   display: flex;
@@ -673,8 +769,12 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .empty-state {
@@ -738,16 +838,37 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
 }
 
 @media (max-width: 1100px) {
-  .cards-group { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cards-group {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 768px) {
-  .hide-mobile { display: none !important; }
-  .cards-group { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .header-row { flex-direction: column; align-items: stretch; }
-  .header-actions { align-self: flex-end; }
-  .search-row { flex-direction: column; align-items: stretch; }
-  .search-wrapper { width: 100%; }
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .cards-group {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-actions {
+    align-self: flex-end;
+  }
+
+  .search-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-wrapper {
+    width: 100%;
+  }
 
   .training-table :deep(thead) {
     display: none;

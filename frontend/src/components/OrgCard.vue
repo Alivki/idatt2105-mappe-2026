@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MembershipSummary } from '@/types/auth'
+import type {MembershipSummary} from '@/types/auth'
 
 const props = defineProps<{
   membership: MembershipSummary
@@ -37,14 +37,16 @@ function getColorIndex(id: number): number {
     @click="$emit('select')"
   >
     <div class="org-card__left">
-      <div class="org-card__logo" :class="`org-card__logo--${getColorIndex(props.membership.organizationId)}`">
+      <div class="org-card__logo"
+           :class="`org-card__logo--${getColorIndex(props.membership.organizationId)}`">
         {{ getInitials(props.membership.organizationName) }}
       </div>
       <div class="org-card__info">
         <h3>{{ props.membership.organizationName }}</h3>
       </div>
     </div>
-    <span class="org-card__role" :class="`org-card__role--${getColorIndex(props.membership.organizationId)}`">
+    <span class="org-card__role"
+          :class="`org-card__role--${getColorIndex(props.membership.organizationId)}`">
       {{ roleLabels[props.membership.role] ?? props.membership.role }}
     </span>
   </div>

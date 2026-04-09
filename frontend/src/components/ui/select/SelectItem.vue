@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { inject, computed, ref, onMounted } from "vue"
-import type { Ref } from "vue"
-import { CheckIcon } from "lucide-vue-next"
+import {inject, computed, ref, onMounted} from "vue"
+import type {Ref} from "vue"
+import {CheckIcon} from "lucide-vue-next"
 
 const props = defineProps<{
   value: string
@@ -9,7 +9,11 @@ const props = defineProps<{
   class?: string
 }>()
 
-const { selectedValue, select, registerItem } = inject("select") as { selectedValue: Ref<string>; select: (value: string, label?: string) => void; registerItem: (value: string, label: string) => void }
+const {selectedValue, select, registerItem} = inject("select") as {
+  selectedValue: Ref<string>;
+  select: (value: string, label?: string) => void;
+  registerItem: (value: string, label: string) => void
+}
 const itemRef = ref<HTMLElement | null>(null)
 
 const isSelected = computed(() => selectedValue.value === props.value)
@@ -36,10 +40,10 @@ function onClick() {
     @click="onClick"
   >
     <span class="select-item__indicator">
-      <CheckIcon v-if="isSelected" class="select-item__check" />
+      <CheckIcon v-if="isSelected" class="select-item__check"/>
     </span>
     <span class="select-item__text">
-      <slot />
+      <slot/>
     </span>
   </div>
 </template>

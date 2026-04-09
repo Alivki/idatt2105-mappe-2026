@@ -5,7 +5,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div :class="['select-separator', props.class]" />
+  <div :class="['select-separator', props.class]"/>
 </template>
 
 <style scoped>

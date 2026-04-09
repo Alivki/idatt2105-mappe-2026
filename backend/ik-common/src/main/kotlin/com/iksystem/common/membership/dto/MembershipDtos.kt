@@ -13,6 +13,8 @@ data class MembershipSummary(
     val organizationId: Long,
     @Schema(description = "Organization name", example = "IK System")
     val organizationName: String,
+    @Schema(description = "External organization number", example = "123456789", nullable = true)
+    val orgNumber: String?,
     @Schema(description = "Role in this organization", example = "ADMIN")
     val role: String,
 )

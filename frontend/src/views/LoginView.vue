@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import LoginForm from '@/components/LoginForm.vue'
-import { ref } from 'vue'
+import {ref} from 'vue'
 import veraLogo from '@/assets/vera.png'
 
 const loginFormRef = ref<InstanceType<typeof LoginForm> | null>(null)
@@ -16,7 +16,7 @@ const loginFormRef = ref<InstanceType<typeof LoginForm> | null>(null)
         <p class="subtitle">Logg inn for å fortsette</p>
       </div>
 
-      <LoginForm ref="loginFormRef" />
+      <LoginForm ref="loginFormRef"/>
     </div>
 
     <div v-if="loginFormRef?.loginError" class="error-card">

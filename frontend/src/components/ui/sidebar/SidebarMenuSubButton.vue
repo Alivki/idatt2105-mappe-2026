@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Component } from "vue"
+import type {Component} from "vue"
 
 const props = withDefaults(defineProps<{
   as?: string | Component
@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<{
     ]"
     v-bind="$attrs"
   >
-    <slot />
+    <slot/>
   </component>
 </template>
 

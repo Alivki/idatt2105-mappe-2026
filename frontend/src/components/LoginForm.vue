@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useForm } from '@tanstack/vue-form'
-import { z } from 'zod'
-import { useLogin, useSelectOrg } from '@/composables/useAuth'
-import { useRouter } from 'vue-router'
-import { ref } from 'vue'
-import { toast } from 'vue-sonner'
-import { Eye, EyeOff, Mail, Lock } from 'lucide-vue-next'
-import { useAuthStore } from '@/stores/auth'
+import {useForm} from '@tanstack/vue-form'
+import {z} from 'zod'
+import {useLogin, useSelectOrg} from '@/composables/useAuth'
+import {useRouter} from 'vue-router'
+import {ref} from 'vue'
+import {toast} from 'vue-sonner'
+import {Eye, EyeOff, Mail, Lock} from 'lucide-vue-next'
+import {useAuthStore} from '@/stores/auth'
 import Button from '@/components/ui/button/Button.vue'
 import InputGroup from '@/components/ui/input-group/InputGroup.vue'
 import InputGroupAddon from '@/components/ui/input-group/InputGroupAddon.vue'
@@ -26,7 +26,7 @@ const form = useForm({
     email: '',
     password: '',
   },
-  onSubmit: async ({ value }) => {
+  onSubmit: async ({value}) => {
     try {
       await login.mutateAsync(value)
     } catch {
@@ -38,7 +38,7 @@ const form = useForm({
     if (memberships.length === 0) {
       router.push('/select-org')
     } else if (memberships.length === 1) {
-      await selectOrg.mutateAsync({ organizationId: memberships[0]!.organizationId })
+      await selectOrg.mutateAsync({organizationId: memberships[0]!.organizationId})
       router.push('/select-org')
     } else {
       router.push('/select-org')
@@ -46,7 +46,7 @@ const form = useForm({
   },
 })
 
-defineExpose({ loginError: login.error })
+defineExpose({loginError: login.error})
 </script>
 
 <template>
@@ -67,7 +67,7 @@ defineExpose({ loginError: login.error })
             <label>E-post</label>
             <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
               <InputGroupAddon>
-                <Mail />
+                <Mail/>
               </InputGroupAddon>
               <InputGroupInput
                 type="email"
@@ -89,7 +89,7 @@ defineExpose({ loginError: login.error })
             <label>Passord</label>
             <InputGroup :class="state.meta.errors.length ? 'input-group--error' : ''">
               <InputGroupAddon>
-                <Lock />
+                <Lock/>
               </InputGroupAddon>
               <InputGroupInput
                 :type="showPassword ? 'text' : 'password'"
@@ -100,8 +100,8 @@ defineExpose({ loginError: login.error })
               />
               <InputGroupAddon align="inline-end">
                 <InputGroupButton @click="showPassword = !showPassword">
-                  <Eye v-if="!showPassword" />
-                  <EyeOff v-else />
+                  <Eye v-if="!showPassword"/>
+                  <EyeOff v-else/>
                 </InputGroupButton>
               </InputGroupAddon>
             </InputGroup>

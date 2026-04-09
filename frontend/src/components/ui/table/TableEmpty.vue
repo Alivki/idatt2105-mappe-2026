@@ -15,7 +15,7 @@ defineProps<{
       :colspan="colspan"
     >
       <div class="table-empty__content">
-        <slot />
+        <slot/>
       </div>
     </TableCell>
   </TableRow>

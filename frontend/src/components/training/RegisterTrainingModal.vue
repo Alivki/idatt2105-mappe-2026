@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import {ref, watch, computed} from 'vue'
 import axios from 'axios'
-import { toast } from 'vue-sonner'
-import { z } from 'zod'
-import type { DateValue } from '@internationalized/date'
+import {toast} from 'vue-sonner'
+import {z} from 'zod'
+import type {DateValue} from '@internationalized/date'
+import {dateValueToIso} from '@/utils/date'
 import Dialog from '@/components/ui/dialog/Dialog.vue'
 import DialogContent from '@/components/ui/dialog/DialogContent.vue'
 import DialogDescription from '@/components/ui/dialog/DialogDescription.vue'
@@ -23,7 +24,7 @@ import {
   useCreateTrainingLogMutation,
   useOrganizationMembersQuery,
 } from '@/composables/useTrainingLogs'
-import type { TrainingStatus } from '@/types/training'
+import type {TrainingStatus} from '@/types/training'
 
 const props = defineProps<{ open: boolean }>()
 const emits = defineEmits<{ (e: 'update:open', value: boolean): void }>()
@@ -48,14 +49,9 @@ const completedAtSchema = z.custom<DateValue>((v) => !!v, 'Fullført dato er på
 const expiresAtSchema = z.custom<DateValue>((v) => !!v, 'Utløpsdato er påkrevd')
 
 const statusOptions: Array<{ value: TrainingStatus; label: string }> = [
-  { value: 'COMPLETED', label: 'Fullført' },
-  { value: 'NOT_COMPLETED', label: 'Ikke fullført' },
+  {value: 'COMPLETED', label: 'Fullført'},
+  {value: 'NOT_COMPLETED', label: 'Ikke fullført'},
 ]
-
-function dateValueToIso(dv: DateValue | undefined): string | undefined {
-  if (!dv) return undefined
-  return new Date(dv.year, dv.month - 1, dv.day).toISOString()
-}
 
 watch(() => props.open, (isOpen) => {
   if (isOpen) {
@@ -134,7 +130,7 @@ async function handleSubmit() {
           <span>Ansatt *</span>
           <Select v-model="employeeUserId">
             <SelectTrigger>
-              <SelectValue placeholder="Velg ansatt..." />
+              <SelectValue placeholder="Velg ansatt..."/>
             </SelectTrigger>
             <SelectContent>
               <SelectItem v-for="m in members" :key="m.userId" :value="String(m.userId)">
@@ -147,25 +143,25 @@ async function handleSubmit() {
 
         <label :class="['field', { 'field--error': errors.title }]">
           <span>Opplæringstype *</span>
-          <Input v-model="title" placeholder="F.eks. Brannvern, HMS, Førstehjelp…" />
+          <Input v-model="title" placeholder="F.eks. Brannvern, HMS, Førstehjelp…"/>
           <p v-if="errors.title" class="error-message">{{ errors.title }}</p>
         </label>
 
         <label :class="['field', { 'field--error': errors.description }]">
           <span>Beskrivelse *</span>
-          <Textarea v-model="description" rows="3" placeholder="Beskriv opplæringen..." />
+          <Textarea v-model="description" rows="3" placeholder="Beskriv opplæringen..."/>
           <p v-if="errors.description" class="error-message">{{ errors.description }}</p>
         </label>
 
         <div class="field-row">
           <div :class="['field', { 'field--error': errors.completedAt }]">
             <span>Fullført dato *</span>
-            <DatePicker v-model="completedAt" placeholder="Velg dato" open-upward />
+            <DatePicker v-model="completedAt" placeholder="Velg dato" open-upward/>
             <p v-if="errors.completedAt" class="error-message">{{ errors.completedAt }}</p>
           </div>
           <div :class="['field', { 'field--error': errors.expiresAt }]">
             <span>Utløpsdato *</span>
-            <DatePicker v-model="expiresAt" placeholder="Velg dato" open-upward />
+            <DatePicker v-model="expiresAt" placeholder="Velg dato" open-upward/>
             <p v-if="errors.expiresAt" class="error-message">{{ errors.expiresAt }}</p>
           </div>
         </div>

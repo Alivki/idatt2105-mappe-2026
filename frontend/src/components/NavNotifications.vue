@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { BellDot, CheckCheck } from 'lucide-vue-next'
-import { ref, computed, watch, onBeforeUnmount, nextTick } from 'vue'
+import {BellDot, CheckCheck} from 'lucide-vue-next'
+import {ref, computed, watch, onBeforeUnmount, nextTick} from 'vue'
 import {
   SidebarMenuButton,
   SidebarMenuItem,
@@ -11,11 +11,11 @@ import {
   useMarkAllAsReadMutation,
 } from '@/composables/useNotifications'
 import api from '@/lib/api'
-import type { Notification, NotificationPage } from '@/types/notification'
+import type {Notification, NotificationPage} from '@/types/notification'
 
-const { data: unreadData } = useUnreadCountQuery()
-const { mutate: markAsRead } = useMarkAsReadMutation()
-const { mutate: markAllAsRead } = useMarkAllAsReadMutation()
+const {data: unreadData} = useUnreadCountQuery()
+const {mutate: markAsRead} = useMarkAsReadMutation()
+const {mutate: markAllAsRead} = useMarkAllAsReadMutation()
 
 const hasUnread = computed(() => (unreadData.value?.count ?? 0) > 0)
 
@@ -50,7 +50,7 @@ async function fetchPage(page: number) {
   loading.value = true
   try {
     const res = await api.get<NotificationPage>('/notifications', {
-      params: { page, size: 20 },
+      params: {page, size: 20},
     })
     const data = res.data
     if (page === 0) {
@@ -187,7 +187,7 @@ function formatTime(iso: string): string {
   if (diffHours < 24) return `${diffHours}t siden`
   const diffDays = Math.floor(diffHours / 24)
   if (diffDays < 7) return `${diffDays}d siden`
-  return date.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })
+  return date.toLocaleDateString('nb-NO', {day: 'numeric', month: 'short'})
 }
 
 function typeLabel(type: string): string {
@@ -205,87 +205,87 @@ function typeLabel(type: string): string {
 </script>
 
 <template>
-    <SidebarMenuItem>
-      <div
-        ref="triggerRef"
-        @mouseenter="onTriggerMouseEnter"
-        @mouseleave="onTriggerMouseLeave"
+  <SidebarMenuItem>
+    <div
+      ref="triggerRef"
+      @mouseenter="onTriggerMouseEnter"
+      @mouseleave="onTriggerMouseLeave"
+    >
+      <SidebarMenuButton
+        size="sm"
+        tooltip="Varslingssenter"
+        @click="toggle"
       >
-        <SidebarMenuButton
-          size="sm"
-          tooltip="Varslingssenter"
-          @click="toggle"
-        >
-          <div class="bell-wrapper">
-            <BellDot />
-            <span v-if="hasUnread" class="pulse-dot">
+        <div class="bell-wrapper">
+          <BellDot/>
+          <span v-if="hasUnread" class="pulse-dot">
               <span class="pulse-dot-ping"></span>
               <span class="pulse-dot-core"></span>
             </span>
-          </div>
-          <span>Varslingssenter</span>
-        </SidebarMenuButton>
-      </div>
+        </div>
+        <span>Varslingssenter</span>
+      </SidebarMenuButton>
+    </div>
 
-      <Teleport to="body">
-        <Transition name="notif-dropdown">
-          <div
-            v-if="isOpen"
-            ref="panelRef"
-            class="notif-panel"
-            :style="panelStyle"
-            @mouseenter="onPanelMouseEnter"
-            @mouseleave="onPanelMouseLeave"
-          >
-            <div class="notif-header">
-              <span class="notif-header-title">Varslinger</span>
-              <button
-                v-if="hasUnread"
-                class="notif-mark-all"
-                @click="handleMarkAllAsRead"
-              >
-                <CheckCheck />
-                <span>Merk alle som lest</span>
-              </button>
+    <Teleport to="body">
+      <Transition name="notif-dropdown">
+        <div
+          v-if="isOpen"
+          ref="panelRef"
+          class="notif-panel"
+          :style="panelStyle"
+          @mouseenter="onPanelMouseEnter"
+          @mouseleave="onPanelMouseLeave"
+        >
+          <div class="notif-header">
+            <span class="notif-header-title">Varslinger</span>
+            <button
+              v-if="hasUnread"
+              class="notif-mark-all"
+              @click="handleMarkAllAsRead"
+            >
+              <CheckCheck/>
+              <span>Merk alle som lest</span>
+            </button>
+          </div>
+
+          <div class="notif-separator"></div>
+
+          <div class="notif-list" @scroll="handleScroll">
+            <div
+              v-if="notifications.length === 0 && !loading"
+              class="notif-empty"
+            >
+              Ingen varslinger
             </div>
 
-            <div class="notif-separator"></div>
-
-            <div class="notif-list" @scroll="handleScroll">
-              <div
-                v-if="notifications.length === 0 && !loading"
-                class="notif-empty"
-              >
-                Ingen varslinger
-              </div>
-
-              <div
-                v-for="notif in notifications"
-                :key="notif.id"
-                class="notif-item"
-                :class="{ 'notif-item--unread': !notif.isRead }"
-                @mouseenter="handleNotificationHover(notif)"
-              >
-                <div class="notif-item-header">
-                  <span class="notif-item-type">{{ typeLabel(notif.type) }}</span>
-                  <div class="notif-item-right">
-                    <span class="notif-item-time">{{ formatTime(notif.createdAt) }}</span>
-                    <span v-if="!notif.isRead" class="pulse-dot pulse-dot--sm">
+            <div
+              v-for="notif in notifications"
+              :key="notif.id"
+              class="notif-item"
+              :class="{ 'notif-item--unread': !notif.isRead }"
+              @mouseenter="handleNotificationHover(notif)"
+            >
+              <div class="notif-item-header">
+                <span class="notif-item-type">{{ typeLabel(notif.type) }}</span>
+                <div class="notif-item-right">
+                  <span class="notif-item-time">{{ formatTime(notif.createdAt) }}</span>
+                  <span v-if="!notif.isRead" class="pulse-dot pulse-dot--sm">
                       <span class="pulse-dot-ping"></span>
                       <span class="pulse-dot-core"></span>
                     </span>
-                  </div>
                 </div>
-                <div class="notif-item-title">{{ notif.title }}</div>
-                <div class="notif-item-message">{{ notif.message }}</div>
               </div>
-
-              <div v-if="loading" class="notif-loading">Laster...</div>
+              <div class="notif-item-title">{{ notif.title }}</div>
+              <div class="notif-item-message">{{ notif.message }}</div>
             </div>
+
+            <div v-if="loading" class="notif-loading">Laster...</div>
           </div>
-        </Transition>
-      </Teleport>
-    </SidebarMenuItem>
+        </div>
+      </Transition>
+    </Teleport>
+  </SidebarMenuItem>
 </template>
 
 <style scoped>

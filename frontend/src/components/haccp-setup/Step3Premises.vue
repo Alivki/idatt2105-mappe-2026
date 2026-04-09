@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { HazardType, WizardState } from '@/types/haccp-setup'
-import { hazardTypeLabels } from '@/types/haccp-setup'
-import { ArrowDown, Plus, X, Info } from 'lucide-vue-next'
+import type {HazardType, WizardState} from '@/types/haccp-setup'
+import {hazardTypeLabels} from '@/types/haccp-setup'
+import {ArrowDown, Plus, X, Info} from 'lucide-vue-next'
 
-const wizard = defineModel<WizardState>('wizard', { required: true })
+const wizard = defineModel<WizardState>('wizard', {required: true})
 
 const allHazardTypes: HazardType[] = ['BIOLOGICAL', 'CHEMICAL', 'PHYSICAL', 'ALLERGEN']
 
@@ -46,7 +46,7 @@ function removeStep(stepId: string) {
 <template>
   <div class="step-content">
     <div class="info-banner">
-      <Info :size="16" :stroke-width="1.5" aria-hidden="true" />
+      <Info :size="16" :stroke-width="1.5" aria-hidden="true"/>
       <p>
         Flytskjemaet viser produksjonsprosessen fra varemottak til servering.
         Merk farer og KKP-kandidater for hvert trinn. Vi har forhåndsutfylt basert på svarene dine.
@@ -74,7 +74,7 @@ function removeStep(stepId: string) {
               title="Fjern"
               @click="removeStep(step.id)"
             >
-              <X :size="14" :stroke-width="1.5" aria-hidden="true" />
+              <X :size="14" :stroke-width="1.5" aria-hidden="true"/>
             </button>
           </div>
 
@@ -100,15 +100,15 @@ function removeStep(stepId: string) {
         </div>
 
         <div v-if="index < wizard.processSteps.length - 1" class="flow-connector">
-          <ArrowDown :size="14" :stroke-width="1.5" class="flow-arrow" aria-hidden="true" />
+          <ArrowDown :size="14" :stroke-width="1.5" class="flow-arrow" aria-hidden="true"/>
           <button class="flow-add-btn" title="Legg til trinn" @click="addStep(index)">
-            <Plus :size="12" :stroke-width="2" aria-hidden="true" />
+            <Plus :size="12" :stroke-width="2" aria-hidden="true"/>
           </button>
         </div>
       </div>
 
       <button class="flow-add-end" @click="addStep(wizard.processSteps.length - 1)">
-        <Plus :size="14" :stroke-width="2" aria-hidden="true" />
+        <Plus :size="14" :stroke-width="2" aria-hidden="true"/>
         Legg til trinn
       </button>
     </div>
@@ -140,7 +140,9 @@ function removeStep(stepId: string) {
   color: hsl(var(--primary));
 }
 
-.info-banner p { margin: 0; }
+.info-banner p {
+  margin: 0;
+}
 
 .flow-container {
   display: flex;

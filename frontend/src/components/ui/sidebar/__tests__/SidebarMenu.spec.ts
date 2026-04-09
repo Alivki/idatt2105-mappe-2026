@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, h, ref } from 'vue'
+import {describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h, ref} from 'vue'
 
 import SidebarMenu from '../SidebarMenu.vue'
 import SidebarMenuAction from '../SidebarMenuAction.vue'
@@ -9,7 +9,7 @@ import SidebarMenuButton from '../SidebarMenuButton.vue'
 import SidebarMenuButtonChild from '../SidebarMenuButtonChild.vue'
 import SidebarMenuItem from '../SidebarMenuItem.vue'
 import SidebarMenuSkeleton from '../SidebarMenuSkeleton.vue'
-import { provideSidebarContext } from '../utils'
+import {provideSidebarContext} from '../utils'
 
 const sidebarState = ref<'expanded' | 'collapsed'>('expanded')
 const sidebarOpen = ref(true)
@@ -62,7 +62,7 @@ function mountWithSidebar(component: unknown, options: Record<string, unknown> =
 
 vi.mock('@vueuse/core', () => ({
   reactiveOmit: (obj: Record<string, unknown>, ...keys: string[]) => {
-    const clone = { ...obj }
+    const clone = {...obj}
     for (const key of keys) delete clone[key]
     return clone
   },
@@ -71,27 +71,27 @@ vi.mock('@vueuse/core', () => ({
 vi.mock('@/components/ui/tooltip', () => ({
   Tooltip: defineComponent({
     name: 'TooltipStub',
-    setup(_, { slots }) {
-      return () => h('div', { 'data-test': 'tooltip-root' }, slots.default?.())
+    setup(_, {slots}) {
+      return () => h('div', {'data-test': 'tooltip-root'}, slots.default?.())
     },
   }),
   TooltipTrigger: defineComponent({
     name: 'TooltipTriggerStub',
     props: {
-      asChild: { type: Boolean, default: false },
+      asChild: {type: Boolean, default: false},
     },
-    setup(_, { slots }) {
-      return () => h('div', { 'data-test': 'tooltip-trigger' }, slots.default?.())
+    setup(_, {slots}) {
+      return () => h('div', {'data-test': 'tooltip-trigger'}, slots.default?.())
     },
   }),
   TooltipContent: defineComponent({
     name: 'TooltipContentStub',
     props: {
-      side: { type: String, default: '' },
-      align: { type: String, default: '' },
-      hidden: { type: Boolean, default: false },
+      side: {type: String, default: ''},
+      align: {type: String, default: ''},
+      hidden: {type: Boolean, default: false},
     },
-    setup(props, { slots }) {
+    setup(props, {slots}) {
       return () =>
         h(
           'div',
@@ -111,8 +111,8 @@ vi.mock('@/components/ui/skeleton', () => ({
   Skeleton: defineComponent({
     name: 'SkeletonStub',
     inheritAttrs: false,
-    setup(_, { attrs }) {
-      return () => h('div', { ...attrs, class: 'skeleton-stub' })
+    setup(_, {attrs}) {
+      return () => h('div', {...attrs, class: 'skeleton-stub'})
     },
   }),
 }))
@@ -156,8 +156,8 @@ describe('SidebarMenu and related components', () => {
     sidebarState.value = 'expanded'
 
     const wrapper = mountWithSidebar(SidebarMenuAction, {
-      props: { class: 'action-extra' },
-      slots: { default: () => 'Act' },
+      props: {class: 'action-extra'},
+      slots: {default: () => 'Act'},
     })
 
     const action = wrapper.get('[data-sidebar="menu-action"]')
@@ -170,7 +170,7 @@ describe('SidebarMenu and related components', () => {
 
   it('SidebarMenuAction supports showOnHover class', () => {
     const wrapper = mountWithSidebar(SidebarMenuAction, {
-      props: { showOnHover: true },
+      props: {showOnHover: true},
     })
 
     expect(wrapper.get('[data-sidebar="menu-action"]').classes()).toContain('sidebar-menu-action--hover-only')
@@ -178,7 +178,7 @@ describe('SidebarMenu and related components', () => {
 
   it('SidebarMenuAction respects custom "as" prop', () => {
     const wrapper = mountWithSidebar(SidebarMenuAction, {
-      props: { as: 'a' },
+      props: {as: 'a'},
     })
 
     expect(wrapper.get('[data-sidebar="menu-action"]').element.tagName).toBe('A')
@@ -222,7 +222,7 @@ describe('SidebarMenu and related components', () => {
           collapsible: 'icon',
           side: 'left',
         })
-        return () => h(SidebarMenuBadge, { class: 'badge-extra' }, () => '9')
+        return () => h(SidebarMenuBadge, {class: 'badge-extra'}, () => '9')
       },
     })
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import {computed} from "vue"
 
 const props = withDefaults(defineProps<{
   checked?: boolean
@@ -39,8 +39,9 @@ function toggle() {
   >
     <span v-if="isChecked" class="checkbox__indicator">
       <slot>
-        <svg class="checkbox__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12" />
+        <svg class="checkbox__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
         </svg>
       </slot>
     </span>

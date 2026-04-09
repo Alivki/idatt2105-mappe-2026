@@ -10,5 +10,10 @@ interface ChecklistCompletionRepository : JpaRepository<ChecklistCompletion, Lon
     @Query("SELECT COUNT(cc) FROM ChecklistCompletion cc WHERE cc.checklist.id = :checklistId AND cc.completedAt >= :from AND cc.completedAt < :to")
     fun countByChecklistIdAndCompletedAtBetween(checklistId: Long, from: Instant, to: Instant): Long
 
+    fun findAllByOrganizationIdAndCompletedAtGreaterThanEqualOrderByCompletedAtAsc(
+        organizationId: Long,
+        completedAt: Instant,
+    ): List<ChecklistCompletion>
+
     fun deleteAllByChecklistId(checklistId: Long)
 }

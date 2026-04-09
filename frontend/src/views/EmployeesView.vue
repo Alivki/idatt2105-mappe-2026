@@ -1,36 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, toRef } from 'vue'
-import { useMediaQuery } from '@vueuse/core'
-import { MoreVertical, Shield, ShieldCheck, User, UserMinus, ArrowUpDown, Search, Plus, Mail } from 'lucide-vue-next'
-import { z } from 'zod/v4'
-import { toast } from 'vue-sonner'
+import {computed, ref, toRef} from 'vue'
+import {useMediaQuery} from '@vueuse/core'
+import {Shield, ShieldCheck, User, Plus} from 'lucide-vue-next'
+import {toast} from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/button/Button.vue'
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableEmpty,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu'
-import Dialog from '@/components/ui/dialog/Dialog.vue'
-import DialogContent from '@/components/ui/dialog/DialogContent.vue'
-import DialogDescription from '@/components/ui/dialog/DialogDescription.vue'
-import DialogFooter from '@/components/ui/dialog/DialogFooter.vue'
-import DialogHeader from '@/components/ui/dialog/DialogHeader.vue'
-import DialogTitle from '@/components/ui/dialog/DialogTitle.vue'
+import {Separator} from '@/components/ui/separator'
+import {SidebarTrigger} from '@/components/ui/sidebar'
 import AlertDialog from '@/components/ui/alert-dialog/AlertDialog.vue'
 import AlertDialogAction from '@/components/ui/alert-dialog/AlertDialogAction.vue'
 import AlertDialogCancel from '@/components/ui/alert-dialog/AlertDialogCancel.vue'
@@ -39,13 +15,9 @@ import AlertDialogDescription from '@/components/ui/alert-dialog/AlertDialogDesc
 import AlertDialogFooter from '@/components/ui/alert-dialog/AlertDialogFooter.vue'
 import AlertDialogHeader from '@/components/ui/alert-dialog/AlertDialogHeader.vue'
 import AlertDialogTitle from '@/components/ui/alert-dialog/AlertDialogTitle.vue'
-import Badge from '@/components/ui/badge/Badge.vue'
-import Select from '@/components/ui/select/Select.vue'
-import SelectContent from '@/components/ui/select/SelectContent.vue'
-import SelectItem from '@/components/ui/select/SelectItem.vue'
-import SelectTrigger from '@/components/ui/select/SelectTrigger.vue'
-import SelectValue from '@/components/ui/select/SelectValue.vue'
-import { useAuthStore } from '@/stores/auth'
+import EmployeeTable from '@/components/employees/EmployeeTable.vue'
+import InviteEmployeeDialog from '@/components/employees/InviteEmployeeDialog.vue'
+import {useAuthStore} from '@/stores/auth'
 import {
   useMembersQuery,
   useOrganizationQuery,
@@ -53,8 +25,9 @@ import {
   useRemoveMemberMutation,
   useInviteMutation,
 } from '@/composables/useMembers'
-import type { OrganizationMember } from '@/types/member'
-import type { AxiosError } from 'axios'
+import {useTableSort} from '@/composables/useTableSort'
+import type {OrganizationMember} from '@/types/member'
+import type {AxiosError} from 'axios'
 
 type ApiError = AxiosError<{ error: { message: string } }>
 
@@ -62,70 +35,44 @@ const auth = useAuthStore()
 const search = ref('')
 
 const orgId = toRef(() => auth.organizationId)
-const { data: members, isLoading: membersLoading } = useMembersQuery()
-const { data: org } = useOrganizationQuery(orgId)
+const {data: members, isLoading: membersLoading} = useMembersQuery()
+const {data: org} = useOrganizationQuery(orgId)
 
 const updateRoleMutation = useUpdateMemberRoleMutation()
 const removeMemberMutation = useRemoveMemberMutation()
 const inviteMutation = useInviteMutation()
 const isMobile = useMediaQuery('(max-width: 768px)')
 
-const roleLabel: Record<string, string> = {
-  ADMIN: 'Admin',
-  MANAGER: 'Leder',
-  EMPLOYEE: 'Ansatt',
-}
-
+const roleLabel: Record<string, string> = {ADMIN: 'Admin', MANAGER: 'Leder', EMPLOYEE: 'Ansatt'}
 const roleOptions = ['ADMIN', 'MANAGER', 'EMPLOYEE'] as const
 
 type SortField = 'name' | 'email' | 'role'
-type SortDir = 'asc' | 'desc'
-
-const sortField = ref<SortField>('name')
-const sortDir = ref<SortDir>('asc')
-
-function toggleSort(field: SortField) {
-  if (sortField.value === field) {
-    sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
-  } else {
-    sortField.value = field
-    sortDir.value = 'asc'
-  }
-}
+const {sortField, sortDir, toggleSort} = useTableSort<SortField>('name')
 
 const isSelf = (member: OrganizationMember) => member.userId === auth.user?.id
 const isAdmin = computed(() => auth.role === 'ADMIN')
 
 const sortedAndFilteredMembers = computed(() => {
   if (!members.value) return []
-
   const q = search.value.toLowerCase().trim()
   let list = members.value.slice()
-
   if (q) {
     list = list.filter((m) =>
-      [m.userFullName, m.userEmail, roleLabel[m.role] ?? m.role].some((v) =>
-        v.toLowerCase().includes(q),
-      ),
+      [m.userFullName, m.userEmail, roleLabel[m.role] ?? m.role].some((v) => v.toLowerCase().includes(q)),
     )
   }
-
   const self = list.filter((m) => isSelf(m))
   const others = list.filter((m) => !isSelf(m))
-
   others.sort((a, b) => {
     let cmp = 0
-    if (sortField.value === 'name') {
-      cmp = a.userFullName.localeCompare(b.userFullName, 'nb')
-    } else if (sortField.value === 'email') {
-      cmp = a.userEmail.localeCompare(b.userEmail, 'nb')
-    } else if (sortField.value === 'role') {
-      const order = { ADMIN: 0, MANAGER: 1, EMPLOYEE: 2 }
+    if (sortField.value === 'name') cmp = a.userFullName.localeCompare(b.userFullName, 'nb')
+    else if (sortField.value === 'email') cmp = a.userEmail.localeCompare(b.userEmail, 'nb')
+    else if (sortField.value === 'role') {
+      const order = {ADMIN: 0, MANAGER: 1, EMPLOYEE: 2}
       cmp = (order[a.role as keyof typeof order] ?? 3) - (order[b.role as keyof typeof order] ?? 3)
     }
     return sortDir.value === 'desc' ? -cmp : cmp
   })
-
   return [...self, ...others]
 })
 
@@ -137,21 +84,6 @@ const stats = computed(() => {
     admins: list.filter((m) => m.role === 'ADMIN').length,
   }
 })
-
-function initials(name: string) {
-  return name
-    .split(' ')
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase()
-}
-
-function badgeTone(role: string) {
-  if (role === 'ADMIN') return 'brand'
-  if (role === 'MANAGER') return 'warning'
-  return 'ok'
-}
 
 const roleDialogOpen = ref(false)
 const editingMember = ref<OrganizationMember | null>(null)
@@ -169,7 +101,7 @@ function saveRole() {
   roleDialogOpen.value = false
   editingMember.value = null
   if (!member || role === member.role) return
-  updateRoleMutation.mutate({ userId: member.userId, payload: { role } })
+  updateRoleMutation.mutate({userId: member.userId, payload: {role}})
 }
 
 function cancelRoleEdit() {
@@ -199,36 +131,17 @@ function cancelRemove() {
 }
 
 const addDialogOpen = ref(false)
-const inviteEmail = ref('')
-const inviteRole = ref('EMPLOYEE')
-const inviteError = ref('')
 
-const emailSchema = z.email({ message: 'Ugyldig e-postadresse' })
-
-function openAddDialog() {
-  inviteEmail.value = ''
-  inviteRole.value = 'EMPLOYEE'
-  inviteError.value = ''
-  addDialogOpen.value = true
-}
-
-function handleInvite() {
-  const result = emailSchema.safeParse(inviteEmail.value.trim())
-  if (!result.success) {
-    inviteError.value = result.error?.issues?.[0]?.message ?? 'Ugyldig e-postadresse'
-    return
-  }
-  inviteError.value = ''
+function handleInvite(payload: { email: string; role: string }) {
   inviteMutation.mutate(
-    { email: inviteEmail.value.trim(), role: inviteRole.value },
+    {email: payload.email, role: payload.role},
     {
       onSuccess: () => {
         addDialogOpen.value = false
-        toast.success('Invitasjon sendt til ' + inviteEmail.value.trim())
+        toast.success('Invitasjon sendt til ' + payload.email)
       },
       onError: (error: Error) => {
         const msg = (error as ApiError)?.response?.data?.error?.message ?? 'Kunne ikke sende invitasjon'
-        inviteError.value = msg
         toast.error(msg)
       },
     },
@@ -240,8 +153,8 @@ function handleInvite() {
   <AppLayout>
     <header class="page-header">
       <div class="page-header-inner">
-        <SidebarTrigger />
-        <Separator orientation="vertical" class="header-separator" />
+        <SidebarTrigger/>
+        <Separator orientation="vertical" class="header-separator"/>
         <span class="page-title">Ansatte</span>
       </div>
     </header>
@@ -252,8 +165,8 @@ function handleInvite() {
           <h1>Ansatte</h1>
           <p>Administrer og se oversikt over alle ansatte.</p>
         </div>
-        <Button @click="openAddDialog">
-          <Plus :size="16" aria-hidden="true" />
+        <Button @click="addDialogOpen = true">
+          <Plus :size="16" aria-hidden="true"/>
           Legg til ansatt
         </Button>
       </section>
@@ -288,158 +201,19 @@ function handleInvite() {
           </div>
         </section>
 
-        <section class="table-section">
-          <div class="search-wrapper">
-            <Search :size="16" class="search-icon" aria-hidden="true" />
-            <input v-model="search" class="search-input" placeholder="Søk etter ansatt..." aria-label="Søk etter ansatt" />
-          </div>
-
-          <div v-if="isMobile" class="mobile-member-list">
-            <article
-              v-for="member in sortedAndFilteredMembers"
-              :key="member.id"
-              class="mobile-member-card"
-              :class="isSelf(member) ? 'row-self' : ''"
-            >
-              <div class="mobile-member-top">
-                <div class="cell-user">
-                  <div class="user-avatar" :class="{ 'user-avatar--self': isSelf(member) }">
-                    {{ initials(member.userFullName) }}
-                  </div>
-                  <div>
-                    <span class="user-name">{{ member.userFullName }}</span>
-                    <span v-if="isSelf(member)" class="you-label">(deg)</span>
-                  </div>
-                </div>
-
-                <div v-if="!isSelf(member)" class="actions-wrapper">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger as-child>
-                      <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger" aria-label="Handlinger">
-                        <MoreVertical :size="18" aria-hidden="true" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" :side-offset="4">
-                      <DropdownMenuLabel>Handlinger</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem @click="openRoleEdit(member)">
-                        <ShieldCheck :size="16" aria-hidden="true" />
-                        Endre rolle
-                      </DropdownMenuItem>
-                      <template v-if="isAdmin">
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem class="menu-item--danger" @click="openRemoveDialog(member)">
-                          <UserMinus :size="16" aria-hidden="true" />
-                          Fjern fra organisasjon
-                        </DropdownMenuItem>
-                      </template>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-
-              <div class="mobile-member-row">
-                <span>E-post</span>
-                <span class="cell-email">{{ member.userEmail }}</span>
-              </div>
-              <div class="mobile-member-row">
-                <span>Rolle</span>
-                <Badge :tone="badgeTone(member.role)">
-                  {{ roleLabel[member.role] ?? member.role }}
-                </Badge>
-              </div>
-            </article>
-
-            <div v-if="sortedAndFilteredMembers.length === 0" class="landing-box">
-              <h3>Ingen ansatte matcher søket</h3>
-              <span>Prøv et annet søk eller inviter en ny ansatt.</span>
-            </div>
-          </div>
-
-          <div v-else class="table-card">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead class="th-name">
-                    <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('name')">
-                      Navn
-                      <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'name' }" aria-hidden="true" />
-                    </Button>
-                  </TableHead>
-                  <TableHead class="th-email">
-                    <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('email')">
-                      E-post
-                      <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'email' }" aria-hidden="true" />
-                    </Button>
-                  </TableHead>
-                  <TableHead class="th-role">
-                    <Button variant="ghost" size="sm" class="sort-btn" @click="toggleSort('role')">
-                      Rolle
-                      <ArrowUpDown :size="14" class="sort-icon" :class="{ 'sort-icon--active': sortField === 'role' }" aria-hidden="true" />
-                    </Button>
-                  </TableHead>
-                  <TableHead class="th-actions" />
-                </TableRow>
-              </TableHeader>
-
-              <TableBody>
-                <TableRow
-                  v-for="member in sortedAndFilteredMembers"
-                  :key="member.id"
-                  :class="isSelf(member) ? 'row-self' : ''"
-                >
-                  <TableCell>
-                    <div class="cell-user">
-                      <div class="user-avatar" :class="{ 'user-avatar--self': isSelf(member) }">
-                        {{ initials(member.userFullName) }}
-                      </div>
-                      <div>
-                        <span class="user-name">{{ member.userFullName }}</span>
-                        <span v-if="isSelf(member)" class="you-label">(deg)</span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell class="cell-email">{{ member.userEmail }}</TableCell>
-                  <TableCell>
-                    <Badge :tone="badgeTone(member.role)">
-                      {{ roleLabel[member.role] ?? member.role }}
-                    </Badge>
-                  </TableCell>
-                  <TableCell class="cell-actions">
-                    <div v-if="!isSelf(member)" class="actions-wrapper">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger as-child>
-                          <Button type="button" variant="ghost" size="icon-sm" class="actions-trigger" aria-label="Handlinger">
-                            <MoreVertical :size="18" aria-hidden="true" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" :side-offset="4">
-                          <DropdownMenuLabel>Handlinger</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem @click="openRoleEdit(member)">
-                            <ShieldCheck :size="16" aria-hidden="true" />
-                            Endre rolle
-                          </DropdownMenuItem>
-                          <template v-if="isAdmin">
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem class="menu-item--danger" @click="openRemoveDialog(member)">
-                              <UserMinus :size="16" aria-hidden="true" />
-                              Fjern fra organisasjon
-                            </DropdownMenuItem>
-                          </template>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </TableCell>
-                </TableRow>
-
-                <TableEmpty v-if="sortedAndFilteredMembers.length === 0" :colspan="4">
-                  Ingen ansatte matcher søket.
-                </TableEmpty>
-              </TableBody>
-            </Table>
-          </div>
-        </section>
+        <EmployeeTable
+          :members="sortedAndFilteredMembers"
+          :search="search"
+          :sort-field="sortField"
+          :sort-dir="sortDir"
+          :is-mobile="isMobile"
+          :is-admin="isAdmin"
+          :current-user-id="auth.user?.id"
+          @update:search="search = $event"
+          @toggle-sort="toggleSort($event as SortField)"
+          @edit-role="openRoleEdit"
+          @remove-member="openRemoveDialog"
+        />
       </template>
 
       <section v-else-if="!membersLoading" class="landing-card">
@@ -460,7 +234,6 @@ function handleInvite() {
             Velg ny rolle for {{ editingMember?.userFullName }}.
           </AlertDialogDescription>
         </AlertDialogHeader>
-
         <div class="role-options">
           <label
             v-for="role in roleOptions"
@@ -468,14 +241,13 @@ function handleInvite() {
             class="role-option"
             :class="{ 'role-option--selected': selectedRole === role }"
           >
-            <input v-model="selectedRole" type="radio" :value="role" class="sr-only" />
-            <Shield v-if="role === 'ADMIN'" :size="18" aria-hidden="true" />
-            <ShieldCheck v-else-if="role === 'MANAGER'" :size="18" aria-hidden="true" />
-            <User v-else :size="18" aria-hidden="true" />
+            <input v-model="selectedRole" type="radio" :value="role" class="sr-only"/>
+            <Shield v-if="role === 'ADMIN'" :size="18" aria-hidden="true"/>
+            <ShieldCheck v-else-if="role === 'MANAGER'" :size="18" aria-hidden="true"/>
+            <User v-else :size="18" aria-hidden="true"/>
             <span>{{ roleLabel[role] }}</span>
           </label>
         </div>
-
         <AlertDialogFooter>
           <AlertDialogCancel @click="cancelRoleEdit">Avbryt</AlertDialogCancel>
           <AlertDialogAction @click="saveRole">Lagre</AlertDialogAction>
@@ -488,7 +260,8 @@ function handleInvite() {
         <AlertDialogHeader>
           <AlertDialogTitle>Fjern fra organisasjon?</AlertDialogTitle>
           <AlertDialogDescription>
-            {{ removingMember?.userFullName }} vil miste tilgangen til denne organisasjonen. Brukerkontoen blir ikke slettet.
+            {{ removingMember?.userFullName }} vil miste tilgangen til denne organisasjonen.
+            Brukerkontoen blir ikke slettet.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -498,64 +271,48 @@ function handleInvite() {
       </AlertDialogContent>
     </AlertDialog>
 
-    <Dialog :open="addDialogOpen" @update:open="(v: boolean) => { addDialogOpen = v }">
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Legg til ansatt</DialogTitle>
-          <DialogDescription>
-            Inviter en ny ansatt til organisasjonen via e-post.
-          </DialogDescription>
-        </DialogHeader>
-
-        <form class="invite-form" @submit.prevent="handleInvite">
-          <div class="form-field">
-            <label class="form-label" for="invite-email">E-post</label>
-            <div :class="['email-input-wrapper', { 'email-input-wrapper--error': inviteError }]">
-              <Mail :size="16" class="email-input-icon" aria-hidden="true" />
-              <input
-                id="invite-email"
-                v-model="inviteEmail"
-                type="email"
-                class="email-input"
-                placeholder="navn@eksempel.no"
-                autocomplete="off"
-              />
-            </div>
-            <span v-if="inviteError" class="form-error" role="alert">{{ inviteError }}</span>
-          </div>
-
-          <div class="form-field">
-            <label class="form-label">Rolle</label>
-            <Select v-model="inviteRole">
-              <SelectTrigger>
-                <SelectValue placeholder="Velg rolle" />
-              </SelectTrigger>
-              <SelectContent open-upward>
-                <SelectItem value="ADMIN">Admin</SelectItem>
-                <SelectItem value="MANAGER">Leder</SelectItem>
-                <SelectItem value="EMPLOYEE">Ansatt</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" type="button" @click="addDialogOpen = false">Avbryt</Button>
-            <Button type="submit" :disabled="inviteMutation.isPending.value">
-              {{ inviteMutation.isPending.value ? 'Sender...' : 'Send invitasjon' }}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <InviteEmployeeDialog
+      :open="addDialogOpen"
+      :is-pending="inviteMutation.isPending.value"
+      @update:open="addDialogOpen = $event"
+      @invite="handleInvite"
+    />
   </AppLayout>
 </template>
 
 <style scoped>
-.page-header { display: flex; height: 4rem; flex-shrink: 0; align-items: center; }
-.page-header-inner { display: flex; align-items: center; gap: 0.5rem; padding: 0 1rem; }
-.header-separator { height: 1rem !important; width: 1px !important; margin-right: 0.5rem; }
-.page-title { font-weight: 500; color: hsl(var(--sidebar-primary, 245 43% 52%)); }
-.page-content { display: flex; flex: 1; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; }
+.page-header {
+  display: flex;
+  height: 4rem;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.page-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.header-separator {
+  height: 1rem !important;
+  width: 1px !important;
+  margin-right: 0.5rem;
+}
+
+.page-title {
+  font-weight: 500;
+  color: hsl(var(--sidebar-primary, 245 43% 52%));
+}
+
+.page-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1rem 1rem;
+}
 
 .header-row {
   display: flex;
@@ -564,8 +321,18 @@ function handleInvite() {
   gap: 1rem;
 }
 
-h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
-.header-row p { margin-top: 4px; color: var(--text-secondary); font-size: 0.88rem; }
+h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.header-row p {
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
 
 .loading-state {
   display: flex;
@@ -580,12 +347,21 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   animation: shimmer 1.5s infinite ease-in-out;
 }
 
-.skeleton-item--wide { height: 80px; }
-.skeleton-item--table { height: 300px; }
+.skeleton-item--wide {
+  height: 80px;
+}
+
+.skeleton-item--table {
+  height: 300px;
+}
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .org-card {
@@ -594,9 +370,9 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  border: 1px solid hsl(var(--border, 35 18% 88%));
+  border: 1px solid hsl(var(--border));
   border-radius: 0.75rem;
-  background: hsl(var(--card, 40 25% 98%));
+  background: hsl(var(--card));
 }
 
 .org-left {
@@ -620,9 +396,22 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   flex-shrink: 0;
 }
 
-.org-details { min-width: 0; }
-.org-details h2 { margin: 0; font-size: 1.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.org-meta { color: hsl(var(--muted-foreground, 24 5% 46%)); font-size: 0.85rem; }
+.org-details {
+  min-width: 0;
+}
+
+.org-details h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.org-meta {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.85rem;
+}
 
 .org-stats {
   display: flex;
@@ -641,204 +430,35 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   font-size: 0.6rem;
   font-weight: 500;
   letter-spacing: 0.06em;
-  color: hsl(var(--muted-foreground, 24 5% 46%));
+  color: hsl(var(--muted-foreground));
 }
 
 .stat-value {
   font-size: 1.4rem;
   font-weight: 700;
   line-height: 1;
-  color: hsl(var(--foreground, 24 10% 15%));
+  color: hsl(var(--foreground));
 }
-
-.search-wrapper {
-  position: relative;
-  width: 16rem;
-}
-
-.search-icon {
-  position: absolute;
-  left: 0.65rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: hsl(var(--muted-foreground, 24 5% 46%));
-  pointer-events: none;
-}
-
-.search-input {
-  width: 100%;
-  border: 1px solid hsl(var(--border, 35 18% 88%));
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem 0.5rem 2.1rem;
-  font: inherit;
-  font-size: 0.85rem;
-  color: hsl(var(--foreground, 24 10% 15%));
-  background: hsl(var(--card, 40 25% 98%));
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: hsl(var(--ring, 245 43% 52%));
-  box-shadow: 0 0 0 2px hsl(var(--ring, 245 43% 52%) / 0.15);
-}
-
-.table-section { display: flex; flex-direction: column; gap: 0.75rem; }
-
-.table-card {
-  border: 1px solid hsl(var(--border, 35 18% 88%));
-  border-radius: 0.75rem;
-  background: hsl(var(--card, 40 25% 98%));
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.sort-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: none;
-  border: none;
-  font: inherit;
-  font-weight: 500;
-  color: hsl(var(--muted-foreground, 24 5% 46%));
-  cursor: pointer;
-  padding: 0.25rem 0.4rem;
-  border-radius: var(--radius-md, 0.375rem);
-  margin: -0.25rem -0.4rem;
-  transition: background 150ms ease, color 150ms ease;
-}
-
-.sort-btn:hover {
-  background: hsl(var(--accent, 250 40% 95%));
-  color: hsl(var(--foreground, 24 10% 15%));
-}
-
-.sort-icon { opacity: 0.4; transition: opacity 150ms; }
-.sort-icon--active { opacity: 1; }
-
-.row-self {
-  background-color: hsl(var(--muted, 40 18% 93%) / 0.6) !important;
-}
-
-.row-self:hover {
-  background-color: hsl(var(--muted, 40 18% 93%) / 0.75) !important;
-}
-
-.cell-user {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.user-avatar {
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 9999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: hsl(var(--muted, 40 18% 93%));
-  color: hsl(var(--muted-foreground, 24 5% 46%));
-  font-size: 0.75rem;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.user-avatar--self {
-  background: var(--brand-soft);
-  color: var(--brand);
-}
-
-.user-name { font-weight: 500; }
-.you-label { color: hsl(var(--muted-foreground, 24 5% 46%)); font-size: 0.8rem; margin-left: 0.25rem; }
-
-.cell-email { color: hsl(var(--muted-foreground, 24 5% 46%)); }
-
-.cell-actions {
-  width: 3rem;
-  text-align: right;
-}
-
-.actions-wrapper {
-  position: relative;
-  display: inline-flex;
-}
-
-.actions-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: var(--radius-md, 0.375rem);
-  border: none;
-  background: none;
-  color: hsl(var(--muted-foreground, 24 5% 46%));
-  cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
-}
-
-.actions-trigger:hover {
-  background: hsl(var(--accent, 250 40% 95%));
-  color: hsl(var(--foreground, 24 10% 15%));
-}
-
-.menu-item--danger { color: var(--red); }
-
-.mobile-member-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.mobile-member-card {
-  border: 1px solid hsl(var(--border, 35 18% 88%));
-  border-radius: 0.75rem;
-  background: hsl(var(--card, 40 25% 98%));
-  padding: 0.5rem 0.65rem;
-}
-
-.mobile-member-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.mobile-member-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.3rem 0;
-}
-
-.mobile-member-row > span:first-child {
-  font-size: 0.73rem;
-  font-weight: 600;
-  color: hsl(var(--muted-foreground, 24 5% 46%));
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.mobile-member-row > :last-child {
-  text-align: right;
-  min-width: 0;
-}
-
-.th-name { min-width: 10rem; }
-.th-email { min-width: 10rem; }
-.th-role { min-width: 6rem; }
-.th-actions { width: 3rem; }
 
 .landing-card {
   padding: 1.5rem;
-  border: 1px solid hsl(var(--border, 35 18% 88%));
+  border: 1px solid hsl(var(--border));
   border-radius: 1rem;
-  background: hsl(var(--card, 40 25% 98%));
+  background: hsl(var(--card));
 }
-.landing-card h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
-.landing-card p { margin: 0.35rem 0 1.25rem; color: hsl(var(--muted-foreground, 24 5% 46%)); }
+
+.landing-card h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.landing-card p {
+  margin: 0.35rem 0 1.25rem;
+  color: hsl(var(--muted-foreground));
+}
+
 .landing-box {
   border: 1px dashed color-mix(in srgb, var(--brand-soft) 60%, var(--brand) 15%);
   background: var(--brand-soft);
@@ -849,101 +469,81 @@ h1 { margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; }
   flex-direction: column;
   gap: 0.35rem;
 }
-.landing-box h3 { margin: 0; font-size: 1.1rem; }
-.landing-box span { color: hsl(var(--muted-foreground, 24 5% 46%)); }
 
-.role-options { display: flex; flex-direction: column; gap: 0.5rem; }
+.landing-box h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.landing-box span {
+  color: hsl(var(--muted-foreground));
+}
+
+.role-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .role-option {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  border: 1px solid hsl(var(--border, 35 18% 88%));
+  border: 1px solid hsl(var(--border));
   border-radius: 0.75rem;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
 }
-.role-option:hover { background: hsl(var(--muted, 40 18% 93%) / 0.5); }
-.role-option--selected { border-color: var(--brand); background: var(--brand-soft); }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
-.invite-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.role-option:hover {
+  background: hsl(var(--muted) / 0.5);
 }
 
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+.role-option--selected {
+  border-color: var(--brand);
+  background: var(--brand-soft);
 }
 
-.form-label {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: hsl(var(--foreground, 24 10% 15%));
-}
-
-.email-input-wrapper {
-  position: relative;
-}
-
-.email-input-icon {
+.sr-only {
   position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: hsl(var(--muted-foreground, 24 5% 46%));
-  pointer-events: none;
-}
-
-.email-input {
-  display: flex;
-  height: 2.5rem;
-  width: 100%;
-  border-radius: 0.5rem;
-  border: 1px solid hsl(var(--input, 35 15% 85%));
-  background-color: hsl(var(--card, 40 25% 98%));
-  padding: 0.5rem 0.75rem 0.5rem 2.25rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: inherit;
-  box-shadow: 0 1px 2px 0 hsl(var(--foreground, 24 10% 15%) / 0.05);
-  outline: none;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
-  font-family: inherit;
-}
-
-.email-input::placeholder {
-  color: hsl(var(--muted-foreground, 24 5% 46%));
-}
-
-.email-input:focus {
-  box-shadow: 0 0 0 2px hsl(var(--ring, 245 43% 52%) / 0.2);
-  border-color: hsl(var(--primary, 245 43% 52%) / 0.5);
-}
-
-.form-error {
-  font-size: 0.8rem;
-  color: hsl(var(--destructive));
-}
-
-.email-input-wrapper--error .email-input {
-  border-color: hsl(var(--destructive));
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
 @media (max-width: 700px) {
-  h1 { font-size: 1.5rem; }
-  .header-row { flex-direction: column; gap: 0.75rem; }
-  .table-card .th-email, .table-card .cell-email { display: none; }
-  .org-card { flex-direction: column; align-items: flex-start; }
-  .org-stats { align-self: flex-start; flex-wrap: wrap; gap: 0.75rem 1rem; }
-  .search-wrapper { width: 100%; }
-  .table-card :deep(table) { min-width: 36rem; }
-  .table-section { gap: 0.5rem; }
-  .header-row > :last-child { width: 100%; }
-  .header-row > :last-child :deep(button) { width: 100%; }
-  .org-card { padding: 0.9rem 1rem; }
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .header-row {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .org-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.9rem 1rem;
+  }
+
+  .org-stats {
+    align-self: flex-start;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+  }
+
+  .header-row > :last-child {
+    width: 100%;
+  }
+
+  .header-row > :last-child :deep(button) {
+    width: 100%;
+  }
 }
 </style>

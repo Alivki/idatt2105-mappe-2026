@@ -1,26 +1,26 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent, h, nextTick } from 'vue'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h, nextTick} from 'vue'
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import TimePicker from '../TimePicker.vue'
 
 vi.mock('lucide-vue-next', () => ({
   Clock: defineComponent({
     name: 'Clock',
     setup() {
-      return () => h('svg', { class: 'clock-icon-stub' })
+      return () => h('svg', {class: 'clock-icon-stub'})
     },
   }),
   ChevronDown: defineComponent({
     name: 'ChevronDown',
     setup() {
-      return () => h('svg', { class: 'chevron-icon-stub' })
+      return () => h('svg', {class: 'chevron-icon-stub'})
     },
   }),
 }))
 
 const TransitionStub = defineComponent({
   name: 'TransitionStub',
-  setup(_, { slots }) {
+  setup(_, {slots}) {
     return () => slots.default?.()
   },
 })
@@ -284,7 +284,7 @@ describe('TimePicker', () => {
     await nextTick()
     expect(wrapper.find('.time-picker__panel').exists()).toBe(true)
 
-    document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    document.dispatchEvent(new MouseEvent('mousedown', {bubbles: true}))
     await nextTick()
 
     expect(wrapper.find('.time-picker__panel').exists()).toBe(false)
@@ -309,7 +309,7 @@ describe('TimePicker', () => {
     await wrapper.get('.time-picker__toggle').trigger('click')
     await nextTick()
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}))
     await nextTick()
 
     expect(wrapper.find('.time-picker__panel').exists()).toBe(false)
@@ -321,7 +321,7 @@ describe('TimePicker', () => {
     await wrapper.get('.time-picker__toggle').trigger('click')
     await nextTick()
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+    document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', bubbles: true}))
     await nextTick()
 
     expect(wrapper.find('.time-picker__panel').exists()).toBe(true)

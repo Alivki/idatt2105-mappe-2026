@@ -1,6 +1,6 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent, h, nextTick } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h, nextTick} from 'vue'
+import {describe, expect, it, vi} from 'vitest'
 import FoodDeviationDialog from '../FoodDeviationFormDialog.vue'
 
 vi.mock('@internationalized/date', () => ({
@@ -21,25 +21,25 @@ function pass(name: string, tag = 'div') {
   return defineComponent({
     name,
     inheritAttrs: false,
-    setup(_, { attrs, slots }) {
+    setup(_, {attrs, slots}) {
       return () => h(tag, attrs, slots.default?.())
     },
   })
 }
 
-vi.mock('@/components/ui/dialog/Dialog.vue', () => ({ default: pass('Dialog') }))
-vi.mock('@/components/ui/dialog/DialogContent.vue', () => ({ default: pass('DialogContent') }))
+vi.mock('@/components/ui/dialog/Dialog.vue', () => ({default: pass('Dialog')}))
+vi.mock('@/components/ui/dialog/DialogContent.vue', () => ({default: pass('DialogContent')}))
 vi.mock('@/components/ui/dialog/DialogDescription.vue', () => ({
   default: pass('DialogDescription', 'p'),
 }))
-vi.mock('@/components/ui/dialog/DialogHeader.vue', () => ({ default: pass('DialogHeader') }))
-vi.mock('@/components/ui/dialog/DialogTitle.vue', () => ({ default: pass('DialogTitle', 'h2') }))
+vi.mock('@/components/ui/dialog/DialogHeader.vue', () => ({default: pass('DialogHeader')}))
+vi.mock('@/components/ui/dialog/DialogTitle.vue', () => ({default: pass('DialogTitle', 'h2')}))
 
 vi.mock('@/components/ui/button/Button.vue', () => ({
   default: defineComponent({
     name: 'ButtonStub',
     inheritAttrs: false,
-    setup(_, { attrs, slots }) {
+    setup(_, {attrs, slots}) {
       return () => h('button', attrs, slots.default?.())
     },
   }),
@@ -49,14 +49,14 @@ vi.mock('@/components/ui/date-picker/DatePicker.vue', () => ({
   default: defineComponent({
     name: 'DatePickerStub',
     emits: ['update:modelValue'],
-    setup(_, { emit }) {
+    setup(_, {emit}) {
       return () =>
         h(
           'button',
           {
             class: 'stub-date',
             type: 'button',
-            onClick: () => emit('update:modelValue', { year: 2026, month: 4, day: 8 }),
+            onClick: () => emit('update:modelValue', {year: 2026, month: 4, day: 8}),
           },
           'set-date',
         )
@@ -68,7 +68,7 @@ vi.mock('@/components/ui/time-picker/TimePicker.vue', () => ({
   default: defineComponent({
     name: 'TimePickerStub',
     emits: ['update:hours', 'update:minutes'],
-    setup(_, { emit }) {
+    setup(_, {emit}) {
       return () =>
         h('div', [
           h(
@@ -98,10 +98,10 @@ vi.mock('@/components/ui/textarea/Textarea.vue', () => ({
   default: defineComponent({
     name: 'TextareaStub',
     props: {
-      modelValue: { type: String, default: '' },
+      modelValue: {type: String, default: ''},
     },
     emits: ['update:modelValue'],
-    setup(props, { emit, attrs }) {
+    setup(props, {emit, attrs}) {
       return () =>
         h('textarea', {
           ...attrs,
@@ -117,10 +117,10 @@ vi.mock('@/components/ui/select/Select.vue', () => ({
     name: 'SelectStub',
     inheritAttrs: false,
     props: {
-      modelValue: { type: String, default: '' },
+      modelValue: {type: String, default: ''},
     },
     emits: ['update:modelValue'],
-    setup(props, { emit, slots, attrs }) {
+    setup(props, {emit, slots, attrs}) {
       return () =>
         h(
           'select',
@@ -138,7 +138,7 @@ vi.mock('@/components/ui/select/Select.vue', () => ({
 vi.mock('@/components/ui/select/SelectContent.vue', () => ({
   default: defineComponent({
     name: 'SelectContentStub',
-    setup(_, { slots }) {
+    setup(_, {slots}) {
       return () => h('div', {}, slots.default?.())
     },
   }),
@@ -148,10 +148,10 @@ vi.mock('@/components/ui/select/SelectItem.vue', () => ({
   default: defineComponent({
     name: 'SelectItemStub',
     props: {
-      value: { type: String, default: '' },
+      value: {type: String, default: ''},
     },
-    setup(props, { slots }) {
-      return () => h('option', { value: props.value }, slots.default?.())
+    setup(props, {slots}) {
+      return () => h('option', {value: props.value}, slots.default?.())
     },
   }),
 }))
@@ -159,7 +159,7 @@ vi.mock('@/components/ui/select/SelectItem.vue', () => ({
 vi.mock('@/components/ui/select/SelectTrigger.vue', () => ({
   default: defineComponent({
     name: 'SelectTriggerStub',
-    setup(_, { slots }) {
+    setup(_, {slots}) {
       return () => h('div', {}, slots.default?.())
     },
   }),
@@ -168,20 +168,20 @@ vi.mock('@/components/ui/select/SelectTrigger.vue', () => ({
 vi.mock('@/components/ui/select/SelectValue.vue', () => ({
   default: defineComponent({
     name: 'SelectValueStub',
-    setup(_, { slots }) {
+    setup(_, {slots}) {
       return () => h('span', {}, slots.default?.())
     },
   }),
 }))
 
 const members = [
-  { userId: 1, label: 'Ada' },
-  { userId: 2, label: 'Linus' },
+  {userId: 1, label: 'Ada'},
+  {userId: 2, label: 'Linus'},
 ]
 
 describe('FoodDeviationDialog', () => {
   it('shows validation errors on empty submit', async () => {
-    const wrapper = mount(FoodDeviationDialog, { props: { open: true, members } })
+    const wrapper = mount(FoodDeviationDialog, {props: {open: true, members}})
 
     await wrapper.get('form').trigger('submit.prevent')
 
@@ -195,7 +195,7 @@ describe('FoodDeviationDialog', () => {
   })
 
   it('creates payload from filled form in create mode', async () => {
-    const wrapper = mount(FoodDeviationDialog, { props: { open: true, members } })
+    const wrapper = mount(FoodDeviationDialog, {props: {open: true, members}})
 
     await wrapper.get('.stub-date').trigger('click')
     await wrapper.get('.stub-hours').trigger('click')
@@ -257,7 +257,7 @@ describe('FoodDeviationDialog', () => {
       },
     })
 
-    await wrapper.setProps({ open: true })
+    await wrapper.setProps({open: true})
     await nextTick()
 
     expect(wrapper.text()).toContain('Rediger matavvik')

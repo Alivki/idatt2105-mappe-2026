@@ -1,5 +1,5 @@
-import { type Ref, computed } from "vue"
-import { CalendarDate, type DateValue } from "@internationalized/date"
+import {type Ref, computed} from "vue"
+import {CalendarDate, type DateValue} from "@internationalized/date"
 
 export interface MonthGrid {
   value: CalendarDate
@@ -17,7 +17,7 @@ export function useCalendar(opts: {
   const fixedWeeks = opts.fixedWeeks ?? false
 
   const weekDays = computed(() => {
-    const fmt = new Intl.DateTimeFormat(locale, { weekday: "short" })
+    const fmt = new Intl.DateTimeFormat(locale, {weekday: "short"})
     const days: string[] = []
     // Jan 5 2025 is a Sunday (day 0)
     for (let i = 0; i < 7; i++) {
@@ -32,7 +32,7 @@ export function useCalendar(opts: {
     return [buildMonth(p.year, p.month, weekStartsOn, fixedWeeks)]
   })
 
-  return { grid, weekDays }
+  return {grid, weekDays}
 }
 
 function daysInMonth(year: number, month: number): number {
@@ -61,5 +61,5 @@ function buildMonth(year: number, month: number, weekStartsOn: number, fixedWeek
     rows.push(week)
   }
 
-  return { value: new CalendarDate(year, month, 1), rows }
+  return {value: new CalendarDate(year, month, 1), rows}
 }

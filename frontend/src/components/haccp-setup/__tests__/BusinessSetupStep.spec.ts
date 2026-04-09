@@ -1,6 +1,6 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h} from 'vue'
+import {describe, expect, it, vi} from 'vitest'
 import BusinessSetupStep from '../Step1BusinessType.vue'
 
 
@@ -8,7 +8,7 @@ vi.mock('lucide-vue-next', () => {
   const icon = (name: string) => defineComponent({
     name,
     setup() {
-      return () => h('svg', { 'data-icon': name })
+      return () => h('svg', {'data-icon': name})
     },
   })
   return {
@@ -107,7 +107,7 @@ describe('BusinessSetupStep', () => {
     const wrapper = mount(BusinessSetupStep, {
       props: {
         wizard,
-        haccpTrinn: { level: 1, label: 'Trinn 1' },
+        haccpTrinn: {level: 1, label: 'Trinn 1'},
       },
     })
 
@@ -124,7 +124,7 @@ describe('BusinessSetupStep', () => {
     const wrapper = mount(BusinessSetupStep, {
       props: {
         wizard,
-        haccpTrinn: { level: 2, label: 'Trinn 2' },
+        haccpTrinn: {level: 2, label: 'Trinn 2'},
       },
     })
 
@@ -156,7 +156,7 @@ describe('BusinessSetupStep', () => {
     const wrapper = mount(BusinessSetupStep, {
       props: {
         wizard,
-        haccpTrinn: { level: 2, label: 'Trinn 2' },
+        haccpTrinn: {level: 2, label: 'Trinn 2'},
       },
     })
 

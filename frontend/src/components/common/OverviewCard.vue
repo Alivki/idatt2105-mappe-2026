@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
+import type {Component} from 'vue'
 
 withDefaults(defineProps<{
   label: string
@@ -17,11 +17,11 @@ withDefaults(defineProps<{
 <template>
   <div :class="['overview-card', `overview-card--${variant}`]">
     <div class="card-header">
-      <component :is="icon" v-if="icon" :size="16" class="card-icon" aria-hidden="true" />
+      <component :is="icon" v-if="icon" :size="16" class="card-icon" aria-hidden="true"/>
       <p class="card-label">{{ label }}</p>
     </div>
     <p class="card-value" :class="valueClass">{{ value }}</p>
-    <slot />
+    <slot/>
     <p v-if="subLabel" class="card-sub">{{ subLabel }}</p>
   </div>
 </template>
@@ -33,7 +33,7 @@ withDefaults(defineProps<{
   gap: 8px;
   border-radius: var(--radius-lg);
   padding: 16px;
-  border: 2px solid hsl(var(--border));
+  border: 1px solid hsl(var(--border));
   background: hsl(var(--card));
   min-height: 6.25rem;
 }
@@ -116,7 +116,15 @@ withDefaults(defineProps<{
 }
 
 /* Support for color classes from props */
-:deep(.val-green), .val-green { color: var(--green); }
-:deep(.val-amber), .val-amber { color: var(--amber); }
-:deep(.val-red), .val-red { color: var(--red); }
+:deep(.val-green), .val-green {
+  color: var(--green);
+}
+
+:deep(.val-amber), .val-amber {
+  color: var(--amber);
+}
+
+:deep(.val-red), .val-red {
+  color: var(--red);
+}
 </style>

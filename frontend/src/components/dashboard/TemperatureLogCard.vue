@@ -17,22 +17,22 @@ defineProps<{
 
     <table>
       <thead>
-        <tr>
-          <th>Plassering</th>
-          <th>Temp</th>
-          <th>Grense</th>
-          <th class="status-col">Status</th>
-        </tr>
+      <tr>
+        <th>Plassering</th>
+        <th>Temp</th>
+        <th>Grense</th>
+        <th class="status-col">Status</th>
+      </tr>
       </thead>
       <tbody>
-        <tr v-for="row in rows" :key="row.location">
-          <td>{{ row.location }}</td>
-          <td :class="{ 'danger-text': row.status === 'Avvik' }">{{ row.temperature }}</td>
-          <td>{{ row.limit }}</td>
-          <td class="status-col">
-            <Badge :tone="row.status === 'OK' ? 'ok' : 'danger'">{{ row.status }}</Badge>
-          </td>
-        </tr>
+      <tr v-for="row in rows" :key="row.location">
+        <td>{{ row.location }}</td>
+        <td :class="{ 'danger-text': row.status === 'Avvik' }">{{ row.temperature }}</td>
+        <td>{{ row.limit }}</td>
+        <td class="status-col">
+          <Badge :tone="row.status === 'OK' ? 'ok' : 'danger'">{{ row.status }}</Badge>
+        </td>
+      </tr>
       </tbody>
     </table>
   </section>

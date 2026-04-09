@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { provide, ref, watch } from "vue"
+import {provide, ref, watch} from "vue"
 
 const props = withDefaults(defineProps<{
   open?: boolean
@@ -28,9 +28,9 @@ function close() {
   setOpen(false)
 }
 
-provide("alert-dialog", { isOpen, setOpen, close })
+provide("alert-dialog", {isOpen, setOpen, close})
 </script>
 
 <template>
-  <slot />
+  <slot/>
 </template>

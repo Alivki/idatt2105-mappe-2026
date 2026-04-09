@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, inject } from "vue"
-import { Button } from '@/components/ui/button'
+import {computed, inject} from "vue"
+import {Button} from '@/components/ui/button'
 
 const props = defineProps<{
   class?: string
 }>()
 
-const { close } = inject("alert-dialog") as { close: () => void }
+const {close} = inject("alert-dialog") as { close: () => void }
 
 const buttonClass = computed(() =>
   ["alert-cancel", props.class].filter(Boolean).join(" "),
@@ -15,7 +15,7 @@ const buttonClass = computed(() =>
 
 <template>
   <Button variant="outline" :class="buttonClass" @click="close">
-    <slot />
+    <slot/>
   </Button>
 </template>
 

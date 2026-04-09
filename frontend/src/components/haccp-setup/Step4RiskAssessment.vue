@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { WizardState } from '@/types/haccp-setup'
-import { hazardTypeLabels, hazardTypeColors } from '@/types/haccp-setup'
-import { Info, ShieldAlert } from 'lucide-vue-next'
-import { computed } from 'vue'
+import type {WizardState} from '@/types/haccp-setup'
+import {hazardTypeLabels, hazardTypeColors} from '@/types/haccp-setup'
+import {Info, ShieldAlert} from 'lucide-vue-next'
+import {computed} from 'vue'
 import Select from '@/components/ui/select/Select.vue'
 import SelectTrigger from '@/components/ui/select/SelectTrigger.vue'
 import SelectValue from '@/components/ui/select/SelectValue.vue'
@@ -10,13 +10,13 @@ import SelectContent from '@/components/ui/select/SelectContent.vue'
 import SelectItem from '@/components/ui/select/SelectItem.vue'
 import Textarea from '@/components/ui/textarea/Textarea.vue'
 
-const wizard = defineModel<WizardState>('wizard', { required: true })
+const wizard = defineModel<WizardState>('wizard', {required: true})
 
 function getRiskLevel(likelihood: number, severity: number) {
   const risk = likelihood * severity
-  if (risk >= 6) return { label: 'Høy', color: 'var(--red)', bg: 'var(--red-soft)' }
-  if (risk >= 3) return { label: 'Middels', color: 'var(--amber)', bg: 'var(--amber-soft)' }
-  return { label: 'Lav', color: 'var(--green)', bg: 'var(--green-soft)' }
+  if (risk >= 6) return {label: 'Høy', color: 'var(--red)', bg: 'var(--red-soft)'}
+  if (risk >= 3) return {label: 'Middels', color: 'var(--amber)', bg: 'var(--amber-soft)'}
+  return {label: 'Lav', color: 'var(--green)', bg: 'var(--green-soft)'}
 }
 
 function isKKP(likelihood: number, severity: number): boolean {
@@ -41,7 +41,7 @@ function updateSeverity(entryId: string, val: string) {
 <template>
   <div class="step-content">
     <div class="info-banner">
-      <Info :size="16" :stroke-width="1.5" aria-hidden="true" />
+      <Info :size="16" :stroke-width="1.5" aria-hidden="true"/>
       <p>
         Vurder sannsynlighet og alvorlighet for hver fare. Farer med risiko 6–9 foreslås som KKP.
         Legg til forebyggende tiltak.
@@ -49,7 +49,7 @@ function updateSeverity(entryId: string, val: string) {
     </div>
 
     <div v-if="kkpCount > 0" class="kkp-summary">
-      <ShieldAlert :size="16" :stroke-width="1.5" aria-hidden="true" />
+      <ShieldAlert :size="16" :stroke-width="1.5" aria-hidden="true"/>
       <span><strong>{{ kkpCount }}</strong> fare{{ kkpCount !== 1 ? 'r' : '' }} identifisert som KKP</span>
     </div>
 
@@ -72,9 +72,12 @@ function updateSeverity(entryId: string, val: string) {
           >
             {{ hazardTypeLabels[entry.hazardType] }}
           </span>
-          <div class="entry-risk-badge" :style="{ color: getRiskLevel(entry.likelihood, entry.severity).color, background: getRiskLevel(entry.likelihood, entry.severity).bg }">
+          <div class="entry-risk-badge"
+               :style="{ color: getRiskLevel(entry.likelihood, entry.severity).color, background: getRiskLevel(entry.likelihood, entry.severity).bg }">
             {{ entry.likelihood * entry.severity }}
-            <span class="risk-text">{{ getRiskLevel(entry.likelihood, entry.severity).label }}</span>
+            <span class="risk-text">{{
+                getRiskLevel(entry.likelihood, entry.severity).label
+              }}</span>
           </div>
           <span v-if="isKKP(entry.likelihood, entry.severity)" class="kkp-badge">KKP</span>
         </div>
@@ -93,9 +96,10 @@ function updateSeverity(entryId: string, val: string) {
           <div class="entry-row">
             <div class="entry-field entry-field--half">
               <label>Sannsynlighet</label>
-              <Select :model-value="String(entry.likelihood)" @update:model-value="updateLikelihood(entry.id, $event)">
+              <Select :model-value="String(entry.likelihood)"
+                      @update:model-value="updateLikelihood(entry.id, $event)">
                 <SelectTrigger class="entry-select">
-                  <SelectValue placeholder="Velg..." />
+                  <SelectValue placeholder="Velg..."/>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="1">1 – Lav</SelectItem>
@@ -106,9 +110,10 @@ function updateSeverity(entryId: string, val: string) {
             </div>
             <div class="entry-field entry-field--half">
               <label>Alvorlighet</label>
-              <Select :model-value="String(entry.severity)" @update:model-value="updateSeverity(entry.id, $event)">
+              <Select :model-value="String(entry.severity)"
+                      @update:model-value="updateSeverity(entry.id, $event)">
                 <SelectTrigger class="entry-select">
-                  <SelectValue placeholder="Velg..." />
+                  <SelectValue placeholder="Velg..."/>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="1">1 – Lav</SelectItem>
@@ -166,7 +171,9 @@ function updateSeverity(entryId: string, val: string) {
   color: hsl(var(--primary));
 }
 
-.info-banner p { margin: 0; }
+.info-banner p {
+  margin: 0;
+}
 
 .kkp-summary {
   display: flex;

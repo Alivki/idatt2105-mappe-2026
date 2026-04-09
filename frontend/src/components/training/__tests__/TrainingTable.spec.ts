@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { mount } from '@vue/test-utils'
+import {describe, it, expect} from 'vitest'
+import {mount} from '@vue/test-utils'
 import TrainingTable from '../TrainingTable.vue'
 
 interface TrainingRow {
@@ -29,7 +29,7 @@ const StatusBadgeStub = {
   props: ['status'],
 }
 
-const iconStub = { template: '<span />' }
+const iconStub = {template: '<span />'}
 
 const globalStubs = {
   EmployeeAvatar: EmployeeAvatarStub,
@@ -59,22 +59,22 @@ const makeRow = (overrides: Partial<TrainingRow> = {}): TrainingRow => ({
 const makeGrouped = (
   rows: TrainingRow[],
   key = 'Brannvern',
-): Record<string, TrainingRow[]> => ({ [key]: rows })
+): Record<string, TrainingRow[]> => ({[key]: rows})
 
 describe('TrainingTable', () => {
   describe('empty state', () => {
     it('shows empty message when groupedTrainings is empty', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: {} },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: {}},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.text()).toContain('Ingen resultater matcher filteret.')
     })
 
     it('does not show table when groupedTrainings is empty', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: {} },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: {}},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.find('table').exists()).toBe(false)
     })
@@ -83,16 +83,16 @@ describe('TrainingTable', () => {
   describe('group header', () => {
     it('renders group type as header text', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.text()).toContain('Brannvern')
     })
 
     it('shows correct employee count badge', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow(), makeRow({ id: 2 })]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow(), makeRow({id: 2})])},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.text()).toContain('2 ansatte')
     })
@@ -102,10 +102,10 @@ describe('TrainingTable', () => {
         props: {
           groupedTrainings: {
             Brannvern: [makeRow()],
-            HMS: [makeRow({ id: 2, type: 'HMS' })],
+            HMS: [makeRow({id: 2, type: 'HMS'})],
           },
         },
-        global: { stubs: globalStubs },
+        global: {stubs: globalStubs},
       })
       expect(wrapper.text()).toContain('Brannvern')
       expect(wrapper.text()).toContain('HMS')
@@ -115,64 +115,64 @@ describe('TrainingTable', () => {
   describe('table content', () => {
     it('renders employee name in a row', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.text()).toContain('Ola Nordmann')
     })
 
     it('renders employee role in a row', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.text()).toContain('Ansatt')
     })
 
     it('renders training type in a row', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.text()).toContain('Brannvern')
     })
 
     it('renders completed date', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.text()).toContain('2024-01-15')
     })
 
     it('renders expires date', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.text()).toContain('2025-01-15')
     })
 
     it('renders "—" when completed is null', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow({ completed: null })]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow({completed: null})])},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.text()).toContain('—')
     })
 
     it('renders "—" when expires is null', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow({ expires: null })]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow({expires: null})])},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.text()).toContain('—')
     })
 
     it('renders EmployeeAvatar with correct props', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
       })
       const avatar = wrapper.find('.avatar-stub')
       expect(avatar.attributes('data-initials')).toBe('ON')
@@ -181,8 +181,8 @@ describe('TrainingTable', () => {
 
     it('renders StatusBadge with correct status', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.find('.status-badge-stub').text()).toBe('Gyldig')
     })
@@ -190,9 +190,12 @@ describe('TrainingTable', () => {
     it('applies amber text class to expires cell when status is Utløper snart', () => {
       const wrapper = mount(TrainingTable, {
         props: {
-          groupedTrainings: makeGrouped([makeRow({ status: 'Utløper snart', expires: '2024-06-01' })]),
+          groupedTrainings: makeGrouped([makeRow({
+            status: 'Utløper snart',
+            expires: '2024-06-01'
+          })]),
         },
-        global: { stubs: globalStubs },
+        global: {stubs: globalStubs},
       })
       // Find the expires td - it should have amber coloring
       const tds = wrapper.findAll('td')
@@ -201,11 +204,17 @@ describe('TrainingTable', () => {
     })
 
     it('renders multiple rows in the same group', () => {
-      const row1 = makeRow({ id: 1, employee: { name: 'Person A', initials: 'PA', color: '#000', role: 'Ansatt' } })
-      const row2 = makeRow({ id: 2, employee: { name: 'Person B', initials: 'PB', color: '#fff', role: 'Leder' } })
+      const row1 = makeRow({
+        id: 1,
+        employee: {name: 'Person A', initials: 'PA', color: '#000', role: 'Ansatt'}
+      })
+      const row2 = makeRow({
+        id: 2,
+        employee: {name: 'Person B', initials: 'PB', color: '#fff', role: 'Leder'}
+      })
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([row1, row2]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([row1, row2])},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.text()).toContain('Person A')
       expect(wrapper.text()).toContain('Person B')
@@ -215,16 +224,16 @@ describe('TrainingTable', () => {
   describe('collapse/expand', () => {
     it('shows table by default (not collapsed)', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
       })
       expect(wrapper.find('table').exists()).toBe(true)
     })
 
     it('hides table when group header is clicked', async () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
       })
       await wrapper.find('button').trigger('click')
       expect(wrapper.find('table').exists()).toBe(false)
@@ -232,8 +241,8 @@ describe('TrainingTable', () => {
 
     it('shows table again after double click on group header', async () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
       })
       const headerBtn = wrapper.find('button')
       await headerBtn.trigger('click') // collapse
@@ -245,8 +254,8 @@ describe('TrainingTable', () => {
   describe('context menu', () => {
     it('context menu is hidden by default', () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
       })
       // The dropdown div should not be visible initially
       expect(wrapper.find('.absolute.right-0').exists()).toBe(false)
@@ -254,8 +263,8 @@ describe('TrainingTable', () => {
 
     it('opens context menu on MoreVertical button click', async () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
         attachTo: document.body,
       })
       // The ctx-wrap button (⋮)
@@ -267,8 +276,8 @@ describe('TrainingTable', () => {
 
     it('closes context menu when clicking the button again', async () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
         attachTo: document.body,
       })
       const menuBtn = wrapper.find('.ctx-wrap button')
@@ -281,8 +290,8 @@ describe('TrainingTable', () => {
     it('emits edit event with row when Rediger is clicked', async () => {
       const row = makeRow()
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([row]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([row])},
+        global: {stubs: globalStubs},
         attachTo: document.body,
       })
       await wrapper.find('.ctx-wrap button').trigger('click')
@@ -297,8 +306,8 @@ describe('TrainingTable', () => {
     it('emits delete event with row when Slett is clicked', async () => {
       const row = makeRow()
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([row]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([row])},
+        global: {stubs: globalStubs},
         attachTo: document.body,
       })
       await wrapper.find('.ctx-wrap button').trigger('click')
@@ -311,8 +320,8 @@ describe('TrainingTable', () => {
 
     it('closes context menu after edit is clicked', async () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
         attachTo: document.body,
       })
       await wrapper.find('.ctx-wrap button').trigger('click')
@@ -324,8 +333,8 @@ describe('TrainingTable', () => {
 
     it('closes context menu after delete is clicked', async () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
         attachTo: document.body,
       })
       await wrapper.find('.ctx-wrap button').trigger('click')
@@ -339,15 +348,15 @@ describe('TrainingTable', () => {
   describe('outside click', () => {
     it('closes context menu on outside click', async () => {
       const wrapper = mount(TrainingTable, {
-        props: { groupedTrainings: makeGrouped([makeRow()]) },
-        global: { stubs: globalStubs },
+        props: {groupedTrainings: makeGrouped([makeRow()])},
+        global: {stubs: globalStubs},
         attachTo: document.body,
       })
       await wrapper.find('.ctx-wrap button').trigger('click')
       expect(wrapper.find('.ctx-wrap .absolute').exists()).toBe(true)
 
       // Simulate outside click
-      document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      document.body.dispatchEvent(new MouseEvent('click', {bubbles: true}))
       await wrapper.vm.$nextTick()
       expect(wrapper.find('.ctx-wrap .absolute').exists()).toBe(false)
       wrapper.unmount()

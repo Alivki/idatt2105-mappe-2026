@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject } from "vue"
+import {inject} from "vue"
 
 const props = defineProps<{
   class?: string
@@ -7,7 +7,7 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 
-const { close } = inject("dropdown-menu") as { close: () => void }
+const {close} = inject("dropdown-menu") as { close: () => void }
 
 function handleClick(e: MouseEvent) {
   if (props.disabled) {
@@ -25,7 +25,7 @@ function handleClick(e: MouseEvent) {
     :tabindex="disabled ? -1 : 0"
     @click="handleClick"
   >
-    <slot />
+    <slot/>
   </div>
 </template>
 

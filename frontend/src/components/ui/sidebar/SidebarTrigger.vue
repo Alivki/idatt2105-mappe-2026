@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { PanelLeft } from "lucide-vue-next"
-import { Button } from "@/components/ui/button"
-import { useSidebar } from "./utils"
+import {PanelLeft} from "lucide-vue-next"
+import {Button} from "@/components/ui/button"
+import {useSidebar} from "./utils"
 
 const props = defineProps<{
   class?: string
 }>()
 
-const { toggleSidebar } = useSidebar()
+const {toggleSidebar} = useSidebar()
 </script>
 
 <template>
@@ -19,7 +19,7 @@ const { toggleSidebar } = useSidebar()
     style="height: 2.25rem; width: 2.25rem;"
     @click="toggleSidebar"
   >
-    <PanelLeft />
+    <PanelLeft/>
     <span class="sr-only">Toggle Sidebar</span>
   </Button>
 </template>

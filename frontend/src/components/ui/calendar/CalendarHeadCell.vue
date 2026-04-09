@@ -3,7 +3,7 @@
 
 <template>
   <th class="calendar-head-cell">
-    <slot />
+    <slot/>
   </th>
 </template>
 

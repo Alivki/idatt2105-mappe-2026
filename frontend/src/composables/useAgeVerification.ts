@@ -95,12 +95,12 @@ export function useDailySummariesQuery(from: Ref<string>, to: Ref<string>) {
   })
 }
 
-export function useDayDetailQuery(date: Ref<string>) {
+export function useDayDetailQuery(date: Ref<string>, enabled?: Ref<boolean>) {
   return useQuery({
     queryKey: computed(() => [...ageVerificationQueryKey, 'day-detail', date.value]),
     queryFn: () =>
       api.get<DayDetailResponse>(`/age-verification/daily-summary/${date.value}`).then((r) => r.data),
-    enabled: computed(() => !!date.value),
+    enabled: computed(() => !!date.value && (enabled?.value ?? true)),
   })
 }
 

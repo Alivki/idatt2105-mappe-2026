@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick } from 'vue'
+import {afterEach, describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, nextTick} from 'vue'
 
 import DropdownMenuGroup from '../DropdownMenuGroup.vue'
 import DropdownMenuLabel from '../DropdownMenuLabel.vue'
@@ -24,8 +24,8 @@ afterEach(() => {
 describe('DropdownMenu simple wrappers', () => {
   it('group renders role and custom class', () => {
     const wrapper = mount(DropdownMenuGroup, {
-      props: { class: 'group-extra' },
-      slots: { default: '<span data-test="child">Child</span>' },
+      props: {class: 'group-extra'},
+      slots: {default: '<span data-test="child">Child</span>'},
     })
 
     expect(wrapper.attributes('role')).toBe('group')
@@ -35,8 +35,8 @@ describe('DropdownMenu simple wrappers', () => {
 
   it('label renders inset and custom class', () => {
     const wrapper = mount(DropdownMenuLabel, {
-      props: { inset: true, class: 'label-extra' },
-      slots: { default: 'Label' },
+      props: {inset: true, class: 'label-extra'},
+      slots: {default: 'Label'},
     })
 
     expect(wrapper.classes()).toContain('dropdown-label')
@@ -47,7 +47,7 @@ describe('DropdownMenu simple wrappers', () => {
 
   it('separator renders role and class', () => {
     const wrapper = mount(DropdownMenuSeparator, {
-      props: { class: 'separator-extra' },
+      props: {class: 'separator-extra'},
     })
 
     expect(wrapper.attributes('role')).toBe('separator')
@@ -57,8 +57,8 @@ describe('DropdownMenu simple wrappers', () => {
 
   it('shortcut renders slot and class', () => {
     const wrapper = mount(DropdownMenuShortcut, {
-      props: { class: 'shortcut-extra' },
-      slots: { default: '⌘K' },
+      props: {class: 'shortcut-extra'},
+      slots: {default: '⌘K'},
     })
 
     expect(wrapper.element.tagName).toBe('SPAN')
@@ -71,7 +71,7 @@ describe('DropdownMenu simple wrappers', () => {
 describe('DropdownMenu sub components', () => {
   it('sub trigger opens on mouseenter and closes on mouseleave', async () => {
     const Host = defineComponent({
-      components: { DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent },
+      components: {DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent},
       template: `
         <DropdownMenuSub>
           <DropdownMenuSubTrigger class="trigger-extra" data-test="trigger">More</DropdownMenuSubTrigger>
@@ -83,7 +83,7 @@ describe('DropdownMenu sub components', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     const trigger = wrapper.get('[data-test="trigger"]')
@@ -110,7 +110,7 @@ describe('DropdownMenu sub components', () => {
 
   it('sub content stays open on mouseenter and remains rendered after content mouseleave', async () => {
     const Host = defineComponent({
-      components: { DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent },
+      components: {DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent},
       template: `
         <DropdownMenuSub>
           <DropdownMenuSubTrigger data-test="trigger">More</DropdownMenuSubTrigger>
@@ -122,7 +122,7 @@ describe('DropdownMenu sub components', () => {
     })
 
     const wrapper = mount(Host, {
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await wrapper.get('[data-test="trigger"]').trigger('mouseenter')
@@ -142,7 +142,7 @@ describe('DropdownMenu sub components', () => {
 
   it('clicking outside sub content closes it, but clicking inside sub does not', async () => {
     const Host = defineComponent({
-      components: { DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent },
+      components: {DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent},
       template: `
         <DropdownMenuSub>
           <DropdownMenuSubTrigger data-test="trigger">More</DropdownMenuSubTrigger>
@@ -155,18 +155,18 @@ describe('DropdownMenu sub components', () => {
 
     const wrapper = mount(Host, {
       attachTo: document.body,
-      global: { stubs: { transition: true } },
+      global: {stubs: {transition: true}},
     })
 
     await wrapper.get('[data-test="trigger"]').trigger('mouseenter')
     await nextTick()
     expect(wrapper.find('[data-test="sub-content"]').exists()).toBe(true)
 
-    wrapper.get('[data-test="trigger"]').element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    wrapper.get('[data-test="trigger"]').element.dispatchEvent(new MouseEvent('mousedown', {bubbles: true}))
     await nextTick()
     expect(wrapper.find('[data-test="sub-content"]').exists()).toBe(true)
 
-    document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    document.dispatchEvent(new MouseEvent('mousedown', {bubbles: true}))
     await nextTick()
     expect(wrapper.find('[data-test="sub-content"]').exists()).toBe(false)
 

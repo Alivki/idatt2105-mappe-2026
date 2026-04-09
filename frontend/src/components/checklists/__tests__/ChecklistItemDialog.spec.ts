@@ -1,13 +1,13 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import {mount} from '@vue/test-utils'
+import {defineComponent, h} from 'vue'
+import {describe, expect, it, vi} from 'vitest'
 import ChecklistItemDialog from '../ChecklistItemFormDialog.vue'
 
 function makePassThrough(name: string, tag = 'div') {
   return defineComponent({
     name,
     inheritAttrs: false,
-    setup(_, { attrs, slots }) {
+    setup(_, {attrs, slots}) {
       return () => h(tag, attrs, slots.default?.())
     },
   })
@@ -16,26 +16,26 @@ function makePassThrough(name: string, tag = 'div') {
 vi.mock('@/components/ui/dialog/Dialog.vue', () => ({
   default: defineComponent({
     name: 'DialogStub',
-    props: { open: { type: Boolean, default: false } },
+    props: {open: {type: Boolean, default: false}},
     emits: ['update:open'],
-    setup(props, { attrs, slots }) {
-      return () => h('div', { 'data-open': String(props.open), ...attrs }, slots.default?.())
+    setup(props, {attrs, slots}) {
+      return () => h('div', {'data-open': String(props.open), ...attrs}, slots.default?.())
     },
   }),
 }))
-vi.mock('@/components/ui/dialog/DialogContent.vue', () => ({ default: makePassThrough('DialogContent') }))
-vi.mock('@/components/ui/dialog/DialogHeader.vue', () => ({ default: makePassThrough('DialogHeader') }))
-vi.mock('@/components/ui/dialog/DialogTitle.vue', () => ({ default: makePassThrough('DialogTitle', 'h2') }))
-vi.mock('@/components/ui/dialog/DialogDescription.vue', () => ({ default: makePassThrough('DialogDescription', 'p') }))
-vi.mock('@/components/ui/dialog/DialogFooter.vue', () => ({ default: makePassThrough('DialogFooter') }))
-vi.mock('@/components/ui/button/Button.vue', () => ({ default: makePassThrough('ButtonStub', 'button') }))
+vi.mock('@/components/ui/dialog/DialogContent.vue', () => ({default: makePassThrough('DialogContent')}))
+vi.mock('@/components/ui/dialog/DialogHeader.vue', () => ({default: makePassThrough('DialogHeader')}))
+vi.mock('@/components/ui/dialog/DialogTitle.vue', () => ({default: makePassThrough('DialogTitle', 'h2')}))
+vi.mock('@/components/ui/dialog/DialogDescription.vue', () => ({default: makePassThrough('DialogDescription', 'p')}))
+vi.mock('@/components/ui/dialog/DialogFooter.vue', () => ({default: makePassThrough('DialogFooter')}))
+vi.mock('@/components/ui/button/Button.vue', () => ({default: makePassThrough('ButtonStub', 'button')}))
 vi.mock('@/components/ui/input/Input.vue', () => ({
   default: defineComponent({
     name: 'UiInputStub',
-    props: { modelValue: { type: String, default: '' } },
+    props: {modelValue: {type: String, default: ''}},
     emits: ['update:modelValue'],
     inheritAttrs: false,
-    setup(props, { emit, attrs }) {
+    setup(props, {emit, attrs}) {
       return () => h('input', {
         ...attrs,
         value: props.modelValue,
@@ -47,10 +47,10 @@ vi.mock('@/components/ui/input/Input.vue', () => ({
 vi.mock('@/components/ui/textarea/Textarea.vue', () => ({
   default: defineComponent({
     name: 'UiTextareaStub',
-    props: { modelValue: { type: String, default: '' } },
+    props: {modelValue: {type: String, default: ''}},
     emits: ['update:modelValue'],
     inheritAttrs: false,
-    setup(props, { emit, attrs }) {
+    setup(props, {emit, attrs}) {
       return () => h('textarea', {
         ...attrs,
         value: props.modelValue,
@@ -199,8 +199,8 @@ describe('ChecklistItemFormDialog', () => {
       },
     })
 
-    await wrapper.setProps({ open: false })
-    await wrapper.setProps({ mode: 'create', initialItem: null, open: true })
+    await wrapper.setProps({open: false})
+    await wrapper.setProps({mode: 'create', initialItem: null, open: true})
 
     expect((wrapper.get('input').element as HTMLInputElement).value).toBe('')
     expect((wrapper.get('textarea').element as HTMLTextAreaElement).value).toBe('')

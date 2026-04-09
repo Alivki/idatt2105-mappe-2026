@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { X } from 'lucide-vue-next'
+import {X} from 'lucide-vue-next'
 
 const props = defineProps<{
   types: string[]
@@ -8,7 +8,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'update:modelType':   [value: string]
+  'update:modelType': [value: string]
   'update:modelStatus': [value: string]
 }>()
 
@@ -39,7 +39,7 @@ function clearAll(): void {
       </button>
     </div>
 
-    <div class="divider" />
+    <div class="divider"/>
     <div class="filter-group">
       <span class="filter-label">Status</span>
       <button
@@ -72,7 +72,8 @@ function clearAll(): void {
       class="clear-btn"
       @click="clearAll"
     >
-      <X :size="13" /> Fjern filter
+      <X :size="13"/>
+      Fjern filter
     </button>
 
   </div>
@@ -130,6 +131,7 @@ function clearAll(): void {
   transition: all 0.15s ease;
   white-space: nowrap;
 }
+
 .pill:hover {
   background: #f0fdf4;
   border-color: #a7f3d0;
@@ -143,21 +145,71 @@ function clearAll(): void {
   font-weight: 600;
 }
 
-.pill-outline-green { color: #059669; border-color: #d1fae5; background: #f0fdf4; }
-.pill-outline-amber { color: #d97706; border-color: #fde68a; background: #fffbeb; }
-.pill-outline-red   { color: #dc2626; border-color: #fecdd3; background: #fff1f2; }
+.pill-outline-green {
+  color: #059669;
+  border-color: #d1fae5;
+  background: #f0fdf4;
+}
 
-.pill-outline-green:hover { background: #d1fae5; border-color: #6ee7b7; }
-.pill-outline-amber:hover { background: #fde68a; border-color: #fcd34d; }
-.pill-outline-red:hover   { background: #fecdd3; border-color: #fca5a5; }
+.pill-outline-amber {
+  color: #d97706;
+  border-color: #fde68a;
+  background: #fffbeb;
+}
 
-.pill-green { background: #059669; border-color: #059669; color: #fff; font-weight: 600; }
-.pill-amber { background: #d97706; border-color: #d97706; color: #fff; font-weight: 600; }
-.pill-red   { background: #dc2626; border-color: #dc2626; color: #fff; font-weight: 600; }
+.pill-outline-red {
+  color: #dc2626;
+  border-color: #fecdd3;
+  background: #fff1f2;
+}
 
-.pill-green:hover { background: #047857; }
-.pill-amber:hover { background: #b45309; }
-.pill-red:hover   { background: #b91c1c; }
+.pill-outline-green:hover {
+  background: #d1fae5;
+  border-color: #6ee7b7;
+}
+
+.pill-outline-amber:hover {
+  background: #fde68a;
+  border-color: #fcd34d;
+}
+
+.pill-outline-red:hover {
+  background: #fecdd3;
+  border-color: #fca5a5;
+}
+
+.pill-green {
+  background: #059669;
+  border-color: #059669;
+  color: #fff;
+  font-weight: 600;
+}
+
+.pill-amber {
+  background: #d97706;
+  border-color: #d97706;
+  color: #fff;
+  font-weight: 600;
+}
+
+.pill-red {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+  font-weight: 600;
+}
+
+.pill-green:hover {
+  background: #047857;
+}
+
+.pill-amber:hover {
+  background: #b45309;
+}
+
+.pill-red:hover {
+  background: #b91c1c;
+}
 
 .pill-dot {
   width: 7px;
@@ -165,13 +217,24 @@ function clearAll(): void {
   border-radius: 50%;
   flex-shrink: 0;
 }
-.dot-green { background: #059669; }
-.dot-amber { background: #d97706; }
-.dot-red   { background: #dc2626; }
+
+.dot-green {
+  background: #059669;
+}
+
+.dot-amber {
+  background: #d97706;
+}
+
+.dot-red {
+  background: #dc2626;
+}
 
 .pill-green .pill-dot,
 .pill-amber .pill-dot,
-.pill-red   .pill-dot { background: rgba(255,255,255,0.7); }
+.pill-red .pill-dot {
+  background: rgba(255, 255, 255, 0.7);
+}
 
 .clear-btn {
   display: inline-flex;
@@ -188,6 +251,7 @@ function clearAll(): void {
   cursor: pointer;
   transition: all 0.15s;
 }
+
 .clear-btn:hover {
   color: #dc2626;
   border-color: #fca5a5;

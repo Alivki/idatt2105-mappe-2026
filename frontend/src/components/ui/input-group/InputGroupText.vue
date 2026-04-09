@@ -6,7 +6,7 @@ defineProps<{
 
 <template>
   <span :class="['input-group-text', $props.class]">
-    <slot />
+    <slot/>
   </span>
 </template>
 

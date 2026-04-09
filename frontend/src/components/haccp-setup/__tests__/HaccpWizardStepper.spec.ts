@@ -1,11 +1,11 @@
-import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import {mount} from '@vue/test-utils'
+import {describe, expect, it} from 'vitest'
 import WizardStepper from '../HaccpStepper.vue'
 
 describe('WizardStepper', () => {
   it('renders the correct number of bars and label', () => {
     const wrapper = mount(WizardStepper, {
-      props: { currentStep: 2, totalSteps: 5 },
+      props: {currentStep: 2, totalSteps: 5},
     })
 
     const bars = wrapper.findAll('.stepper-bar')
@@ -15,7 +15,7 @@ describe('WizardStepper', () => {
 
   it('marks previous bars as completed and current as active', () => {
     const wrapper = mount(WizardStepper, {
-      props: { currentStep: 3, totalSteps: 4 },
+      props: {currentStep: 3, totalSteps: 4},
     })
 
     const bars = wrapper.findAll('.stepper-bar')
@@ -28,7 +28,7 @@ describe('WizardStepper', () => {
 
   it('shows no completed bars on first step', () => {
     const wrapper = mount(WizardStepper, {
-      props: { currentStep: 1, totalSteps: 3 },
+      props: {currentStep: 1, totalSteps: 3},
     })
 
     const bars = wrapper.findAll('.stepper-bar')

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { inject, computed } from "vue"
-import { Circle } from "lucide-vue-next"
+import {inject, computed} from "vue"
+import {Circle} from "lucide-vue-next"
 
 const props = defineProps<{
   class?: string
@@ -8,7 +8,10 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 
-const group = inject("dropdown-radio-group") as { modelValue: () => string; select: (value: string) => void }
+const group = inject("dropdown-radio-group") as {
+  modelValue: () => string;
+  select: (value: string) => void
+}
 const isChecked = computed(() => group.modelValue() === props.value)
 
 function handleClick() {
@@ -26,9 +29,9 @@ function handleClick() {
     @click="handleClick"
   >
     <span class="dropdown-radio-indicator">
-      <Circle v-if="isChecked" class="dropdown-radio-icon" />
+      <Circle v-if="isChecked" class="dropdown-radio-icon"/>
     </span>
-    <slot />
+    <slot/>
   </div>
 </template>
 

@@ -11,7 +11,7 @@ defineProps<{
     :disabled="disabled || undefined"
     :class="['input-group-button', $props.class]"
   >
-    <slot />
+    <slot/>
   </button>
 </template>
 
