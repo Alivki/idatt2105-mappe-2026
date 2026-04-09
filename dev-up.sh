@@ -77,7 +77,7 @@ section "Building shared backend module (ik-common)"
 cd "$ROOT_DIR/backend"
 
 if [[ "$SKIP_MVN_INSTALL" != "true" ]]; then
-  ./mvnw -q -pl ik-common -DskipTests install
+  ./mvnw -q -pl ik-common -Dmaven.test.skip=true install
 else
   echo "SKIP_MVN_INSTALL=true -> skipping 'ik-common install'"
 fi
