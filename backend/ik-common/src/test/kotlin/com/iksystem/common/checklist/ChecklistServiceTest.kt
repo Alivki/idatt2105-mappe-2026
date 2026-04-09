@@ -9,12 +9,14 @@ import com.iksystem.common.checklist.dto.UpdateChecklistRequest
 import com.iksystem.common.checklist.model.Checklist
 import com.iksystem.common.checklist.model.ChecklistFrequency
 import com.iksystem.common.checklist.model.ChecklistItem
+import com.iksystem.common.checklist.repository.ChecklistCompletionRepository
 import com.iksystem.common.checklist.repository.ChecklistItemRepository
 import com.iksystem.common.checklist.repository.ChecklistRepository
 import com.iksystem.common.exception.BadRequestException
 import com.iksystem.common.exception.ForbiddenException
 import com.iksystem.common.exception.NotFoundException
 import com.iksystem.common.security.AuthenticatedUser
+import com.iksystem.common.user.repository.UserRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -34,13 +36,23 @@ class ChecklistServiceTest {
 
     private lateinit var checklistRepository: ChecklistRepository
     private lateinit var checklistItemRepository: ChecklistItemRepository
+    private lateinit var checklistCompletionRepository: ChecklistCompletionRepository
+    private lateinit var userRepository: UserRepository
     private lateinit var service: ChecklistService
 
     @BeforeEach
     fun setUp() {
         checklistRepository = mock(ChecklistRepository::class.java)
         checklistItemRepository = mock(ChecklistItemRepository::class.java)
-        service = ChecklistService(checklistRepository, checklistItemRepository)
+        checklistCompletionRepository = mock(ChecklistCompletionRepository::class.java)
+        userRepository = mock(UserRepository::class.java)
+
+        service = ChecklistService(
+            checklistRepository,
+            checklistItemRepository,
+            checklistCompletionRepository,
+            userRepository
+        )
     }
 
     @Test
