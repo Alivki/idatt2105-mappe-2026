@@ -23,8 +23,12 @@ import { usePenaltyPointsQuery } from '@/composables/usePenaltyPoints'
 import { useTemperatureMonitoring } from '@/composables/useTemperatureMonitoring'
 import { useTrainingLogsQuery } from '@/composables/useTrainingLogs'
 import { useAlcoholPolicyExistsQuery } from '@/composables/useAlcoholPolicy'
-import { useDayDetailQuery } from '@/composables/useAgeVerification'
+import { useActiveShiftQuery, useDayDetailQuery } from '@/composables/useAgeVerification'
+import { useAuthStore } from '@/stores/auth'
 import type { Checklist } from '@/types/checklist'
+
+const auth = useAuthStore()
+const isManagerOrAdmin = computed(() => ['ADMIN', 'MANAGER'].includes(auth.role ?? ''))
 
 const foodQuery = useFoodDeviationsQuery()
 const alcoholQuery = useAlcoholDeviationsQuery()
@@ -35,7 +39,8 @@ const tempMonitoring = useTemperatureMonitoring()
 const trainingQuery = useTrainingLogsQuery()
 const alcoholPolicyQuery = useAlcoholPolicyExistsQuery()
 const todayDate = ref(new Date().toISOString().slice(0, 10))
-const todayDetailQuery = useDayDetailQuery(todayDate)
+const todayDetailQuery = useDayDetailQuery(todayDate, isManagerOrAdmin)
+const activeShiftQuery = useActiveShiftQuery()
 
 // ── KPI helpers ──
 
@@ -96,9 +101,18 @@ const trainingStats = computed(() => {
   return { completed, total: logs.length, expiringSoon }
 })
 
-const todayShiftsCount = computed(() => todayDetailQuery.data.value?.shifts.length ?? 0)
-const todayIdsChecked = computed(() => todayDetailQuery.data.value?.totalIdsChecked ?? 0)
-const todayShiftDeviations = computed(() => todayDetailQuery.data.value?.totalDeviations ?? 0)
+const todayShiftsCount = computed(() => {
+  if (isManagerOrAdmin.value) return todayDetailQuery.data.value?.shifts.length ?? 0
+  return activeShiftQuery.data.value ? 1 : 0
+})
+const todayIdsChecked = computed(() => {
+  if (isManagerOrAdmin.value) return todayDetailQuery.data.value?.totalIdsChecked ?? 0
+  return activeShiftQuery.data.value?.shift.idsCheckedCount ?? 0
+})
+const todayShiftDeviations = computed(() => {
+  if (isManagerOrAdmin.value) return todayDetailQuery.data.value?.totalDeviations ?? 0
+  return activeShiftQuery.data.value?.shift.deviationCount ?? 0
+})
 
 const showHaccpSetup = computed(() => {
   const checklists = checklistsQuery.data.value ?? []

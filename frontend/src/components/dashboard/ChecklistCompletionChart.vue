@@ -124,7 +124,7 @@ const chartOptions = {
       titleFont: { weight: 'bold' as const, size: 13 },
       bodyFont: { size: 12 },
       callbacks: {
-        label: (ctx: any) => `${ctx.parsed.y}%`,
+        label: (ctx: { parsed: { y: number | null } }) => `${ctx.parsed.y ?? 0}%`,
       },
     },
   },
@@ -148,7 +148,7 @@ const chartOptions = {
       ticks: {
         color: 'hsl(24, 5%, 56%)',
         font: { size: 11 },
-        callback: (v: any) => `${v}%`,
+        callback: (v: string | number) => `${v}%`,
         stepSize: 25,
       },
     },

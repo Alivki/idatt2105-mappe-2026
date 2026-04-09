@@ -2,7 +2,7 @@
 import { Settings } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 
-const props = defineProps<{
+defineProps<{
   showHaccp: boolean
   showAlcoholPolicy: boolean
 }>()
