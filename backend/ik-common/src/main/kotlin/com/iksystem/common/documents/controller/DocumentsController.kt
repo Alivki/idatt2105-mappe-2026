@@ -23,12 +23,29 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
+/**
+ * REST controller for handling document operations.
+ *
+ * Provides endpoints for:
+ * - Uploading documents to S3
+ * - Retrieving presigned URLs for documents
+ * - Deleting documents
+ * - Testing S3 connectivity
+ *
+ * All operations are scoped to the authenticated user's organization
+ * and protected by role-based access control.
+ */
 @RestController
 @RequestMapping("/api/v1/documents")
 @Tag(name = "Documents", description = "Document management and upload to S3")
 @SecurityRequirement(name = "bearerAuth")
 class DocumentsController(private val documentsService: DocumentsService) {
 
+    /**
+     * Tests connectivity to the S3 storage.
+     *
+     * @return "OK" if the connection is successful
+     */
     @Operation(summary = "Test S3 connectivity", description = "Verifies that the S3 connection is working. Requires ADMIN role.")
     @ApiResponse(responseCode = "200", description = "S3 connection OK")
     @GetMapping("/test-s3")
@@ -38,6 +55,13 @@ class DocumentsController(private val documentsService: DocumentsService) {
         return "OK"
     }
 
+    /**
+     * Uploads a document to S3 and stores metadata in the system.
+     *
+     * @param file The file to upload
+     * @param auth The authenticated user
+     * @return Response containing document metadata and access URL
+     */
     @Operation(summary = "Upload document", description = "Upload a document to S3 and store metadata. Returns presigned URL. Requires ADMIN or MANAGER role.")
     @ApiResponses(
         ApiResponse(responseCode = "201", description = "Document uploaded successfully"),
@@ -64,6 +88,15 @@ class DocumentsController(private val documentsService: DocumentsService) {
         )
     }
 
+    /**
+     * Retrieves a presigned URL for accessing a document.
+     *
+     * The URL is time-limited and typically valid for 1 hour.
+     *
+     * @param id The document ID
+     * @param auth The authenticated user
+     * @return Response containing the presigned URL
+     */
     @Operation(summary = "Get document presigned URL", description = "Generate a fresh presigned URL for accessing a document. URL is valid for 1 hour.")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Presigned URL generated successfully"),
@@ -80,6 +113,13 @@ class DocumentsController(private val documentsService: DocumentsService) {
         return ResponseEntity.ok(DocumentUrlResponse(id = id, url = url))
     }
 
+    /**
+     * Deletes a document from both S3 and the database.
+     *
+     * @param id The document ID
+     * @param auth The authenticated user
+     * @return No content response if deletion is successful
+     */
     @Operation(summary = "Delete document", description = "Delete a document from S3 and database. Requires ADMIN or MANAGER role.")
     @ApiResponses(
         ApiResponse(responseCode = "204", description = "Document deleted successfully"),

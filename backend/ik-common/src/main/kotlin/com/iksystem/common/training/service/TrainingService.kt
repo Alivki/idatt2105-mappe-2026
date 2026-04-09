@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 
+/**
+ * Service handling business logic for training logs.
+ */
 @Service
 class TrainingService(
     private val trainingRepository: TrainingRepository,
@@ -22,6 +25,9 @@ class TrainingService(
     private val membershipRepository: MembershipRepository,
 ) {
 
+    /**
+     * Returns all training logs for the user's organization.
+     */
     @Transactional(readOnly = true)
     fun list(auth: AuthenticatedUser): List<TrainingLogResponse> {
         val orgId = auth.requireOrganizationId()
@@ -29,12 +35,18 @@ class TrainingService(
             .map { it.toResponse() }
     }
 
+    /**
+     * Returns a training log by ID.
+     */
     @Transactional(readOnly = true)
     fun getById(id: Long, auth: AuthenticatedUser): TrainingLogResponse {
         val orgId = auth.requireOrganizationId()
         return requireTrainingLog(id, orgId).toResponse()
     }
 
+    /**
+     * Creates a new training log.
+     */
     @Transactional
     fun create(request: CreateTrainingLogRequest, auth: AuthenticatedUser): TrainingLogResponse {
         val orgId = auth.requireOrganizationId()
@@ -57,6 +69,9 @@ class TrainingService(
         return trainingLog.toResponse()
     }
 
+    /**
+     * Updates an existing training log.
+     */
     @Transactional
     fun update(id: Long, request: UpdateTrainingLogRequest, auth: AuthenticatedUser): TrainingLogResponse {
         val orgId = auth.requireOrganizationId()
@@ -94,6 +109,9 @@ class TrainingService(
         return updated.toResponse()
     }
 
+    /**
+     * Deletes a training log by ID.
+     */
     @Transactional
     fun delete(id: Long, auth: AuthenticatedUser) {
         val orgId = auth.requireOrganizationId()
@@ -101,16 +119,25 @@ class TrainingService(
         trainingRepository.delete(trainingLog)
     }
 
+    /**
+     * Ensures a training log exists for the given organization.
+     */
     private fun requireTrainingLog(id: Long, organizationId: Long): TrainingLog {
         return trainingRepository.findByIdAndOrganizationId(id, organizationId)
             ?: throw NotFoundException("Training log not found")
     }
 
+    /**
+     * Ensures a user exists.
+     */
     private fun requireUser(userId: Long): User {
         return userRepository.findById(userId)
             .orElseThrow { NotFoundException("User not found") }
     }
 
+    /**
+     * Ensures a user is a member of the organization.
+     */
     private fun requireMember(userId: Long, organizationId: Long): User {
         val user = requireUser(userId)
         val isMember = membershipRepository.existsByUserIdAndOrganizationId(user.id, organizationId)
@@ -121,6 +148,9 @@ class TrainingService(
     }
 }
 
+/**
+ * Maps a TrainingLog entity to a response DTO.
+ */
 private fun TrainingLog.toResponse(): TrainingLogResponse = TrainingLogResponse(
     id = id,
     organizationId = organizationId,

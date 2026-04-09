@@ -3,38 +3,62 @@ package com.iksystem.food.haccpsetup.dto
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 
+/**
+ * Types of food businesses.
+ */
 enum class BusinessType {
     RESTAURANT, CAFE, BAR, KIOSK, CATERING, CANTEEN,
     INSTITUTION_KITCHEN, FOOD_PRODUCTION, RETAIL, MOBILE_VENDOR,
 }
 
+/**
+ * Size categories for businesses.
+ */
 enum class BusinessSize {
     SMALL_1_5, MEDIUM_6_15, LARGE_16_50, ENTERPRISE_50_PLUS,
 }
 
+/**
+ * Types of food handled.
+ */
 enum class FoodType {
     READY_TO_EAT, PERISHABLE_TEMP_CONTROL, RAW_MEAT_POULTRY,
     SEAFOOD_FISH, DAIRY, ALLERGEN_CONTAINING, SHELF_STABLE_ONLY,
 }
 
+/**
+ * Food processing methods.
+ */
 enum class FoodProcess {
     COOKING_HEAT_TREATMENT, COOLING_COOKED, THAWING_FROZEN,
     VACUUM_PACKING, CURING_SMOKING_PRESERVING, NONE_PRE_MADE,
 }
 
+/**
+ * Available facility types.
+ */
 enum class Facility {
     COMMERCIAL_KITCHEN, COLD_STORAGE, FREEZER_STORAGE, DRY_STORAGE,
     SEPARATE_PREP_AREAS, DISHWASHING_STATION, HANDWASHING_STATIONS, STAFF_CHANGING_AREA,
 }
 
+/**
+ * Types of temperature equipment.
+ */
 enum class TempEquipment {
     REFRIGERATORS, FREEZERS, HOT_HOLDING, COOKING_EQUIPMENT, NONE,
 }
 
+/**
+ * Methods of receiving goods.
+ */
 enum class GoodsReceiving {
     DIRECT_DELIVERY, PICK_UP, BOTH,
 }
 
+/**
+ * Request payload for generating HACCP checklists.
+ */
 data class HaccpSetupRequest(
     @field:NotNull(message = "Business type is required")
     val businessType: BusinessType,

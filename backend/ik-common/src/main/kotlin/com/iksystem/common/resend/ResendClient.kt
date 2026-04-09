@@ -5,10 +5,17 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.http.*
 
+/**
+ * Client for sending emails via the Resend API.
+ */
 @Component
 class ResendClient(private val props: ResendConfig) {
     private val restTemplate = RestTemplate()
 
+    /**
+     * Sends an email with given recipient, subject, and HTML content.
+     * Skips sending if devMode is enabled.
+     */
     fun sendEmail(to: String, subject: String, html: String) {
         if (props.devMode) {
             println("DEV MODE: Email not sent to $to with subject: $subject")

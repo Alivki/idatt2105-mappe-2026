@@ -11,7 +11,20 @@ import jakarta.persistence.Table
 import java.time.Instant
 
 /**
- * Checklist template scoped to a single organization.
+ * Represents a checklist template scoped to a single organization.
+ *
+ * A checklist defines a reusable set of tasks that can be completed
+ * based on a given frequency (e.g., daily, weekly).
+ *
+ * @property id Unique identifier for the checklist
+ * @property organizationId ID of the organization this checklist belongs to
+ * @property name Name of the checklist
+ * @property description Optional description of the checklist
+ * @property frequency How often the checklist should be completed
+ * @property active Whether the checklist is currently active
+ * @property source Origin of the checklist (e.g., MANUAL, SYSTEM)
+ * @property createdAt Timestamp when the checklist was created
+ * @property updatedAt Timestamp when the checklist was last updated
  */
 @Entity
 @Table(name = "checklists")

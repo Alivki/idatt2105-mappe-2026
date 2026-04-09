@@ -2,8 +2,15 @@ package com.iksystem.common.resend
 
 import org.springframework.stereotype.Component
 
+/**
+ * Builds HTML email templates with a shared layout.
+ */
 @Component
 class EmailTemplateBuilder {
+
+    /**
+     * Wraps content in a base HTML email layout.
+     */
     private fun baseLayout(content: String): String {
         return """
         <!DOCTYPE html>
@@ -20,6 +27,9 @@ class EmailTemplateBuilder {
         """.trimIndent()
     }
 
+    /**
+     * Builds a simple registration email.
+     */
     fun registrationEmail(
         title: String,
         description: String,
@@ -32,6 +42,9 @@ class EmailTemplateBuilder {
         return baseLayout(content)
     }
 
+    /**
+     * Builds an email with a call-to-action button.
+     */
     fun actionEmail(
         title: String,
         description: String,
@@ -67,6 +80,9 @@ class EmailTemplateBuilder {
         return baseLayout(content)
     }
 
+    /**
+     * Builds a status card email with labeled rows and status badge.
+     */
     fun statusCard(
         title: String,
         rows: List<Pair<String, String>>,

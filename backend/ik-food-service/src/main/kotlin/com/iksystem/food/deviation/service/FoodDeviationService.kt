@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 
+/**
+ * Service handling business logic for food deviations.
+ */
 @Service
 class FoodDeviationService(
     private val repository: FoodDeviationRepository,
@@ -27,18 +30,27 @@ class FoodDeviationService(
     private val notificationsService: NotificationsService,
 ) {
 
+    /**
+     * Returns all food deviations for the user's organization.
+     */
     @Transactional(readOnly = true)
     fun list(auth: AuthenticatedUser): List<FoodDeviationResponse> {
         val orgId = auth.requireOrganizationId()
         return repository.findAllByOrganizationIdOrderByReportedAtDesc(orgId).map { it.toResponse() }
     }
 
+    /**
+     * Returns a food deviation by ID.
+     */
     @Transactional(readOnly = true)
     fun getById(id: Long, auth: AuthenticatedUser): FoodDeviationResponse {
         val orgId = auth.requireOrganizationId()
         return requireDeviation(id, orgId).toResponse()
     }
 
+    /**
+     * Creates a new food deviation and triggers notifications.
+     */
     @Transactional
     fun create(request: CreateFoodDeviationRequest, auth: AuthenticatedUser): FoodDeviationResponse {
         val orgId = auth.requireOrganizationId()
@@ -68,6 +80,9 @@ class FoodDeviationService(
         return deviation.toResponse()
     }
 
+    /**
+     * Updates an existing food deviation.
+     */
     @Transactional
     fun update(id: Long, request: UpdateFoodDeviationRequest, auth: AuthenticatedUser): FoodDeviationResponse {
         val orgId = auth.requireOrganizationId()
@@ -98,6 +113,9 @@ class FoodDeviationService(
         return updated.toResponse()
     }
 
+    /**
+     * Deletes a food deviation by ID.
+     */
     @Transactional
     fun delete(id: Long, auth: AuthenticatedUser) {
         val orgId = auth.requireOrganizationId()
@@ -105,6 +123,9 @@ class FoodDeviationService(
         repository.delete(deviation)
     }
 
+    /**
+     * Sends notifications when a deviation is created.
+     */
     private fun notifyDeviationCreated(deviation: FoodDeviation) {
         val message = "Food deviation '${deviation.deviationType}' (${deviation.severity}) reported by ${deviation.reportedByUser.fullName}: ${deviation.description.take(100)}"
 
@@ -131,16 +152,25 @@ class FoodDeviationService(
         }
     }
 
+    /**
+     * Ensures a deviation exists for the organization.
+     */
     private fun requireDeviation(id: Long, organizationId: Long): FoodDeviation {
         return repository.findByIdAndOrganizationId(id, organizationId)
             ?: throw NotFoundException("Food deviation not found")
     }
 
+    /**
+     * Ensures a user exists.
+     */
     private fun requireUser(userId: Long): User {
         return userRepository.findById(userId)
             .orElseThrow { NotFoundException("User not found") }
     }
 
+    /**
+     * Resolves a user as an organization member if provided.
+     */
     private fun resolveOrgMember(userId: Long?, organizationId: Long): User? {
         if (userId == null) return null
         val user = requireUser(userId)
@@ -151,6 +181,9 @@ class FoodDeviationService(
     }
 }
 
+/**
+ * Maps a FoodDeviation entity to a response DTO.
+ */
 private fun FoodDeviation.toResponse() = FoodDeviationResponse(
     id = id,
     organizationId = organizationId,

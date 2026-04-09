@@ -28,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Controller for temperature appliances and measurements.
+ */
 @Tag(name = "Temperature", description = "Temperature appliance and measurement management for IK-Mat")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
@@ -36,6 +39,9 @@ class TemperatureController(
     private val service: TemperatureService,
 ) {
 
+    /**
+     * Lists all appliances.
+     */
     @Operation(summary = "List temperature appliances", description = "Returns all temperature appliances for the active organization.")
     @ApiResponse(responseCode = "200", description = "Appliance list returned")
     @GetMapping("/appliances")
@@ -44,6 +50,9 @@ class TemperatureController(
     ): ResponseEntity<List<TemperatureApplianceResponse>> =
         ResponseEntity.ok(service.listAppliances(auth))
 
+    /**
+     * Creates a new appliance.
+     */
     @Operation(summary = "Create temperature appliance")
     @ApiResponse(responseCode = "201", description = "Appliance created")
     @PostMapping("/appliances")
@@ -54,6 +63,9 @@ class TemperatureController(
     ): ResponseEntity<TemperatureApplianceResponse> =
         ResponseEntity.status(HttpStatus.CREATED).body(service.createAppliance(request, auth))
 
+    /**
+     * Updates an appliance.
+     */
     @Operation(summary = "Update temperature appliance")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Appliance updated"),
@@ -68,6 +80,9 @@ class TemperatureController(
     ): ResponseEntity<TemperatureApplianceResponse> =
         ResponseEntity.ok(service.updateAppliance(id, request, auth))
 
+    /**
+     * Deletes an appliance.
+     */
     @Operation(summary = "Delete temperature appliance")
     @ApiResponses(
         ApiResponse(responseCode = "204", description = "Appliance deleted"),
@@ -83,6 +98,9 @@ class TemperatureController(
         return ResponseEntity.noContent().build()
     }
 
+    /**
+     * Lists measurements.
+     */
     @Operation(summary = "List temperature measurements", description = "Returns temperature measurements, optionally filtered by appliance.")
     @ApiResponse(responseCode = "200", description = "Measurement list returned")
     @GetMapping("/measurements")
@@ -92,6 +110,9 @@ class TemperatureController(
     ): ResponseEntity<List<TemperatureMeasurementResponse>> =
         ResponseEntity.ok(service.listMeasurements(auth, applianceId))
 
+    /**
+     * Registers a measurement.
+     */
     @Operation(summary = "Register temperature measurement")
     @ApiResponse(responseCode = "201", description = "Measurement registered")
     @PostMapping("/measurements")
@@ -101,6 +122,9 @@ class TemperatureController(
     ): ResponseEntity<TemperatureMeasurementResponse> =
         ResponseEntity.status(HttpStatus.CREATED).body(service.registerMeasurement(request, auth))
 
+    /**
+     * Deletes selected measurements.
+     */
     @Operation(summary = "Delete selected measurements")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Measurements deleted"),

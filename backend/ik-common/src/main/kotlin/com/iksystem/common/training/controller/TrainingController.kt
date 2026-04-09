@@ -24,6 +24,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * REST controller for managing training logs within an organization.
+ */
 @Tag(name = "Training Logs", description = "Staff training record management")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
@@ -32,12 +35,18 @@ class TrainingController(
     private val trainingService: TrainingService,
 ) {
 
+    /**
+     * Returns all training logs for the authenticated user's organization.
+     */
     @Operation(summary = "List training logs", description = "Returns all training logs for the active organization.")
     @ApiResponse(responseCode = "200", description = "Training log list returned")
     @GetMapping
     fun list(@AuthenticationPrincipal auth: AuthenticatedUser): ResponseEntity<List<TrainingLogResponse>> =
         ResponseEntity.ok(trainingService.list(auth))
 
+    /**
+     * Returns a single training log by ID.
+     */
     @Operation(summary = "Get training log", description = "Returns one training log by ID in the active organization.")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Training log returned"),
@@ -50,6 +59,9 @@ class TrainingController(
     ): ResponseEntity<TrainingLogResponse> =
         ResponseEntity.ok(trainingService.getById(id, auth))
 
+    /**
+     * Creates a new training log.
+     */
     @Operation(summary = "Create training log", description = "Creates a new training log entry in the active organization.")
     @ApiResponses(
         ApiResponse(responseCode = "201", description = "Training log created"),
@@ -63,6 +75,9 @@ class TrainingController(
     ): ResponseEntity<TrainingLogResponse> =
         ResponseEntity.status(HttpStatus.CREATED).body(trainingService.create(request, auth))
 
+    /**
+     * Updates an existing training log.
+     */
     @Operation(summary = "Update training log", description = "Updates a training log entry.")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Training log updated"),
@@ -78,6 +93,9 @@ class TrainingController(
     ): ResponseEntity<TrainingLogResponse> =
         ResponseEntity.ok(trainingService.update(id, request, auth))
 
+    /**
+     * Deletes a training log by ID.
+     */
     @Operation(summary = "Delete training log", description = "Deletes a training log entry.")
     @ApiResponses(
         ApiResponse(responseCode = "204", description = "Training log deleted"),

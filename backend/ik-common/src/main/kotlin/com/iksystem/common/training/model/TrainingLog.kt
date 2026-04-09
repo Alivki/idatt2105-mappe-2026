@@ -13,6 +13,9 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import java.time.Instant
 
+/**
+ * Entity representing a training log for an employee.
+ */
 @Entity
 @Table(name = "training_logs")
 data class TrainingLog(

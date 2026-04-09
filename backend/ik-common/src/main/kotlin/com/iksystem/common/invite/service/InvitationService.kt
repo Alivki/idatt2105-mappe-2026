@@ -28,6 +28,15 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
+/**
+ * Service responsible for managing invitations and onboarding users into organizations.
+ *
+ * Handles:
+ * - Creating and sending invitations
+ * - Validating invitation tokens
+ * - Accepting invitations and creating users/memberships
+ * - Generating authentication tokens upon successful onboarding
+ */
 @Service
 class InvitationService(
     private val invitationRepository: InvitationRepository,
@@ -43,6 +52,18 @@ class InvitationService(
     @Value("\${jwt.refresh-token-expiration}") private val refreshTokenExpiration: Long,
 ) {
 
+    /**
+     * Creates and sends an invitation to a user.
+     *
+     * Validates that:
+     * - The user is not already a member of the organization
+     * - No active invitation already exists for the email
+     *
+     * Generates a unique token and sends an email via Resend.
+     *
+     * @param request Invitation request data
+     * @param auth The authenticated user creating the invitation
+     */
     @Transactional
     fun createInvite(request: InviteUserRequest, auth: AuthenticatedUser) {
         val orgId = auth.requireOrganizationId()
@@ -75,6 +96,17 @@ class InvitationService(
         resendService.sendInviteEmail(email, org.name, token)
     }
 
+    /**
+     * Retrieves and validates an invitation using its token.
+     *
+     * Ensures that:
+     * - The invitation exists
+     * - The invitation is not expired
+     * - The invitation has not already been accepted
+     *
+     * @param token The invitation token
+     * @return Public invitation details
+     */
     @Transactional(readOnly = true)
     fun getValidInvite(token: String): InviteDetailsResponse {
         val invite = invitationRepository.findByToken(token)
@@ -94,6 +126,25 @@ class InvitationService(
         )
     }
 
+    /**
+     * Accepts an invitation and completes user onboarding.
+     *
+     * Handles both:
+     * - Existing users (password validation)
+     * - New users (account creation)
+     *
+     * Also:
+     * - Creates membership in the organization
+     * - Marks invitation as accepted
+     * - Generates access and refresh tokens
+     * - Creates session entry
+     *
+     * @param token Invitation token
+     * @param password Password for authentication or new account
+     * @param fullName Full name (required for new users)
+     * @param phoneNumber Phone number (required for new users)
+     * @return Authentication response with tokens
+     */
     @Transactional
     fun acceptInvitation(token: String, password: String?, fullName: String?, phoneNumber: String?): AuthResponse {
         val invite = invitationRepository.findByToken(token)

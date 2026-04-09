@@ -25,12 +25,30 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
 
+/**
+ * REST controller for managing user notifications.
+ *
+ * Provides endpoints for:
+ * - Fetching paginated notifications
+ * - Retrieving unread notification count
+ * - Marking notifications as read (single or all)
+ *
+ * All operations are scoped to the authenticated user and their active organization.
+ */
 @Tag(name = "Notifications", description = "User notification management")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("api/v1/notifications")
 class NotificationsController(private val notificationsRepository: NotificationsRepository) {
 
+    /**
+     * Retrieves a paginated list of notifications for the authenticated user.
+     *
+     * @param auth The authenticated user
+     * @param page Page index (default = 0)
+     * @param size Number of items per page (default = 20)
+     * @return A paginated list of notifications
+     */
     @Operation(summary = "List notifications", description = "Returns paginated notifications for the authenticated user in the active organization.")
     @ApiResponse(responseCode = "200", description = "Notification list returned")
     @GetMapping
@@ -47,6 +65,12 @@ class NotificationsController(private val notificationsRepository: Notifications
         return ResponseEntity.ok(notifications)
     }
 
+    /**
+     * Returns the number of unread notifications for the authenticated user.
+     *
+     * @param auth The authenticated user
+     * @return The unread notification count
+     */
     @Operation(summary = "Get unread count", description = "Returns the number of unread notifications for the authenticated user.")
     @ApiResponse(responseCode = "200", description = "Unread count returned")
     @GetMapping("/unread-count")
@@ -56,6 +80,16 @@ class NotificationsController(private val notificationsRepository: Notifications
         return ResponseEntity.ok(UnreadCountResponse(count))
     }
 
+    /**
+     * Marks a specific notification as read.
+     *
+     * Only updates the notification if it belongs to the authenticated user
+     * and their active organization.
+     *
+     * @param id Notification ID
+     * @param auth The authenticated user
+     * @return No content response
+     */
     @Operation(summary = "Mark notification as read", description = "Marks a single notification as read.")
     @ApiResponse(responseCode = "204", description = "Notification marked as read")
     @PatchMapping("/{id}/read")
@@ -73,6 +107,12 @@ class NotificationsController(private val notificationsRepository: Notifications
         return ResponseEntity.noContent().build()
     }
 
+    /**
+     * Marks all notifications as read for the authenticated user.
+     *
+     * @param auth The authenticated user
+     * @return No content response
+     */
     @Operation(summary = "Mark all notifications as read", description = "Marks all notifications as read for the authenticated user in the active organization.")
     @ApiResponse(responseCode = "204", description = "All notifications marked as read")
     @PostMapping("/mark-all-read")
@@ -82,6 +122,9 @@ class NotificationsController(private val notificationsRepository: Notifications
         return ResponseEntity.noContent().build()
     }
 
+    /**
+     * Maps a Notification entity to a NotificationsResponse DTO.
+     */
     private fun Notification.toResponse() = NotificationsResponse(
         id = id,
         title = title,

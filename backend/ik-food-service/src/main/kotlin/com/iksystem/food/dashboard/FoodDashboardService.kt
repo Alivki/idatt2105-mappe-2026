@@ -20,6 +20,9 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
+/**
+ * Service responsible for aggregating food dashboard statistics.
+ */
 @Service
 class FoodDashboardService(
     private val foodDeviationRepository: FoodDeviationRepository,
@@ -30,6 +33,9 @@ class FoodDashboardService(
     private val trainingRepository: TrainingRepository,
 ) {
 
+    /**
+     * Returns all dashboard statistics for the user's organization.
+     */
     @Transactional(readOnly = true)
     fun getStats(auth: AuthenticatedUser): FoodDashboardStatsResponse {
         val orgId = auth.requireOrganizationId()
@@ -41,6 +47,9 @@ class FoodDashboardService(
         )
     }
 
+    /**
+     * Builds deviation-related statistics.
+     */
     private fun getDeviationStats(orgId: Long): DeviationStats {
         val open = foodDeviationRepository.countByOrganizationIdAndStatus(orgId, FoodDeviationStatus.OPEN)
         val underTreatment = foodDeviationRepository.countByOrganizationIdAndStatus(orgId, FoodDeviationStatus.UNDER_TREATMENT)
@@ -70,6 +79,9 @@ class FoodDashboardService(
         )
     }
 
+    /**
+     * Builds temperature-related statistics.
+     */
     private fun getTemperatureStats(orgId: Long): TemperatureStats {
         val deviationCount = measurementRepository.countByOrganizationIdAndStatus(orgId, TemperatureMeasurementStatus.DEVIATION)
         val okCount = measurementRepository.countByOrganizationIdAndStatus(orgId, TemperatureMeasurementStatus.OK)
@@ -95,6 +107,9 @@ class FoodDashboardService(
         )
     }
 
+    /**
+     * Builds checklist-related statistics.
+     */
     private fun getChecklistStats(orgId: Long): ChecklistStats {
         val totalActive = checklistRepository.countByOrganizationIdAndActive(orgId, true)
         val totalItems = checklistItemRepository.countAllByOrganizationId(orgId)
@@ -119,6 +134,9 @@ class FoodDashboardService(
         )
     }
 
+    /**
+     * Builds training-related statistics.
+     */
     private fun getTrainingStats(orgId: Long): TrainingStats {
         val completed = trainingRepository.countByOrganizationIdAndStatus(orgId, TrainingStatus.COMPLETED)
         val expiresSoon = trainingRepository.countByOrganizationIdAndStatus(orgId, TrainingStatus.EXPIRES_SOON)

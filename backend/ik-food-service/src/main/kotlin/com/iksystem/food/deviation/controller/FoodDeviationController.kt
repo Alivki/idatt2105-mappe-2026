@@ -17,6 +17,9 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
+/**
+ * REST controller for managing food deviations.
+ */
 @Tag(name = "Food Deviations", description = "Deviation management for IK-Mat")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
@@ -25,12 +28,18 @@ class FoodDeviationController(
     private val service: FoodDeviationService,
 ) {
 
+    /**
+     * Returns all food deviations for the user's organization.
+     */
     @Operation(summary = "List food deviations")
     @ApiResponse(responseCode = "200", description = "Food deviation list returned")
     @GetMapping
     fun list(@AuthenticationPrincipal auth: AuthenticatedUser): ResponseEntity<List<FoodDeviationResponse>> =
         ResponseEntity.ok(service.list(auth))
 
+    /**
+     * Returns a food deviation by ID.
+     */
     @Operation(summary = "Get food deviation by ID")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Food deviation returned"),
@@ -43,6 +52,9 @@ class FoodDeviationController(
     ): ResponseEntity<FoodDeviationResponse> =
         ResponseEntity.ok(service.getById(id, auth))
 
+    /**
+     * Creates a new food deviation.
+     */
     @Operation(summary = "Create food deviation")
     @ApiResponses(
         ApiResponse(responseCode = "201", description = "Food deviation created"),
@@ -55,6 +67,9 @@ class FoodDeviationController(
     ): ResponseEntity<FoodDeviationResponse> =
         ResponseEntity.status(HttpStatus.CREATED).body(service.create(request, auth))
 
+    /**
+     * Updates an existing food deviation.
+     */
     @Operation(summary = "Update food deviation")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "Food deviation updated"),
@@ -69,6 +84,9 @@ class FoodDeviationController(
     ): ResponseEntity<FoodDeviationResponse> =
         ResponseEntity.ok(service.update(id, request, auth))
 
+    /**
+     * Deletes a food deviation by ID.
+     */
     @Operation(summary = "Delete food deviation")
     @ApiResponses(
         ApiResponse(responseCode = "204", description = "Food deviation deleted"),

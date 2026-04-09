@@ -11,6 +11,9 @@ import jakarta.persistence.Table
 import java.math.BigDecimal
 import java.time.Instant
 
+/**
+ * Entity representing a temperature appliance.
+ */
 @Entity
 @Table(name = "temperature_appliances")
 data class TemperatureAppliance(

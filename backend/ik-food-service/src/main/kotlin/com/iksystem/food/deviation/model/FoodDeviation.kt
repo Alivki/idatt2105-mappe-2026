@@ -4,6 +4,9 @@ import com.iksystem.common.user.model.User
 import jakarta.persistence.*
 import java.time.Instant
 
+/**
+ * Entity representing a food deviation record.
+ */
 @Entity
 @Table(name = "food_deviations")
 data class FoodDeviation(
