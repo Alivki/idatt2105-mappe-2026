@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, h, ref } from 'vue'
+import { defineComponent, h } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 import EmployeeInviteDialog from '../InviteEmployeeDialog.vue'
 
