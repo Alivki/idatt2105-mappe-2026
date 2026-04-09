@@ -1,6 +1,7 @@
 package com.iksystem.common.organization.service
 
 import com.iksystem.common.exception.ConflictException
+import com.iksystem.common.exception.ForbiddenException
 import com.iksystem.common.exception.NotFoundException
 import com.iksystem.common.membership.model.Membership
 import com.iksystem.common.membership.repository.MembershipRepository
@@ -9,6 +10,7 @@ import com.iksystem.common.organization.dto.OrganizationResponse
 import com.iksystem.common.organization.model.Organization
 import com.iksystem.common.organization.repository.OrganizationRepository
 import com.iksystem.common.user.model.Role
+
 import com.iksystem.common.user.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -78,9 +80,13 @@ class OrganizationService(
      * @throws NotFoundException if no organization with the given [id] exists.
      */
     @Transactional
-    fun delete(id: Long) {
+    fun delete(id: Long, callerUserId: Long) {
         if (!organizationRepository.existsById(id)) {
             throw NotFoundException("Organization not found")
+        }
+        val membership = membershipRepository.findByUserIdAndOrganizationId(callerUserId, id)
+        if (membership == null || membership.role != Role.ADMIN) {
+            throw ForbiddenException("You must be an admin of this organization to delete it")
         }
         organizationRepository.deleteById(id)
     }

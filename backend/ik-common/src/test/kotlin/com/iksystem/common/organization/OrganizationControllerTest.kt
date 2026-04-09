@@ -114,12 +114,17 @@ class OrganizationControllerTest {
 
     @Test
     fun `delete returns 204 with empty body`() {
-        val result = controller.delete(8L)
+        val auth = AuthenticatedUser(
+            userId = 10L,
+            organizationId = 8L,
+            role = "ADMIN"
+        )
+        val result = controller.delete(8L, auth)
 
         assertEquals(204, result.statusCode.value())
         assertNull(result.body)
 
-        verify(organizationService).delete(8L)
+        verify(organizationService).delete(8L, 10L)
     }
 
     private fun organizationResponse(
