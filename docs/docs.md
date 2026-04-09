@@ -172,9 +172,6 @@ docker compose down -v
 
 ## 5. Kjøring lokalt uten Docker (utvikling)
 
-> [!WARNING]
-> Når du kjører uten Docker må du passe på porter: begge backend-moduler bruker default `8080`.
-
 ### 5.1 Backend
 
 Vi har et samlet dev-script som starter **alt** du trenger i utvikling:
