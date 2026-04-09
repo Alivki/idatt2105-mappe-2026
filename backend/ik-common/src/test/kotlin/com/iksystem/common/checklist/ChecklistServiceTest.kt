@@ -17,7 +17,6 @@ import com.iksystem.common.exception.BadRequestException
 import com.iksystem.common.exception.ForbiddenException
 import com.iksystem.common.exception.NotFoundException
 import com.iksystem.common.security.AuthenticatedUser
-import com.iksystem.common.user.repository.UserRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
