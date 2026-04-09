@@ -46,7 +46,13 @@ class ChecklistServiceTest {
         checklistItemRepository = mock(ChecklistItemRepository::class.java)
         checklistCompletionRepository = mock(ChecklistCompletionRepository::class.java)
         userRepository = mock(UserRepository::class.java)
-        service = ChecklistService(checklistRepository, checklistItemRepository, checklistCompletionRepository, userRepository)
+
+        service = ChecklistService(
+            checklistRepository,
+            checklistItemRepository,
+            checklistCompletionRepository,
+            userRepository,
+        )
     }
 
     @Test
