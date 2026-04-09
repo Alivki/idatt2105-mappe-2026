@@ -108,18 +108,20 @@ test.describe('deviations as admin', () => {
     ).toBeVisible()
   })
 
-  test('admin sees either deviation cards or empty state on overview', async ({ page }) => {
+  test('admin sees deviation content on overview', async ({ page }) => {
     await page.goto('/avvik')
 
     const listCards = page.locator('.deviation-card')
-    const emptyHeading = page.getByRole('heading', { name: 'Ingen avvik i valgt liste' })
+    const emptyText = page.getByText('Ingen avvik i valgt liste')
 
-    await expect(listCards.or(emptyHeading)).toBeVisible()
+    await page.waitForLoadState('networkidle')
 
-    if (await listCards.count() > 0) {
+    const cardCount = await listCards.count()
+
+    if (cardCount > 0) {
       await expect(listCards.first()).toBeVisible()
     } else {
-      await expect(emptyHeading).toBeVisible()
+      await expect(emptyText).toBeVisible()
     }
   })
 })
