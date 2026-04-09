@@ -253,6 +253,11 @@ export function useTemperatureMonitoring() {
     return result.deleted ?? 0
   }
 
+  function refetch() {
+    appliancesQuery.refetch()
+    measurementsQuery.refetch()
+  }
+
   return {
     appliances,
     activeAppliances,
@@ -263,5 +268,6 @@ export function useTemperatureMonitoring() {
     deleteAppliance,
     registerTemperature,
     deleteEntries,
+    refetch,
   }
 }

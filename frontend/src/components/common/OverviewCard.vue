@@ -33,7 +33,7 @@ withDefaults(defineProps<{
   gap: 8px;
   border-radius: var(--radius-lg);
   padding: 16px;
-  border: 2px solid hsl(var(--border));
+  border: 1px solid hsl(var(--border));
   background: hsl(var(--card));
   min-height: 6.25rem;
 }

@@ -1,4 +1,5 @@
 import './assets/main.css'
+import './lib/chartjs'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 

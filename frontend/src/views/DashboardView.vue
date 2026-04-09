@@ -1,172 +1,48 @@
 <script setup lang="ts">
-import { computed, onActivated, onMounted } from 'vue'
-import KpiCard from '@/components/dashboard/KpiCard.vue'
-import LatestDeviationCard from '@/components/dashboard/LatestDeviationCard.vue'
-import TemperatureLogCard from '@/components/dashboard/TemperatureLogCard.vue'
+import { computed, ref } from 'vue'
+import {
+  ClipboardCheck,
+  Thermometer,
+  AlertTriangle,
+  Gauge,
+  GraduationCap,
+} from 'lucide-vue-next'
+import OverviewCard from '@/components/common/OverviewCard.vue'
+import DeviationBarChart from '@/components/dashboard/DeviationBarChart.vue'
+import ChecklistCompletionChart from '@/components/dashboard/ChecklistCompletionChart.vue'
+import DeviationDonutChart from '@/components/dashboard/DeviationDonutChart.vue'
+import PenaltyPointsStatus from '@/components/deviations/PenaltyPointsStatus.vue'
+import TodayIdChecksCard from '@/components/dashboard/TodayIdChecksCard.vue'
+import SetupCtaCard from '@/components/dashboard/SetupCtaCard.vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
-import Badge from '@/components/ui/badge/Badge.vue'
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
-import { useChecklistsQuery } from '@/composables/useChecklists'
+import PageHeader from '@/components/common/PageHeader.vue'
+import { useChecklistsQuery, useCompletionHistoryQuery } from '@/composables/useChecklists'
 import { useFoodDeviationsQuery } from '@/composables/useFoodDeviations'
 import { useAlcoholDeviationsQuery } from '@/composables/useAlcoholDeviations'
+import { usePenaltyPointsQuery } from '@/composables/usePenaltyPoints'
+import { useTemperatureMonitoring } from '@/composables/useTemperatureMonitoring'
+import { useTrainingLogsQuery } from '@/composables/useTrainingLogs'
+import { useAlcoholPolicyExistsQuery } from '@/composables/useAlcoholPolicy'
+import { useActiveShiftQuery, useDayDetailQuery } from '@/composables/useAgeVerification'
+import { useAuthStore } from '@/stores/auth'
 import type { Checklist } from '@/types/checklist'
-import type { DeviationSeverity } from '@/types/deviation'
+
+const auth = useAuthStore()
+const isManagerOrAdmin = computed(() => ['ADMIN', 'MANAGER'].includes(auth.role ?? ''))
 
 const foodQuery = useFoodDeviationsQuery()
 const alcoholQuery = useAlcoholDeviationsQuery()
 const checklistsQuery = useChecklistsQuery()
+const completionHistoryQuery = useCompletionHistoryQuery()
+const penaltyQuery = usePenaltyPointsQuery()
+const tempMonitoring = useTemperatureMonitoring()
+const trainingQuery = useTrainingLogsQuery()
+const alcoholPolicyQuery = useAlcoholPolicyExistsQuery()
+const todayDate = ref(new Date().toISOString().slice(0, 10))
+const todayDetailQuery = useDayDetailQuery(todayDate, isManagerOrAdmin)
+const activeShiftQuery = useActiveShiftQuery()
 
-function refreshDashboardData() {
-  checklistsQuery.refetch()
-  foodQuery.refetch()
-  alcoholQuery.refetch()
-}
-
-onMounted(() => {
-  refreshDashboardData()
-})
-
-onActivated(() => {
-  refreshDashboardData()
-})
-
-const kpis = computed<Array<{
-  title: string
-  value: string
-  subtitle?: string
-  highlight?: 'default' | 'danger' | 'success'
-  progress?: {
-    current: number
-    total: number
-  }
-}>>(() => {
-  const dailyStats = getDailyChecklistStats(checklistsQuery.data.value ?? [])
-  const foodItems = foodQuery.data.value ?? []
-  const alcoholItems = alcoholQuery.data.value ?? []
-  const openCount = foodItems.filter((d) => d.status === 'OPEN').length + alcoholItems.filter((d) => d.status === 'OPEN').length
-  const criticalFoodCount = foodItems.filter((d) => d.status === 'OPEN' && (d.severity === 'CRITICAL' || d.severity === 'HIGH')).length
-
-  return [
-    {
-      title: 'Sjekklister i dag',
-      value: `${dailyStats.completed}/${dailyStats.total}`,
-      progress: {
-        current: dailyStats.completed,
-        total: Math.max(dailyStats.total, 1),
-      },
-    },
-    {
-      title: 'Temp.avvik',
-      value: '2',
-      subtitle: 'Krever tiltak',
-      highlight: 'danger' as const,
-    },
-    {
-      title: 'Åpne avvik',
-      value: String(openCount),
-      subtitle: `${criticalFoodCount} kritisk`,
-    },
-    {
-      title: 'Opplæring',
-      value: '92%',
-      subtitle: '1 utløper snart',
-      highlight: 'success' as const,
-    },
-  ]
-})
-
-const temperatures = [
-  {
-    location: 'Kjøleskap 1',
-    temperature: '3.2 C',
-    limit: '0-4 C',
-    status: 'OK' as const,
-  },
-  {
-    location: 'Kjøleskap 2',
-    temperature: '6.1 C',
-    limit: '0-4 C',
-    status: 'Avvik' as const,
-  },
-  {
-    location: 'Fryser',
-    temperature: '-19.4 C',
-    limit: 'Under -18 C',
-    status: 'OK' as const,
-  },
-  {
-    location: 'Varmholding',
-    temperature: '57.0 C',
-    limit: 'Over 60 C',
-    status: 'Avvik' as const,
-  },
-]
-
-const latestDeviations = computed(() => {
-  const food = (foodQuery.data.value ?? []).map((d) => ({
-    id: d.id,
-    title: d.description.slice(0, 80),
-    moduleLabel: 'IK-Mat',
-    reportedBy: d.reportedByUserName,
-    reportedAt: d.reportedAt,
-    severityLabel: toSeverityLabel(d.severity),
-  }))
-  const alcohol = (alcoholQuery.data.value ?? []).map((d) => ({
-    id: d.id,
-    title: d.description.slice(0, 80),
-    moduleLabel: 'IK-Alkohol',
-    reportedBy: d.reportedByUserName,
-    reportedAt: d.reportedAt,
-    severityLabel: 'Middels' as const,
-  }))
-
-  return [...food, ...alcohol]
-    .sort((a, b) => new Date(b.reportedAt).getTime() - new Date(a.reportedAt).getTime())
-    .slice(0, 3)
-    .map((item) => ({
-      ...item,
-      relativeTime: toRelativeTime(item.reportedAt),
-    }))
-})
-
-function toSeverityLabel(severity: DeviationSeverity): 'Lav' | 'Middels' | 'Høy' | 'Kritisk' {
-  switch (severity) {
-    case 'LOW':
-      return 'Lav'
-    case 'MEDIUM':
-      return 'Middels'
-    case 'HIGH':
-      return 'Høy'
-    default:
-      return 'Kritisk'
-  }
-}
-
-function toRelativeTime(value: string): string {
-  const timestamp = new Date(value).getTime()
-  if (Number.isNaN(timestamp)) {
-    return '-'
-  }
-
-  const diffMs = Date.now() - timestamp
-  const minute = 60 * 1000
-  const hour = 60 * minute
-  const day = 24 * hour
-
-  if (diffMs < hour) {
-    const minutes = Math.max(1, Math.floor(diffMs / minute))
-    return `${minutes} min siden`
-  }
-
-  if (diffMs < day) {
-    const hours = Math.floor(diffMs / hour)
-    return `${hours} time${hours > 1 ? 'r' : ''} siden`
-  }
-
-  const days = Math.floor(diffMs / day)
-  return `${days} dag${days > 1 ? 'er' : ''} siden`
-}
+// ── KPI helpers ──
 
 function getDailyChecklistStats(checklists: Checklist[]): { total: number; completed: number } {
   const daily = checklists.filter((item) => item.frequency === 'DAILY' && item.active)
@@ -175,157 +51,344 @@ function getDailyChecklistStats(checklists: Checklist[]): { total: number; compl
     completed: daily.filter((item) => item.status === 'COMPLETED').length,
   }
 }
+
+function getFrequencyStats(checklists: Checklist[], freq: 'WEEKLY' | 'MONTHLY') {
+  const items = checklists.filter((c) => c.frequency === freq && c.active)
+  return items.filter((c) => c.status !== 'COMPLETED').length
+}
+
+const dailyStats = computed(() => getDailyChecklistStats(checklistsQuery.data.value ?? []))
+const weeklyRemaining = computed(() => getFrequencyStats(checklistsQuery.data.value ?? [], 'WEEKLY'))
+const monthlyRemaining = computed(() => getFrequencyStats(checklistsQuery.data.value ?? [], 'MONTHLY'))
+
+const checklistProgress = computed(() => {
+  const { completed, total } = dailyStats.value
+  if (total <= 0) return 0
+  return Math.round((completed / total) * 100)
+})
+
+const tempDeviationCount = computed(() => {
+  const today = new Date().toISOString().slice(0, 10)
+  return tempMonitoring.entries.value.filter(
+    (e) => e.status === 'DEVIATION' && e.measuredAt.slice(0, 10) === today,
+  ).length
+})
+
+const openDeviationCount = computed(() => {
+  const foodItems = foodQuery.data.value ?? []
+  const alcoholItems = alcoholQuery.data.value ?? []
+  return (
+    foodItems.filter((d) => d.status === 'OPEN').length +
+    alcoholItems.filter((d) => d.status === 'OPEN').length
+  )
+})
+
+const completedApplianceCount = computed(() => {
+  const today = new Date().toISOString().slice(0, 10)
+  const countByAppliance: Record<number, number> = {}
+  for (const e of tempMonitoring.entries.value) {
+    if (e.measuredAt.slice(0, 10) === today) {
+      countByAppliance[e.applianceId] = (countByAppliance[e.applianceId] ?? 0) + 1
+    }
+  }
+  return tempMonitoring.activeAppliances.value.filter((a) => (countByAppliance[a.id] ?? 0) >= 2).length
+})
+
+const trainingStats = computed(() => {
+  const logs = trainingQuery.data.value ?? []
+  const completed = logs.filter((l) => l.status === 'COMPLETED').length
+  const expiringSoon = logs.filter((l) => l.status === 'EXPIRES_SOON').length
+  return { completed, total: logs.length, expiringSoon }
+})
+
+const todayShiftsCount = computed(() => {
+  if (isManagerOrAdmin.value) return todayDetailQuery.data.value?.shifts.length ?? 0
+  return activeShiftQuery.data.value ? 1 : 0
+})
+const todayIdsChecked = computed(() => {
+  if (isManagerOrAdmin.value) return todayDetailQuery.data.value?.totalIdsChecked ?? 0
+  return activeShiftQuery.data.value?.shift.idsCheckedCount ?? 0
+})
+const todayShiftDeviations = computed(() => {
+  if (isManagerOrAdmin.value) return todayDetailQuery.data.value?.totalDeviations ?? 0
+  return activeShiftQuery.data.value?.shift.deviationCount ?? 0
+})
+
+const showHaccpSetup = computed(() => {
+  const checklists = checklistsQuery.data.value ?? []
+  return checklists.filter((c) => c.source === 'HACCP_WIZARD').length === 0
+})
+
+const showAlcoholPolicySetup = computed(() => alcoholPolicyQuery.data.value === false)
+
+const todayFormatted = computed(() => {
+  return new Date().toLocaleDateString('nb-NO', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+})
 </script>
 
 <template>
   <AppLayout>
-    <header class="page-header">
-      <div class="page-header-inner">
-        <SidebarTrigger />
-        <Separator orientation="vertical" class="header-separator" />
-        <span class="page-title">Dashboard</span>
-      </div>
-    </header>
+    <PageHeader title="Oversikt" />
 
     <div class="page-content">
-      <section class="dashboard-header">
-        <div>
-          <h1>Oversikt</h1>
-          <p>Fredag 20. mars 2026</p>
-        </div>
+      <p class="dashboard-date">{{ todayFormatted }}</p>
 
-        <div class="module-toggle" aria-label="Velg modul">
-          <Badge tone="brand">IK-Mat</Badge>
-          <Badge tone="ok">IK-Alkohol</Badge>
-        </div>
-      </section>
+      <!-- Setup CTAs — top if either is missing -->
+      <SetupCtaCard
+        :show-haccp="showHaccpSetup"
+        :show-alcohol-policy="showAlcoholPolicySetup"
+      />
 
+      <!-- KPI cards -->
       <section class="kpi-grid">
-        <KpiCard
-          v-for="kpi in kpis"
-          :key="kpi.title"
-          :title="kpi.title"
-          :value="kpi.value"
-          :subtitle="kpi.subtitle"
-          :progress="kpi.progress"
-          :highlight="kpi.highlight"
-        />
+        <router-link to="/sjekklister" class="kpi-link">
+          <OverviewCard
+            label="Sjekklister i dag"
+            :value="`${dailyStats.completed}/${dailyStats.total}`"
+            :icon="ClipboardCheck"
+          >
+            <div
+              class="progress-track"
+              role="progressbar"
+              :aria-valuenow="dailyStats.completed"
+              :aria-valuemax="Math.max(dailyStats.total, 1)"
+            >
+              <div
+                class="progress-fill progress-fill--green"
+                :style="{ width: `${checklistProgress}%` }"
+              />
+            </div>
+            <p class="kpi-meta">
+              {{ weeklyRemaining }} ukentlige &middot; {{ monthlyRemaining }} månedlige gjenstår
+            </p>
+          </OverviewCard>
+        </router-link>
+
+        <router-link to="/temperatur" class="kpi-link">
+          <OverviewCard
+            label="Temp.avvik"
+            :value="String(tempDeviationCount)"
+            :variant="tempDeviationCount > 0 ? 'open' : 'neutral'"
+            :sub-label="tempDeviationCount > 0 ? 'Krever tiltak' : 'Alt OK'"
+            :icon="Thermometer"
+          />
+        </router-link>
+
+        <router-link to="/avvik" class="kpi-link">
+          <OverviewCard
+            label="Åpne avvik"
+            :value="String(openDeviationCount)"
+            :icon="AlertTriangle"
+            :variant="openDeviationCount > 0 ? 'open' : 'neutral'"
+            :sub-label="openDeviationCount > 0 ? 'Trenger oppfølging' : 'Ingen åpne avvik'"
+          />
+        </router-link>
+
+        <router-link to="/temperatur/hvitevarer" class="kpi-link">
+          <OverviewCard
+            label="Ferdigmålte enheter"
+            :value="`${completedApplianceCount}/${tempMonitoring.activeAppliances.value.length}`"
+            :icon="Gauge"
+            sub-label="Ferdig = 2 målinger i dag"
+          />
+        </router-link>
+
+        <router-link to="/opplaering" class="kpi-link">
+          <OverviewCard
+            label="Opplæring"
+            :value="`${trainingStats.completed}/${trainingStats.total}`"
+            :icon="GraduationCap"
+            :sub-label="trainingStats.expiringSoon > 0 ? `${trainingStats.expiringSoon} utløper snart` : 'Alle oppdatert'"
+            :variant="trainingStats.expiringSoon > 0 ? 'in-progress' : 'neutral'"
+          />
+        </router-link>
       </section>
 
-      <TemperatureLogCard :rows="temperatures" />
-      <LatestDeviationCard :deviations="latestDeviations" />
+      <!-- Bento grid -->
+      <section class="bento-grid">
+        <!-- Row 1: Bar chart (wide) + ID card (narrow) + Donut -->
+        <div class="bento-col-wide">
+          <DeviationBarChart
+            :food-deviations="foodQuery.data.value ?? []"
+            :alcohol-deviations="alcoholQuery.data.value ?? []"
+          />
+        </div>
+
+        <TodayIdChecksCard
+          :shifts-today="todayShiftsCount"
+          :ids-checked="todayIdsChecked"
+          :deviations-today="todayShiftDeviations"
+        />
+
+        <DeviationDonutChart
+          :food-deviations="foodQuery.data.value ?? []"
+          :alcohol-deviations="alcoholQuery.data.value ?? []"
+        />
+
+        <!-- Row 2: Penalty points + Checklist chart -->
+        <div class="bento-span-full">
+          <PenaltyPointsStatus :summary="penaltyQuery.data.value ?? null" />
+          <div class="bento-flex-child">
+            <ChecklistCompletionChart
+              :checklists="checklistsQuery.data.value ?? []"
+              :completion-history="completionHistoryQuery.data.value ?? []"
+            />
+          </div>
+        </div>
+      </section>
     </div>
   </AppLayout>
 </template>
 
 <style scoped>
-.page-header {
-  display: flex;
-  height: 4rem;
-  flex-shrink: 0;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.page-header-inner {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0 1rem;
-}
-
-.header-separator {
-  height: 1rem !important;
-  width: 1px !important;
-  margin-right: 0.5rem;
-}
-
-.page-title {
-  font-weight: 500;
-  color: hsl(var(--sidebar-primary, 245 43% 52%));
-}
-
 .page-content {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 1rem;
-  padding: 0 1rem 1rem;
+  gap: 1.25rem;
+  padding: 0 1rem 2rem;
 }
 
-.dashboard-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+.dashboard-date {
+  margin: 0;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.84rem;
+  text-transform: capitalize;
+}
+
+/* ── KPI grid ── */
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
 }
 
-.dashboard-header h1 {
-  margin: 0;
-  font-size: 3rem;
-  letter-spacing: -0.03em;
-}
-
-.dashboard-header p {
-  margin: 2px 0 0;
-  color: var(--text-secondary);
-  font-size: 1.75rem;
-}
-
-.module-toggle {
+.kpi-link {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 4px;
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-lg);
+  transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
-.kpi-grid {
-  margin-top: 14px;
-  padding: 10px 8px 4px;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  border-radius: var(--radius-md);
+.kpi-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
+
+.kpi-link > * {
+  flex: 1;
+}
+
+.progress-track {
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: hsl(var(--border));
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 500ms ease;
+}
+
+.progress-fill--green {
+  background: var(--green);
+}
+
+.kpi-meta {
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+  margin: 0;
+}
+
+/* ── Bento grid ── */
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: 5fr 2fr 3fr;
+  gap: 14px;
+}
+
+.bento-col-wide {
+  display: flex;
+}
+
+.bento-col-wide > * {
+  flex: 1;
+}
+
+.bento-span-full {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 3fr 7fr;
+  gap: 14px;
+  margin-top: 2px;
+}
+
+.bento-flex-child {
+  display: flex;
+}
+
+.bento-flex-child > * {
+  flex: 1;
+}
+
+/* ── Responsive ── */
 
 @media (max-width: 1120px) {
   .kpi-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .bento-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .bento-col-wide {
+    grid-column: span 2;
+  }
+
+  .bento-span-full {
+    grid-column: span 2;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (max-width: 760px) {
-  .page-header-inner {
-    width: 100%;
-    padding: 0 0.75rem;
-  }
-
   .page-content {
-    padding: 0 0.75rem 0.75rem;
+    padding: 0 0.75rem 1rem;
     gap: 0.75rem;
   }
 
-  .dashboard-header {
-    flex-direction: column;
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
-  .dashboard-header h1 {
-    font-size: 1.9rem;
+  .bento-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
-  .dashboard-header p {
-    font-size: 1rem;
+  .bento-col-wide {
+    grid-column: span 1;
   }
 
-  .module-toggle {
-    flex-wrap: wrap;
+  .bento-span-full {
+    grid-column: span 1;
+    grid-template-columns: 1fr;
   }
+}
 
-  .module-toggle :deep(.badge),
-  .module-toggle :deep([class*='badge']) {
-    flex: 0 0 auto;
-  }
-
+@media (max-width: 480px) {
   .kpi-grid {
     grid-template-columns: 1fr;
   }

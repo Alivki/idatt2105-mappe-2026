@@ -5,9 +5,9 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import PageHeader from '@/components/common/PageHeader.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 import Button from '@/components/ui/button/Button.vue'
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
 import ChecklistCard from '@/components/checklists/ChecklistCard.vue'
 import OverviewCard from '@/components/common/OverviewCard.vue'
 import ChecklistFormDialog from '@/components/checklists/ChecklistFormDialog.vue'
@@ -192,13 +192,7 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 
 <template>
   <AppLayout active-menu-item="Sjekklister">
-    <header class="page-header">
-      <div class="page-header-inner">
-        <SidebarTrigger />
-        <Separator orientation="vertical" class="header-separator" />
-        <span class="page-title">Sjekklister</span>
-      </div>
-    </header>
+    <PageHeader title="Sjekklister" />
 
     <div class="page-content">
       <section class="header-row">
@@ -240,49 +234,36 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
             <div class="skeleton-line skeleton-line--short"></div>
           </div>
         </div>
-        <div v-else-if="checklistQuery.isError.value" class="empty-state">
-          <div class="empty-state-inner">
-            <div class="empty-state-icon">
-              <ClipboardCheck :stroke-width="1.5" aria-hidden="true" />
-            </div>
-            <div class="empty-state-text">
-              <h2>Kunne ikke hente sjekklister</h2>
-              <p>Noe gikk galt under lasting av sjekklister. Prøv igjen senere.</p>
-            </div>
-          </div>
-        </div>
+        <EmptyState
+          v-else-if="checklistQuery.isError.value"
+          :icon="ClipboardCheck"
+          title="Kunne ikke hente sjekklister"
+          description="Noe gikk galt under lasting av sjekklister. Prøv igjen senere."
+        />
 
-        <div v-else-if="checklists.length === 0" class="empty-state">
-          <div class="empty-state-inner">
-            <div class="empty-state-icon empty-state-icon--green">
-              <ListChecks :stroke-width="1.5" aria-hidden="true" />
-            </div>
-            <div class="empty-state-text">
-              <h2>Ingen sjekklister ennå</h2>
-              <p>Vi anbefaler å bruke HACCP-veiviseren for å sette opp sjekklistene dine. Veiviseren stiller noen spørsmål om virksomheten og genererer skreddersydde sjekklister basert på Mattilsynets krav.</p>
-            </div>
-            <div class="empty-state-actions">
-              <Button v-if="canManage" @click="router.push('/haccp-oppsett')">
-                Gå til HACCP-oppsett
-              </Button>
-              <Button v-if="canManage" variant="outline" @click="openCreateChecklistDialog">
-                + Opprett manuelt
-              </Button>
-            </div>
-          </div>
-        </div>
+        <EmptyState
+          v-else-if="checklists.length === 0"
+          :icon="ListChecks"
+          variant="green"
+          title="Ingen sjekklister ennå"
+          description="Vi anbefaler å bruke HACCP-veiviseren for å sette opp sjekklistene dine. Veiviseren stiller noen spørsmål om virksomheten og genererer skreddersydde sjekklister basert på Mattilsynets krav."
+        >
+          <template #actions>
+            <Button v-if="canManage" @click="router.push('/haccp-oppsett')">
+              Gå til HACCP-oppsett
+            </Button>
+            <Button v-if="canManage" variant="outline" @click="openCreateChecklistDialog">
+              + Opprett manuelt
+            </Button>
+          </template>
+        </EmptyState>
 
-        <div v-else-if="groupedChecklists.length === 0" class="empty-state">
-          <div class="empty-state-inner">
-            <div class="empty-state-icon">
-              <ClipboardCheck :stroke-width="1.5" aria-hidden="true" />
-            </div>
-            <div class="empty-state-text">
-              <h2>Ingen sjekklister i valgt frekvens</h2>
-              <p>Prøv å endre filteret for å se sjekklister med en annen frekvens.</p>
-            </div>
-          </div>
-        </div>
+        <EmptyState
+          v-else-if="groupedChecklists.length === 0"
+          :icon="ClipboardCheck"
+          title="Ingen sjekklister i valgt frekvens"
+          description="Prøv å endre filteret for å se sjekklister med en annen frekvens."
+        />
 
         <div v-else class="sections-wrap">
           <section v-for="section in groupedChecklists" :key="section.frequency" class="frequency-section">
@@ -321,10 +302,6 @@ function handleMutationError(error: unknown, fallbackMessage: string) {
 </template>
 
 <style scoped>
-.page-header { display: flex; height: 4rem; flex-shrink: 0; align-items: center; }
-.page-header-inner { display: flex; align-items: center; gap: 0.5rem; padding: 0 1rem; }
-.header-separator { height: 1rem !important; width: 1px !important; margin-right: 0.5rem; }
-.page-title { font-weight: 500; color: hsl(var(--sidebar-primary, 245 43% 52%)); }
 .page-content { display: flex; flex: 1; flex-direction: column; gap: 1rem; padding: 0 1rem 1rem; }
 
 .header-row {
@@ -387,71 +364,6 @@ h1 {
   color: var(--red);
 }
 
-.empty-state {
-  position: relative;
-  display: flex;
-  min-height: 320px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 1rem;
-  border: 2px dashed hsl(var(--muted-foreground) / 0.2);
-  background: hsl(var(--muted) / 0.3);
-  padding: 2rem;
-}
-
-.empty-state-inner {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  text-align: center;
-}
-
-.empty-state-icon {
-  display: flex;
-  height: 4rem;
-  width: 4rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: 1rem;
-  background-color: hsl(var(--muted));
-}
-
-.empty-state-icon :deep(svg) {
-  width: 2rem;
-  height: 2rem;
-  color: hsl(var(--muted-foreground));
-}
-
-.empty-state-text h2 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.empty-state-text p {
-  max-width: 28rem;
-  font-size: 0.875rem;
-  color: hsl(var(--muted-foreground));
-  margin-top: 0.25rem;
-}
-
-.empty-state-icon--green {
-  background-color: var(--green-soft);
-  box-shadow: 0 0 0 4px var(--green-soft);
-}
-
-.empty-state-icon--green :deep(svg) {
-  color: var(--green);
-}
-
-.empty-state-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
 .checklist-grid {
   display: flex;
   flex-direction: column;
@@ -483,11 +395,6 @@ h1 {
 }
 
 @media (max-width: 760px) {
-  .page-header-inner {
-    width: 100%;
-    padding: 0 0.75rem;
-  }
-
   .page-content {
     padding: 0 0.75rem 0.75rem;
     gap: 0.75rem;
@@ -523,15 +430,6 @@ h1 {
 
   .filter-button {
     flex: 0 0 auto;
-  }
-
-  .empty-state-actions {
-    width: 100%;
-    flex-direction: column;
-  }
-
-  .empty-state-actions > * {
-    width: 100%;
   }
 
   .section-divider span {

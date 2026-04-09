@@ -243,6 +243,7 @@ class AuthService(
         membershipId = id,
         organizationId = organization.id,
         organizationName = organization.name,
+        orgNumber = organization.orgNumber,
         role = role.name,
     )
 }
