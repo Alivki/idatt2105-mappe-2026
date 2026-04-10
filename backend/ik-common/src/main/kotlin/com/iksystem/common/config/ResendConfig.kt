@@ -8,5 +8,6 @@ import org.springframework.context.annotation.Configuration
 class ResendConfig {
     lateinit var apiKey: String
     lateinit var fromEmail: String
+    lateinit var baseUrl: String
     var devMode: Boolean = false
 }

@@ -36,4 +36,5 @@ aws:
 resend:
   api-key: ${RESEND_API_KEY}
   from-email: fullstack-v2026 <noreply@email.iverl.com>
+  base-url: ${APP_BASE_URL:http://localhost:80}
   dev-mode: ${RESEND_DEV_MODE:false}

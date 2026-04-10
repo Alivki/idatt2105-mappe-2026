@@ -22,6 +22,8 @@ class ResendServiceTest {
         templateBuilder = mock(EmailTemplateBuilder::class.java)
         props = mock(ResendConfig::class.java)
 
+        `when`(props.baseUrl).thenReturn("http://localhost:80")
+
         service = ResendService(
             resendClient = resendClient,
             tempBuilder = templateBuilder,
@@ -62,7 +64,7 @@ class ResendServiceTest {
                 "Verify your account",
                 "Click below to verify your account.",
                 "Verify Account",
-                "test/verify?token=abc123"
+                "http://localhost:80/verify?token=abc123"
             )
         ).thenReturn(html)
 
@@ -72,7 +74,7 @@ class ResendServiceTest {
             "Verify your account",
             "Click below to verify your account.",
             "Verify Account",
-            "test/verify?token=abc123"
+            "http://localhost:80/verify?token=abc123"
         )
         verify(resendClient).sendEmail(
             "user@example.com",
@@ -90,7 +92,7 @@ class ResendServiceTest {
                 "Important update",
                 "Please check the app",
                 "View in App",
-                "https://your-app-url.com"
+                "http://localhost:80"
             )
         ).thenReturn(html)
 
@@ -104,7 +106,7 @@ class ResendServiceTest {
             "Important update",
             "Please check the app",
             "View in App",
-            "https://your-app-url.com"
+            "http://localhost:80"
         )
         verify(resendClient).sendEmail(
             "notify@example.com",
