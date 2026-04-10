@@ -29,7 +29,7 @@ class ResendService(
      * Sends an email with a verification link.
      */
     fun sendVerificationEmail(email: String, token: String) {
-        val url = "test/verify?token=$token"
+        val url = "${props.baseUrl}/verify?token=$token"
 
         val html = tempBuilder.actionEmail(
             title = "Verify your account",
@@ -49,7 +49,7 @@ class ResendService(
             title = title,
             description = message,
             buttonText = "View in App",
-            buttonUrl = "https://your-app-url.com"
+            buttonUrl = props.baseUrl
         )
         resendClient.sendEmail(email, title, html)
     }
@@ -58,7 +58,7 @@ class ResendService(
      * Sends an invitation email to join an organization.
      */
     fun sendInviteEmail(email: String, orgName: String, token: String) {
-        val inviteUrl = "http://localhost:80/invite?token=$token"
+        val inviteUrl = "${props.baseUrl}/invite?token=$token"
 
         val html = tempBuilder.actionEmail(
             title = "Du er invitert til $orgName",
