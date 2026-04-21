@@ -19,4 +19,4 @@ ARG SERVICE_MODULE
 WORKDIR /app
 COPY --from=build /app/${SERVICE_MODULE}/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xmx192m", "-Xss256k", "-XX:+UseSerialGC", "-XX:TieredStopAtLevel=1", "-jar", "app.jar"]
